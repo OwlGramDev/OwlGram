@@ -27,12 +27,15 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Spannable;
 import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.DynamicDrawableSpan;
 import android.text.style.ImageSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import it.owlgram.android.OwlConfig;
 
 public class Emoji {
 
@@ -225,6 +228,7 @@ public class Emoji {
         private boolean fullSize = false;
         private static Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
         private static Rect rect = new Rect();
+        private static TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
 
         public EmojiDrawable(DrawableInfo i) {
             info = i;
@@ -251,17 +255,24 @@ public class Emoji {
                 canvas.drawText(EmojiData.data[info.page][info.emojiIndex], getBounds().left, getBounds().bottom, textPaint);
                 return;
             }*/
-            if (!isLoaded()) {
-                loadEmoji(info.page, info.page2);
-                canvas.drawRect(getBounds(), placeholderPaint);
-                return;
-            }
-
             Rect b;
             if (fullSize) {
                 b = getDrawRect();
             } else {
                 b = getBounds();
+            }
+
+            if (OwlConfig.useSystemEmoji) {
+                String emoji = fixEmoji(EmojiData.data[info.page][info.emojiIndex]);
+                textPaint.setTextSize(b.height() * 0.8f);
+                canvas.drawText(emoji,  0, emoji.length(), b.left, b.bottom - b.height() * 0.225f, textPaint);
+                return;
+            }
+
+            if (!isLoaded()) {
+                loadEmoji(info.page, info.page2);
+                canvas.drawRect(getBounds(), placeholderPaint);
+                return;
             }
 
             if (!canvas.quickReject(b.left, b.top, b.right, b.bottom, Canvas.EdgeType.AA)) {

@@ -39,6 +39,7 @@ import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Layout;
 import android.text.Spannable;
@@ -50,6 +51,7 @@ import android.text.TextUtils;
 import android.text.style.CharacterStyle;
 import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
+import android.util.Log;
 import android.util.Property;
 import android.util.SparseArray;
 import android.util.StateSet;
@@ -57,6 +59,7 @@ import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewStructure;
 import android.view.accessibility.AccessibilityEvent;
@@ -98,6 +101,8 @@ import org.telegram.messenger.video.VideoPlayerRewinder;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.AnimatedFileDrawable;
@@ -106,6 +111,7 @@ import org.telegram.ui.Components.AnimationProperties;
 import org.telegram.ui.Components.AudioVisualizerDrawable;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.BackgroundGradientDrawable;
+import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.CheckBoxBase;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.EmptyStubSpan;
@@ -828,16 +834,18 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     VideoForwardDrawable videoForwardDrawable;
     VideoPlayerRewinder videoPlayerRewinder;
 
+    BaseFragment baseFragment;
+
     private final Theme.ResourcesProvider resourcesProvider;
 
-    public ChatMessageCell(Context context) {
-        this(context, null);
+    public ChatMessageCell(BaseFragment baseFragment, Context context) {
+        this(baseFragment, context, null);
     }
 
-    public ChatMessageCell(Context context, Theme.ResourcesProvider resourcesProvider) {
+    public ChatMessageCell(BaseFragment baseFragment, Context context, Theme.ResourcesProvider resourcesProvider) {
         super(context);
         this.resourcesProvider = resourcesProvider;
-
+        this.baseFragment = baseFragment;
         backgroundDrawable = new MessageBackgroundDrawable(this);
         avatarImage = new ImageReceiver();
         avatarImage.setRoundRadius(AndroidUtilities.dp(21));
@@ -2007,6 +2015,46 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         int y = (int) event.getY();
 
         boolean result = false;
+
+        final Handler handler = new Handler();
+        Runnable longPressed = () -> {
+            if(pressedBotButton != -1) {
+                BotButton botButton = botButtons.get(pressedBotButton);
+                if(TextUtils.isEmpty(botButton.button.url)){
+                    if(this.baseFragment != null) {
+                        if(botButton.button.query == null){
+                            AndroidUtilities.addToClipboard(new String(botButton.button.data));
+                        }else{
+                            AndroidUtilities.addToClipboard(botButton.button.query);
+                        }
+                        BulletinFactory.of(this.baseFragment).createCopyBulletin(LocaleController.getString("OwlgramCallbackCopied", R.string.OwlgramCallbackCopied)).show();
+                    }
+                }else{
+                    BottomSheet.Builder builder = new BottomSheet.Builder(getContext());
+                    final String urlFinal = botButton.button.url;
+                    builder.setTitle(urlFinal);
+                    builder.setItems(new CharSequence[]{LocaleController.getString("Open", R.string.Open), LocaleController.getString("Copy", R.string.Copy)}, (dialog, which) -> {
+                        if (which == 0) {
+                            Browser.openUrl(getContext(), urlFinal);
+                        } else if (which == 1) {
+                            String url = urlFinal;
+                            if (url.startsWith("mailto:")) {
+                                url = url.substring(7);
+                            } else if (url.startsWith("tel:")) {
+                                url = url.substring(4);
+                            }
+                            AndroidUtilities.addToClipboard(url);
+                        }
+                    });
+                    BottomSheet sheet = builder.create();
+                    sheet.setCanceledOnTouchOutside(true);
+                    sheet.show();
+                }
+                pressedBotButton = -1;
+                invalidate();
+            }
+        };
+
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             int addX;
             if (currentMessageObject.isOutOwner()) {
@@ -2021,6 +2069,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     pressedBotButton = a;
                     invalidate();
                     result = true;
+                    handler.postDelayed(longPressed, ViewConfiguration.getLongPressTimeout());
                     break;
                 }
             }
@@ -2142,7 +2191,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             resetPressedLink(-1);
         }
         updateRadialProgressBackground();
-        if (!disallowLongPress && result && event.getAction() == MotionEvent.ACTION_DOWN) {
+        if (!disallowLongPress && pressedBotButton == -1 && result && event.getAction() == MotionEvent.ACTION_DOWN) {
             startCheckLongPress();
         }
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="OwlgramChat">채팅</string>
+    <string name="OwlgramSettings">OwlGram 설정</string>
+    <string name="OwlgramUpdates">업데이트</string>
+    <string name="OwlgramOfficialChannel">공식 채널</string>
+    <string name="OwlgramUsername">OwlGram</string>
+    <string name="OwlgramSourceCode">소스 코드</string>
+    <string name="OwlgramTranslation">번역 OwlGram</string>
+    <string name="OwlgramTranslationDesc">OwlGram을 귀하의 언어로 번역하는 데 도움을 주세요</string>
+    <string name="OwlgramHidePhone">내 번호 숨기기</string>
+    <string name="OwlgramHidePhoneContacts">내 연락처 번호 숨기기</string>
+    <string name="OwlgramHideStatusBar">투명한 상태 표시줄</string>
+    <string name="OwlgramMessageTime">초 단위 시간</string>
+    <string name="OwlgramRoundedNumbers">반올림된 숫자</string>
+    <string name="OwlgramTranslationProvider">번역 제공자</string>
+    <string name="OwlgramDestinationLanguage">대상 언어</string>
+    <string name="OwlgramConfirmCall">통화 전 확인</string>
+
+    <string name="OwlgramVersion">Android용 Owlgram %1$s</string>
+</resources>

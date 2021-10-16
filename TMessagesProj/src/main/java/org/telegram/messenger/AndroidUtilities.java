@@ -153,6 +153,8 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import it.owlgram.android.OwlConfig;
+
 public class AndroidUtilities {
 
     private static final Hashtable<String, Typeface> typefaceCache = new Hashtable<>();
@@ -1314,6 +1316,23 @@ public class AndroidUtilities {
 
     public static Typeface getTypeface(String assetPath) {
         synchronized (typefaceCache) {
+            if (OwlConfig.useSystemFont && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (assetPath.contains("medium") && assetPath.contains("italic")) {
+                    return Typeface.create("sans-serif-medium", Typeface.ITALIC);
+                }
+                if (assetPath.contains("medium")) {
+                    return Typeface.create("sans-serif-medium", Typeface.NORMAL);
+                }
+                if (assetPath.contains("italic")) {
+                    return Typeface.create((Typeface) null, Typeface.ITALIC);
+                }
+                if (assetPath.contains("mono")) {
+                    return Typeface.MONOSPACE;
+                }
+                if (assetPath.contains("mw_bold")) {
+                    return Typeface.create("serif", Typeface.BOLD);
+                }
+            }
             if (!typefaceCache.containsKey(assetPath)) {
                 try {
                     Typeface t;
@@ -3757,6 +3776,41 @@ public class AndroidUtilities {
             return preferences.getLong(key, defaultValue);
         } catch (Exception e) {
             return preferences.getInt(key, (int) defaultValue);
+        }
+    }
+    public static int getTransparentColor(int color, float opacity){
+        int alpha = Color.alpha(color);
+        int red = Color.red(color);
+        int green = Color.green(color);
+        int blue = Color.blue(color);
+
+        // Set alpha based on your logic, here I'm making it 25% of it's initial value.
+        alpha *= opacity;
+
+        return Color.argb(alpha, red, green, blue);
+    }
+
+    public static String capitalize(String name){
+        String capitalizeString = "";
+        if(!name.trim().equals("")){
+            capitalizeString = name.substring(0,1).toUpperCase() + name.substring(1);
+        }
+        return capitalizeString;
+    }
+
+    public static void selectionSort(ArrayList<CharSequence> x, ArrayList<String> y) {
+        for (int i = 0; i < x.size() - 1; i++) {
+            for (int j = i + 1; j < x.size(); j++) {
+                if (x.get(i).toString().compareTo(x.get(j).toString()) > 0) {
+                    CharSequence temp = x.get(i);
+                    x.set(i, x.get(j));
+                    x.set(j, temp);
+
+                    String tempStr = y.get(i);
+                    y.set(i, y.get(j));
+                    y.set(j, tempStr);
+                }
+            }
         }
     }
 }

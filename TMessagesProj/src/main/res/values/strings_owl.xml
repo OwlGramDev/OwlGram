@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="OwlgramChat">Chat</string>
+    <string name="OwlgramSettings">OwlGram Settings</string>
+    <string name="OwlgramUpdates">Updates</string>
+    <string name="OwlgramOfficialChannel">Official Channel</string>
+    <string name="OwlgramUsername">OwlGram</string>
+    <string name="OwlgramSourceCode">Source Code</string>
+    <string name="OwlgramTranslation">Translate OwlGram</string>
+    <string name="OwlgramTranslationDesc">Help us translate OwlGram into your language</string>
+    <string name="OwlgramHidePhone">Hide my number</string>
+    <string name="OwlgramHidePhoneContacts">Hide my contacts number</string>
+    <string name="OwlgramHideStatusBar">Transparent status bar</string>
+    <string name="OwlgramMessageTime">Seconds in the time</string>
+    <string name="OwlgramRoundedNumbers">Rounded numbers</string>
+    <string name="OwlgramTranslationProvider">Translation provider</string>
+
+    <string name="OwlgramDestinationLanguage">Destination language</string>
+    <string name="OwlgramConfirmCall">Confirm before calling</string>
+    <string name="OwlgramUseSystemFont">Use System Font</string>
+    <string name="OwlgramUseSystemEmoji">Use System Emoji</string>
+    <string name="OwlgramTranslateApiUnsupported">The translation provider you selected don\'t support your language.</string>
+    <string name="OwlgramTranslationProviderShort">Provider</string>
+    <string name="OwlgramTranslateFailed">Translate server error</string>
+    <string name="OwlgramProviderGoogleTranslate">Google Translate</string>
+    <string name="OwlgramProviderYandex">Yandex Translate</string>
+    <string name="OwlgramProviderDeepLTranslate">DeepL Translate</string>
+    <string name="OwlgramProviderNiuTrans">Niu Trans</string>
+    <string name="OwlgramTranslationTarget">Target language</string>
+    <string name="OwlgramUseGoogleTranslate">Use Google</string>
+    <string name="OwlgramResetLanguage">Reset language</string>
+    <string name="OwlgramDeepLFormality">Formality</string>
+    <string name="OwlgramDeepLFormalityDefault">Default</string>
+    <string name="OwlgramDeepLFormalityMore">More</string>
+    <string name="OwlgramDeepLFormalityLess">Less</string>
+    <string name="OwlgramTranslate">Translate</string>
+    <string name="OwlgramUndoTranslate">Undo translate</string>
+    <string name="OwlgramFormatterDay24HSec">HH:mm:ss</string>
+    <string name="OwlgramFormatterDay12HSec">h:mm:ss a</string>
+    <string name="OwlgramMediaFlipByTap">Flip media by tapping</string>
+    <string name="OwlgramJumpChannel">Jump to the next channel</string>
+    <string name="OwlgramHideKeyboardScrolling">Hide keyboard on chat scroll</string>
+    <string name="OwlgramPlayGifAsVideo">Play GIF as Video</string>
+    <string name="OwlgramSeparatedPhotoAndVideos">Separate cards for photos and videos</string>
+    <string name="OwlgramFolderWhenForward">Show folders when forwarding</string>
+    <string name="OwlgramShowFolderIcons">Show folder icons</string>
+    <string name="OwlgramAudioVideo">Audio/Video Messages</string>
+    <string name="OwlgramCameraStarting">Start with the rear camera</string>
+    <string name="OwlgramSendConfirm">Send Confirm</string>
+    <string name="OwlgramSelectBetween">Select between</string>
+    <string name="OwlgramSignAsRead">Sign as read</string>
+    <string name="OwlgramCreateMention">Create mention</string>
+    <string name="OwlgramVersion">Owlgram for Android %1$s</string>
+    <string name="OwlgramCallbackCopied">Callback copied to clipboard</string>
+</resources>

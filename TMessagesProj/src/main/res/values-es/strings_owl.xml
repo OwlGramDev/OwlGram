@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="OwlgramChat">Chat</string>
+    <string name="OwlgramSettings">Configuración OwlGram</string>
+    <string name="OwlgramUpdates">Actualizaciones</string>
+    <string name="OwlgramOfficialChannel">Canal oficial</string>
+    <string name="OwlgramUsername">OwlGram</string>
+    <string name="OwlgramSourceCode">Código fuente</string>
+    <string name="OwlgramTranslation">Traducir OwlGram</string>
+    <string name="OwlgramTranslationDesc">Ayúdanos a traducir OwlGram a tu idioma</string>
+    <string name="OwlgramHidePhone">Ocultar mi numero</string>
+    <string name="OwlgramHidePhoneContacts"> Ocultar mi número de contactos</string>
+    <string name="OwlgramHideStatusBar"> Barra de estado transparente</string>
+    <string name="OwlgramMessageTime">Segundos en el tiempo</string>
+    <string name="OwlgramRoundedNumbers">Números redondeados</string>
+    <string name="OwlgramTranslationProvider">Proveedor de traducción</string>
+    <string name="OwlgramDestinationLanguage">Idioma de destino</string>
+    <string name="OwlgramConfirmCall">Confirmar antes de llamar</string>
+
+    <string name="OwlgramVersion">Owlgram para Android %1$s</string>
+</resources>

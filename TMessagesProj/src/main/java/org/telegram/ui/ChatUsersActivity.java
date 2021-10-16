@@ -44,6 +44,8 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.FileLog;
@@ -506,7 +508,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                 slowmodeSelectRow = rowCount++;
                 slowmodeInfoRow = rowCount++;
             }
-            if (ChatObject.isChannel(currentChat)) {
+            if (ChatObject.isChannel(currentChat) && ChatObject.hasAdminRights(currentChat)) {
                 if (participantsDivider2Row == -1) {
                     participantsDivider2Row = rowCount++;
                 }
@@ -520,10 +522,8 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
             }
 
             if (loadingUsers && !firstLoaded) {
-                if (!firstLoaded) {
-                    if (info != null && info.banned_count > 0) {
-                        loadingUserCellRow = rowCount++;
-                    }
+                if (info != null && info.banned_count > 0) {
+                    loadingUserCellRow = rowCount++;
                 }
             } else {
                 if (!participants.isEmpty()) {
@@ -559,15 +559,15 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                     //restricted1SectionRow = rowCount++;
                     blockedEmptyRow = rowCount++;
                 }
-            } else if (!firstLoaded) {
+            } else {
                 restricted1SectionRow = rowCount++;
                 loadingUserCellRow = rowCount++;
             }
         } else if (type == TYPE_ADMIN) {
-            if (ChatObject.isChannel(currentChat) && currentChat.megagroup && !currentChat.gigagroup && (info == null || info.participants_count <= 200)) {
+            /*if (ChatObject.isChannel(currentChat) && currentChat.megagroup && !currentChat.gigagroup && (info == null || info.participants_count <= 200) && ChatObject.hasAdminRights(currentChat)) {
                 recentActionsRow = rowCount++;
                 addNewSectionRow = rowCount++;
-            }
+            }*/
 
             if (ChatObject.canAddAdmins(currentChat)) {
                 addNewRow = rowCount++;
@@ -579,7 +579,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                     participantsEndRow = rowCount;
                 }
                 participantsInfoRow = rowCount++;
-            } else if (!firstLoaded) {
+            } else {
                 loadingUserCellRow = rowCount++;
             }
         } else if (type == TYPE_USERS) {
@@ -1381,7 +1381,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
     public void setIgnoresUsers(LongSparseArray<TLRPC.TL_groupCallParticipant> participants) {
         ignoredUsers = participants;
     }
-    
+
     private void onOwnerChaged(TLRPC.User user) {
         undoView.showWithAction(-chatId, isChannel ? UndoView.ACTION_OWNER_TRANSFERED_CHANNEL : UndoView.ACTION_OWNER_TRANSFERED_GROUP, user);
         boolean foundAny = false;
@@ -1977,7 +1977,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
     public void setDelegate(ChatUsersActivityDelegate chatUsersActivityDelegate) {
         delegate = chatUsersActivityDelegate;
     }
-    
+
     private int getCurrentSlowmode() {
         if (info != null) {
             if (info.slowmode_seconds == 10) {
@@ -3107,10 +3107,10 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                     boolean showJoined = false;
                     if (position >= participantsStartRow && position < participantsEndRow) {
                         lastRow = participantsEndRow;
-                        showJoined = ChatObject.isChannel(currentChat) && !currentChat.megagroup;
+                        showJoined = ChatObject.isChannel(currentChat);
                     } else if (position >= contactsStartRow && position < contactsEndRow) {
                         lastRow = contactsEndRow;
-                        showJoined = ChatObject.isChannel(currentChat) && !currentChat.megagroup;
+                        showJoined = ChatObject.isChannel(currentChat);
                     } else {
                         lastRow = botEndRow;
                     }

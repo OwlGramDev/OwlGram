@@ -961,7 +961,7 @@ public class ForwardingPreviewView extends FrameLayout {
         @NonNull
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            ChatMessageCell chatMessageCell = new ChatMessageCell(parent.getContext(), resourcesProvider);
+            ChatMessageCell chatMessageCell = new ChatMessageCell(null, parent.getContext(), resourcesProvider);
             return new RecyclerListView.Holder(chatMessageCell);
         }
 

@@ -141,6 +141,10 @@ public class MessageObject {
     public boolean scheduled;
     public boolean preview;
 
+    public boolean translated;
+    public Object originalMessage;
+    public ArrayList<TLRPC.MessageEntity> originalEntities;
+
     public ArrayList<TLRPC.TL_pollAnswer> checkedVotes;
 
     public CharSequence editingMessage;

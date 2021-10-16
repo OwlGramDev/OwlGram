@@ -41,7 +41,6 @@ public class DividerCell extends View {
         } else {
             paint.setColor(Theme.getColor(Theme.key_divider));
         }
-
         canvas.drawLine(getPaddingLeft(), getPaddingTop(), getWidth() - getPaddingRight(), getPaddingTop(), paint);
     }
 
