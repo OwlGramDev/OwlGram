@@ -18615,6 +18615,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 addContactItem.setVisibility(View.GONE);
             }
         }
+
         if (userBlocked || addToContactsButton.getVisibility() == View.GONE && reportSpamButton.getVisibility() == View.GONE) {
             show = false;
         }

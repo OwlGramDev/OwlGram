@@ -143,9 +143,29 @@ ConnectionsManager& ConnectionsManager::getInstance(int32_t instanceNum) {
             static ConnectionsManager instance1(1);
             return instance1;
         case 2:
-        default:
             static ConnectionsManager instance2(2);
             return instance2;
+        case 3:
+            static ConnectionsManager instance3(3);
+            return instance3;
+        case 4:
+            static ConnectionsManager instance4(4);
+            return instance4;
+        case 5:
+            static ConnectionsManager instance5(5);
+            return instance5;
+        case 6:
+            static ConnectionsManager instance6(6);
+            return instance6;
+        case 7:
+            static ConnectionsManager instance7(7);
+            return instance7;
+        case 8:
+            static ConnectionsManager instance8(8);
+            return instance8;
+        case 9:
+            static ConnectionsManager instance9(9);
+            return instance9;
     }
 }
 

@@ -52,4 +52,12 @@
     <string name="OwlgramCreateMention">Create mention</string>
     <string name="OwlgramVersion">Owlgram for Android %1$s</string>
     <string name="OwlgramCallbackCopied">Callback copied to clipboard</string>
+    <string name="OwlgramAutoLockInstant">Instant</string>
+    <string name="OwlgramMkwRowPlayer">Show MKV as Video</string>
+    <string name="OwlgramAllVideoPlay">Stream All Videos</string>
+    <string name="OwlgramUserRestrictionsSendStickers">Send Stickers</string>
+    <string name="OwlgramUserRestrictionsSendGifs">Send GIFs</string>
+    <string name="OwlgramUserRestrictionsSendGames">Send Games</string>
+    <string name="OwlgramUserRestrictionsUseInlineBot">Use inline bot</string>
+    <string name="OwlgramRestrictionReason">Restriction reason</string>
 </resources>

@@ -58,7 +58,7 @@ public class OwlConfig {
             gifAsVideo = preferences.getBoolean("gifAsVideo", true);
             separatedPhotoAndVideo = preferences.getBoolean("separatedPhotoAndVideo", false);
             showFolderWhenForward = preferences.getBoolean("showFolderWhenForward", false);
-            showFolderIcons = preferences.getBoolean("showFolderWhenForward", false);
+            showFolderIcons = preferences.getBoolean("showFolderWhenForward", true);
             useRearCamera = preferences.getBoolean("useRearCamera", false);
             sendConfirm = preferences.getBoolean("sendConfirm", false);
             useSystemFont = preferences.getBoolean("useSystemFont", false);
