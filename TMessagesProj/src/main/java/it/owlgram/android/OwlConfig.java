@@ -29,6 +29,10 @@ public class OwlConfig {
     public static boolean sendConfirm;
     public static boolean useSystemFont;
     public static boolean useSystemEmoji;
+    public static boolean showGreetings;
+    public static boolean showTranslate;
+    public static boolean showSaveMessage;
+    public static boolean showMessageDetails;
     public static String translationTarget = "app";
     public static int deepLFormality = DeepLTranslator.FORMALITY_DEFAULT;
     public static int translationProvider = Translator.PROVIDER_GOOGLE;
@@ -63,6 +67,10 @@ public class OwlConfig {
             sendConfirm = preferences.getBoolean("sendConfirm", false);
             useSystemFont = preferences.getBoolean("useSystemFont", false);
             useSystemEmoji = preferences.getBoolean("useSystemEmoji", false);
+            showGreetings = preferences.getBoolean("showGreetings", true);
+            showTranslate = preferences.getBoolean("showTranslate", true);
+            showSaveMessage = preferences.getBoolean("showSaveMessage", true);
+            showMessageDetails = preferences.getBoolean("showSaveMessage", false);
             translationTarget = preferences.getString("translationTarget", "app");
             translationProvider = preferences.getInt("translationProvider", isChineseUser ? Translator.PROVIDER_NIU : Translator.PROVIDER_GOOGLE);
             configLoaded = true;
@@ -178,6 +186,38 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("useSystemEmoji", useSystemEmoji);
+        editor.commit();
+    }
+
+    public static void toggleShowGreetings() {
+        showGreetings = !showGreetings;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showGreetings", showGreetings);
+        editor.commit();
+    }
+
+    public static void toggleShowTranslate() {
+        showTranslate = !showTranslate;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showTranslate", showTranslate);
+        editor.commit();
+    }
+
+    public static void toggleShowSaveMessage() {
+        showSaveMessage = !showSaveMessage;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showSaveMessage", showSaveMessage);
+        editor.commit();
+    }
+
+    public static void toggleShowMessageDetails() {
+        showMessageDetails = !showMessageDetails;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showMessageDetails", showMessageDetails);
         editor.commit();
     }
 

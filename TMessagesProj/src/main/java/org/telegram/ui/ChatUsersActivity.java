@@ -229,6 +229,8 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
         private ArrayList<String> strings = new ArrayList<>();
         private ArrayList<Integer> sizes = new ArrayList<>();
 
+        public boolean isAdmin = true;
+
         public ChooseView(Context context) {
             super(context);
 
@@ -293,6 +295,11 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
             };
         }
 
+        public void setAdmin(boolean state) {
+            isAdmin = state;
+            invalidate();
+        }
+
         @Override
         public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
             super.onInitializeAccessibilityNodeInfo(info);
@@ -307,6 +314,9 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             float x = event.getX();
+            if(!isAdmin){
+                return true;
+            }
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 getParent().requestDisallowInterceptTouchEvent(true);
                 for (int a = 0; a < strings.size(); a++) {
@@ -383,11 +393,16 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
 
             for (int a = 0; a < strings.size(); a++) {
                 int cx = sideSide + (lineSize + gapSize * 2 + circleSize) * a + circleSize / 2;
-                if (a <= selectedSlowmode) {
-                    paint.setColor(Theme.getColor(Theme.key_switchTrackChecked));
+                if (isAdmin) {
+                    if (a <= selectedSlowmode) {
+                        paint.setColor(Theme.getColor(Theme.key_switchTrackChecked));
+                    } else {
+                        paint.setColor(Theme.getColor(Theme.key_switchTrack));
+                    }
                 } else {
-                    paint.setColor(Theme.getColor(Theme.key_switchTrack));
+                    paint.setColor(AndroidUtilities.getTransparentColor(Theme.getColor(Theme.key_switchTrackChecked), 0.5f));
                 }
+
                 canvas.drawCircle(cx, cy, a == selectedSlowmode ? AndroidUtilities.dp(6) : circleSize / 2, paint);
                 if (a != 0) {
                     int x = cx - circleSize / 2 - gapSize - lineSize;
@@ -509,7 +524,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                 }
             }
 
-            if (!ChatObject.isChannel(currentChat) && currentChat.creator || currentChat.megagroup && !currentChat.gigagroup && ChatObject.canBlockUsers(currentChat)) {
+            if (!ChatObject.isChannel(currentChat) && currentChat.creator || currentChat.megagroup && !currentChat.gigagroup) {
                 if (participantsDivider2Row == -1) {
                     participantsDivider2Row = rowCount++;
                 }
@@ -3009,13 +3024,11 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                 Object object = cell.getCurrentObject();
                 if (type != TYPE_ADMIN && object instanceof TLRPC.User) {
                     TLRPC.User user = (TLRPC.User) object;
-                    if (user.self) {
-                        return false;
-                    }
+                    return !user.self;
                 }
                 return true;
             }
-            return viewType == 0 || viewType == 2 || viewType == 6;
+            return viewType == 2 || viewType == 6;
         }
 
         @Override
@@ -3126,6 +3139,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                 default:
                     view = new ChooseView(mContext);
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    ((ChooseView)view).setAdmin(!ChatObject.isChannel(currentChat) && currentChat.creator || currentChat.megagroup && !currentChat.gigagroup && ChatObject.canBlockUsers(currentChat));
                     break;
             }
             return new RecyclerListView.Holder(view);

@@ -258,6 +258,7 @@ import java.util.regex.Pattern;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.helpers.EntitiesHelper;
 import it.owlgram.android.translator.Translator;
+import it.owlgram.android.ui.DetailsActivity;
 
 @SuppressWarnings("unchecked")
 public class ChatActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, LocationActivity.LocationActivityDelegate, ChatAttachAlertDocumentLayout.DocumentSelectActivityDelegate {
@@ -392,6 +393,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private View searchAsListTogglerView;
     private ImageView searchCalendarButton;
     private ImageView searchUserButton;
+    private ImageView searchBeginningButton;
     private ImageView searchUpButton;
     private ImageView searchDownButton;
     private SearchCounterView searchCountText;
@@ -542,6 +544,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private Runnable chatInviteRunnable;
 
     private boolean clearingHistory;
+    private boolean showSearchAsIcon;
 
     public boolean openAnimationEnded;
     private boolean fragmentOpened;
@@ -578,6 +581,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private SparseArray<ArrayList<Integer>> replyMessageOwners = new SparseArray<>();
     private HashMap<String, ArrayList<MessageObject>> messagesByDays = new HashMap<>();
     protected ArrayList<MessageObject> messages = new ArrayList<>();
+    private ArrayList<String> translatingMessage = new ArrayList<>();
     private SparseArray<MessageObject> waitingForReplies = new SparseArray<>();
     private LongSparseArray<ArrayList<MessageObject>> polls = new LongSparseArray<>();
     private LongSparseArray<MessageObject.GroupedMessages> groupedMessagesMap = new LongSparseArray<>();
@@ -732,7 +736,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private int scrollAnimationIndex;
     private int scrollCallbackAnimationIndex;
 
-    private boolean showSearchAsIcon;
     private boolean showAudioCallAsIcon;
     public MessageEnterTransitionContainer messageEnterTransitionContainer;
     private float pullingDownOffset;
@@ -2236,6 +2239,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             avatarContainer.onDestroy();
         }
         avatarContainer = new ChatAvatarContainer(context, this, currentEncryptedChat != null, themeDelegate);
+        avatarContainer.setOnLongClickListener(v -> {
+            openSearchWithText(null);
+            return true;
+        });
         AndroidUtilities.updateViewVisibilityAnimated(avatarContainer, true, 1f, false);
         if (inPreviewMode || inBubbleMode) {
             avatarContainer.setOccupyStatusBar(false);
@@ -3602,7 +3609,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         emptyViewContainer.setOnTouchListener((v, event) -> true);
 
         int distance = getArguments().getInt("nearby_distance", -1);
-        if ((distance >= 0 || preloadedGreetingsSticker != null) && currentUser != null && !userBlocked) {
+        if (OwlConfig.showGreetings && (distance >= 0 || preloadedGreetingsSticker != null) && currentUser != null && !userBlocked) {
             greetingsViewContainer = new ChatGreetingsView(context, currentUser, distance, currentAccount, preloadedGreetingsSticker, themeDelegate);
             greetingsViewContainer.setListener((sticker) -> {
                 animatingDocuments.put(sticker, 0);
@@ -3631,7 +3638,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     emptyMessage = LocaleController.getString("GotAQuestion", R.string.GotAQuestion);
                 } else if (currentUser == null || currentUser.self || currentUser.deleted || userBlocked) {
                     emptyMessage = LocaleController.getString("NoMessages", R.string.NoMessages);
+                } else if (!OwlConfig.showGreetings) {
+                    emptyMessage = LocaleController.getString("NoMessages", R.string.NoMessages);
                 }
+
                 if (emptyMessage == null) {
                     greetingsViewContainer = new ChatGreetingsView(context, currentUser, distance, currentAccount, preloadedGreetingsSticker, themeDelegate);
                     greetingsViewContainer.setListener((sticker) -> {
@@ -5569,6 +5579,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             closePinned.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_chat_topPanelClose), PorterDuff.Mode.MULTIPLY));
             closePinned.setScaleType(ImageView.ScaleType.CENTER);
             closePinned.setContentDescription(LocaleController.getString("Close", R.string.Close));
+            closePinned.setOnLongClickListener(v -> {
+                SharedPreferences preferences = MessagesController.getNotificationsSettings(currentAccount);
+                preferences.edit().putInt("pin_" + dialog_id, pinnedMessageIds.get(0)).commit();
+                updatePinnedMessageView(true);
+                return true;
+            });
 
             pinnedProgress = new RadialProgressView(context, themeDelegate);
             pinnedProgress.setVisibility(View.GONE);
@@ -7456,7 +7472,16 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         });
         final float paddingTop = Theme.chat_composeShadowDrawable.getIntrinsicHeight() / AndroidUtilities.density - 3f;
         searchContainer.addView(searchAsListTogglerView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.NO_GRAVITY, 0, paddingTop, 0, 0));
-
+        searchBeginningButton = new ImageView(context);
+        searchBeginningButton.setScaleType(ImageView.ScaleType.CENTER);
+        searchBeginningButton.setImageResource(R.drawable.round_arrow_upward_white_36);
+        searchBeginningButton.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_chat_searchPanelIcons), PorterDuff.Mode.MULTIPLY));
+        searchBeginningButton.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.getColor(Theme.key_actionBarActionModeDefaultSelector), 1));
+        searchContainer.addView(searchBeginningButton, LayoutHelper.createFrame(48, 48, Gravity.RIGHT | Gravity.TOP, 0, 0, 96, 0));
+        searchBeginningButton.setOnClickListener(view -> {
+            jumpToDate(1375315200);
+        });
+        searchBeginningButton.setContentDescription(LocaleController.getString("OwlgramJumpToBeginning", R.string.OwlgramJumpToBeginning));
         searchUpButton = new ImageView(context);
         searchUpButton.setScaleType(ImageView.ScaleType.CENTER);
         searchUpButton.setImageResource(R.drawable.msg_go_up);
@@ -19864,10 +19889,20 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             items.add(LocaleController.getString("Forward", R.string.Forward));
                             options.add(2);
                             icons.add(R.drawable.msg_forward);
+
                         }
                         if (chatMode != MODE_SCHEDULED) {
                             MessageObject messageObject = getMessageForTranslate();
-                            if (messageObject != null) {
+                            long my_user_id = UserConfig.getInstance(currentAccount).getClientUserId();
+                            long user_id = selectedObject.messageOwner.from_id.user_id;
+                            long chat_id = selectedObject.getChatId();
+                            if (!(chat_id == 0 && user_id == my_user_id) && OwlConfig.showSaveMessage) {
+                                items.add(LocaleController.getString("OwlgramAddToSavedMessages", R.string.OwlgramAddToSavedMessages));
+                                options.add(202);
+                                icons.add(R.drawable.menu_saved);
+                            }
+
+                            if (messageObject != null && OwlConfig.showTranslate) {
                                 items.add(messageObject.translated ? LocaleController.getString("UndoTranslate", R.string.OwlgramUndoTranslate) : LocaleController.getString("Translate", R.string.OwlgramTranslate));
                                 options.add(201);
                                 icons.add(R.drawable.round_translate_white_36);
@@ -19902,6 +19937,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 options.add(23);
                                 icons.add(R.drawable.msg_report);
                             }
+                        }
+                        if (chatMode != MODE_SCHEDULED && OwlConfig.showMessageDetails) {
+                            items.add(LocaleController.getString("OwlgramMessageDetails", R.string.OwlgramMessageDetails));
+                            options.add(203);
+                            icons.add(R.drawable.menu_info);
                         }
                         if (message.canDeleteMessage(chatMode == MODE_SCHEDULED, currentChat) && (threadMessageObjects == null || !threadMessageObjects.contains(message))) {
                             items.add(LocaleController.getString("Delete", R.string.Delete));
@@ -20065,6 +20105,18 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     if (scrimPopupWindow != null) {
                         scrimPopupWindow.dismiss();
                     }
+                });
+                cell.setOnLongClickListener(v1 -> {
+                    if (selectedObject == null || i >= options.size()) {
+                        return false;
+                    }
+                    if (processSelectedOptionLongClick(options.get(i))) {
+                        if (scrimPopupWindow != null) {
+                            scrimPopupWindow.dismiss();
+                        }
+                        return true;
+                    }
+                    return false;
                 });
             }
 
@@ -20644,6 +20696,16 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void translateMessage(MessageObject messageObject) {
+        boolean foundThisMessage = false;
+        String currentID = messageObject.getChatId()+"_"+messageObject.getId();
+        for(int i=0;i<translatingMessage.size();i++){
+            String check = translatingMessage.get(i);
+            if(check.equals(currentID)){
+                foundThisMessage = true;
+                break;
+            }
+        }
+        if(foundThisMessage) return;
         if (messageObject == null) {
             return;
         }
@@ -20656,9 +20718,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
         final MessageObject finalMessageObject = messageObject;
         Object finalOriginal = original;
+        translatingMessage.add(currentID);
         Translator.translate(original, new Translator.TranslateCallBack() {
             @Override
             public void onSuccess(Object translation) {
+                translatingMessage.remove(currentID);
                 if (translation instanceof String) {
                     if(finalMessageObject.originalEntities != null){
                         Object[] result = Translator.getEntities((String) translation, finalMessageObject.originalEntities);
@@ -21275,6 +21339,21 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
                 break;
             }
+            case 202: {
+                ArrayList<MessageObject> messages =  new ArrayList<>();
+                messages.add(selectedObject);
+                long my_user_id = UserConfig.getInstance(currentAccount).getClientUserId();
+                int result_send = getSendMessagesHelper().sendMessage(messages, my_user_id, false, true, false, 0);
+                AlertsCreator.showSendMediaAlert(result_send, this, themeDelegate);
+                if (result_send == 0) {
+                    undoView.showWithAction(my_user_id, UndoView.ACTION_FWD_MESSAGES, messages.size());
+                }
+                break;
+            }
+            case 203: {
+                presentFragment(new DetailsActivity(selectedObject));
+                break;
+            }
             case 100: {
                 if (!checkSlowMode(chatActivityEnterView.getSendButton())) {
                     if (getMediaController().isPlayingMessage(selectedObject)) {
@@ -21325,6 +21404,16 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         selectedObject = null;
         selectedObjectGroup = null;
         selectedObjectToEditCaption = null;
+    }
+
+    private boolean processSelectedOptionLongClick(int option) {
+        switch (option) {
+            case 201: {
+                Translator.showTranslationTargetSelector(getParentActivity(), null, () -> processSelectedOption(88));
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -24893,6 +24982,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         themeDescriptions.add(new ThemeDescription(replyIconImageView, ThemeDescription.FLAG_IMAGECOLOR, null, null, null, null, Theme.key_chat_replyPanelIcons));
         themeDescriptions.add(new ThemeDescription(replyCloseImageView, ThemeDescription.FLAG_IMAGECOLOR, null, null, null, null, Theme.key_chat_replyPanelClose));
         themeDescriptions.add(new ThemeDescription(null, 0, null, null, null, selectedBackgroundDelegate, Theme.key_chat_replyPanelName));
+        themeDescriptions.add(new ThemeDescription(searchBeginningButton, ThemeDescription.FLAG_IMAGECOLOR, null, null, null, null, Theme.key_chat_searchPanelIcons));
+        themeDescriptions.add(new ThemeDescription(searchBeginningButton, ThemeDescription.FLAG_BACKGROUNDFILTER | ThemeDescription.FLAG_DRAWABLESELECTEDSTATE, null, null, null, null, Theme.key_actionBarActionModeDefaultSelector));
 
         themeDescriptions.add(new ThemeDescription(searchUpButton, ThemeDescription.FLAG_IMAGECOLOR, null, null, null, null, Theme.key_chat_searchPanelIcons));
         themeDescriptions.add(new ThemeDescription(searchUpButton, ThemeDescription.FLAG_BACKGROUNDFILTER | ThemeDescription.FLAG_DRAWABLESELECTEDSTATE, null, null, null, null, Theme.key_actionBarActionModeDefaultSelector));

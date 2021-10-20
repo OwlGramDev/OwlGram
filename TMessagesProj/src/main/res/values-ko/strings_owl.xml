@@ -16,6 +16,4 @@
     <string name="OwlgramTranslationProvider">번역 제공자</string>
     <string name="OwlgramDestinationLanguage">대상 언어</string>
     <string name="OwlgramConfirmCall">통화 전 확인</string>
-
-    <string name="OwlgramVersion">Android용 Owlgram %1$s</string>
 </resources>

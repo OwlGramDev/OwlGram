@@ -66,6 +66,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
+import it.owlgram.android.Copyright;
+
 public class MessagesController extends BaseController implements NotificationCenter.NotificationCenterDelegate {
 
     private ConcurrentHashMap<Long, TLRPC.Chat> chats = new ConcurrentHashMap<>(100, 1.0f, 2);
@@ -14319,7 +14321,7 @@ public class MessagesController extends BaseController implements NotificationCe
         }
         for (int a = 0, N = reasons.size(); a < N; a++) {
             TLRPC.TL_restrictionReason reason = reasons.get(a);
-            if ("all".equals(reason.platform) || !BuildVars.isStandaloneApp() && !BuildVars.isBetaApp() && "android".equals(reason.platform)) {
+            if ("all".equals(reason.platform) || !BuildVars.isStandaloneApp() && !BuildVars.isBetaApp() && "android".equals(reason.platform) && !Copyright.isNoCopyrightFeaturesEnabled()) {
                 return reason.text;
             }
         }
@@ -14364,7 +14366,7 @@ public class MessagesController extends BaseController implements NotificationCe
         } else {
             reason = getRestrictionReason(user.restriction_reason);
         }
-        if (reason != null) {
+        if (reason != null && !Copyright.isNoCopyrightFeaturesEnabled()) {
             showCantOpenAlert(fragment, reason);
             return false;
         }

@@ -183,6 +183,7 @@ import java.util.zip.ZipOutputStream;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.settings.OwlgramSettings;
+import it.owlgram.android.translator.Translator;
 
 public class ProfileActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, SharedMediaLayout.SharedMediaPreloaderDelegate, ImageUpdater.ImageUpdaterDelegate {
 
@@ -291,6 +292,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private boolean isInLandscapeMode;
     private boolean allowPullingDown;
     private boolean isPulledDown;
+    private boolean translatingBio;
 
     private Paint whitePaint = new Paint();
 
@@ -300,6 +302,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private TLRPC.UserFull userInfo;
 
     private String currentBio;
+    private String originalBio;
 
     private long selectedUser;
     private int onlineCount = -1;
@@ -2528,7 +2531,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             } else if (position == owlSettingsRow) {
                 presentFragment(new OwlgramSettings());
             } else {
-                processOnClickOrPress(position);
+                processOnClickOrPress(view, position);
             }
         });
 
@@ -2652,7 +2655,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                     return onMemberClick(participant, true);
                 } else {
-                    return processOnClickOrPress(position);
+                    return processOnClickOrPress(view, position);
                 }
             }
         });
@@ -3486,7 +3489,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         presentFragment(fragment);
     }
 
-    private boolean processOnClickOrPress(final int position) {
+    private boolean processOnClickOrPress(final View cellView, final int position) {
         if (position == usernameRow || position == setUsernameRow) {
             final String username;
             if (userId != 0) {
@@ -3607,11 +3610,14 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (position == bioRow && (userInfo == null || TextUtils.isEmpty(userInfo.about))) {
                 return false;
             }
+            AboutLinkCell aboutLinkCell = (AboutLinkCell)cellView;
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-            builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy)}, (dialogInterface, i) -> {
+            builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy), (originalBio != null ? LocaleController.getString("OwlgramUndoTranslate",R.string.OwlgramUndoTranslate):LocaleController.getString("OwlgramTranslate",R.string.OwlgramTranslate))}, (dialogInterface, i) -> {
                 try {
                     String about;
-                    if (position == locationRow) {
+                    if(originalBio != null){
+                        about = originalBio;
+                    }else if (position == locationRow) {
                         about = chatInfo != null && chatInfo.location instanceof TLRPC.TL_channelLocation ? ((TLRPC.TL_channelLocation) chatInfo.location).address : null;
                     } else if (position == channelInfoRow) {
                         about = chatInfo != null ? chatInfo.about : null;
@@ -3621,11 +3627,21 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     if (TextUtils.isEmpty(about)) {
                         return;
                     }
-                    AndroidUtilities.addToClipboard(about);
-                    if (position == bioRow) {
-                        BulletinFactory.of(this).createCopyBulletin(LocaleController.getString("BioCopied", R.string.BioCopied)).show();
-                    } else {
-                        BulletinFactory.of(this).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
+                    if(i == 0){
+                        AndroidUtilities.addToClipboard(about);
+                        if (position == bioRow) {
+                            BulletinFactory.of(this).createCopyBulletin(LocaleController.getString("BioCopied", R.string.BioCopied)).show();
+                        } else {
+                            BulletinFactory.of(this).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
+                        }
+                    }else if(i == 1){
+                        if(originalBio != null){
+                            aboutLinkCell.setTextAndValue(originalBio, LocaleController.getString("UserBio", R.string.UserBio), false);
+                            currentBio = originalBio;
+                            originalBio = null;
+                        } else {
+                            translateBio(about, aboutLinkCell);
+                        }
                     }
                 } catch (Exception e) {
                     FileLog.e(e);
@@ -3666,6 +3682,25 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             getNotificationCenter().postNotificationName(NotificationCenter.closeChats);
             finishFragment();
             getNotificationCenter().postNotificationName(NotificationCenter.needDeleteDialog, -currentChat.id, null, currentChat, param);
+        });
+    }
+
+    private void translateBio(String bio, AboutLinkCell aboutLinkCell){
+        if(translatingBio) return;
+        translatingBio = true;
+        Translator.translate(bio, new Translator.TranslateCallBack() {
+            @Override
+            public void onSuccess(Object translation) {
+                translatingBio = false;
+                currentBio = (String)translation;
+                originalBio = bio;
+                aboutLinkCell.setTextAndValue(currentBio, LocaleController.getString("UserBio", R.string.UserBio), false);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Translator.handleTranslationError(getParentActivity(), e, () -> translateBio(bio, aboutLinkCell), null);
+            }
         });
     }
 
@@ -5342,9 +5377,6 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             sharedMediaLayout.setChatUsers(null, null);
                         }
                     } else {
-                        if (addButton) {
-                            membersSectionRow = rowCount++;
-                        }
                         if (sharedMediaLayout != null) {
                             if (!sortedUsers.isEmpty()) {
                                 usersForceShowingIn = 2;
@@ -5381,9 +5413,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             sharedMediaLayout.setChatUsers(null, null);
                         }
                     } else {
-                        if (addButton) {
-                            membersSectionRow = rowCount++;
-                        }
+
                         if (sharedMediaLayout != null) {
                             sharedMediaLayout.setChatUsers(sortedUsers, chatInfo);
                         }
@@ -6458,7 +6488,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     cell.getTextView().setMovementMethod(null);
                     try {
                         PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
-                        int code = pInfo.versionCode / 10;
+                        //int code = pInfo.versionCode / 10;
                         String abi = "";
                         switch (pInfo.versionCode % 10) {
                             case 1:
@@ -6486,7 +6516,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                 }
                                 break;
                         }
-                        cell.setText(LocaleController.formatString("OwlgramVersion", R.string.OwlgramVersion, String.format(Locale.US, "v%s (%d) %s", pInfo.versionName, code, abi)));
+                        cell.setText(LocaleController.formatString("OwlgramVersion", R.string.OwlgramVersion, String.format(Locale.US, "v%s [%s] %s", pInfo.versionName, BuildVars.TELEGRAM_VERSION_STRING, abi)));
                     } catch (Exception e) {
                         FileLog.e(e);
                     }
@@ -6772,7 +6802,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 case 3:
                     AboutLinkCell aboutLinkCell = (AboutLinkCell) holder.itemView;
                     if (position == userInfoRow) {
-                        aboutLinkCell.setTextAndValue(userInfo.about, LocaleController.getString("UserBio", R.string.UserBio), true);
+                        String about = userInfo.about;
+                        if(originalBio != null){
+                            about = currentBio;
+                        }
+                        aboutLinkCell.setTextAndValue(about, LocaleController.getString("UserBio", R.string.UserBio), true);
                     } else if (position == channelInfoRow) {
                         String text = chatInfo.about;
                         while (text.contains("\n\n\n")) {
@@ -6783,6 +6817,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         String value;
                         if (userInfo == null || !TextUtils.isEmpty(userInfo.about)) {
                             value = userInfo == null ? LocaleController.getString("Loading", R.string.Loading) : userInfo.about;
+                            if(originalBio != null){
+                                value = currentBio;
+                            }
                             aboutLinkCell.setTextAndValue(value, LocaleController.getString("UserBio", R.string.UserBio), false);
                             currentBio = userInfo != null ? userInfo.about : null;
                         } else {
@@ -7142,7 +7179,6 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
         }else if(chatId != 0 && currentChat != null){
             ac.setLoaded();
-            boolean isChannel = ChatObject.isChannel(currentChat);
             boolean hasAdminRights = ChatObject.hasAdminRights(currentChat);
             if(!addButton){
                 ac.hideAdd();
@@ -7159,7 +7195,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if(chatInfo != null && chatInfo.linked_chat_id == 0 || hasVoiceChatItem && addButton){
                 ac.hideChannel();
             }
-            if ((currentChat.creator || currentChat.left || currentChat.kicked) && !isChannel){
+            if (currentChat.creator || currentChat.left || currentChat.kicked){
                 ac.hideLeave();
             }
             if(!currentChat.megagroup){

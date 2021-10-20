@@ -33,6 +33,7 @@ public class OwlgramChatSettings extends BaseFragment {
     private int chatHeaderRow;
     private int mediaSwipeByTapRow;
     private int jumpChannelRow;
+    private int showGreetings;
     private int hideKeyboardRow;
     private int playGifAsVideoRow;
     private int separatedPhotoAndVideoRow;
@@ -41,6 +42,11 @@ public class OwlgramChatSettings extends BaseFragment {
     private int showFolderWhenForwardRow;
     private int showFolderIconsRow;
     private int foldersDividerRow;
+    private int messageMenuHeaderRow;
+    private int showTranslateRow;
+    private int showAddToSMRow;
+    private int showMessageDetails;
+    private int messageMenuDividerRow;
     private int audioVideoHeaderRow;
     private int rearCameraStartingRow;
     private int confirmSendRow;
@@ -88,10 +94,15 @@ public class OwlgramChatSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.mediaFlipByTap);
                 }
-            } else if (position == jumpChannelRow){
+            } else if (position == jumpChannelRow) {
                 OwlConfig.toggleJumpChannel();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.jumpChannel);
+                }
+            } else if (position == showGreetings) {
+                OwlConfig.toggleShowGreetings();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.showGreetings);
                 }
             } else if (position == hideKeyboardRow){
                 OwlConfig.toggleHideKeyboard();
@@ -118,6 +129,21 @@ public class OwlgramChatSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.sendConfirm);
                 }
+            } else if (position == showTranslateRow){
+                OwlConfig.toggleShowTranslate();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.showTranslate);
+                }
+            } else if (position == showAddToSMRow){
+                OwlConfig.toggleShowSaveMessage();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.showSaveMessage);
+                }
+            } else if (position == showMessageDetails){
+                OwlConfig.toggleShowMessageDetails();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.showMessageDetails);
+                }
             }
         });
         return fragmentView;
@@ -132,6 +158,7 @@ public class OwlgramChatSettings extends BaseFragment {
         chatHeaderRow = rowCount++;
         mediaSwipeByTapRow = rowCount++;
         jumpChannelRow = rowCount++;
+        showGreetings = rowCount++;
         hideKeyboardRow = rowCount++;
         playGifAsVideoRow = rowCount++;
         //separatedPhotoAndVideoRow = rowCount++;
@@ -140,6 +167,13 @@ public class OwlgramChatSettings extends BaseFragment {
         showFolderWhenForwardRow = rowCount++;
         //showFolderIconsRow = rowCount++;
         foldersDividerRow = rowCount++;
+
+        messageMenuHeaderRow = rowCount++;
+        showTranslateRow = rowCount++;
+        showAddToSMRow = rowCount++;
+        showMessageDetails = rowCount++;
+        messageMenuDividerRow = rowCount++;
+
         audioVideoHeaderRow = rowCount++;
         rearCameraStartingRow = rowCount++;
         confirmSendRow = rowCount++;
@@ -176,10 +210,12 @@ public class OwlgramChatSettings extends BaseFragment {
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == chatHeaderRow) {
                         headerCell.setText(LocaleController.getString("OwlgramChat", R.string.OwlgramChat));
-                    }else if (position == foldersHeaderRow) {
+                    } else if (position == foldersHeaderRow) {
                         headerCell.setText(LocaleController.getString("Filters", R.string.Filters));
-                    }else if (position == audioVideoHeaderRow) {
+                    } else if (position == audioVideoHeaderRow) {
                         headerCell.setText(LocaleController.getString("OwlgramAudioVideo", R.string.OwlgramAudioVideo));
+                    } else if (position == messageMenuHeaderRow) {
+                        headerCell.setText(LocaleController.getString("OwlgramMessageMenu", R.string.OwlgramMessageMenu));
                     }
                     break;
                 case 3:
@@ -189,6 +225,8 @@ public class OwlgramChatSettings extends BaseFragment {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramMediaFlipByTap", R.string.OwlgramMediaFlipByTap), OwlConfig.mediaFlipByTap, true);
                     } else if (position == jumpChannelRow) {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramJumpChannel", R.string.OwlgramJumpChannel), OwlConfig.jumpChannel, true);
+                    } else if (position == showGreetings) {
+                        textCell.setTextAndCheck(LocaleController.getString("OwlgramShowGreetings", R.string.OwlgramShowGreetings), OwlConfig.showGreetings, true);
                     } else if (position == hideKeyboardRow) {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramHideKeyboardScrolling", R.string.OwlgramHideKeyboardScrolling), OwlConfig.hideKeyboard, true);
                     } else if (position == playGifAsVideoRow) {
@@ -203,6 +241,12 @@ public class OwlgramChatSettings extends BaseFragment {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramCameraStarting", R.string.OwlgramCameraStarting), OwlConfig.useRearCamera, true);
                     } else if (position == confirmSendRow) {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramSendConfirm", R.string.OwlgramSendConfirm), OwlConfig.sendConfirm, true);
+                    } else if (position == showTranslateRow) {
+                        textCell.setTextAndCheck(LocaleController.getString("OwlgramShowTranslate", R.string.OwlgramShowTranslate), OwlConfig.showTranslate, true);
+                    } else if (position == showAddToSMRow) {
+                        textCell.setTextAndCheck(LocaleController.getString("OwlgramShowSaveMessage", R.string.OwlgramShowSaveMessage), OwlConfig.showSaveMessage, true);
+                    } else if (position == showMessageDetails) {
+                        textCell.setTextAndCheck(LocaleController.getString("OwlgramShowDetails", R.string.OwlgramShowDetails), OwlConfig.showMessageDetails, true);
                     }
                     break;
             }
@@ -243,11 +287,14 @@ public class OwlgramChatSettings extends BaseFragment {
         public int getItemViewType(int position) {
             if(position == chatDividerRow || position == foldersDividerRow){
                 return 1;
-            }else if (position == chatHeaderRow || position == foldersHeaderRow || position == audioVideoHeaderRow) {
+            }else if (position == chatHeaderRow || position == foldersHeaderRow || position == audioVideoHeaderRow ||
+                    position == messageMenuHeaderRow) {
                 return 2;
             }else if (position == mediaSwipeByTapRow || position == jumpChannelRow || position == hideKeyboardRow ||
                     position == playGifAsVideoRow || position == separatedPhotoAndVideoRow || position == showFolderWhenForwardRow ||
-                    position == showFolderIconsRow || position == rearCameraStartingRow  || position == confirmSendRow) {
+                    position == showFolderIconsRow || position == rearCameraStartingRow  || position == confirmSendRow ||
+                    position == showGreetings || position == showTranslateRow || position == showAddToSMRow ||
+                    position == showMessageDetails) {
                 return 3;
             }
             return 1;

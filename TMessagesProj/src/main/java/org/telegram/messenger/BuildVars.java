@@ -20,9 +20,10 @@ public class BuildVars {
     public static boolean CHECK_UPDATES = true;
     public static boolean NO_SCOPED_STORAGE = true/* || Build.VERSION.SDK_INT <= 28*/;
     public static int BUILD_VERSION = 2432;
-    public static String BUILD_VERSION_STRING = "8.1.2";
-    public static int APP_ID = 1034529;
-    public static String APP_HASH = "49cde27c6d17b656bc7e25c06d2f3ac0";
+    public static String BUILD_VERSION_STRING = "1.0.2";
+    public static String TELEGRAM_VERSION_STRING = "8.1.2";
+    public static int APP_ID = 4;
+    public static String APP_HASH = "014b35b6184100b085b0d0572f9b5103";
     public static String SMS_HASH = isStandaloneApp() ? "w0lkcmTZkKh" : (DEBUG_VERSION ? "O2P2z+/jBpJ" : "oLeq9AcOZkT");
     public static String PLAYSTORE_APP_URL = "https://play.google.com/store/apps/details?id=it.owlgram.android";
 

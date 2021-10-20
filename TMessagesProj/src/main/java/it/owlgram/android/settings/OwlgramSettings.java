@@ -81,14 +81,16 @@ public class OwlgramSettings extends BaseFragment{
         listView.setOnItemClickListener((view, position, x, y) -> {
             if(position == channelUpdatesRow){
                 MessagesController.getInstance(currentAccount).openByUserName(LocaleController.getString("OwlgramUsername", R.string.OwlgramUsername), this, 1);
-            }else if (position == sourceCodeRow) {
+            } else if (position == sourceCodeRow) {
                 Browser.openUrl(getParentActivity(), "https://github.com/OwlGramDev/OwlGram");
-            }else if(position == supportTranslationRow) {
+            } else if (position == supportTranslationRow) {
                 Browser.openUrl(getParentActivity(), "https://owl.crowdin.com/owlgram");
-            }else if(position == generalSettingsRow){
+            } else if (position == generalSettingsRow){
                 presentFragment(new OwlgramGeneralSettings());
-            }else if(position == chatSettingsRow){
+            } else if (position == chatSettingsRow){
                 presentFragment(new OwlgramChatSettings());
+            } else if (position == updateSettingsRow){
+                presentFragment(new OwlgramUpdateSettings());
             }
         });
         return fragmentView;

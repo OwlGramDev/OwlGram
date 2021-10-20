@@ -16,6 +16,4 @@
     <string name="OwlgramTranslationProvider">مزود الترجمة</string>
     <string name="OwlgramDestinationLanguage">لغة الوجهة</string>
     <string name="OwlgramConfirmCall">التأكيد قبل الاتصال</string>
-
-    <string name="OwlgramVersion">Owlgram للأندرويد %1$s</string>
 </resources>

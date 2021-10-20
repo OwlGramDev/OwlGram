@@ -2267,6 +2267,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     return getMessagesController().dialogFilters.get(tabId).unreadCount;
                 }
 
+                @SuppressLint("ClickableViewAccessibility")
                 @Override
                 public boolean didSelectTab(FilterTabsView.TabView tabView, boolean selected) {
                     if (actionBar.isActionModeShowed()) {
@@ -2296,7 +2297,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         public boolean onTouch(View v, MotionEvent event) {
                             if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
                                 if (scrimPopupWindow != null && scrimPopupWindow.isShowing()) {
-                                    View contentView = scrimPopupWindow.getContentView();
+                                    @SuppressLint("ClickableViewAccessibility") View contentView = scrimPopupWindow.getContentView();
                                     contentView.getLocationInWindow(pos);
                                     rect.set(pos[0], pos[1], pos[0] + contentView.getMeasuredWidth(), pos[1] + contentView.getMeasuredHeight());
                                     if (!rect.contains((int) event.getX(), (int) event.getY())) {
@@ -2340,8 +2341,20 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                     linearLayout.setMinimumWidth(AndroidUtilities.dp(200));
                     linearLayout.setOrientation(LinearLayout.VERTICAL);
+                    boolean canShowRead = false;
+                    if (dialogFilter != null) {
+                        if (dialogFilter.dialogs.isEmpty()) {
+                            getMessagesController().loadTabDialogs(dialogFilter);
+                        }
+                        for (TLRPC.Dialog dialog : dialogFilter.dialogs) {
+                            if (dialog.unread_count != 0 || dialog.unread_mentions_count != 0) {
+                                canShowRead = true;
+                                break;
+                            }
+                        }
+                    }
                     scrimPopupWindowItems = new ActionBarMenuSubItem[4];
-                    for (int a = 0, N = (tabView.getId() == Integer.MAX_VALUE ? 3 : 4); a < N; a++) {
+                    for (int a = 0, N = ((tabView.getId() == Integer.MAX_VALUE ? 3 : 4)) - (canShowRead ? 0:1); a < N; a++) {
                         ActionBarMenuSubItem cell = new ActionBarMenuSubItem(getParentActivity(), a == 0, a == N - 1);
                         if (a == 0) {
                             if (getMessagesController().dialogFilters.size() <= 1) {
@@ -2354,7 +2367,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             } else {
                                 cell.setTextAndIcon(LocaleController.getString("FilterEdit", R.string.FilterEdit), R.drawable.msg_edit);
                             }
-                        } else if(a == 2) {
+                        } else if (a == 2 & canShowRead) {
                             cell.setTextAndIcon(LocaleController.getString("OwlgramSignAsRead", R.string.OwlgramSignAsRead), R.drawable.msg_markread);
                         } else {
                             cell.setTextAndIcon(LocaleController.getString("FilterDeleteItem", R.string.FilterDeleteItem), R.drawable.msg_delete);
@@ -2362,6 +2375,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         scrimPopupWindowItems[a] = cell;
                         linearLayout.addView(cell);
                         final int i = a;
+                        boolean finalCanShowRead = canShowRead;
                         cell.setOnClickListener(v1 -> {
                             if (i == 0) {
                                 resetScroll();
@@ -2373,21 +2387,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 } else {
                                     presentFragment(new FilterCreateActivity(dialogFilter));
                                 }
-                            } else if (i == 2) {
-                                if (dialogFilter == null) {
-                                    int folderId = tabView.getId() == Integer.MAX_VALUE ? 0 : -1;
-                                    getMessagesStorage().readAllDialogs(folderId);
-                                } else {
-                                    if (dialogFilter.dialogs.isEmpty()) {
-                                        getMessagesController().loadTabDialogs(dialogFilter);
-                                    }
-                                    for (TLRPC.Dialog dialog : dialogFilter.dialogs) {
-                                        if (dialog.unread_count == 0 && dialog.unread_mentions_count == 0)
-                                            continue;
-                                        getMessagesController().markDialogAsRead(dialog.id, dialog.top_message, dialog.top_message, dialog.last_message_date, false, 0, dialog.unread_count, true, 0);
-                                    }
+                            } else if (i == 2 && finalCanShowRead) {
+                                for (TLRPC.Dialog dialog : dialogFilter.dialogs) {
+                                    if (dialog.unread_count == 0 && dialog.unread_mentions_count == 0)
+                                        continue;
+                                    getMessagesController().markDialogAsRead(dialog.id, dialog.top_message, dialog.top_message, dialog.last_message_date, false, 0, dialog.unread_count, true, 0);
                                 }
-                            } else if (i == 3) {
+                            } else {
                                 showDeleteAlert(dialogFilter);
                             }
                             if (scrimPopupWindow != null) {

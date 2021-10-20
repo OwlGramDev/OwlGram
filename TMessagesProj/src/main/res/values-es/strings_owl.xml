@@ -16,6 +16,4 @@
     <string name="OwlgramTranslationProvider">Proveedor de traducción</string>
     <string name="OwlgramDestinationLanguage">Idioma de destino</string>
     <string name="OwlgramConfirmCall">Confirmar antes de llamar</string>
-
-    <string name="OwlgramVersion">Owlgram para Android %1$s</string>
 </resources>

@@ -16,6 +16,4 @@
     <string name="OwlgramTranslationProvider">Vertaalprovider</string>
     <string name="OwlgramDestinationLanguage">Bestemmingstaal</string>
     <string name="OwlgramConfirmCall">Bevestigen voordat je belt</string>
-
-    <string name="OwlgramVersion">Owlgram voor Android %1$s</string>
 </resources>
