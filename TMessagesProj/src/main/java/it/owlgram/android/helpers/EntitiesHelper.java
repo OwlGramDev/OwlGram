@@ -2,6 +2,7 @@ package it.owlgram.android.helpers;
 
 
 import android.os.Build;
+import android.text.Html;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
@@ -10,6 +11,8 @@ import org.telegram.tgnet.TLRPC;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class EntitiesHelper {
@@ -128,5 +131,113 @@ public class EntitiesHelper {
             return fixEndString(string);
         }
         return string;
+    }
+
+    public static TextWithMention getEntities(String text, ArrayList<TLRPC.MessageEntity> entities) {
+        ArrayList<TLRPC.MessageEntity> returnEntities = new ArrayList<>();
+        ArrayList<TLRPC.MessageEntity> copyEntities = new ArrayList<>(entities);
+        Pattern p = Pattern.compile("<(.*?)>(.*?)</\\1>");
+        Matcher m = p.matcher(text);
+        String new_text = text;
+        while(m.find()){
+            String html = m.group(0);
+            String html_tag = m.group(1);
+            String content = m.group(2);
+            if(html != null && content != null && html_tag != null){
+                int offset = new_text.indexOf(html);
+                int length = content.length();
+                new_text = new_text.replace(html, content);
+                String[] html_tags = html_tag.split("-");
+                for (String tag: html_tags) {
+                    TLRPC.MessageEntity entity = null;
+                    switch (tag) {
+                        case "b":
+                            entity = new TLRPC.TL_messageEntityBold();
+                            break;
+                        case "i":
+                            entity = new TLRPC.TL_messageEntityItalic();
+                            break;
+                        case "u":
+                            entity = new TLRPC.TL_messageEntityUnderline();
+                            break;
+                        case "s":
+                            entity = new TLRPC.TL_messageEntityStrike();
+                            break;
+                        case "c":
+                            entity = new TLRPC.TL_messageEntityCode();
+                            break;
+                        case "p":
+                            entity = new TLRPC.TL_messageEntityPre();
+                            break;
+                        case "q":
+                            entity = new TLRPC.TL_messageEntityBlockquote();
+                            break;
+                        case "a":
+                            for (int i = 0; i < copyEntities.size(); i++) {
+                                TLRPC.MessageEntity old_entity = copyEntities.get(i);
+                                boolean found = false;
+                                if (old_entity instanceof TLRPC.TL_messageEntityMentionName) {
+                                    found = true;
+                                    entity = new TLRPC.TL_messageEntityMentionName();
+                                    ((TLRPC.TL_messageEntityMentionName) entity).user_id = ((TLRPC.TL_messageEntityMentionName) old_entity).user_id;
+                                } else if (old_entity instanceof TLRPC.TL_inputMessageEntityMentionName) {
+                                    found = true;
+                                    entity = new TLRPC.TL_inputMessageEntityMentionName();
+                                    ((TLRPC.TL_inputMessageEntityMentionName) entity).user_id = ((TLRPC.TL_inputMessageEntityMentionName) old_entity).user_id;
+                                } else if (old_entity instanceof TLRPC.TL_messageEntityTextUrl) {
+                                    found = true;
+                                    entity = new TLRPC.TL_messageEntityTextUrl();
+                                    entity.url = old_entity.url;
+                                } else if (old_entity instanceof TLRPC.TL_messageEntityUrl) {
+                                    found = true;
+                                    entity = new TLRPC.TL_messageEntityUrl();
+                                } else if (old_entity instanceof TLRPC.TL_messageEntityMention) {
+                                    found = true;
+                                    entity = new TLRPC.TL_messageEntityMention();
+                                } else if (old_entity instanceof TLRPC.TL_messageEntityBotCommand) {
+                                    found = true;
+                                    entity = new TLRPC.TL_messageEntityBotCommand();
+                                } else if (old_entity instanceof TLRPC.TL_messageEntityHashtag) {
+                                    found = true;
+                                    entity = new TLRPC.TL_messageEntityHashtag();
+                                } else if (old_entity instanceof TLRPC.TL_messageEntityCashtag) {
+                                    found = true;
+                                    entity = new TLRPC.TL_messageEntityCashtag();
+                                } else if (old_entity instanceof TLRPC.TL_messageEntityEmail) {
+                                    found = true;
+                                    entity = new TLRPC.TL_messageEntityEmail();
+                                } else if (old_entity instanceof TLRPC.TL_messageEntityBankCard) {
+                                    found = true;
+                                    entity = new TLRPC.TL_messageEntityBankCard();
+                                } else if (old_entity instanceof TLRPC.TL_messageEntityPhone) {
+                                    found = true;
+                                    entity = new TLRPC.TL_messageEntityPhone();
+                                }
+                                if(found){
+                                    entity.offset = old_entity.offset;
+                                    entity.length = old_entity.length;
+                                    copyEntities.remove(i);
+                                    break;
+                                }
+                            }
+                            break;
+                    }
+                    if(entity != null){
+                        entity.offset = offset;
+                        entity.length = length;
+                        returnEntities.add(entity);
+                    }
+                }
+            }
+        }
+        TextWithMention textWithMention = new TextWithMention();
+        textWithMention.text = new_text;
+        textWithMention.entities = returnEntities;
+        return textWithMention;
+    }
+
+    public static class TextWithMention {
+        public String text;
+        public ArrayList<TLRPC.MessageEntity> entities;
     }
 }

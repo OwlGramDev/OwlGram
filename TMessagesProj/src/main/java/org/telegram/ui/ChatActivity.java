@@ -5095,7 +5095,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (!foundTopView) {
                     scrolled = super.scrollVerticallyBy(dy, recycler, state);
                 }
-                if (OwlConfig.jumpChannel && dy > 0 && scrolled == 0 && ChatObject.isChannel(currentChat) && !currentChat.megagroup && chatListView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING && !chatListView.isFastScrollAnimationRunning() && !chatListView.isMultiselect()) {
+                if (!OwlConfig.jumpChannel && dy > 0 && scrolled == 0 && ChatObject.isChannel(currentChat) && !currentChat.megagroup && chatListView.getScrollState() == RecyclerView.SCROLL_STATE_DRAGGING && !chatListView.isFastScrollAnimationRunning() && !chatListView.isMultiselect()) {
                     if (pullingDownOffset == 0 && pullingDownDrawable != null) {
                         pullingDownDrawable.updateDialog();
                     }
@@ -20725,9 +20725,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 translatingMessage.remove(currentID);
                 if (translation instanceof String) {
                     if(finalMessageObject.originalEntities != null){
-                        Object[] result = Translator.getEntities((String) translation, finalMessageObject.originalEntities);
-                        finalMessageObject.messageOwner.message = (String) result[0];
-                        finalMessageObject.messageOwner.entities = (ArrayList<TLRPC.MessageEntity>)result[1];
+                        EntitiesHelper.TextWithMention result = EntitiesHelper.getEntities((String) translation, finalMessageObject.originalEntities);
+                        finalMessageObject.messageOwner.message = result.text;
+                        finalMessageObject.messageOwner.entities = result.entities;
                     }else{
                         finalMessageObject.messageOwner.message = finalOriginal + "\n--------\n" + translation;
                     }

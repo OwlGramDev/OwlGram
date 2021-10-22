@@ -1,16 +1,16 @@
 package it.owlgram.android;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.R;
 
+import java.util.Date;
+
 import it.owlgram.android.translator.DeepLTranslator;
 import it.owlgram.android.translator.Translator;
 
-@SuppressLint("ApplySharedPref")
 public class OwlConfig {
     private static final Object sync = new Object();
     public static boolean hidePhoneNumber;
@@ -33,10 +33,13 @@ public class OwlConfig {
     public static boolean showTranslate;
     public static boolean showSaveMessage;
     public static boolean showMessageDetails;
+    public static boolean betaUpdates;
+    public static boolean notifyUpdates;
     public static String translationTarget = "app";
     public static int deepLFormality = DeepLTranslator.FORMALITY_DEFAULT;
     public static int translationProvider = Translator.PROVIDER_GOOGLE;
     public static boolean isChineseUser = false;
+    public static long lastUpdateCheck = 0;
 
     private static boolean configLoaded;
 
@@ -56,13 +59,13 @@ public class OwlConfig {
             fullTime = preferences.getBoolean("fullTime", false);
             roundedNumbers = preferences.getBoolean("roundedNumbers", true);
             confirmCall = preferences.getBoolean("confirmCall", true);
-            mediaFlipByTap = preferences.getBoolean("mediaSwipeByTap", true);
-            jumpChannel = preferences.getBoolean("jumpChannel", true);
+            mediaFlipByTap = preferences.getBoolean("mediaSwipeByTap", false);
+            jumpChannel = preferences.getBoolean("jumpChannel", false);
             hideKeyboard = preferences.getBoolean("hideKeyboard", false);
             gifAsVideo = preferences.getBoolean("gifAsVideo", true);
             separatedPhotoAndVideo = preferences.getBoolean("separatedPhotoAndVideo", false);
             showFolderWhenForward = preferences.getBoolean("showFolderWhenForward", false);
-            showFolderIcons = preferences.getBoolean("showFolderWhenForward", true);
+            //showFolderIcons = preferences.getBoolean("showFolderWhenForward", true);
             useRearCamera = preferences.getBoolean("useRearCamera", false);
             sendConfirm = preferences.getBoolean("sendConfirm", false);
             useSystemFont = preferences.getBoolean("useSystemFont", false);
@@ -70,7 +73,10 @@ public class OwlConfig {
             showGreetings = preferences.getBoolean("showGreetings", true);
             showTranslate = preferences.getBoolean("showTranslate", true);
             showSaveMessage = preferences.getBoolean("showSaveMessage", true);
-            showMessageDetails = preferences.getBoolean("showSaveMessage", false);
+            showMessageDetails = preferences.getBoolean("showMessageDetails", false);
+            betaUpdates = preferences.getBoolean("betaUpdates", false);
+            notifyUpdates = preferences.getBoolean("notifyUpdates", true);
+            lastUpdateCheck = preferences.getLong("lastUpdateCheck", 0);
             translationTarget = preferences.getString("translationTarget", "app");
             translationProvider = preferences.getInt("translationProvider", isChineseUser ? Translator.PROVIDER_NIU : Translator.PROVIDER_GOOGLE);
             configLoaded = true;
@@ -82,7 +88,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("hidePhone", hidePhoneNumber);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleHideContactNumber() {
@@ -90,7 +96,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("hideContactNumber", hideContactNumber);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleFullTime() {
@@ -98,7 +104,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("fullTime", fullTime);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleRoundedNumbers() {
@@ -106,7 +112,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("roundedNumbers", roundedNumbers);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleConfirmCall() {
@@ -114,7 +120,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("confirmCall", confirmCall);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleMediaFlipByTap() {
@@ -122,7 +128,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("mediaFlipByTap", mediaFlipByTap);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleJumpChannel() {
@@ -130,7 +136,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("jumpChannel", jumpChannel);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleHideKeyboard() {
@@ -138,7 +144,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("hideKeyboard", hideKeyboard);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleGifAsVideo() {
@@ -146,7 +152,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("gifAsVideo", gifAsVideo);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleShowFolderWhenForward() {
@@ -154,7 +160,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showFolderWhenForward", showFolderWhenForward);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleUseRearCamera() {
@@ -162,7 +168,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("useRearCamera", useRearCamera);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleSendConfirm() {
@@ -170,7 +176,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("sendConfirm", sendConfirm);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleUseSystemFont() {
@@ -178,7 +184,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("useSystemFont", useSystemFont);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleUseSystemEmoji() {
@@ -186,7 +192,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("useSystemEmoji", useSystemEmoji);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleShowGreetings() {
@@ -194,7 +200,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showGreetings", showGreetings);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleShowTranslate() {
@@ -202,7 +208,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showTranslate", showTranslate);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleShowSaveMessage() {
@@ -210,7 +216,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showSaveMessage", showSaveMessage);
-        editor.commit();
+        editor.apply();
     }
 
     public static void toggleShowMessageDetails() {
@@ -218,7 +224,23 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showMessageDetails", showMessageDetails);
-        editor.commit();
+        editor.apply();
+    }
+
+    public static void toggleBetaUpdates() {
+        betaUpdates = !betaUpdates;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("betaUpdates", betaUpdates);
+        editor.apply();
+    }
+
+    public static void toggleNotifyUpdates() {
+        notifyUpdates = !notifyUpdates;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("notifyUpdates", notifyUpdates);
+        editor.apply();
     }
 
     public static void setTranslationProvider(int provider) {
@@ -226,7 +248,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("translationProvider", translationProvider);
-        editor.commit();
+        editor.apply();
     }
 
     public static void setTranslationTarget(String target) {
@@ -234,7 +256,7 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("translationTarget", translationTarget);
-        editor.commit();
+        editor.apply();
     }
 
     public static void setDeepLFormality(int formality) {
@@ -242,7 +264,15 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("deepLFormality", deepLFormality);
-        editor.commit();
+        editor.apply();
+    }
+
+    public static void saveLastUpdateCheck() {
+        lastUpdateCheck = new Date().getTime();
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putLong("lastUpdateCheck", lastUpdateCheck);
+        editor.apply();
     }
 
 }

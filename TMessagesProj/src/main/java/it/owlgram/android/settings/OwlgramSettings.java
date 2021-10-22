@@ -84,7 +84,7 @@ public class OwlgramSettings extends BaseFragment{
             } else if (position == sourceCodeRow) {
                 Browser.openUrl(getParentActivity(), "https://github.com/OwlGramDev/OwlGram");
             } else if (position == supportTranslationRow) {
-                Browser.openUrl(getParentActivity(), "https://owl.crowdin.com/owlgram");
+                Browser.openUrl(getParentActivity(), "https://crowdin.com/project/owlgram");
             } else if (position == generalSettingsRow){
                 presentFragment(new OwlgramGeneralSettings());
             } else if (position == chatSettingsRow){
@@ -167,7 +167,7 @@ public class OwlgramSettings extends BaseFragment{
                     TextDetailSettingsCell textDetailCell = (TextDetailSettingsCell) holder.itemView;
                     textDetailCell.setMultilineDetail(true);
                     if(position == supportTranslationRow) {
-                        textDetailCell.setTextAndValueAndIcon(LocaleController.getString("OwlgramTranslation", R.string.OwlgramTranslation), LocaleController.getString("OwlgramTranslationDesc", R.string.OwlgramTranslationDesc), R.drawable.round_translate_white_36, true);
+                        textDetailCell.setTextAndValueAndIcon(LocaleController.getString("OwlgramTranslation", R.string.OwlgramTranslation), LocaleController.getString("OwlgramTranslationDesc", R.string.OwlgramTranslationDesc), R.drawable.round_translate_white_36, false);
                     }
                     break;
             }

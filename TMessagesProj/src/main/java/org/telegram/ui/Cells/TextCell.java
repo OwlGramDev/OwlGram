@@ -30,8 +30,8 @@ public class TextCell extends FrameLayout {
     public final SimpleTextView textView;
     public final SimpleTextView valueTextView;
     public final RLottieImageView imageView;
-    private ImageView valueImageView;
-    private int leftPadding;
+    private final ImageView valueImageView;
+    private final int leftPadding;
     private boolean needDivider;
     private int offsetFromImage = 71;
     private int imageLeft = 21;

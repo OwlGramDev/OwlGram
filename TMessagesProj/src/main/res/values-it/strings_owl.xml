@@ -4,7 +4,7 @@
     <string name="OwlgramSettings">Impostazioni di OwlGram</string>
     <string name="OwlgramUpdates">Aggiornamenti</string>
     <string name="OwlgramOfficialChannel">Canale ufficiale</string>
-    <string name="OwlgramUsername">OwlGram</string>
+    <string name="OwlgramUsername">OwlGramIT</string>
     <string name="OwlgramSourceCode">Codice sorgente</string>
     <string name="OwlgramTranslation">Traduci OwlGram</string>
     <string name="OwlgramTranslationDesc">Aiutaci a tradurre OwlGram nella tua lingua</string>
@@ -36,8 +36,8 @@
     <string name="OwlgramUndoTranslate">Annulla traduzione</string>
     <string name="OwlgramFormatterDay24HSec">HH:mm:ss</string>
     <string name="OwlgramFormatterDay12HSec">h:mm:ss a</string>
-    <string name="OwlgramMediaFlipByTap">Sfoglia i media toccando</string>
-    <string name="OwlgramJumpChannel">Passa al canale successivo</string>
+    <string name="OwlgramMediaFlipByTap">Disabilita \"Sfoglia i media toccando\"</string>
+    <string name="OwlgramJumpChannel">Disabilita \"Passa al canale successivo\"</string>
     <string name="OwlgramHideKeyboardScrolling">Nascondi la tastiera mentre scorri</string>
     <string name="OwlgramPlayGifAsVideo">Riproduci le GIF come video</string>
     <string name="OwlgramSeparatedPhotoAndVideos">Schede separate per foto e video</string>

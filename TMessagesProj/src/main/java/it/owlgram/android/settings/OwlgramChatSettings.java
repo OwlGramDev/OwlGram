@@ -159,8 +159,8 @@ public class OwlgramChatSettings extends BaseFragment {
         mediaSwipeByTapRow = rowCount++;
         jumpChannelRow = rowCount++;
         showGreetings = rowCount++;
-        hideKeyboardRow = rowCount++;
         playGifAsVideoRow = rowCount++;
+        hideKeyboardRow = rowCount++;
         //separatedPhotoAndVideoRow = rowCount++;
         chatDividerRow = rowCount++;
         foldersHeaderRow = rowCount++;
@@ -285,7 +285,7 @@ public class OwlgramChatSettings extends BaseFragment {
 
         @Override
         public int getItemViewType(int position) {
-            if(position == chatDividerRow || position == foldersDividerRow){
+            if(position == chatDividerRow || position == foldersDividerRow || position == messageMenuDividerRow){
                 return 1;
             }else if (position == chatHeaderRow || position == foldersHeaderRow || position == audioVideoHeaderRow ||
                     position == messageMenuHeaderRow) {

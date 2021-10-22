@@ -36,8 +36,8 @@
     <string name="OwlgramUndoTranslate">Undo translate</string>
     <string name="OwlgramFormatterDay24HSec">HH:mm:ss</string>
     <string name="OwlgramFormatterDay12HSec">h:mm:ss a</string>
-    <string name="OwlgramMediaFlipByTap">Flip Media by Tapping</string>
-    <string name="OwlgramJumpChannel">Jump to Next Channel</string>
+    <string name="OwlgramMediaFlipByTap">Disable \"Flip Media by Tapping\"</string>
+    <string name="OwlgramJumpChannel">Disable \"Jump to Next Channel\"</string>
     <string name="OwlgramHideKeyboardScrolling">Hide keyboard on chat scroll</string>
     <string name="OwlgramPlayGifAsVideo">Play GIFs as Video</string>
     <string name="OwlgramSeparatedPhotoAndVideos">Separate cards for photos and videos</string>
@@ -78,9 +78,19 @@
     <string name="OwlgramForwardedFrom">Forwarded from</string>
     <string name="OwlgramRepliedMessage">Message in reply</string>
     <string name="OwlgramInReplyTo">In reply to</string>
-    <string name="OwlgramUpdateTitle">Upgrade to OwlGram %s is ready!</string>
-    <string name="OwlgramUpdateSubTitle">Get the latest version of OwlGram with</string>
-    <string name="OwlgramUpdateNote">**Note: **%s</string>
+    <string name="OwlgramUpdateNote">Note:</string>
     <string name="OwlgramUpdateInstall">Install</string>
+    <string name="OwlgramUpdateDownload">Download</string>
     <string name="OwlgramUpdateRemind">Remind</string>
+    <string name="OwlgramUpdateChecker">Update checker</string>
+    <string name="OwlgramInAppUpdates">In-App Updates</string>
+    <string name="OwlgramUpdateAvailable">Update Available</string>
+    <string name="OwlgramLastCheck">Last check: %s</string>
+    <string name="OwlgramNeverLastCheck">Never</string>
+    <string name="OwlgramCheckUpdates">Check</string>
+    <string name="OwlgramBetaUpdates">Beta Updates</string>
+    <string name="OwlgramBetaUpdatesDesc">Choose this channel if you want to receive preview versions</string>
+    <string name="OwlgramUpdatePopup">Notify when is available an update</string>
+    <string name="OwlgramUpdatePopupDesc">You will be notified when a new update is available</string>
+    <string name="OwlgramApkChannel">Apk channel</string>
 </resources>
