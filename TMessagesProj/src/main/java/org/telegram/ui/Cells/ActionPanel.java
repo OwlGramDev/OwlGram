@@ -151,7 +151,7 @@ public class ActionPanel extends LinearLayout {
         ImageView mt = new ImageView(context);
         mt.setScaleType(ImageView.ScaleType.FIT_CENTER);
         mt.setOnClickListener(view -> onItemClick(myId));
-        mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(4), Color.TRANSPARENT, AndroidUtilities.getTransparentColor(color, 0.5f)));
+        mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(color, 0.5f)));
         mt.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
         ImageView iv = new ImageView(context);

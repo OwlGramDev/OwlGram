@@ -515,7 +515,8 @@ public class SessionsActivity extends BaseFragment implements NotificationCenter
             currentSessionRow = -1;
             currentSessionSectionRow = -1;
         }
-        boolean hasQr = currentType == 0 && getMessagesController().qrLoginCamera;
+        //&& getMessagesController().qrLoginCamera
+        boolean hasQr = currentType == 0;
         if (!passwordSessions.isEmpty() || !sessions.isEmpty()) {
             terminateAllSessionsRow = rowCount++;
             terminateAllSessionsDetailRow = rowCount++;

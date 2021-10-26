@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="OwlgramChat">Chat</string>
     <string name="OwlgramSettings">Impostazioni di OwlGram</string>
     <string name="OwlgramUpdates">Aggiornamenti</string>
     <string name="OwlgramOfficialChannel">Canale ufficiale</string>
-    <string name="OwlgramUsername">OwlGramIT</string>
+    <string name="OwlgramUsername">OwlGram</string>
     <string name="OwlgramSourceCode">Codice sorgente</string>
     <string name="OwlgramTranslation">Traduci OwlGram</string>
     <string name="OwlgramTranslationDesc">Aiutaci a tradurre OwlGram nella tua lingua</string>
@@ -15,8 +14,8 @@
     <string name="OwlgramRoundedNumbers">Numeri arrotondati</string>
     <string name="OwlgramTranslationProvider">Fornitore di traduzione</string>
     <string name="OwlgramDestinationLanguage">Lingua di destinazione</string>
-    <string name="OwlgramConfirmCall">Chiedi prima di chiamare</string>
-    <string name="OwlgramUseSystemFont">Usa il font di sistema</string>
+    <string name="OwlgramConfirmCall">Avvisa prima di chiamare</string>
+    <string name="OwlgramUseSystemFont">Usa i font di sistema</string>
     <string name="OwlgramUseSystemEmoji">Usa le emoji di sistema</string>
     <string name="OwlgramTranslateApiUnsupported">Il fornitore di traduzione selezionato non supporta la tua lingua.</string>
     <string name="OwlgramTranslationProviderShort">Fornitore</string>
@@ -27,7 +26,7 @@
     <string name="OwlgramProviderNiuTrans">Niu Trans</string>
     <string name="OwlgramTranslationTarget">Lingua di destinazione</string>
     <string name="OwlgramUseGoogleTranslate">Usa Google</string>
-    <string name="OwlgramResetLanguage">Ripristina lingua</string>
+    <string name="OwlgramResetLanguage">Reimposta la lingua</string>
     <string name="OwlgramDeepLFormality">Formalità</string>
     <string name="OwlgramDeepLFormalityDefault">Predefinito</string>
     <string name="OwlgramDeepLFormalityMore">Più</string>
@@ -36,23 +35,23 @@
     <string name="OwlgramUndoTranslate">Annulla traduzione</string>
     <string name="OwlgramFormatterDay24HSec">HH:mm:ss</string>
     <string name="OwlgramFormatterDay12HSec">h:mm:ss a</string>
-    <string name="OwlgramMediaFlipByTap">Disabilita \"Sfoglia i media toccando\"</string>
-    <string name="OwlgramJumpChannel">Disabilita \"Passa al canale successivo\"</string>
+    <string name="OwlgramMediaFlipByTap">Disattiva \"Sfoglia i media toccando\"</string>
+    <string name="OwlgramJumpChannel">Disattiva \"Passa al canale successivo\"</string>
     <string name="OwlgramHideKeyboardScrolling">Nascondi la tastiera mentre scorri</string>
     <string name="OwlgramPlayGifAsVideo">Riproduci le GIF come video</string>
     <string name="OwlgramSeparatedPhotoAndVideos">Schede separate per foto e video</string>
     <string name="OwlgramFolderWhenForward">Mostra le cartelle durante l\'inoltro</string>
     <string name="OwlgramShowFolderIcons">Mostra le icone delle cartelle</string>
-    <string name="OwlgramAudioVideo">Audio/Video Messaggi</string>
+    <string name="OwlgramAudioVideo">Messaggi vocali/Videomessaggi</string>
     <string name="OwlgramCameraStarting">Inizia con la fotocamera posteriore</string>
     <string name="OwlgramSendConfirm">Conferma l\'invio</string>
     <string name="OwlgramSelectBetween">Seleziona tra</string>
-    <string name="OwlgramSignAsRead">Segna come letto</string>
+    <string name="OwlgramSignAsRead">Segna tutte come lette</string>
     <string name="OwlgramCreateMention">Crea menzione</string>
     <string name="OwlgramVersion">OwlGram %1$s</string>
     <string name="OwlgramCallbackCopied">Callback copiata negli appunti</string>
     <string name="OwlgramAutoLockInstant">Subito</string>
-    <string name="OwlgramMkwRowPlayer">Mostra i file MKV come video</string>
+    <string name="OwlgramMkwRowPlayer">Mostra MKV come video</string>
     <string name="OwlgramAllVideoPlay">Riproduci in streaming tutti i video</string>
     <string name="OwlgramUserRestrictionsSendStickers">Inviare sticker</string>
     <string name="OwlgramUserRestrictionsSendGifs">Inviare GIF</string>
@@ -65,9 +64,9 @@
     <string name="OwlgramShowSaveMessage">Salva messaggio</string>
     <string name="OwlgramShowDetails">Dettagli</string>
     <string name="OwlgramAddToSavedMessages">Salva messaggio</string>
-    <string name="OwlgramShowGreetings">Mostra lo sticker di saluto</string>
+    <string name="OwlgramShowGreetings">Sticker di benvenuto</string>
     <string name="OwlgramMessageDetails">Dettagli</string>
-    <string name="OwlgramDevDetails">Dettagli dei messaggi</string>
+    <string name="OwlgramDevDetails">Dettagli del messaggio</string>
     <string name="OwlgramUserInfo">Utente</string>
     <string name="OwlgramBotInfo">Bot</string>
     <string name="OwlgramName">Nome completo</string>
@@ -78,4 +77,24 @@
     <string name="OwlgramForwardedFrom">Inoltrato da</string>
     <string name="OwlgramRepliedMessage">Messaggio in risposta</string>
     <string name="OwlgramInReplyTo">In risposta a</string>
+    <string name="OwlgramUpdateNote">Note:</string>
+    <string name="OwlgramUpdateInstall">Installa</string>
+    <string name="OwlgramUpdateDownload">Scarica</string>
+    <string name="OwlgramUpdateRemind">Ricordamelo più tardi</string>
+    <string name="OwlgramInAppUpdates">Aggiornamenti In-App</string>
+    <string name="OwlgramNoUpdate">OwlGram è aggiornato</string>
+    <string name="OwlgramNeverChecked">Mai verificato</string>
+    <string name="OwlgramCheckFailed">Impossibile verificare gli aggiornamenti</string>
+    <string name="OwlgramUpdateAvailable">Aggiornamento disponibile</string>
+    <string name="OwlgramLastCheck">Ultima verifica: %s</string>
+    <string name="OwlgramNeverLastCheck">Mai</string>
+    <string name="OwlgramUpdateChecking">Verifica aggiornamenti…</string>
+    <string name="OwlgramUpdateDownloading">Download in corso…</string>
+    <string name="OwlgramCheckUpdates">Verifica</string>
+    <string name="OwlgramBetaUpdates">Installa versioni beta</string>
+    <string name="OwlgramBetaUpdatesDesc">Prova i nuovi aggiornamenti di OwlGram prima del loro rilascio ufficiale</string>
+    <string name="OwlgramUpdatePopup">Notifica quando è disponibile un aggiornamento</string>
+    <string name="OwlgramUpdatePopupDesc">Riceverai una notifica quando un aggiornamento è disponibile</string>
+    <string name="OwlgramApkChannel">Canale APK</string>
+    <string name="OwlgramNoQuoteForward">Inoltra senza citare</string>
 </resources>

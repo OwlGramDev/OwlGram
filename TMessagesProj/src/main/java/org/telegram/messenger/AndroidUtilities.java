@@ -3813,4 +3813,16 @@ public class AndroidUtilities {
             }
         }
     }
+    private static final String[] BINARY_UNITS = {"B","kB","MB","GB","TB","PB","EB"};
+    private static final String[] SI_UNITS = {"B","KiB","MiB","GiB","TiB","PiB","EiB"};
+    public static String humanReadableByteCount(final long bytes, final boolean useSIUnits, final Locale locale){
+        final String[] units= useSIUnits ? SI_UNITS : BINARY_UNITS;
+        final int base = useSIUnits ? 1000 : 1024;
+        if(bytes<base){
+            return bytes + " " + units[0];
+        }
+        final int exponent = (int) (Math.log(bytes) / Math.log(base));
+        final String unit = units[exponent];
+        return String.format(locale, "%.2f %s",bytes / Math.pow(base,exponent),unit);
+    }
 }

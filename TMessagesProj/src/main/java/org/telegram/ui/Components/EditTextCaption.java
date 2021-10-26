@@ -36,6 +36,8 @@ import android.widget.FrameLayout;
 
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
@@ -339,6 +341,7 @@ public class EditTextCaption extends EditTextBoldCursor {
     }
 
     private boolean performMenuAction(int itemId) {
+        Log.e("TEST", "_" + itemId);
         if (itemId == R.id.menu_regular) {
             makeSelectedRegular();
             return true;

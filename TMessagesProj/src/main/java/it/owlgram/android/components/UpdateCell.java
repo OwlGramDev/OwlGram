@@ -2,10 +2,10 @@ package it.owlgram.android.components;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Html;
-import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.ImageView;
@@ -13,24 +13,35 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.BackupImageView;
+import org.telegram.ui.Components.RadialProgressView;
+
+import java.util.Locale;
+import java.util.Objects;
+
+import it.owlgram.android.updates.ApkDownloader;
 
 public class UpdateCell extends LinearLayout {
     private final BackupImageView backupImageView;
     private final TextView updateTitle;
     private final TextView descMessage;
     private final TextView note;
+    private final TextView download_status;
+    private final RadialProgressView radialProgress;
+    private final LinearLayout downloadingUpdate;
+    private final LinearLayout downloadUpdate;
+    private final LinearLayout installUpdate;
 
+    @SuppressLint("SetTextI18n")
     public UpdateCell(Context context) {
         super(context);
         int colorBackground = Theme.getColor(Theme.key_windowBackgroundWhite);
-        int blue_color = Theme.getColor(Theme.key_dialogTextBlue);
         int colorText = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText);
 
         setBackgroundColor(colorBackground);
@@ -104,87 +115,132 @@ public class UpdateCell extends LinearLayout {
         linearLayout.addView(descMessage);
         linearLayout.addView(note);
 
-        LinearLayout linearLayout2 = new LinearLayout(context);
+        downloadUpdate = new LinearLayout(context);
         RelativeLayout.LayoutParams layoutParams7 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        layoutParams7.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75),AndroidUtilities.dp(20));
+        layoutParams7.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(25),AndroidUtilities.dp(20));
         layoutParams7.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        linearLayout2.setLayoutParams(layoutParams7);
+        downloadUpdate.setLayoutParams(layoutParams7);
 
-        CardView cardView = new CardView(context);
-        cardView.setCardBackgroundColor(blue_color);
+        MaterialButton materialButton = new MaterialButton(context);
         LinearLayout.LayoutParams layoutParams10 = new LinearLayout.LayoutParams(0, AndroidUtilities.dp(40), 1.0f);
         layoutParams10.setMargins(0,0,AndroidUtilities.dp(10), 0);
-        cardView.setLayoutParams(layoutParams10);
-        cardView.setCardElevation(0);
-        cardView.setRadius(AndroidUtilities.dp(5.0f));
+        materialButton.setLayoutParams(layoutParams10);
+        materialButton.setText(LocaleController.getString("OwlgramUpdateDownload", R.string.OwlgramUpdateDownload));
+        materialButton.setOnClickListener(view -> onConfirmUpdate());
 
-        RelativeLayout rl = new RelativeLayout(context);
-        rl.setLayoutParams(new CardView.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-
-        ImageView mt = new ImageView(context);
-        mt.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(4), Color.TRANSPARENT, Color.argb(55, 0,0,0)));
-        mt.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        mt.setOnClickListener(view -> onConfirmUpdate());
-
-        TextView textView = new TextView(context);
-        textView.setTextColor(Color.WHITE);
-        textView.setLines(1);
-        textView.setSingleLine(true);
-        RelativeLayout.LayoutParams layoutParams8 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        layoutParams8.addRule(RelativeLayout.CENTER_IN_PARENT);
-        textView.setLayoutParams(layoutParams8);
-        textView.setGravity(Gravity.CENTER_HORIZONTAL);
-        textView.setEllipsize(TextUtils.TruncateAt.END);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
-        textView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
-        textView.setText(LocaleController.getString("OwlgramUpdateDownload", R.string.OwlgramUpdateDownload));
-
-        CardView cardView2 = new CardView(context);
-        cardView2.setCardBackgroundColor(Color.TRANSPARENT);
+        MaterialButton materialButton2 = new MaterialButton(context);
+        materialButton2.setOutlineMode();
         LinearLayout.LayoutParams layoutParams11 = new LinearLayout.LayoutParams(0, AndroidUtilities.dp(40), 1.0f);
         layoutParams11.setMargins(AndroidUtilities.dp(10),0,0, 0);
-        cardView2.setLayoutParams(layoutParams11);
-        cardView2.setLayoutParams(new LinearLayout.LayoutParams(0, AndroidUtilities.dp(40), 1.0f));
-        cardView2.setCardElevation(0);
-        cardView2.setRadius(AndroidUtilities.dp(5.0f));
+        materialButton2.setLayoutParams(layoutParams11);
+        materialButton2.setLayoutParams(new LinearLayout.LayoutParams(0, AndroidUtilities.dp(40), 1.0f));
+        materialButton2.setText(LocaleController.getString("OwlgramUpdateRemind", R.string.OwlgramUpdateRemind));
+        materialButton2.setOnClickListener(view -> onRemindUpdate());
 
-        RelativeLayout rl2 = new RelativeLayout(context);
-        rl2.setLayoutParams(new CardView.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        downloadingUpdate = new LinearLayout(context);
+        RelativeLayout.LayoutParams layoutParams8 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        layoutParams8.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75),AndroidUtilities.dp(20));
+        layoutParams8.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        downloadingUpdate.setLayoutParams(layoutParams8);
+        downloadingUpdate.setGravity(Gravity.CENTER_VERTICAL);
+        downloadingUpdate.setVisibility(GONE);
 
-        ImageView mt2 = new ImageView(context);
-        mt2.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        mt2.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(4), Color.TRANSPARENT, AndroidUtilities.getTransparentColor(blue_color, 0.5f)));
-        mt2.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        mt2.setOnClickListener(view -> onRemindUpdate());
+        RelativeLayout relativeLayout2 = new RelativeLayout(context);
+        relativeLayout2.setLayoutParams(new LinearLayout.LayoutParams(AndroidUtilities.dp(52), AndroidUtilities.dp(52)));
 
-        TextView textView2 = new TextView(context);
-        textView2.setTextColor(blue_color);
-        textView2.setLines(1);
-        textView2.setSingleLine(true);
-        RelativeLayout.LayoutParams layoutParams9 = new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        radialProgress = new RadialProgressView(context);
+        radialProgress.setNoProgress(false);
+        radialProgress.setLayoutParams(new LinearLayout.LayoutParams(AndroidUtilities.dp(52), AndroidUtilities.dp(52)));
+        radialProgress.setProgressColor(colorText);
+        radialProgress.setProgress(0);
+        radialProgress.setStrokeWidth(3.2F);
+
+        ImageView imageView = new ImageView(context);
+        RelativeLayout.LayoutParams layoutParams9 = new RelativeLayout.LayoutParams(AndroidUtilities.dp(33), AndroidUtilities.dp(33));
         layoutParams9.addRule(RelativeLayout.CENTER_IN_PARENT);
-        textView2.setLayoutParams(layoutParams9);
-        textView2.setGravity(Gravity.CENTER_HORIZONTAL);
-        textView2.setEllipsize(TextUtils.TruncateAt.END);
-        textView2.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
-        textView2.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
-        textView2.setText(LocaleController.getString("OwlgramUpdateRemind", R.string.OwlgramUpdateRemind));
+        imageView.setLayoutParams(layoutParams9);
+        Drawable d = ContextCompat.getDrawable(context, R.drawable.round_close_white_36);
+        Objects.requireNonNull(d).setColorFilter(colorText, PorterDuff.Mode.SRC_ATOP);
+        imageView.setBackground(d);
+        imageView.setOnClickListener(view -> ApkDownloader.cancel());
 
+        LinearLayout linearLayout4 = new LinearLayout(context);
+        linearLayout4.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        linearLayout4.setOrientation(VERTICAL);
 
-        rl.addView(mt);
-        rl.addView(textView);
-        cardView.addView(rl);
-        linearLayout2.addView(cardView);
+        TextView title_download = new TextView(context);
+        LinearLayout.LayoutParams layoutParams12 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        layoutParams12.setMargins(AndroidUtilities.dp(12), 0, 0,0);
+        title_download.setLayoutParams(layoutParams12);
+        title_download.setTextColor(colorText);
+        setTextEntities(title_download, "<b>" + LocaleController.getString("OwlgramUpdateDownloading", R.string.OwlgramUpdateDownloading) + "</b>");
+        title_download.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+        title_download.setGravity(Gravity.LEFT | Gravity.TOP);
+        title_download.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
 
-        rl2.addView(mt2);
-        rl2.addView(textView2);
-        cardView2.addView(rl2);
-        linearLayout2.addView(cardView2);
+        download_status = new TextView(context);
+        LinearLayout.LayoutParams layoutParams13 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        layoutParams13.setMargins(AndroidUtilities.dp(12), 0, 0,0);
+        download_status.setLayoutParams(layoutParams13);
+        download_status.setTextColor(AndroidUtilities.getTransparentColor(colorText, 0.4F));
+        download_status.setText(LocaleController.getString("Connecting", R.string.Connecting));
+        download_status.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        download_status.setGravity(Gravity.LEFT | Gravity.TOP);
+        download_status.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
 
-        relativeLayout.addView(linearLayout2);
+        installUpdate = new LinearLayout(context);
+        RelativeLayout.LayoutParams layoutParams15 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        layoutParams15.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(25),AndroidUtilities.dp(20));
+        layoutParams15.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        installUpdate.setLayoutParams(layoutParams15);
+        installUpdate.setVisibility(GONE);
+
+        MaterialButton materialButton3 = new MaterialButton(context);
+        LinearLayout.LayoutParams layoutParams14 = new LinearLayout.LayoutParams(0, AndroidUtilities.dp(50), 1.0f);
+        materialButton3.setLayoutParams(layoutParams14);
+        materialButton3.setText(LocaleController.getString("OwlgramUpdateInstall", R.string.OwlgramUpdateInstall));
+        materialButton3.setOnClickListener(view -> onInstallUpdate());
+
+        downloadUpdate.addView(materialButton);
+        downloadUpdate.addView(materialButton2);
+        relativeLayout2.addView(radialProgress);
+        relativeLayout2.addView(imageView);
+        downloadingUpdate.addView(relativeLayout2);
+        linearLayout4.addView(title_download);
+        linearLayout4.addView(download_status);
+        downloadingUpdate.addView(linearLayout4);
+        installUpdate.addView(materialButton3);
+        relativeLayout.addView(downloadUpdate);
+        relativeLayout.addView(downloadingUpdate);
+        relativeLayout.addView(installUpdate);
         relativeLayout.addView(linearLayout);
         addView(relativeLayout);
+    }
+
+    public void setDownloadMode() {
+        downloadingUpdate.setVisibility(VISIBLE);
+        downloadUpdate.setVisibility(GONE);
+        installUpdate.setVisibility(GONE);
+        radialProgress.setProgress(0);
+        download_status.setText(LocaleController.getString("Connecting", R.string.Connecting));
+    }
+
+    public void setConfirmMode() {
+        downloadingUpdate.setVisibility(GONE);
+        downloadUpdate.setVisibility(VISIBLE);
+        installUpdate.setVisibility(GONE);
+    }
+
+    public void setInstallMode() {
+        downloadingUpdate.setVisibility(GONE);
+        downloadUpdate.setVisibility(GONE);
+        installUpdate.setVisibility(VISIBLE);
+    }
+
+    @SuppressLint("SetTextI18n")
+    public void setPercentage(int percentage, long downBytes, long totBytes) {
+        radialProgress.setProgress(percentage / 100F);
+        download_status.setText(AndroidUtilities.humanReadableByteCount(downBytes, false,Locale.US) + "/" + AndroidUtilities.humanReadableByteCount(totBytes, false,Locale.US));
     }
 
     private void setTextEntities(TextView tv, String text) {
@@ -210,5 +266,8 @@ public class UpdateCell extends LinearLayout {
     }
 
     protected void onConfirmUpdate() {}
+
+    protected void onInstallUpdate() {}
+
     protected void onRemindUpdate() {}
 }

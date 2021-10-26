@@ -1,0 +1,217 @@
+package it.owlgram.android.updates;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.os.PowerManager;
+
+import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.NotificationCenter;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class ApkDownloader {
+    private static final Object sync = new Object();
+    private static boolean configLoaded;
+    @SuppressLint("StaticFieldLeak")
+    private static DownloadTask downloadTask;
+    private static UpdateManager updateManager;
+
+    static {
+        loadDownloadInfo();
+    }
+
+    private static void loadDownloadInfo() {
+        synchronized (sync) {
+            if (configLoaded) {
+                return;
+            }
+            downloadTask = null;
+            configLoaded = true;
+        }
+    }
+
+    public static boolean updateDownloaded() {
+        return apkFile().exists() && downloadTask == null;
+    }
+
+    private static File apkFile() {
+        return new File(AndroidUtilities.getCacheDir().getAbsolutePath()+"/update.apk");
+    }
+
+    public static void installUpdate(Activity activity) {
+        AndroidUtilities.openForView(ApkDownloader.apkFile(), "update.apk", "application/vnd.android.package-archive", activity, null);
+    }
+
+    public static void downloadAPK(Context context, String link) {
+        if(downloadTask != null) return;
+        File output = apkFile();
+        downloadTask = new DownloadTask(context, output);
+        downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,link);
+    }
+
+    public static void cancel() {
+        if(downloadTask != null){
+            downloadTask.cancel(true);
+        }
+    }
+
+    public static void setDownloadListener(UpdateManager u) {
+        updateManager = u;
+    }
+
+    public static boolean isRunningDownload() {
+        return downloadTask != null;
+    }
+
+    public static long downloadedBytes() {
+        if(downloadTask != null){
+            return downloadTask.total;
+        }
+        return 0;
+    }
+
+    public static long totalBytes() {
+        if(downloadTask != null){
+            return downloadTask.fileLength;
+        }
+        return 0;
+    }
+
+    public static int percentage() {
+        if(downloadTask != null){
+            return downloadTask.percentage;
+        }
+        return 0;
+    }
+
+    @SuppressWarnings("deprecation")
+    private static class DownloadTask extends AsyncTask<String, Object, String> {
+        @SuppressLint("StaticFieldLeak")
+        private final Context mContext;
+        private PowerManager.WakeLock mWakeLock;
+        private final File mTargetFile;
+        public long total = 0;
+        public long fileLength = 0;
+        public int percentage = 0;
+
+        public DownloadTask(Context context, File targetFile) {
+            this.mContext = context;
+            this.mTargetFile = targetFile;
+        }
+
+        @Override
+        protected String doInBackground(String... sUrl) {
+            InputStream input = null;
+            OutputStream output = null;
+            HttpURLConnection connection = null;
+            try {
+                URL url = new URL(sUrl[0]);
+                connection = (HttpURLConnection) url.openConnection();
+                connection.connect();
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    return "Server returned HTTP " + connection.getResponseCode()
+                            + " " + connection.getResponseMessage();
+                }
+                fileLength = connection.getContentLength();
+                input = connection.getInputStream();
+                output = new FileOutputStream(mTargetFile,false);
+
+                byte[] data = new byte[4096];
+                total = 0;
+                int count;
+                long last_update = System.currentTimeMillis();
+                publishProgress(0, 0, fileLength);
+                while ((count = input.read(data)) != -1) {
+                    if (isCancelled()) {
+                        input.close();
+                        return null;
+                    }
+                    total += count;
+                    if (fileLength > 0) {
+                        long curr_time = System.currentTimeMillis();
+                        if (curr_time - last_update > 1000) {
+                            last_update = curr_time;
+                            percentage = (int) (total * 100 / fileLength);
+                            publishProgress(percentage, total, fileLength);
+                        }
+                    }
+                    output.write(data, 0, count);
+                }
+                publishProgress((int) (total * 100 / fileLength), total, fileLength);
+            } catch (Exception e) {
+                return e.toString();
+            } finally {
+                try {
+                    if (output != null)
+                        output.close();
+                    if (input != null)
+                        input.close();
+                } catch (IOException ignored) {
+                }
+                if (connection != null)
+                    connection.disconnect();
+            }
+            return null;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+            mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                    getClass().getName());
+            mWakeLock.acquire(10*60*1000L);
+        }
+
+        @Override
+        protected void onProgressUpdate(Object... progress) {
+            super.onProgressUpdate(progress);
+            if(updateManager != null) {
+                try {
+                    updateManager.onProgressChange((int) progress[0], (long) progress[1], (long) progress[2]);
+                }catch (Exception ignored) {}
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            mWakeLock.release();
+            deleteUpdate();
+            downloadTask = null;
+            if(updateManager != null) {
+                updateManager.onFinished();
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            mWakeLock.release();
+            downloadTask = null;
+            if(updateManager != null) {
+                updateManager.onFinished();
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoaded);
+            }
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static void deleteUpdate() {
+        File file = apkFile();
+        if(file.exists())
+            file.delete();
+        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoadFailed);
+    }
+
+    public interface UpdateManager {
+        void onProgressChange(int percentage, long downBytes, long totBytes);
+        void onFinished();
+    }
+}

@@ -280,6 +280,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenter.No
     private SharedMediaLayout.SharedMediaData[] sharedMediaData = new SharedMediaLayout.SharedMediaData[6];
 
     private final static int forward = 3;
+    private final static int forward_noquote = 93;
     private final static int delete = 4;
     private final static int gotochat = 7;
 
@@ -426,7 +427,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenter.No
                         actionBar.closeSearchField();
                         cantDeleteMessagesCount = 0;
                     }, null);
-                } else if (id == forward) {
+                } else if (id == forward || id == forward_noquote) {
                     Bundle args = new Bundle();
                     args.putBoolean("onlySelect", true);
                     args.putInt("dialogsType", 3);
@@ -456,12 +457,15 @@ public class MediaActivity extends BaseFragment implements NotificationCenter.No
                                 if (message != null) {
                                     SendMessagesHelper.getInstance(currentAccount).sendMessage(message.toString(), did, null, null, null, true, null, null, null, true, 0, null);
                                 }
-                                SendMessagesHelper.getInstance(currentAccount).sendMessage(fmessages, did, false, false, true, 0);
+                                SendMessagesHelper.getInstance(currentAccount).sendMessage(fmessages, did, id == forward_noquote, false, true, 0);
                             }
                             fragment1.finishFragment();
                         } else {
                             long did = dids.get(0);
                             Bundle args1 = new Bundle();
+                            if (id == forward_noquote) {
+                                args1.putBoolean("forward_noquote", true);
+                            }
                             args1.putBoolean("scrollToTopOnResume", true);
                             if (DialogObject.isEncryptedDialog(did)) {
                                 args1.putInt("enc_id", DialogObject.getEncryptedChatId(did));
@@ -651,6 +655,7 @@ public class MediaActivity extends BaseFragment implements NotificationCenter.No
 
         if (!DialogObject.isEncryptedDialog(dialogId)) {
             actionModeViews.add(gotoItem = actionMode.addItemWithWidth(gotochat, R.drawable.msg_message, AndroidUtilities.dp(54), LocaleController.getString("AccDescrGoToMessage", R.string.AccDescrGoToMessage)));
+            actionModeViews.add(actionMode.addItemWithWidth(forward_noquote, R.drawable.msg_forward_noquote, AndroidUtilities.dp(54), LocaleController.getString("OwlgramNoQuoteForward", R.string.OwlgramNoQuoteForward)));
             actionModeViews.add(actionMode.addItemWithWidth(forward, R.drawable.msg_forward, AndroidUtilities.dp(54), LocaleController.getString("Forward", R.string.Forward)));
         }
         actionModeViews.add(actionMode.addItemWithWidth(delete, R.drawable.msg_delete, AndroidUtilities.dp(54), LocaleController.getString("Delete", R.string.Delete)));

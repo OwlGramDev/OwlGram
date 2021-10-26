@@ -32,14 +32,19 @@ public class OwlConfig {
     public static boolean showGreetings;
     public static boolean showTranslate;
     public static boolean showSaveMessage;
+    public static boolean showNoQuoteForward;
     public static boolean showMessageDetails;
     public static boolean betaUpdates;
     public static boolean notifyUpdates;
+    public static boolean isChineseUser = false;
     public static String translationTarget = "app";
+    public static String updateData;
     public static int deepLFormality = DeepLTranslator.FORMALITY_DEFAULT;
     public static int translationProvider = Translator.PROVIDER_GOOGLE;
-    public static boolean isChineseUser = false;
+    public static int lastUpdateStatus = 0;
+    public static int remindedUpdate = 0;
     public static long lastUpdateCheck = 0;
+
 
     private static boolean configLoaded;
 
@@ -59,13 +64,13 @@ public class OwlConfig {
             fullTime = preferences.getBoolean("fullTime", false);
             roundedNumbers = preferences.getBoolean("roundedNumbers", true);
             confirmCall = preferences.getBoolean("confirmCall", true);
-            mediaFlipByTap = preferences.getBoolean("mediaSwipeByTap", false);
+            mediaFlipByTap = preferences.getBoolean("mediaFlipByTap", false);
             jumpChannel = preferences.getBoolean("jumpChannel", false);
             hideKeyboard = preferences.getBoolean("hideKeyboard", false);
             gifAsVideo = preferences.getBoolean("gifAsVideo", true);
             separatedPhotoAndVideo = preferences.getBoolean("separatedPhotoAndVideo", false);
-            showFolderWhenForward = preferences.getBoolean("showFolderWhenForward", false);
-            //showFolderIcons = preferences.getBoolean("showFolderWhenForward", true);
+            showFolderWhenForward = preferences.getBoolean("showFolderWhenForward", true);
+            //showFolderIcons = preferences.getBoolean("showFolderIcons", true);
             useRearCamera = preferences.getBoolean("useRearCamera", false);
             sendConfirm = preferences.getBoolean("sendConfirm", false);
             useSystemFont = preferences.getBoolean("useSystemFont", false);
@@ -73,11 +78,15 @@ public class OwlConfig {
             showGreetings = preferences.getBoolean("showGreetings", true);
             showTranslate = preferences.getBoolean("showTranslate", true);
             showSaveMessage = preferences.getBoolean("showSaveMessage", true);
+            showNoQuoteForward = preferences.getBoolean("showNoQuoteForward", false);
             showMessageDetails = preferences.getBoolean("showMessageDetails", false);
             betaUpdates = preferences.getBoolean("betaUpdates", false);
             notifyUpdates = preferences.getBoolean("notifyUpdates", true);
             lastUpdateCheck = preferences.getLong("lastUpdateCheck", 0);
+            lastUpdateStatus = preferences.getInt("lastUpdateStatus", 0);
+            remindedUpdate = preferences.getInt("remindedUpdate", 0);
             translationTarget = preferences.getString("translationTarget", "app");
+            updateData = preferences.getString("updateData", "");
             translationProvider = preferences.getInt("translationProvider", isChineseUser ? Translator.PROVIDER_NIU : Translator.PROVIDER_GOOGLE);
             configLoaded = true;
         }
@@ -87,7 +96,7 @@ public class OwlConfig {
         hidePhoneNumber = !hidePhoneNumber;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("hidePhone", hidePhoneNumber);
+        editor.putBoolean("hidePhoneNumber", hidePhoneNumber);
         editor.apply();
     }
 
@@ -227,6 +236,14 @@ public class OwlConfig {
         editor.apply();
     }
 
+    public static void toggleShowNoQuoteForwardRow() {
+        showNoQuoteForward = !showNoQuoteForward;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showNoQuoteForward", showNoQuoteForward);
+        editor.apply();
+    }
+
     public static void toggleBetaUpdates() {
         betaUpdates = !betaUpdates;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
@@ -272,6 +289,30 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putLong("lastUpdateCheck", lastUpdateCheck);
+        editor.apply();
+    }
+
+    public static void saveUpdateStatus(int status) {
+        lastUpdateStatus = status;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("lastUpdateStatus", status);
+        editor.apply();
+    }
+
+    public static void remindUpdate(int version) {
+        remindedUpdate = version;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("remindedUpdate", version);
+        editor.apply();
+    }
+
+    public static void setUpdateData(String data) {
+        updateData = data;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("updateData", updateData);
         editor.apply();
     }
 

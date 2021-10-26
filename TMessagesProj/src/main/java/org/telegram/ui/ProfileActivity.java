@@ -37,6 +37,8 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -2644,6 +2646,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         } catch (Exception e) {
                             FileLog.e(e);
                         }
+                        SoundPool soundPool = new SoundPool(1, AudioManager.STREAM_VOICE_CALL, 0);
+                        int soundIn = soundPool.load(ApplicationLoader.applicationContext, R.raw.owl_sound, 1);
+                        Utilities.globalQueue.postRunnable(() -> soundPool.play(soundIn, 1.0f, 1.0f, 1, 0, 1.0f));
                     }
                     return true;
                 } else if (position >= membersStartRow && position < membersEndRow) {

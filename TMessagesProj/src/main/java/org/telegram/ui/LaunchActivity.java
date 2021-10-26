@@ -12,6 +12,7 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
@@ -67,6 +68,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.util.Log;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.appindexing.Action;
 import com.google.firebase.appindexing.FirebaseUserActions;
@@ -162,6 +164,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import it.owlgram.android.OwlConfig;
+import it.owlgram.android.components.UpdateAlertDialog;
+import it.owlgram.android.updates.ApkDownloader;
+import it.owlgram.android.updates.UpdateManager;
 
 public class LaunchActivity extends Activity implements ActionBarLayout.ActionBarLayoutDelegate, NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate {
 
@@ -882,7 +889,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         }
         MediaController.getInstance().setBaseActivity(this, true);
         AndroidUtilities.startAppCenter(this);
-        updateAppUpdateViews(false);
+        updateAppUpdateViews();
     }
 
     private void openSettings(boolean expanded) {
@@ -3543,7 +3550,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         }
         sideMenuContainer.addView(updateLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 44, Gravity.LEFT | Gravity.BOTTOM));
         updateLayout.setOnClickListener(v -> {
-            if (!SharedConfig.isAppUpdateAvailable()) {
+            /*if (!SharedConfig()) {
                 return;
             }
             if (updateLayoutIcon.getIcon() == MediaActionDrawable.ICON_DOWNLOAD) {
@@ -3554,7 +3561,9 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                 updateAppUpdateViews(true);
             } else {
                 AndroidUtilities.openForView(SharedConfig.pendingAppUpdate.document, true, this);
-            }
+            }*/
+            if(ApkDownloader.updateDownloaded())
+                ApkDownloader.installUpdate(LaunchActivity.this);
         });
         updateLayoutIcon = new RadialProgress2(updateLayout);
         updateLayoutIcon.setColors(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff);
@@ -3659,12 +3668,50 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             sideMenu.setPadding(0, 0, 0, 0);
         }
     }
+    private void updateAppUpdateViews() {
+        if(ApkDownloader.updateDownloaded()) {
+            createUpdateUI();
+            updateLayoutIcon.setIcon(MediaActionDrawable.ICON_UPDATE, true, true);
+            updateTextView.setText(LocaleController.getString("AppUpdateNow", R.string.AppUpdateNow));
+            updateLayout.setVisibility(View.VISIBLE);
+            updateLayout.setTag(1);
+            updateLayout.animate().translationY(0).setInterpolator(CubicBezierInterpolator.EASE_OUT).setListener(null).setDuration(180).start();
+            sideMenu.setPadding(0, 0, 0, AndroidUtilities.dp(44));
+        }
+    }
 
+    public void checkAppUpdate() {
+        updateAppUpdateViews();
+        if(!ApkDownloader.updateDownloaded()){
+            long passed_time = (new Date().getTime() - OwlConfig.lastUpdateCheck) / 1000;
+            if(passed_time >= 3600 * 8) {
+                UpdateManager.checkUpdates(new UpdateManager.UpdateCallback() {
+                    @Override
+                    public void onSuccess(Object updateResult) {
+                        OwlConfig.saveLastUpdateCheck();
+                        if(updateResult instanceof UpdateManager.UpdateAvailable) {
+                            OwlConfig.setUpdateData(updateResult.toString());
+                            UpdateManager.UpdateAvailable updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
+                            (new UpdateAlertDialog(LaunchActivity.this, updateAvailable)).show();
+                            OwlConfig.saveUpdateStatus(1);
+                        } else {
+                            OwlConfig.saveUpdateStatus(0);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {}
+                });
+            }
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
     public void checkAppUpdate(boolean force) {
         if (!force && BuildVars.DEBUG_VERSION || !force && !BuildVars.CHECK_UPDATES) {
             return;
         }
-        if (!force && Math.abs(System.currentTimeMillis() - SharedConfig.lastUpdateCheckTime) < MessagesController.getInstance(0).updateCheckDelay * 1000) {
+        if (!force && Math.abs(System.currentTimeMillis() - SharedConfig.lastUpdateCheckTime) < MessagesController.getInstance(0).updateCheckDelay * 1000L) {
             return;
         }
         TLRPC.TL_help_getAppUpdate req = new TLRPC.TL_help_getAppUpdate();
@@ -4311,7 +4358,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         } else if (SharedConfig.pendingAppUpdate != null && SharedConfig.pendingAppUpdate.can_not_skip) {
             showUpdateActivity(UserConfig.selectedAccount, SharedConfig.pendingAppUpdate, true);
         }
-        checkAppUpdate(false);
+        checkAppUpdate();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ApplicationLoader.canDrawOverlays = Settings.canDrawOverlays(this);
@@ -4625,12 +4672,13 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             }
         } else if (id == NotificationCenter.fileLoaded) {
             String path = (String) args[0];
-            if (SharedConfig.isAppUpdateAvailable()) {
+            /*if (SharedConfig.isAppUpdateAvailable()) {
                 String name = FileLoader.getAttachFileName(SharedConfig.pendingAppUpdate.document);
                 if (name.equals(path)) {
                     updateAppUpdateViews(true);
                 }
-            }
+            }*/
+            updateAppUpdateViews();
             if (loadingThemeFileName != null) {
                 if (loadingThemeFileName.equals(path)) {
                     loadingThemeFileName = null;
@@ -4696,12 +4744,13 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             if (path.equals(loadingThemeFileName) || path.equals(loadingThemeWallpaperName)) {
                 onThemeLoadFinish();
             }
-            if (SharedConfig.isAppUpdateAvailable()) {
+            /*if (SharedConfig.isAppUpdateAvailable()) {
                 String name = FileLoader.getAttachFileName(SharedConfig.pendingAppUpdate.document);
                 if (name.equals(path)) {
                     updateAppUpdateViews(true);
                 }
-            }
+            }*/
+            updateAppUpdateViews();
         } else if (id == NotificationCenter.screenStateChanged) {
             if (ApplicationLoader.mainInterfacePaused) {
                 return;
@@ -4773,9 +4822,10 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                     updateTextView.setText(LocaleController.formatString("AppUpdateDownloading", R.string.AppUpdateDownloading, (int) (loadProgress * 100)));
                 }
             }
-        } else if (id == NotificationCenter.appUpdateAvailable) {
-            updateAppUpdateViews(mainFragmentsStack.size() == 1);
         }
+        /* else if (id == NotificationCenter.appUpdateAvailable) {
+            updateAppUpdateViews(mainFragmentsStack.size() == 1);
+        } */
     }
 
     private void invalidateCachedViews(View parent) {

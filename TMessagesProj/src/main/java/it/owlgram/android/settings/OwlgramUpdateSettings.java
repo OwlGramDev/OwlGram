@@ -11,6 +11,9 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.util.Log;
+
+import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
@@ -28,6 +31,8 @@ import org.telegram.ui.Components.RecyclerListView;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateCell;
 import it.owlgram.android.components.UpdateCheckCell;
+import it.owlgram.android.updates.ApkDownloader;
+import it.owlgram.android.updates.UpdateManager;
 
 public class OwlgramUpdateSettings extends BaseFragment {
 
@@ -41,10 +46,23 @@ public class OwlgramUpdateSettings extends BaseFragment {
     private int betaUpdatesRow;
     private int notifyWhenAvailableRow;
     private int apkChannelRow;
+    private boolean checkingUpdates;
+    private TextCheckCell changeBetaMode;
+
+    private UpdateManager.UpdateAvailable updateAvailable;
+    private UpdateCheckCell updateCheckCell;
+    private UpdateCell updateCell;
 
     @Override
     public boolean onFragmentCreate() {
         super.onFragmentCreate();
+        String data = OwlConfig.updateData;
+        try {
+            if(data.length() > 0) {
+                JSONObject jsonObject = new JSONObject(data);
+                updateAvailable = UpdateManager.loadUpdate(jsonObject);
+            }
+        } catch (Exception ignored){}
         updateRowsId();
         return true;
     }
@@ -81,18 +99,49 @@ public class OwlgramUpdateSettings extends BaseFragment {
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         listView.setOnItemClickListener((view, position, x, y) -> {
             if (position == betaUpdatesRow) {
-                OwlConfig.toggleBetaUpdates();
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.betaUpdates);
+                if (!ApkDownloader.updateDownloaded() && !checkingUpdates) {
+                    OwlConfig.toggleBetaUpdates();
+                    ApkDownloader.cancel();
+                    ApkDownloader.deleteUpdate();
+                    if(updateAvailable != null) {
+                        OwlConfig.setUpdateData("");
+                        OwlConfig.remindUpdate(updateAvailable.version);
+                        updateAvailable = null;
+                        listAdapter.notifyItemRemoved(updateSectionAvailableRow);
+                        listAdapter.notifyItemRemoved(updateSectionDividerRow);
+                        updateRowsId();
+                    }
+                    checkUpdates();
+                    if (view instanceof TextCheckCell) {
+                        ((TextCheckCell) view).setChecked(OwlConfig.betaUpdates);
+                    }
                 }
             } else if (position == notifyWhenAvailableRow) {
                 OwlConfig.toggleNotifyUpdates();
                 if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.notifyUpdates
-                    );
+                    ((TextCheckCell) view).setChecked(OwlConfig.notifyUpdates);
                 }
             } else if (position == apkChannelRow) {
                 MessagesController.getInstance(currentAccount).openByUserName("OwlGramAPKs", this, 1);
+            }
+        });
+        ApkDownloader.setDownloadListener(new ApkDownloader.UpdateManager() {
+            @Override
+            public void onProgressChange(int percentage, long downBytes, long totBytes) {
+                if(updateCell != null) {
+                    updateCell.setPercentage(percentage, downBytes, totBytes);
+                }
+            }
+
+            @Override
+            public void onFinished() {
+                changeBetaMode.setEnabled(!ApkDownloader.updateDownloaded(), null);
+                updateCheckCell.setClickable(!ApkDownloader.updateDownloaded());
+                if(ApkDownloader.updateDownloaded()) {
+                    updateCell.setInstallMode();
+                } else {
+                    updateCell.setConfirmMode();
+                }
             }
         });
         return fragmentView;
@@ -104,8 +153,10 @@ public class OwlgramUpdateSettings extends BaseFragment {
         updateSectionAvailableRow = -1;
         updateSectionDividerRow = -1;
 
-        updateSectionAvailableRow = rowCount++;
-        updateSectionDividerRow = rowCount++;
+        if(updateAvailable != null) {
+            updateSectionAvailableRow = rowCount++;
+            updateSectionDividerRow = rowCount++;
+        }
 
         updateSectionHeader = rowCount++;
         updateCheckRow = rowCount++;
@@ -144,11 +195,21 @@ public class OwlgramUpdateSettings extends BaseFragment {
                 case 2:
                     UpdateCell updateCell = (UpdateCell) holder.itemView;
                     updateCell.setUpdate(
-                            "<b>Upgrade to OwlGram 1.2.0 is ready!</b>",
-                            "<b>Get the latest version of OwlGram with</b>\n<a href=\"https://www.google.it/\"><u><b>Chat Themes, Interactive Emoji, Read Receipts in Groups and Live Stream Recording</b></u></a>",
-                            "There are some bugs fix like notification not working.",
-                            "https://telegram.org/file/464001201/3/gtwtSMRXba0.204892/b102dc7205689001f3"
+                            updateAvailable.title,
+                            updateAvailable.desc,
+                            updateAvailable.note,
+                            updateAvailable.banner
                     );
+                    if(ApkDownloader.isRunningDownload()) {
+                        updateCell.setDownloadMode();
+                    } else {
+                        if(ApkDownloader.updateDownloaded()) {
+                            updateCell.setInstallMode();
+                        } else {
+                            updateCell.setConfirmMode();
+                        }
+                    }
+                    updateCell.setPercentage(ApkDownloader.percentage(), ApkDownloader.downloadedBytes(), ApkDownloader.totalBytes());
                     break;
                 case 3:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
@@ -156,11 +217,17 @@ public class OwlgramUpdateSettings extends BaseFragment {
                         headerCell.setText(LocaleController.getString("OwlgramInAppUpdates", R.string.OwlgramInAppUpdates));
                     }
                     break;
+                case 4:
+                    UpdateCheckCell updateCheckCell = (UpdateCheckCell) holder.itemView;
+                    updateCheckCell.loadLastStatus();
+                    updateCheckCell.setClickable(!ApkDownloader.updateDownloaded());
+                    break;
                 case 5:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
-                    textCheckCell.setEnabled(true, null);
+                    textCheckCell.setEnabled(!ApkDownloader.updateDownloaded() || position != betaUpdatesRow, null);
                     if (position == betaUpdatesRow) {
-                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("OwlgramBetaUpdates", R.string.OwlgramBetaUpdates), LocaleController.getString("OwlgramBetaUpdatesDesc", R.string.OwlgramBetaUpdatesDesc), OwlConfig.betaUpdates, true, true);
+                        changeBetaMode = textCheckCell;
+                        changeBetaMode.setTextAndValueAndCheck(LocaleController.getString("OwlgramBetaUpdates", R.string.OwlgramBetaUpdates), LocaleController.getString("OwlgramBetaUpdatesDesc", R.string.OwlgramBetaUpdatesDesc), OwlConfig.betaUpdates, true, true);
                     } else if (position == notifyWhenAvailableRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("OwlgramUpdatePopup", R.string.OwlgramUpdatePopup), LocaleController.getString("OwlgramUpdatePopupDesc", R.string.OwlgramUpdatePopupDesc), OwlConfig.notifyUpdates, true, true);
                     }
@@ -188,15 +255,36 @@ public class OwlgramUpdateSettings extends BaseFragment {
                 case 2:
                     view = new UpdateCell(mContext) {
                         @Override
+                        protected void onInstallUpdate() {
+                            super.onInstallUpdate();
+                            ApkDownloader.installUpdate(getParentActivity());
+                        }
+
+                        @Override
                         protected void onConfirmUpdate() {
                             super.onConfirmUpdate();
+                            if(!ApkDownloader.isRunningDownload()) {
+                                ApkDownloader.downloadAPK(mContext, updateAvailable.link_file);
+                                updateCell.setDownloadMode();
+                            }
                         }
 
                         @Override
                         protected void onRemindUpdate() {
                             super.onRemindUpdate();
+                            updateCheckCell.setCheckTime();
+                            if (updateAvailable != null) {
+                                ApkDownloader.deleteUpdate();
+                                OwlConfig.setUpdateData("");
+                                OwlConfig.remindUpdate(updateAvailable.version);
+                                updateAvailable = null;
+                                listAdapter.notifyItemRemoved(updateSectionAvailableRow);
+                                listAdapter.notifyItemRemoved(updateSectionDividerRow);
+                                updateRowsId();
+                            }
                         }
                     };
+                    updateCell = (UpdateCell) view;
                     break;
                 case 3:
                     view = new HeaderCell(mContext);
@@ -207,8 +295,12 @@ public class OwlgramUpdateSettings extends BaseFragment {
                         @Override
                         protected void onCheckUpdate() {
                             super.onCheckUpdate();
+                            if (!ApkDownloader.updateDownloaded()) {
+                                checkUpdates();
+                            }
                         }
                     };
+                    updateCheckCell = (UpdateCheckCell) view;
                     break;
                 case 5:
                     view = new TextCheckCell(mContext);
@@ -243,5 +335,40 @@ public class OwlgramUpdateSettings extends BaseFragment {
             }
             return 1;
         }
+    }
+    private void checkUpdates() {
+        updateCheckCell.setCheckingStatus();
+        checkingUpdates = true;
+        UpdateManager.checkUpdates(new UpdateManager.UpdateCallback() {
+            @Override
+            public void onSuccess(Object updateResult) {
+                checkingUpdates = false;
+                OwlConfig.saveLastUpdateCheck();
+                if(updateResult instanceof UpdateManager.UpdateAvailable) {
+                    updateCheckCell.setUpdateAvailableStatus();
+                    if (updateAvailable == null) {
+                        OwlConfig.setUpdateData(updateResult.toString());
+                        updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
+                        listAdapter.notifyItemInserted(updateSectionAvailableRow);
+                        listAdapter.notifyItemInserted(updateSectionDividerRow);
+                        updateRowsId();
+                    }
+                } else {
+                    updateCheckCell.setCheckTime();
+                    if (updateAvailable != null) {
+                        OwlConfig.setUpdateData("");
+                        updateAvailable = null;
+                        listAdapter.notifyItemRemoved(updateSectionAvailableRow);
+                        listAdapter.notifyItemRemoved(updateSectionDividerRow);
+                        updateRowsId();
+                    }
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                updateCheckCell.setFailedStatus();
+            }
+        });
     }
 }

@@ -77,8 +77,6 @@ import androidx.recyclerview.widget.LinearSmoothScrollerCustom;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -165,6 +163,7 @@ import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RLottieImageView;
 import org.telegram.ui.Components.RadialProgress2;
 import org.telegram.ui.Components.RecyclerAnimationScrollHelper;
+import org.telegram.ui.Components.RecyclerItemsEnterAnimator;
 import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.SearchViewPager;
 import org.telegram.ui.Components.SizeNotifierFrameLayout;
@@ -172,12 +171,12 @@ import org.telegram.ui.Components.StickersAlert;
 import org.telegram.ui.Components.SwipeGestureSettingsView;
 import org.telegram.ui.Components.UndoView;
 import org.telegram.ui.Components.ViewPagerFixed;
-import org.telegram.ui.Components.RecyclerItemsEnterAnimator;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.updates.ApkDownloader;
 
 public class DialogsActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
@@ -1832,7 +1831,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         getNotificationCenter().addObserver(this, NotificationCenter.onDatabaseMigration);
         getNotificationCenter().addObserver(this, NotificationCenter.didClearDatabase);
-
         loadDialogs(getAccountInstance());
         getMessagesController().loadPinnedDialogs(folderId, 0, null);
         if (databaseMigrationHint != null && !getMessagesStorage().isDatabaseMigrationInProgress()) {
@@ -1867,6 +1865,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
+
         if (searchString == null) {
             getNotificationCenter().removeObserver(this, NotificationCenter.dialogsNeedReload);
             NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
@@ -3415,10 +3414,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
             contentView.addView(updateLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, Gravity.LEFT | Gravity.BOTTOM));
             updateLayout.setOnClickListener(v -> {
-                if (!SharedConfig.isAppUpdateAvailable()) {
+                /*if (!SharedConfig.isAppUpdateAvailable()) {
                     return;
                 }
-                AndroidUtilities.openForView(SharedConfig.pendingAppUpdate.document, true, getParentActivity());
+                AndroidUtilities.openForView(SharedConfig.pendingAppUpdate.document, true, getParentActivity());*/
+                if(ApkDownloader.updateDownloaded())
+                    ApkDownloader.installUpdate(getParentActivity());
             });
 
             updateLayoutIcon = new RadialProgress2(updateLayout);
@@ -3881,7 +3882,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         RecyclerView.Adapter currentAdapter = viewPages[a].listView.getAdapter();
 
         if (viewPages[a].selectedType == Integer.MAX_VALUE) {
-            viewPages[a].dialogsType = 0;
+            viewPages[a].dialogsType = initialDialogsType;
             viewPages[a].listView.updatePullState();
         } else {
             MessagesController.DialogFilter filter = getMessagesController().dialogFilters.get(viewPages[a].selectedType);
@@ -3990,14 +3991,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
                 if (viewPages[0].selectedType != Integer.MAX_VALUE) {
                     viewPages[0].selectedType = Integer.MAX_VALUE;
-                    viewPages[0].dialogsAdapter.setDialogsType(0);
-                    viewPages[0].dialogsType = 0;
+                    viewPages[0].dialogsAdapter.setDialogsType(initialDialogsType);
+                    viewPages[0].dialogsType = initialDialogsType;
                     viewPages[0].dialogsAdapter.notifyDataSetChanged();
                 }
                 viewPages[1].setVisibility(View.GONE);
                 viewPages[1].selectedType = Integer.MAX_VALUE;
-                viewPages[1].dialogsAdapter.setDialogsType(0);
-                viewPages[1].dialogsType = 0;
+                viewPages[1].dialogsAdapter.setDialogsType(initialDialogsType);
+                viewPages[1].dialogsType = initialDialogsType;
                 viewPages[1].dialogsAdapter.notifyDataSetChanged();
                 canShowFilterTabsView = false;
                 updateFilterTabsVisibility(animated);
@@ -6373,6 +6374,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @SuppressWarnings("unchecked")
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
@@ -6395,7 +6397,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     layoutManager.scrollToPositionWithOffset(1, 0);
                 }
 
-                if (viewPages[a].dialogsAdapter.isDataSetChanged() || args.length > 0) {
+                if (viewPages[a].selectedType >= 0 &&
+                        viewPages[a].selectedType < getMessagesController().dialogFilters.size() &&
+                        getMessagesController().dialogFilters.get(viewPages[a].selectedType) != null &&
+                        getMessagesController().selectedDialogFilter[viewPages[a].dialogsType == 8 ? 1 : 0] != null &&
+                        getMessagesController().dialogFilters.get(viewPages[a].selectedType).id !=
+                                getMessagesController().selectedDialogFilter[viewPages[a].dialogsType == 8 ? 1 : 0].id) {
+                    getMessagesController().selectDialogFilter(getMessagesController().dialogFilters.get(viewPages[a].selectedType), viewPages[a].dialogsType == 8 ? 1 : 0);
+                    viewPages[a].dialogsAdapter.notifyDataSetChanged();
+                } else if (viewPages[a].dialogsAdapter.isDataSetChanged() || args.length > 0) {
                     viewPages[a].dialogsAdapter.notifyDataSetChanged();
                     int newItemCount = viewPages[a].dialogsAdapter.getItemCount();
                     if (newItemCount > oldItemCount && initialDialogsType != 11 && initialDialogsType != 12 && initialDialogsType != 13) {
@@ -6560,13 +6570,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         } else if (id == NotificationCenter.appUpdateAvailable) {
             updateMenuButton(true);
         } else if (id == NotificationCenter.fileLoaded || id == NotificationCenter.fileLoadFailed || id == NotificationCenter.fileLoadProgressChanged) {
-            String name = (String) args[0];
+            showUpdateButton();
+            /*String name = (String) args[0];
             if (SharedConfig.isAppUpdateAvailable()) {
                 String fileName = FileLoader.getAttachFileName(SharedConfig.pendingAppUpdate.document);
                 if (fileName.equals(name)) {
                     updateMenuButton(true);
                 }
-            }
+            }*/
         } else if (id == NotificationCenter.onDatabaseMigration) {
             boolean startMigration = (boolean) args[0];
             if (fragmentView != null) {
@@ -6600,13 +6611,34 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     View databaseMigrationHint;
 
+    private void showUpdateButton() {
+        if (updateLayoutAnimator != null) {
+            updateLayoutAnimator.cancel();
+        }
+        if(ApkDownloader.updateDownloaded() && updateLayout != null) {
+            updateLayout.setVisibility(View.VISIBLE);
+            updateLayout.setTag(1);
+            updateLayoutAnimator = new AnimatorSet();
+            updateLayoutAnimator.setDuration(180);
+            updateLayoutAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT);
+            updateLayoutAnimator.playTogether(ObjectAnimator.ofFloat(updateLayout, View.TRANSLATION_Y, 0));
+            updateLayoutAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    updateLayoutAnimator = null;
+                }
+            });
+            updateLayoutAnimator.start();
+        }
+    }
+
     private void updateMenuButton(boolean animated) {
         if (menuDrawable == null || updateLayout == null) {
             return;
         }
         int type;
         float downloadProgress;
-        if (SharedConfig.isAppUpdateAvailable()) {
+        /*if (SharedConfig.isAppUpdateAvailable()) {
             String fileName = FileLoader.getAttachFileName(SharedConfig.pendingAppUpdate.document);
             if (getFileLoader().isLoadingFile(fileName)) {
                 type = MenuDrawable.TYPE_UDPATE_DOWNLOADING;
@@ -6619,8 +6651,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         } else {
             type = MenuDrawable.TYPE_DEFAULT;
             downloadProgress = 0.0f;
+        }*/
+        if(ApkDownloader.updateDownloaded()) {
+            type = MenuDrawable.TYPE_UDPATE_AVAILABLE;
+        } else {
+            type = MenuDrawable.TYPE_DEFAULT;
         }
-        updateAppUpdateViews(animated);
+        downloadProgress = 0.0f;
+        showUpdateButton();
         menuDrawable.setType(type, animated);
         menuDrawable.setUpdateDownloadProgress(downloadProgress, animated);
     }

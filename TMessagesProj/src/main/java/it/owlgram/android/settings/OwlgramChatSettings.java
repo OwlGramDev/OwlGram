@@ -45,6 +45,7 @@ public class OwlgramChatSettings extends BaseFragment {
     private int messageMenuHeaderRow;
     private int showTranslateRow;
     private int showAddToSMRow;
+    private int showNoQuoteForwardRow;
     private int showMessageDetails;
     private int messageMenuDividerRow;
     private int audioVideoHeaderRow;
@@ -144,6 +145,11 @@ public class OwlgramChatSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showMessageDetails);
                 }
+            } else if (position == showNoQuoteForwardRow){
+                OwlConfig.toggleShowNoQuoteForwardRow();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.showNoQuoteForward);
+                }
             }
         });
         return fragmentView;
@@ -172,6 +178,7 @@ public class OwlgramChatSettings extends BaseFragment {
         showTranslateRow = rowCount++;
         showAddToSMRow = rowCount++;
         showMessageDetails = rowCount++;
+        showNoQuoteForwardRow = rowCount++;
         messageMenuDividerRow = rowCount++;
 
         audioVideoHeaderRow = rowCount++;
@@ -247,6 +254,8 @@ public class OwlgramChatSettings extends BaseFragment {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramShowSaveMessage", R.string.OwlgramShowSaveMessage), OwlConfig.showSaveMessage, true);
                     } else if (position == showMessageDetails) {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramShowDetails", R.string.OwlgramShowDetails), OwlConfig.showMessageDetails, true);
+                    } else if (position == showNoQuoteForwardRow) {
+                        textCell.setTextAndCheck(LocaleController.getString("OwlgramNoQuoteForward", R.string.OwlgramNoQuoteForward), OwlConfig.showNoQuoteForward, true);
                     }
                     break;
             }
@@ -294,7 +303,7 @@ public class OwlgramChatSettings extends BaseFragment {
                     position == playGifAsVideoRow || position == separatedPhotoAndVideoRow || position == showFolderWhenForwardRow ||
                     position == showFolderIconsRow || position == rearCameraStartingRow  || position == confirmSendRow ||
                     position == showGreetings || position == showTranslateRow || position == showAddToSMRow ||
-                    position == showMessageDetails) {
+                    position == showMessageDetails || position == showNoQuoteForwardRow) {
                 return 3;
             }
             return 1;

@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="OwlgramChat">Chat</string>
+    <string name="OwlgramChat">Chats</string>
     <string name="OwlgramSettings">OwlGram Settings</string>
     <string name="OwlgramUpdates">Updates</string>
     <string name="OwlgramOfficialChannel">Official Channel</string>
@@ -11,7 +10,7 @@
     <string name="OwlgramHidePhone">Hide my phone number</string>
     <string name="OwlgramHidePhoneContacts">Hide phone number from others</string>
     <string name="OwlgramHideStatusBar">Transparent status bar</string>
-    <string name="OwlgramMessageTime">Show seconds time</string>
+    <string name="OwlgramMessageTime">Show seconds in time</string>
     <string name="OwlgramRoundedNumbers">Rounded numbers</string>
     <string name="OwlgramTranslationProvider">Translation Provider</string>
     <string name="OwlgramDestinationLanguage">Target Language</string>
@@ -45,9 +44,9 @@
     <string name="OwlgramShowFolderIcons">Show folder icons</string>
     <string name="OwlgramAudioVideo">Audio/Video Messages</string>
     <string name="OwlgramCameraStarting">Start with the rear camera</string>
-    <string name="OwlgramSendConfirm">Send Confirm</string>
+    <string name="OwlgramSendConfirm">Confirm sending</string>
     <string name="OwlgramSelectBetween">Select between</string>
-    <string name="OwlgramSignAsRead">Mark as read</string>
+    <string name="OwlgramSignAsRead">Mark as all read</string>
     <string name="OwlgramCreateMention">Create Mention</string>
     <string name="OwlgramVersion">OwlGram %1$s</string>
     <string name="OwlgramCallbackCopied">Callback copied to clipboard</string>
@@ -59,13 +58,13 @@
     <string name="OwlgramUserRestrictionsSendGames">Send Games</string>
     <string name="OwlgramUserRestrictionsUseInlineBot">Use Inline Bots</string>
     <string name="OwlgramRestrictionReason">Restriction reason</string>
-    <string name="OwlgramJumpToBeginning">Jump to beginning</string>
+    <string name="OwlgramJumpToBeginning">Jump to the beginning</string>
     <string name="OwlgramMessageMenu">Message Menu</string>
     <string name="OwlgramShowTranslate">Translate</string>
     <string name="OwlgramShowSaveMessage">Save Message</string>
     <string name="OwlgramShowDetails">Details</string>
     <string name="OwlgramAddToSavedMessages">Save Message</string>
-    <string name="OwlgramShowGreetings">Show greeting sticker</string>
+    <string name="OwlgramShowGreetings">Greeting Stickers</string>
     <string name="OwlgramMessageDetails">Details</string>
     <string name="OwlgramDevDetails">Message Details</string>
     <string name="OwlgramUserInfo">User</string>
@@ -81,16 +80,21 @@
     <string name="OwlgramUpdateNote">Note:</string>
     <string name="OwlgramUpdateInstall">Install</string>
     <string name="OwlgramUpdateDownload">Download</string>
-    <string name="OwlgramUpdateRemind">Remind</string>
-    <string name="OwlgramUpdateChecker">Update checker</string>
+    <string name="OwlgramUpdateRemind">Remind me later</string>
     <string name="OwlgramInAppUpdates">In-App Updates</string>
+    <string name="OwlgramNoUpdate">OwlGram is updated</string>
+    <string name="OwlgramNeverChecked">Never checked</string>
+    <string name="OwlgramCheckFailed">Unable to check for updates</string>
     <string name="OwlgramUpdateAvailable">Update Available</string>
-    <string name="OwlgramLastCheck">Last check: %s</string>
+    <string name="OwlgramLastCheck">Last checked: %s</string>
     <string name="OwlgramNeverLastCheck">Never</string>
+    <string name="OwlgramUpdateChecking">Checking for updates…</string>
+    <string name="OwlgramUpdateDownloading">Downloading…</string>
     <string name="OwlgramCheckUpdates">Check</string>
-    <string name="OwlgramBetaUpdates">Beta Updates</string>
-    <string name="OwlgramBetaUpdatesDesc">Choose this channel if you want to receive preview versions</string>
-    <string name="OwlgramUpdatePopup">Notify when is available an update</string>
-    <string name="OwlgramUpdatePopupDesc">You will be notified when a new update is available</string>
-    <string name="OwlgramApkChannel">Apk channel</string>
+    <string name="OwlgramBetaUpdates">Install beta versions</string>
+    <string name="OwlgramBetaUpdatesDesc">Test new OwlGram updates before their official release</string>
+    <string name="OwlgramUpdatePopup">Notify when an update is available</string>
+    <string name="OwlgramUpdatePopupDesc">You\'ll get a notification when a new update is available</string>
+    <string name="OwlgramApkChannel">APKs Channel</string>
+    <string name="OwlgramNoQuoteForward">NoQuote Forward</string>
 </resources>
