@@ -26,14 +26,17 @@ import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
+import org.telegram.messenger.browser.Browser;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.LayoutHelper;
 
+import it.owlgram.android.Copyright;
 import it.owlgram.android.updates.ApkDownloader;
 import it.owlgram.android.updates.UpdateManager;
 
@@ -311,7 +314,11 @@ public class UpdateAlertDialog extends BottomSheet {
         BottomSheetCell doneButton = new BottomSheetCell(context, false);
         doneButton.setText(LocaleController.formatString("AppUpdateDownloadNow", R.string.AppUpdateDownloadNow), false);
         doneButton.background.setOnClickListener(v -> {
-            ApkDownloader.downloadAPK(context, updateAvailable.link_file);
+            if(Copyright.isNoCopyrightFeaturesEnabled()){
+                ApkDownloader.downloadAPK(context, updateAvailable.link_file);
+            } else {
+                Browser.openUrl(getContext(), BuildVars.PLAYSTORE_APP_URL);
+            }
             dismiss();
         });
         container.addView(doneButton, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 50, Gravity.LEFT | Gravity.BOTTOM, 0, 0, 0, 50));

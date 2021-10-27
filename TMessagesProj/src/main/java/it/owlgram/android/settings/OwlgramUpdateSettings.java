@@ -15,9 +15,11 @@ import com.google.android.exoplayer2.util.Log;
 
 import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
+import org.telegram.messenger.browser.Browser;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
@@ -28,6 +30,7 @@ import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
+import it.owlgram.android.Copyright;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateCell;
 import it.owlgram.android.components.UpdateCheckCell;
@@ -152,6 +155,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
         rowCount = 0;
         updateSectionAvailableRow = -1;
         updateSectionDividerRow = -1;
+        betaUpdatesRow = -1;
 
         if(updateAvailable != null) {
             updateSectionAvailableRow = rowCount++;
@@ -160,7 +164,9 @@ public class OwlgramUpdateSettings extends BaseFragment {
 
         updateSectionHeader = rowCount++;
         updateCheckRow = rowCount++;
-        betaUpdatesRow = rowCount++;
+        if(Copyright.isNoCopyrightFeaturesEnabled()){
+            betaUpdatesRow = rowCount++;
+        }
         notifyWhenAvailableRow = rowCount++;
         apkChannelRow = rowCount++;
     }
@@ -263,9 +269,13 @@ public class OwlgramUpdateSettings extends BaseFragment {
                         @Override
                         protected void onConfirmUpdate() {
                             super.onConfirmUpdate();
-                            if(!ApkDownloader.isRunningDownload()) {
-                                ApkDownloader.downloadAPK(mContext, updateAvailable.link_file);
-                                updateCell.setDownloadMode();
+                            if(Copyright.isNoCopyrightFeaturesEnabled()){
+                                if(!ApkDownloader.isRunningDownload()) {
+                                    ApkDownloader.downloadAPK(mContext, updateAvailable.link_file);
+                                    updateCell.setDownloadMode();
+                                }
+                            } else {
+                                Browser.openUrl(getContext(), BuildVars.PLAYSTORE_APP_URL);
                             }
                         }
 

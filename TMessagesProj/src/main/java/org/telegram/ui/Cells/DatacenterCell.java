@@ -65,6 +65,7 @@ public class DatacenterCell extends LinearLayout {
 
         mainLayout = new LinearLayout(context);
         mainLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        mainLayout.setGravity(Gravity.CENTER_VERTICAL);
 
         CardView cardView = new CardView(context);
         cardView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
