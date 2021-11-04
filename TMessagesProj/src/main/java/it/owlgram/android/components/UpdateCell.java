@@ -46,7 +46,7 @@ public class UpdateCell extends LinearLayout {
 
         setBackgroundColor(colorBackground);
         RelativeLayout relativeLayout = new RelativeLayout(context);
-        relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, AndroidUtilities.dp(330)));
+        relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT,AndroidUtilities.dp(330)));
 
         backupImageView = new BackupImageView(getContext());
         backupImageView.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));

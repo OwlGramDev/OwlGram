@@ -2094,10 +2094,10 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                                     break;
                                                 }
                                             }
-                                            long userId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Data.DATA4));
+                                            @SuppressLint("Range") long userId = cursor.getLong(cursor.getColumnIndex(ContactsContract.Data.DATA4));
                                             NotificationCenter.getInstance(intentAccount[0]).postNotificationName(NotificationCenter.closeChats);
                                             push_user_id = userId;
-                                            String mimeType = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.MIMETYPE));
+                                            @SuppressLint("Range") String mimeType = cursor.getString(cursor.getColumnIndex(ContactsContract.Data.MIMETYPE));
                                             if (TextUtils.equals(mimeType, "vnd.android.cursor.item/vnd.org.telegram.messenger.android.call")) {
                                                 audioCallUser = true;
                                             } else if (TextUtils.equals(mimeType, "vnd.android.cursor.item/vnd.org.telegram.messenger.android.call.video")) {
@@ -3683,26 +3683,26 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
     public void checkAppUpdate() {
         updateAppUpdateViews();
         if(!ApkDownloader.updateDownloaded()){
-            long passed_time = (new Date().getTime() - OwlConfig.lastUpdateCheck) / 1000;
-            if(passed_time >= 3600 * 8) {
-                UpdateManager.checkUpdates(new UpdateManager.UpdateCallback() {
-                    @Override
-                    public void onSuccess(Object updateResult) {
-                        OwlConfig.saveLastUpdateCheck();
-                        if(updateResult instanceof UpdateManager.UpdateAvailable) {
+            UpdateManager.checkUpdates(new UpdateManager.UpdateCallback() {
+                @Override
+                public void onSuccess(Object updateResult) {
+                    if(updateResult instanceof UpdateManager.UpdateAvailable) {
+                        long passed_time = (new Date().getTime() - OwlConfig.lastUpdateCheck) / 1000;
+                        if(passed_time >= 3600 * 8 || OwlConfig.lastUpdateStatus != 1) {
                             OwlConfig.setUpdateData(updateResult.toString());
                             UpdateManager.UpdateAvailable updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
                             (new UpdateAlertDialog(LaunchActivity.this, updateAvailable)).show();
                             OwlConfig.saveUpdateStatus(1);
-                        } else {
-                            OwlConfig.saveUpdateStatus(0);
+                            OwlConfig.saveLastUpdateCheck();
                         }
+                    } else {
+                        OwlConfig.saveUpdateStatus(0);
                     }
+                }
 
-                    @Override
-                    public void onError(Exception e) {}
-                });
-            }
+                @Override
+                public void onError(Exception e) {}
+            });
         }
     }
 

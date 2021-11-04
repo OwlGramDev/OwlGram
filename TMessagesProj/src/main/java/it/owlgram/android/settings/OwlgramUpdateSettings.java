@@ -271,7 +271,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
                             super.onConfirmUpdate();
                             if(Copyright.isNoCopyrightFeaturesEnabled()){
                                 if(!ApkDownloader.isRunningDownload()) {
-                                    ApkDownloader.downloadAPK(mContext, updateAvailable.link_file);
+                                    ApkDownloader.downloadAPK(mContext, updateAvailable.link_file, updateAvailable.version);
                                     updateCell.setDownloadMode();
                                 }
                             } else {

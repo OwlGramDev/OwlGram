@@ -44,9 +44,8 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 30
-    //noinspection GradleDependency
-    buildToolsVersion '30.0.0'
+    compileSdkVersion 31
+    buildToolsVersion '31.0.0'
     ndkVersion "21.4.7075529"
 
     defaultConfig.applicationId = "it.owlgram.android"
@@ -98,7 +97,7 @@ android {
             jniDebuggable true
             signingConfig signingConfigs.debug
             applicationIdSuffix ".beta"
-            minifyEnabled false
+            minifyEnabled true
             shrinkResources false
             multiDexEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -139,7 +138,7 @@ android {
             jniDebuggable false
             signingConfig signingConfigs.debug
             applicationIdSuffix ".beta"
-            minifyEnabled false
+            minifyEnabled true
             multiDexEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             ndk.debugSymbolLevel = 'FULL'
@@ -150,7 +149,7 @@ android {
             jniDebuggable false
             signingConfig signingConfigs.release
             applicationIdSuffix ".web"
-            minifyEnabled false
+            minifyEnabled true
             multiDexEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             ndk.debugSymbolLevel = 'FULL'
@@ -160,7 +159,7 @@ android {
             debuggable false
             jniDebuggable false
             signingConfig signingConfigs.release
-            minifyEnabled false
+            minifyEnabled true
             shrinkResources false
             multiDexEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -302,11 +301,11 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 2432
+    defaultConfig.versionCode = 2436
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            outputFileName = "owlgram.apk"
+            outputFileName = "Android-${defaultConfig.versionCode}.apk"
             output.versionCodeOverride = defaultConfig.versionCode * 10 + variant.productFlavors.get(0).abiVersionCode
         }
     }
@@ -320,8 +319,9 @@ android {
 
     defaultConfig {
         minSdkVersion 16
+        //noinspection OldTargetApi
         targetSdkVersion 29
-        versionName "1.0.4"
+        versionName "1.0.6"
 
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
 

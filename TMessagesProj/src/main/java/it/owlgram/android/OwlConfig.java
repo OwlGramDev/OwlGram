@@ -44,6 +44,7 @@ public class OwlConfig {
     public static int lastUpdateStatus = 0;
     public static int remindedUpdate = 0;
     public static long lastUpdateCheck = 0;
+    public static int oldDownloadedVersion = 0;
 
 
     private static boolean configLoaded;
@@ -87,6 +88,7 @@ public class OwlConfig {
             remindedUpdate = preferences.getInt("remindedUpdate", 0);
             translationTarget = preferences.getString("translationTarget", "app");
             updateData = preferences.getString("updateData", "");
+            oldDownloadedVersion = preferences.getInt("oldDownloadedVersion", 0);
             translationProvider = preferences.getInt("translationProvider", isChineseUser ? Translator.PROVIDER_NIU : Translator.PROVIDER_GOOGLE);
             configLoaded = true;
         }
@@ -305,6 +307,14 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("remindedUpdate", version);
+        editor.apply();
+    }
+
+    public static void saveOldVersion(int version) {
+        oldDownloadedVersion = version;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("oldDownloadedVersion", version);
         editor.apply();
     }
 

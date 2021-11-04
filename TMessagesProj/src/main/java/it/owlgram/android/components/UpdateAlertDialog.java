@@ -228,8 +228,8 @@ public class UpdateAlertDialog extends BottomSheet {
         cardView.setCardBackgroundColor(colorBackground);
 
         RelativeLayout relativeLayout = new RelativeLayout(context);
-        linearLayout.addView(relativeLayout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 250, 0, 4, 0, 4, 0));
-        relativeLayout.addView(cardView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 250));
+        linearLayout.addView(relativeLayout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 270, 0, 4, 0, 4, 0));
+        relativeLayout.addView(cardView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 270));
 
         BackupImageView imageView = new BackupImageView(context);
         imageView.setImage(updateAvailable.banner, null, null);
@@ -315,7 +315,7 @@ public class UpdateAlertDialog extends BottomSheet {
         doneButton.setText(LocaleController.formatString("AppUpdateDownloadNow", R.string.AppUpdateDownloadNow), false);
         doneButton.background.setOnClickListener(v -> {
             if(Copyright.isNoCopyrightFeaturesEnabled()){
-                ApkDownloader.downloadAPK(context, updateAvailable.link_file);
+                ApkDownloader.downloadAPK(context, updateAvailable.link_file, updateAvailable.version);
             } else {
                 Browser.openUrl(getContext(), BuildVars.PLAYSTORE_APP_URL);
             }

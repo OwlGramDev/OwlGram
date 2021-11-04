@@ -3,10 +3,12 @@ package it.owlgram.android.updates;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
 import android.os.PowerManager;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.NotificationCenter;
 
 import java.io.File;
@@ -16,6 +18,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import it.owlgram.android.OwlConfig;
 
 public class ApkDownloader {
     private static final Object sync = new Object();
@@ -39,7 +43,17 @@ public class ApkDownloader {
     }
 
     public static boolean updateDownloaded() {
-        return apkFile().exists() && downloadTask == null;
+        int code = 0;
+        try {
+            PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
+            code = pInfo.versionCode / 10;
+        } catch (Exception ignored){}
+        boolean isAvailableFile = apkFile().exists() && downloadTask == null;
+        if((code == OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
+            OwlConfig.setUpdateData("");
+            return false;
+        }
+        return isAvailableFile;
     }
 
     private static File apkFile() {
@@ -50,9 +64,10 @@ public class ApkDownloader {
         AndroidUtilities.openForView(ApkDownloader.apkFile(), "update.apk", "application/vnd.android.package-archive", activity, null);
     }
 
-    public static void downloadAPK(Context context, String link) {
+    public static void downloadAPK(Context context, String link, int version) {
         if(downloadTask != null) return;
         File output = apkFile();
+        OwlConfig.saveOldVersion(version);
         downloadTask = new DownloadTask(context, output);
         downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,link);
     }

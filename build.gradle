@@ -5,8 +5,7 @@ buildscript {
         google()
     }
     dependencies {
-        //noinspection AndroidGradlePluginVersion
-        classpath 'com.android.tools.build:gradle:4.2.1'
+        classpath 'com.android.tools.build:gradle:4.2.2'
         //noinspection GradleDependency
         classpath 'com.google.gms:google-services:4.3.5'
     }
