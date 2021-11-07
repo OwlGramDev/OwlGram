@@ -138,7 +138,7 @@ public class NotificationsController extends BaseController {
         }
         audioManager = (AudioManager) ApplicationLoader.applicationContext.getSystemService(Context.AUDIO_SERVICE);
     }
-    
+
     private static volatile NotificationsController[] Instance = new NotificationsController[UserConfig.MAX_ACCOUNT_COUNT];
 
     public static NotificationsController getInstance(int num) {
@@ -1760,6 +1760,8 @@ public class NotificationsController extends BaseController {
                                     : LocaleController.formatString("ChangedChatThemeTo", R.string.ChatThemeChangedTo, name, emoticon);
                         }
                         return msg;
+                    } else if (messageObject.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByRequest) {
+                        return messageObject.messageText.toString();
                     }
                 } else {
                     if (messageObject.isMediaEmpty()) {
@@ -2334,6 +2336,8 @@ public class NotificationsController extends BaseController {
                                         ? LocaleController.formatString("ChangedChatThemeYou", R.string.ChatThemeChangedYou, emoticon)
                                         : LocaleController.formatString("ChangedChatThemeTo", R.string.ChatThemeChangedTo, name, emoticon);
                             }
+                        } else if (messageObject.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByRequest) {
+                            msg = messageObject.messageText.toString();
                         }
                     } else if (ChatObject.isChannel(chat) && !chat.megagroup) {
                         if (messageObject.isMediaEmpty()) {
@@ -4125,8 +4129,9 @@ public class NotificationsController extends BaseController {
                 }
             }
 
+            boolean needAddPerson = !(lastMessageObject.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByRequest);
             NotificationCompat.MessagingStyle messagingStyle;
-            if (selfPerson != null) {
+            if (selfPerson != null && needAddPerson) {
                 messagingStyle = new NotificationCompat.MessagingStyle(selfPerson);
             } else {
                 messagingStyle = new NotificationCompat.MessagingStyle("");

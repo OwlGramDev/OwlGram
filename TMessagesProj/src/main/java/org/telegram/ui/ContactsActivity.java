@@ -216,7 +216,9 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
     @Override
     protected void onTransitionAnimationProgress(boolean isOpen, float progress) {
         super.onTransitionAnimationProgress(isOpen, progress);
-        fragmentView.invalidate();
+        if (fragmentView != null) {
+            fragmentView.invalidate();
+        }
     }
 
     @Override
@@ -277,7 +279,7 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
                 listViewAdapter.notifyDataSetChanged();
                 listView.setFastScrollVisible(true);
                 listView.setVerticalScrollBarEnabled(false);
-               // emptyView.setText(LocaleController.getString("NoContacts", R.string.NoContacts));
+                // emptyView.setText(LocaleController.getString("NoContacts", R.string.NoContacts));
                 if (floatingButtonContainer != null) {
                     floatingButtonContainer.setVisibility(View.VISIBLE);
                     floatingHidden = true;
@@ -352,7 +354,7 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
                 if (listView != null && listView.getAdapter() == this) {
                     int count = super.getItemCount();
                     if (needPhonebook) {
-                      //  emptyView.setVisibility(count == 2 ? View.VISIBLE : View.GONE);
+                        //  emptyView.setVisibility(count == 2 ? View.VISIBLE : View.GONE);
                         listView.setFastScrollVisible(count != 2);
                     } else {
                         //emptyView.setVisibility(count == 0 ? View.VISIBLE : View.GONE);
@@ -402,7 +404,7 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
         };
         listView.setSectionsType(1);
         listView.setVerticalScrollBarEnabled(false);
-        listView.setFastScrollEnabled();
+        listView.setFastScrollEnabled(RecyclerListView.FastScroll.LETTER_TYPE);
         listView.setLayoutManager(layoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         listView.setAdapter(listViewAdapter);
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));

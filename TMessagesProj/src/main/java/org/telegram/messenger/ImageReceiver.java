@@ -36,6 +36,8 @@ import org.telegram.ui.Components.RecyclableDrawable;
 
 import androidx.annotation.Keep;
 
+import java.util.ArrayList;
+
 public class ImageReceiver implements NotificationCenter.NotificationCenterDelegate {
 
     public interface ImageReceiverDelegate {
@@ -248,7 +250,7 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
     private boolean forcePreview;
     private boolean forceCrossfade;
     private int[] roundRadius = new int[4];
-    private boolean isRoundRect;
+    private boolean isRoundRect = true;
 
     private Paint roundPaint;
     private RectF roundRect = new RectF();
@@ -273,6 +275,7 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
     private float pressedProgress;
     private int animateFromIsPressed;
     private String uniqKeyPrefix;
+    private ArrayList<Runnable> loadingOperations = new ArrayList<>();
 
     public ImageReceiver() {
         this(null);
@@ -649,10 +652,14 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
     }
 
     public void setImageBitmap(Bitmap bitmap) {
-        setImageBitmap(bitmap != null ? new BitmapDrawable(null, bitmap) : null);
+        setImageBitmap(bitmap != null ? new BitmapDrawable(null, bitmap) : null, true);
     }
 
     public void setImageBitmap(Drawable bitmap) {
+        setImageBitmap(bitmap, true);
+    }
+
+    public void setImageBitmap(Drawable bitmap, boolean notify) {
         ImageLoader.getInstance().cancelLoadingForImageReceiver(this, true);
 
         if (crossfadeWithOldImage) {
@@ -746,6 +753,17 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
 
         if (setImageBackup != null) {
             setImageBackup.clear();
+        }
+
+        if (notify && delegate != null) {
+            delegate.didSetImage(this, currentThumbDrawable != null || staticThumbDrawable != null, true, false);
+        }
+        if (notify && parentView != null) {
+            if (invalidateAll) {
+                parentView.invalidate();
+            } else {
+                parentView.invalidate((int) imageX, (int) imageY, (int) (imageX + imageW), (int) (imageY + imageH));
+            }
         }
 
         if (delegate != null) {
@@ -1016,7 +1034,11 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
 
                         if (isRoundRect) {
                             try {
-                                canvas.drawRoundRect(roundRect, roundRadius[0], roundRadius[0], roundPaint);
+                                if (roundRadius[0] == 0) {
+                                    canvas.drawRect(roundRect, roundPaint);
+                                } else {
+                                    canvas.drawRoundRect(roundRect, roundRadius[0], roundRadius[0], roundPaint);
+                                }
                             } catch (Exception e) {
                                 onBitmapException(bitmapDrawable);
                                 FileLog.e(e);
@@ -1111,7 +1133,11 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
 
                         if (isRoundRect) {
                             try {
-                                canvas.drawRoundRect(roundRect, roundRadius[0], roundRadius[0], roundPaint);
+                                if (roundRadius[0] == 0) {
+                                    canvas.drawRect(roundRect, roundPaint);
+                                } else {
+                                    canvas.drawRoundRect(roundRect, roundRadius[0], roundRadius[0], roundPaint);
+                                }
                             } catch (Exception e) {
                                 onBitmapException(bitmapDrawable);
                                 FileLog.e(e);
@@ -2059,7 +2085,7 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
             }
             updateDrawableRadius(drawable);
 
-            if (isVisible && (!memCache && !forcePreview || forceCrossfade)) {
+            if (isVisible && (!memCache && !forcePreview || forceCrossfade) && crossfadeDuration != 0) {
                 boolean allowCorssfade = true;
                 if (currentMediaDrawable instanceof AnimatedFileDrawable && ((AnimatedFileDrawable) currentMediaDrawable).hasBitmap()) {
                     allowCorssfade = false;
@@ -2318,5 +2344,18 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
 
     public String getUniqKeyPrefix() {
         return uniqKeyPrefix;
+    }
+
+    public void addLoadingImageRunnable(Runnable loadOperationRunnable) {
+        loadingOperations.add(loadOperationRunnable);
+    }
+
+    public ArrayList<Runnable> getLoadingOperations() {
+        return loadingOperations;
+    }
+
+    public void moveImageToFront() {
+        ImageLoader.getInstance().moveToFront(currentImageKey);
+        ImageLoader.getInstance().moveToFront(currentThumbKey);
     }
 }

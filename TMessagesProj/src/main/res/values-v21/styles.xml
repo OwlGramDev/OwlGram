@@ -171,4 +171,9 @@
         <item name="android:windowExitAnimation">@anim/shrink_fade_out_center</item>
     </style>
 
+    <style name="TransparentDialog2" parent="TransparentDialog">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
 </resources>

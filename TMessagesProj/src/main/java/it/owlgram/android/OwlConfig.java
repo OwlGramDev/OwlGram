@@ -36,6 +36,9 @@ public class OwlConfig {
     public static boolean showMessageDetails;
     public static boolean betaUpdates;
     public static boolean notifyUpdates;
+    public static boolean avatarBackgroundDarken;
+    public static boolean avatarBackgroundBlur;
+    public static boolean avatarAsDrawerBackground;
     public static boolean isChineseUser = false;
     public static String translationTarget = "app";
     public static String updateData;
@@ -83,6 +86,9 @@ public class OwlConfig {
             showMessageDetails = preferences.getBoolean("showMessageDetails", false);
             betaUpdates = preferences.getBoolean("betaUpdates", false);
             notifyUpdates = preferences.getBoolean("notifyUpdates", true);
+            avatarBackgroundDarken = preferences.getBoolean("avatarBackgroundDarken", false);
+            avatarBackgroundBlur = preferences.getBoolean("avatarBackgroundBlur", false);
+            avatarAsDrawerBackground = preferences.getBoolean("avatarBackgroundBlur", false);
             lastUpdateCheck = preferences.getLong("lastUpdateCheck", 0);
             lastUpdateStatus = preferences.getInt("lastUpdateStatus", 0);
             remindedUpdate = preferences.getInt("remindedUpdate", 0);
@@ -259,6 +265,30 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("notifyUpdates", notifyUpdates);
+        editor.apply();
+    }
+
+    public static void toggleAvatarAsDrawerBackground() {
+        avatarAsDrawerBackground = !avatarAsDrawerBackground;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("avatarAsDrawerBackground", avatarAsDrawerBackground);
+        editor.apply();
+    }
+
+    public static void toggleAvatarBackgroundBlur() {
+        avatarBackgroundBlur = !avatarBackgroundBlur;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("avatarBackgroundBlur", avatarBackgroundBlur);
+        editor.apply();
+    }
+
+    public static void toggleAvatarBackgroundDarken() {
+        avatarBackgroundDarken = !avatarBackgroundDarken;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("avatarBackgroundDarken", avatarBackgroundDarken);
         editor.apply();
     }
 

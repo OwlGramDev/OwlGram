@@ -80,6 +80,9 @@ public class ActionPanel extends LinearLayout {
     public void hideLeave(){
         mainLayout.getChildAt(4).setVisibility(GONE);
     }
+    public void showLeave(){
+        mainLayout.getChildAt(4).setVisibility(VISIBLE);
+    }
     public void hideChannel(){
         mainLayout.getChildAt(3).setVisibility(GONE);
     }

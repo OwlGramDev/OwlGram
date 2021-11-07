@@ -1448,14 +1448,14 @@ public class ChatObject {
             }
             if (chat.default_banned_rights == null && (
                     chat instanceof TLRPC.TL_chat_layer92 ||
-                    chat instanceof TLRPC.TL_chat_old ||
-                    chat instanceof TLRPC.TL_chat_old2 ||
-                    chat instanceof TLRPC.TL_channel_layer92 ||
-                    chat instanceof TLRPC.TL_channel_layer77 ||
-                    chat instanceof TLRPC.TL_channel_layer72 ||
-                    chat instanceof TLRPC.TL_channel_layer67 ||
-                    chat instanceof TLRPC.TL_channel_layer48 ||
-                    chat instanceof TLRPC.TL_channel_old)) {
+                            chat instanceof TLRPC.TL_chat_old ||
+                            chat instanceof TLRPC.TL_chat_old2 ||
+                            chat instanceof TLRPC.TL_channel_layer92 ||
+                            chat instanceof TLRPC.TL_channel_layer77 ||
+                            chat instanceof TLRPC.TL_channel_layer72 ||
+                            chat instanceof TLRPC.TL_channel_layer67 ||
+                            chat instanceof TLRPC.TL_channel_layer48 ||
+                            chat instanceof TLRPC.TL_channel_old)) {
                 return true;
             }
             if (chat.default_banned_rights == null || getBannedRight(chat.default_banned_rights, action)) {
@@ -1488,6 +1488,10 @@ public class ChatObject {
 
     public static boolean isMegagroup(TLRPC.Chat chat) {
         return (chat instanceof TLRPC.TL_channel || chat instanceof TLRPC.TL_channelForbidden) && chat.megagroup;
+    }
+
+    public static boolean isChannelAndNotMegaGroup(TLRPC.Chat chat) {
+        return isChannel(chat) && !isMegagroup(chat);
     }
 
     public static boolean isMegagroup(int currentAccount, long chatId) {
@@ -1567,6 +1571,11 @@ public class ChatObject {
     public static boolean isChannel(long chatId, int currentAccount) {
         TLRPC.Chat chat = MessagesController.getInstance(currentAccount).getChat(chatId);
         return chat instanceof TLRPC.TL_channel || chat instanceof TLRPC.TL_channelForbidden;
+    }
+
+    public static boolean isChannelAndNotMegaGroup(long chatId, int currentAccount) {
+        TLRPC.Chat chat = MessagesController.getInstance(currentAccount).getChat(chatId);
+        return isChannelAndNotMegaGroup(chat);
     }
 
     public static boolean isCanWriteToChannel(long chatId, int currentAccount) {

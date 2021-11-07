@@ -97,4 +97,14 @@
     <string name="OwlgramUpdatePopupDesc">You\'ll get a notification when a new update is available</string>
     <string name="OwlgramApkChannel">APKs Channel</string>
     <string name="OwlgramNoQuoteForward">NoQuote Forward</string>
+    <string name="OwlgramFileName">Name</string>
+    <string name="OwlgramFilePath">Path</string>
+    <string name="OwlgramFileSize">Size</string>
+    <string name="OwlgramFileDC">Datacenter</string>
+    <string name="OwlgramTranslated">translated</string>
+    <string name="OwlgramForwards">Forwards</string>
+    <string name="OwlgramEdited">Edited</string>
+    <string name="OwlgramAvatarAsBackground">Profile picture as background</string>
+    <string name="OwlgramAvatarBlur">Blur profile picture</string>
+    <string name="OwlgramAvatarDarken">Darken profile picture</string>
 </resources>

@@ -3,7 +3,6 @@ package it.owlgram.android.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -14,6 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ChatObject;
+import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.R;
@@ -27,9 +28,10 @@ import org.telegram.ui.Cells.TextDetailSettingsCell;
 import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
-import org.telegram.ui.Components.UndoView;
 
+import java.io.File;
 import java.util.Date;
+import java.util.Locale;
 
 public class DetailsActivity extends BaseFragment {
     private int rowCount;
@@ -43,7 +45,9 @@ public class DetailsActivity extends BaseFragment {
     private int messageHeaderRow;
     private int messageIdRow;
     private int messageTextRow;
+    private int messageForwardsRow;
     private int messageDateRow;
+    private int messageDateEditedRow;
     private int messageDividerRow;
 
     private int forwardMessageHeaderRow;
@@ -64,6 +68,22 @@ public class DetailsActivity extends BaseFragment {
     private int repliedUserUsernameRow;
     private int repliedUserIdRow;
 
+    private int groupHeaderRow;
+    private int groupNameRow;
+    private int groupIdRow;
+    private int groupUsernameRow;
+    private int groupDividerRow;
+
+    private int fileHeaderRow;
+    private int fileNameRow;
+    private int filePathRow;
+    private int fileSizeRow;
+    private int fileDCRow;
+    private int fileDividerRow;
+
+    private String filePath;
+    private String fileName;
+
     private final MessageObject messageObject;
     private TLRPC.Chat fromChat;
     private TLRPC.User fromUser;
@@ -80,6 +100,9 @@ public class DetailsActivity extends BaseFragment {
         }
         if(messageObject.messageOwner.fwd_from != null && messageObject.messageOwner.fwd_from.from_id instanceof TLRPC.TL_peerUser){
             fromForwardedUser = getMessagesController().getUser(messageObject.messageOwner.fwd_from.from_id.user_id);
+        } else if (messageObject.messageOwner.fwd_from != null && !TextUtils.isEmpty(messageObject.messageOwner.fwd_from.from_name)) {
+            fromForwardedUser = new TLRPC.User() {};
+            fromForwardedUser.first_name = messageObject.messageOwner.fwd_from.from_name;
         }
         if(messageObject.messageOwner.replyMessage != null && messageObject.messageOwner.replyMessage.from_id instanceof TLRPC.TL_peerUser){
             fromRepliedUser = getMessagesController().getUser(messageObject.messageOwner.replyMessage.from_id.user_id);
@@ -133,8 +156,19 @@ public class DetailsActivity extends BaseFragment {
     @SuppressLint("NotifyDataSetChanged")
     private void updateRowsId() {
         rowCount = 0;
+        aboutInfoHeaderRow = -1;
+        nameUserHeaderRow = -1;
+        idUserHeaderRow = -1;
         usernameRow = -1;
+        aboutDividerRow = -1;
+        messageHeaderRow = -1;
+        messageIdRow = -1;
+        messageTextRow = -1;
+        messageForwardsRow = -1;
+        messageDateEditedRow = -1;
+        messageDateRow = -1;
         messageDividerRow = -1;
+
         forwardMessageHeaderRow = -1;
         forwardMessageDateRow = -1;
         forwardDividerRow = -1;
@@ -142,6 +176,7 @@ public class DetailsActivity extends BaseFragment {
         forwardUserNameRow = -1;
         forwardUserUsernameRow = -1;
         forwardUserIdRow = -1;
+
         repliedMessageHeaderRow = -1;
         repliedMessageIdRow = -1;
         repliedMessageTextRow = -1;
@@ -151,7 +186,29 @@ public class DetailsActivity extends BaseFragment {
         repliedUserNameRow = -1;
         repliedUserUsernameRow = -1;
         repliedUserIdRow = -1;
-        messageTextRow = -1;
+
+        groupHeaderRow = -1;
+        groupNameRow = -1;
+        groupIdRow = -1;
+        groupUsernameRow = -1;
+        groupDividerRow = -1;
+
+        fileHeaderRow = -1;
+        fileNameRow = -1;
+        filePathRow = -1;
+        fileSizeRow = -1;
+        fileDCRow = -1;
+        fileDividerRow = -1;
+
+        if((fromChat != null && fromUser != null && fromChat.id != fromUser.id) || (fromChat != null && fromUser == null)) {
+            groupHeaderRow = rowCount++;
+            groupNameRow = rowCount++;
+            if(fromChat.username != null) {
+                groupUsernameRow = rowCount++;
+            }
+            groupIdRow = rowCount++;
+            groupDividerRow = rowCount++;
+        }
 
         if(fromUser != null){
             aboutInfoHeaderRow = rowCount++;
@@ -167,7 +224,15 @@ public class DetailsActivity extends BaseFragment {
         if(messageObject.messageOwner.fwd_from == null && !TextUtils.isEmpty(messageObject.messageOwner.message)){
             messageTextRow = rowCount++;
         }
+        if(messageObject.messageOwner.forwards > 0) {
+            messageForwardsRow = rowCount++;
+        }
+        if(messageObject.messageOwner.edit_date != 0) {
+            messageDateEditedRow = rowCount++;
+        }
+
         messageDateRow = rowCount++;
+
         if(messageObject.messageOwner.fwd_from != null){
             messageDividerRow = rowCount++;
             forwardMessageHeaderRow = rowCount++;
@@ -179,10 +244,12 @@ public class DetailsActivity extends BaseFragment {
             if(fromForwardedUser != null){
                 forwardUserHeaderRow = rowCount++;
                 forwardUserNameRow = rowCount++;
-                if(fromForwardedUser.username != null) {
-                    forwardUserUsernameRow = rowCount++;
+                if(fromForwardedUser.id != 0){
+                    if(fromForwardedUser.username != null) {
+                        forwardUserUsernameRow = rowCount++;
+                    }
+                    forwardUserIdRow = rowCount++;
                 }
-                forwardUserIdRow = rowCount++;
             }
         }
         if(messageObject.messageOwner.replyMessage != null) {
@@ -201,6 +268,52 @@ public class DetailsActivity extends BaseFragment {
                     repliedUserUsernameRow = rowCount++;
                 }
                 repliedUserIdRow = rowCount++;
+            }
+        }
+        if (messageObject.messageOwner.media != null && !(messageObject.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage)) {
+            fileDividerRow = rowCount++;
+            fileHeaderRow = rowCount++;
+            if(messageObject.messageOwner.media.document != null) {
+                if (TextUtils.isEmpty(messageObject.messageOwner.media.document.file_name)) {
+                    for (int a = 0; a < messageObject.messageOwner.media.document.attributes.size(); a++) {
+                        if (messageObject.messageOwner.media.document.attributes.get(a) instanceof TLRPC.TL_documentAttributeFilename) {
+                            fileName = messageObject.messageOwner.media.document.attributes.get(a).file_name;
+                        }
+                    }
+                } else {
+                    fileName = messageObject.messageOwner.media.document.file_name;
+                }
+                if (!TextUtils.isEmpty(fileName)) {
+                    fileNameRow = rowCount++;
+                }
+            }
+            fileDCRow = rowCount++;
+            filePath = messageObject.messageOwner.attachPath;
+            if (!TextUtils.isEmpty(filePath)) {
+                File temp = new File(filePath);
+                if (!temp.exists()) {
+                    filePath = null;
+                }
+            }
+            if (TextUtils.isEmpty(filePath)) {
+                filePath = FileLoader.getPathToMessage(messageObject.messageOwner).toString();
+                File temp = new File(filePath);
+                if (!temp.exists()) {
+                    filePath = null;
+                }
+            }
+            if (TextUtils.isEmpty(filePath)) {
+                filePath = FileLoader.getPathToAttach(messageObject.getDocument(), true).toString();
+                File temp = new File(filePath);
+                if (!temp.isFile()) {
+                    filePath = null;
+                }
+            }
+            if (filePath != null) {
+                filePathRow = rowCount++;
+            }
+            if (messageObject.getSize() != 0) {
+                fileSizeRow = rowCount++;
             }
         }
 
@@ -246,7 +359,12 @@ public class DetailsActivity extends BaseFragment {
                     } else if (position == repliedMessageHeaderRow) {
                         headerCell.setText(LocaleController.getString("OwlgramRepliedMessage", R.string.OwlgramRepliedMessage));
                     } else if (position == repliedUserHeaderRow) {
-                        headerCell.setText( LocaleController.getString("OwlgramInReplyTo", R.string.OwlgramInReplyTo));
+                        headerCell.setText(LocaleController.getString("OwlgramInReplyTo", R.string.OwlgramInReplyTo));
+                    } else if (position == groupHeaderRow) {
+
+                        headerCell.setText(fromChat != null && fromChat.broadcast ? LocaleController.getString("AccDescrChannel", R.string.AccDescrChannel):LocaleController.getString("AccDescrGroup", R.string.AccDescrGroup));
+                    } else if (position == fileHeaderRow) {
+                        headerCell.setText(LocaleController.getString("ChatDocument", R.string.ChatDocument));
                     }
                     break;
                 case 3:
@@ -282,7 +400,7 @@ public class DetailsActivity extends BaseFragment {
                         if (fromForwardedUser.last_name != null){
                             full_name += " " + fromForwardedUser.last_name;
                         }
-                        textDetailCell.setTextAndValue(full_name, LocaleController.getString("OwlgramName", R.string.OwlgramName),true);
+                        textDetailCell.setTextAndValue(full_name, LocaleController.getString("OwlgramName", R.string.OwlgramName),fromForwardedUser.id != 0);
                     } else if (position == forwardUserUsernameRow) {
                         textDetailCell.setTextAndValue("@" + fromForwardedUser.username, LocaleController.getString("Username", R.string.Username),true);
                     } else if (position == forwardUserIdRow) {
@@ -291,7 +409,7 @@ public class DetailsActivity extends BaseFragment {
                         String message = messageObject.messageOwner.replyMessage.message;
                         textDetailCell.setTextAndValue(message, LocaleController.getString("OwlgramTextMessage", R.string.OwlgramTextMessage),true);
                     } else if (position == repliedMessageIdRow) {
-                        textDetailCell.setTextAndValue(String.valueOf(messageObject.messageOwner.replyMessage.id), "ID", false);
+                        textDetailCell.setTextAndValue(String.valueOf(messageObject.messageOwner.replyMessage.id), "ID", true);
                     } else if (position == repliedMessageDateRow) {
                         long date = (long) messageObject.messageOwner.replyMessage.date * 1000;
                         String title = messageObject.scheduled ?  LocaleController.getString("OwlgramMessageScheduledDate", R.string.OwlgramMessageScheduledDate) : LocaleController.getString("OwlgramMessageDate", R.string.OwlgramMessageDate);
@@ -303,9 +421,54 @@ public class DetailsActivity extends BaseFragment {
                         if (fromRepliedUser.last_name != null){
                             full_name += " " + fromRepliedUser.last_name;
                         }
-                        textDetailCell.setTextAndValue(full_name, LocaleController.getString("OwlgramName", R.string.OwlgramName),false);
+                        textDetailCell.setTextAndValue(full_name, LocaleController.getString("OwlgramName", R.string.OwlgramName),true);
                     } else if (position == repliedUserUsernameRow) {
                         textDetailCell.setTextAndValue("@" + fromRepliedUser.username, LocaleController.getString("Username", R.string.Username),true);
+                    } else if (position == groupNameRow) {
+                        textDetailCell.setTextAndValue(fromChat.title, LocaleController.getString("GroupName", R.string.GroupName),true);
+                    } else if (position == groupUsernameRow) {
+                        textDetailCell.setTextAndValue("@" + fromChat.username, LocaleController.getString("Username", R.string.Username),true);
+                    } else if (position == groupIdRow) {
+                        if(ChatObject.isChannel(fromChat)){
+                            textDetailCell.setTextAndValue("-100"+fromChat.id, "ID",false);
+                        }else{
+                            textDetailCell.setTextAndValue("-"+fromChat.id, "ID",false);
+                        }
+                    } else if (position == fileNameRow) {
+                        textDetailCell.setTextAndValue(fileName, LocaleController.getString("OwlgramFileName", R.string.OwlgramFileName),true);
+                    } else if (position == filePathRow) {
+                        textDetailCell.setTextAndValue(filePath, LocaleController.getString("OwlgramFilePath", R.string.OwlgramFilePath),true);
+                    } else if (position == fileSizeRow) {
+                        textDetailCell.setTextAndValue(AndroidUtilities.formatFileSize(messageObject.getSize()), LocaleController.getString("OwlgramFileSize", R.string.OwlgramFileSize),true);
+                    } else if (position == fileDCRow) {
+                        String DC_NAME = LocaleController.getString("NumberUnknown", R.string.NumberUnknown);
+                        int DC = -1;
+                        if (messageObject.messageOwner.media.photo != null && messageObject.messageOwner.media.photo.dc_id > 0) {
+                            DC = messageObject.messageOwner.media.photo.dc_id;
+                        } else if (messageObject.messageOwner.media.document != null && messageObject.messageOwner.media.document.dc_id > 0) {
+                            DC = messageObject.messageOwner.media.document.dc_id;
+                        }
+                        switch (DC){
+                            case 1:
+                                DC_NAME = "MIA, Miami FL, USA";
+                                break;
+                            case 2:
+                            case 4:
+                                DC_NAME = "AMS, Amsterdam, NL";
+                                break;
+                            case 5:
+                                DC_NAME = "SIN, Singapore, SG";
+                                break;
+                        }
+                        if(DC != -1){
+                            DC_NAME = String.format(Locale.ENGLISH, "%s - DC%d", DC_NAME, DC);
+                        }
+                        textDetailCell.setTextAndValue(DC_NAME, LocaleController.getString("OwlgramFileDC", R.string.OwlgramFileDC),true);
+                    } else if (position == messageForwardsRow) {
+                        textDetailCell.setTextAndValue(String.valueOf(messageObject.messageOwner.forwards), LocaleController.getString("OwlgramForwards", R.string.OwlgramForwards), true);
+                    } else if (position == messageDateEditedRow) {
+                        long date = (long) messageObject.messageOwner.edit_date * 1000;
+                        textDetailCell.setTextAndValue(LocaleController.formatString("formatDateAtTime", R.string.formatDateAtTime, LocaleController.getInstance().formatterYear.format(new Date(date)), LocaleController.getInstance().formatterDayWithSeconds.format(new Date(date))), LocaleController.getString("OwlgramEdited", R.string.OwlgramEdited), true);
                     }
                     break;
             }
@@ -340,17 +503,20 @@ public class DetailsActivity extends BaseFragment {
         @Override
         public int getItemViewType(int position) {
             if(position == aboutDividerRow || position == messageDividerRow || position == forwardDividerRow ||
-                    position == repliedDividerRow){
+                    position == repliedDividerRow || position == groupDividerRow || position == fileDividerRow){
                 return 1;
             } else if (position == aboutInfoHeaderRow || position == messageHeaderRow || position == forwardMessageHeaderRow ||
-                    position == forwardUserHeaderRow || position == repliedMessageHeaderRow || position == repliedUserHeaderRow){
+                    position == forwardUserHeaderRow || position == repliedMessageHeaderRow || position == repliedUserHeaderRow ||
+                    position == groupHeaderRow || position == fileHeaderRow){
                 return 2;
             } else if (position == idUserHeaderRow || position == nameUserHeaderRow || position == usernameRow ||
                     position == messageIdRow || position == messageTextRow || position == messageDateRow ||
                     position == forwardMessageDateRow || position == forwardUserIdRow || position == forwardUserUsernameRow ||
                     position == forwardUserNameRow || position == repliedMessageTextRow || position == repliedMessageDateRow ||
                     position == repliedMessageIdRow || position == repliedUserNameRow || position == repliedUserUsernameRow ||
-                    position == repliedUserIdRow) {
+                    position == repliedUserIdRow || position == groupNameRow || position == groupIdRow || position == groupUsernameRow ||
+                    position == fileNameRow || position == filePathRow || position == fileSizeRow || position == fileDCRow ||
+                    position == messageForwardsRow || position == messageDateEditedRow) {
                 return 3;
             }
             return 1;

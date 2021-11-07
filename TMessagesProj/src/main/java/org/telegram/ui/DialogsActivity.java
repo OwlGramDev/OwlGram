@@ -2351,6 +2351,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 break;
                             }
                         }
+                    } else if(getMessagesStorage().getMainUnreadCount() > 0){
+                        canShowRead = true;
                     }
                     scrimPopupWindowItems = new ActionBarMenuSubItem[4];
                     for (int a = 0, N = ((tabView.getId() == Integer.MAX_VALUE ? 3 : 4)) - (canShowRead ? 0:1); a < N; a++) {
@@ -2387,10 +2389,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                     presentFragment(new FilterCreateActivity(dialogFilter));
                                 }
                             } else if (i == 2 && finalCanShowRead) {
-                                for (TLRPC.Dialog dialog : dialogFilter.dialogs) {
-                                    if (dialog.unread_count == 0 && dialog.unread_mentions_count == 0)
-                                        continue;
-                                    getMessagesController().markDialogAsRead(dialog.id, dialog.top_message, dialog.top_message, dialog.last_message_date, false, 0, dialog.unread_count, true, 0);
+                                if (dialogFilter == null) {
+                                    int folderId = tabView.getId() == Integer.MAX_VALUE ? 0 : -1;
+                                    getMessagesStorage().readAllDialogs(folderId);
+                                } else {
+                                    for (TLRPC.Dialog dialog : dialogFilter.dialogs) {
+                                        if (dialog.unread_count == 0 && dialog.unread_mentions_count == 0)
+                                            continue;
+                                        getMessagesController().markDialogAsRead(dialog.id, dialog.top_message, dialog.top_message, dialog.last_message_date, false, 0, dialog.unread_count, true, 0);
+                                    }
                                 }
                             } else {
                                 showDeleteAlert(dialogFilter);

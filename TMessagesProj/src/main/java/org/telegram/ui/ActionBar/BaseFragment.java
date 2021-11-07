@@ -719,5 +719,4 @@ public abstract class BaseFragment {
     public Theme.ResourcesProvider getResourceProvider() {
         return null;
     }
-
 }

@@ -1,11 +1,3 @@
-/*
- * This is the source code of Telegram for Android v. 5.x.x.
- * It is licensed under GNU GPL v. 2 or later.
- * You should have received a copy of the license in this archive (see LICENSE).
- *
- * Copyright Nikolai Kudashov, 2013-2018.
- */
-
 package org.telegram.ui.Cells;
 
 import android.app.Activity;
@@ -32,15 +24,21 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.palette.graphics.Palette;
+
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.ImageLocation;
+import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.R;
+import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.Components.AudioPlayerAlert;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.CubicBezierInterpolator;
@@ -56,7 +54,7 @@ public class DrawerProfileCell extends FrameLayout {
 
     private BackupImageView avatarImageView;
     private TextView nameTextView;
-    private TextView phoneTextView;
+    private AudioPlayerAlert.ClippingTextViewSwitcher phoneTextView;
     private ImageView shadowView;
     private ImageView arrowView;
     private RLottieImageView darkThemeView;
@@ -73,8 +71,57 @@ public class DrawerProfileCell extends FrameLayout {
     private int darkThemeBackgroundColor;
     public static boolean switchingTheme;
 
+    private final ImageReceiver imageReceiver;
+    private Bitmap lastBitmap;
+    private boolean avatarAsDrawerBackground = false;
+
     public DrawerProfileCell(Context context) {
         super(context);
+
+        imageReceiver = new ImageReceiver(this);
+        imageReceiver.setCrossfadeWithOldImage(true);
+        imageReceiver.setForceCrossfade(true);
+        imageReceiver.setDelegate((imageReceiver, set, thumb, memCache) -> {
+            if (OwlConfig.avatarBackgroundDarken || OwlConfig.avatarBackgroundBlur) {
+                if (thumb) {
+                    return;
+                }
+                ImageReceiver.BitmapHolder bmp = imageReceiver.getBitmapSafe();
+                if (bmp != null) {
+                    new Thread(() -> {
+                        int width = OwlConfig.avatarBackgroundBlur ? 150 : bmp.bitmap.getWidth();
+                        int height = OwlConfig.avatarBackgroundBlur ? 150 : bmp.bitmap.getHeight();
+                        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(bitmap);
+                        canvas.drawBitmap(bmp.bitmap, null, new Rect(0, 0, width, height), new Paint(Paint.FILTER_BITMAP_FLAG));
+                        if (OwlConfig.avatarBackgroundBlur) {
+                            try {
+                                Utilities.stackBlurBitmap(bitmap, 3);
+                            } catch (Exception e) {
+                                FileLog.e(e);
+                            }
+                        }
+                        if (OwlConfig.avatarBackgroundDarken) {
+                            final Palette palette = Palette.from(bmp.bitmap).generate();
+                            Paint paint = new Paint();
+                            paint.setColor((palette.getDarkMutedColor(0xFF547499) & 0x00FFFFFF) | 0x44000000);
+                            canvas.drawRect(0, 0, canvas.getWidth(), canvas.getHeight(), paint);
+                        }
+                        AndroidUtilities.runOnUIThread(() -> {
+                            if (lastBitmap != null) {
+                                imageReceiver.setCrossfadeWithOldImage(false);
+                                imageReceiver.setImageBitmap(new BitmapDrawable(null, lastBitmap), false);
+                            }
+                            imageReceiver.setCrossfadeWithOldImage(true);
+                            imageReceiver.setImageBitmap(new BitmapDrawable(null, bitmap));
+                            lastBitmap = bitmap;
+                        });
+                    }).start();
+                }
+            } else {
+                lastBitmap = null;
+            }
+        });
 
         shadowView = new ImageView(context);
         shadowView.setVisibility(INVISIBLE);
@@ -96,12 +143,18 @@ public class DrawerProfileCell extends FrameLayout {
         nameTextView.setEllipsize(TextUtils.TruncateAt.END);
         addView(nameTextView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.BOTTOM, 16, 0, 76, 28));
 
-        phoneTextView = new TextView(context);
-        phoneTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
-        phoneTextView.setLines(1);
-        phoneTextView.setMaxLines(1);
-        phoneTextView.setSingleLine(true);
-        phoneTextView.setGravity(Gravity.LEFT);
+        phoneTextView = new AudioPlayerAlert.ClippingTextViewSwitcher(context) {
+            @Override
+            protected TextView createTextView() {
+                TextView textView = new TextView(context);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+                textView.setLines(1);
+                textView.setMaxLines(1);
+                textView.setSingleLine(true);
+                textView.setGravity(Gravity.LEFT);
+                return textView;
+            }
+        };
         addView(phoneTextView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.BOTTOM, 16, 0, 76, 9));
 
         arrowView = new ImageView(context);
@@ -111,7 +164,7 @@ public class DrawerProfileCell extends FrameLayout {
         setArrowState(false);
 
         sunDrawable = new RLottieDrawable(R.raw.sun, "" + R.raw.sun, AndroidUtilities.dp(28), AndroidUtilities.dp(28), true, null);
-        if (isCurrentThemeDay()) {
+        if (Theme.isCurrentThemeDay()) {
             sunDrawable.setCustomEndFrame(36);
         } else {
             sunDrawable.setCustomEndFrame(0);
@@ -149,11 +202,11 @@ public class DrawerProfileCell extends FrameLayout {
             switchingTheme = true;
             SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("themeconfig", Activity.MODE_PRIVATE);
             String dayThemeName = preferences.getString("lastDayTheme", "Blue");
-            if (Theme.getTheme(dayThemeName) == null) {
+            if (Theme.getTheme(dayThemeName) == null || Theme.getTheme(dayThemeName).isDark()) {
                 dayThemeName = "Blue";
             }
             String nightThemeName = preferences.getString("lastDarkTheme", "Dark Blue");
-            if (Theme.getTheme(nightThemeName) == null) {
+            if (Theme.getTheme(nightThemeName) == null || !Theme.getTheme(nightThemeName).isDark()) {
                 nightThemeName = "Dark Blue";
             }
             Theme.ThemeInfo themeInfo = Theme.getActiveTheme();
@@ -198,23 +251,6 @@ public class DrawerProfileCell extends FrameLayout {
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.needSetDayNightTheme, themeInfo, false, pos, -1, toDark, darkThemeView);
     }
 
-    private boolean isCurrentThemeDay() {
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("themeconfig", Activity.MODE_PRIVATE);
-        String dayThemeName = preferences.getString("lastDayTheme", "Blue");
-        if (Theme.getTheme(dayThemeName) == null) {
-            dayThemeName = "Blue";
-        }
-        String nightThemeName = preferences.getString("lastDarkTheme", "Dark Blue");
-        if (Theme.getTheme(nightThemeName) == null) {
-            nightThemeName = "Dark Blue";
-        }
-        Theme.ThemeInfo themeInfo = Theme.getActiveTheme();
-        if (dayThemeName.equals(nightThemeName) && themeInfo.isDark()) {
-            dayThemeName = "Blue";
-        }
-        return dayThemeName.equals(themeInfo.getKey());
-    }
-
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -243,7 +279,7 @@ public class DrawerProfileCell extends FrameLayout {
         boolean drawCatsShadow = false;
         int color;
         int darkBackColor = 0;
-        if (!useImageBackground && Theme.hasThemeKey(Theme.key_chats_menuTopShadowCats)) {
+        if (!avatarAsDrawerBackground && !useImageBackground && Theme.hasThemeKey(Theme.key_chats_menuTopShadowCats)) {
             color = Theme.getColor(Theme.key_chats_menuTopShadowCats);
             drawCatsShadow = true;
         } else {
@@ -268,12 +304,16 @@ public class DrawerProfileCell extends FrameLayout {
             sunDrawable.commitApplyLayerColors();
         }
         nameTextView.setTextColor(Theme.getColor(Theme.key_chats_menuName));
-        if (useImageBackground) {
-            phoneTextView.setTextColor(Theme.getColor(Theme.key_chats_menuPhone));
+        if (avatarAsDrawerBackground || useImageBackground) {
+            phoneTextView.getTextView().setTextColor(Theme.getColor(Theme.key_chats_menuPhone));
             if (shadowView.getVisibility() != VISIBLE) {
                 shadowView.setVisibility(VISIBLE);
             }
-            if (backgroundDrawable instanceof ColorDrawable || backgroundDrawable instanceof GradientDrawable) {
+            if (avatarAsDrawerBackground) {
+                imageReceiver.setImageCoords(0, 0, getWidth(), getHeight());
+                imageReceiver.draw(canvas);
+                darkBackColor = Theme.getColor(Theme.key_listSelector);
+            } else if (backgroundDrawable instanceof ColorDrawable || backgroundDrawable instanceof GradientDrawable) {
                 backgroundDrawable.setBounds(0, 0, getMeasuredWidth(), getMeasuredHeight());
                 backgroundDrawable.draw(canvas);
                 darkBackColor = Theme.getColor(Theme.key_listSelector);
@@ -300,7 +340,7 @@ public class DrawerProfileCell extends FrameLayout {
             if (shadowView.getVisibility() != visibility) {
                 shadowView.setVisibility(visibility);
             }
-            phoneTextView.setTextColor(Theme.getColor(Theme.key_chats_menuPhoneCats));
+            phoneTextView.getTextView().setTextColor(Theme.getColor(Theme.key_chats_menuPhoneCats));
             super.onDraw(canvas);
             darkBackColor = Theme.getColor(Theme.key_listSelector);
         }
@@ -312,7 +352,7 @@ public class DrawerProfileCell extends FrameLayout {
                     Theme.setSelectorDrawableColor(darkThemeView.getBackground(), darkThemeBackgroundColor = darkBackColor, true);
                 }
             }
-            if (useImageBackground && backgroundDrawable instanceof BitmapDrawable) {
+            if (!avatarAsDrawerBackground && useImageBackground && backgroundDrawable instanceof BitmapDrawable) {
                 canvas.drawCircle(darkThemeView.getX() + darkThemeView.getMeasuredWidth() / 2, darkThemeView.getY() + darkThemeView.getMeasuredHeight() / 2, AndroidUtilities.dp(17), backPaint);
             }
         }
@@ -323,7 +363,11 @@ public class DrawerProfileCell extends FrameLayout {
     }
 
     public boolean isInAvatar(float x, float y) {
-        return x >= avatarImageView.getLeft() && x <= avatarImageView.getRight() && y >= avatarImageView.getTop() && y <= avatarImageView.getBottom();
+        if (avatarAsDrawerBackground) {
+            return y <= arrowView.getTop();
+        } else {
+            return x >= avatarImageView.getLeft() && x <= avatarImageView.getRight() && y >= avatarImageView.getTop() && y <= avatarImageView.getBottom();
+        }
     }
 
     public boolean hasAvatar() {
@@ -349,16 +393,25 @@ public class DrawerProfileCell extends FrameLayout {
         accountsShown = accounts;
         setArrowState(false);
         nameTextView.setText(UserObject.getUserName(user));
-        if(!OwlConfig.hidePhoneNumber){
+        if (!OwlConfig.hidePhoneNumber) {
             phoneTextView.setText(PhoneFormat.getInstance().format("+" + user.phone));
         } else if (!TextUtils.isEmpty(user.username)) {
-            phoneTextView.setText(String.format("@%s", user.username));
+            phoneTextView.setText("@" + user.username);
         } else {
             phoneTextView.setText(LocaleController.getString("MobileHidden",R.string.MobileHidden));
         }
         AvatarDrawable avatarDrawable = new AvatarDrawable(user);
         avatarDrawable.setColor(Theme.getColor(Theme.key_avatar_backgroundInProfileBlue));
         avatarImageView.setForUserOrChat(user, avatarDrawable);
+        if (OwlConfig.avatarAsDrawerBackground) {
+            ImageLocation imageLocation = ImageLocation.getForUser(user, ImageLocation.TYPE_BIG);
+            avatarAsDrawerBackground = imageLocation != null;
+            imageReceiver.setImage(imageLocation, "512_512", null, null, new ColorDrawable(0x00000000), 0, null, user, 1);
+            avatarImageView.setVisibility(INVISIBLE);
+        } else {
+            avatarAsDrawerBackground = false;
+            avatarImageView.setVisibility(VISIBLE);
+        }
 
         applyBackground(true);
     }
