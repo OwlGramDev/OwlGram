@@ -1426,19 +1426,24 @@ public class LoginActivity extends BaseFragment {
                 });
             }
 
-            if (BuildVars.DEBUG_PRIVATE_VERSION) {
-                testBackendCheckBox = new CheckBoxCell(context, 2);
-                testBackendCheckBox.setText("Test Backend", "", testBackend, false);
-                addView(testBackendCheckBox, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
-                testBackendCheckBox.setOnClickListener(v -> {
-                    if (getParentActivity() == null) {
-                        return;
-                    }
-                    CheckBoxCell cell = (CheckBoxCell) v;
-                    testBackend = !testBackend;
-                    cell.setChecked(testBackend, true);
-                });
-            }
+            //if (BuildVars.DEBUG_PRIVATE_VERSION) {
+            testBackendCheckBox = new CheckBoxCell(context, 2);
+            testBackendCheckBox.setText(LocaleController.getString("OwlgramTestBackend", R.string.OwlgramTestBackend), "", testBackend, false);
+            addView(testBackendCheckBox, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
+            testBackendCheckBox.setOnClickListener(v -> {
+                if (getParentActivity() == null) {
+                    return;
+                }
+                CheckBoxCell cell = (CheckBoxCell) v;
+                testBackend = !testBackend;
+                cell.setChecked(testBackend, true);
+                if (testBackend) {
+                    BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.chats_infotip, LocaleController.getString("OwlgramTestBackendOn", R.string.OwlgramTestBackendOn)).show();
+                } else {
+                    BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.chats_infotip, LocaleController.getString("OwlgramTestBackendOff", R.string.OwlgramTestBackendOff)).show();
+                }
+            });
+            //}
 
             HashMap<String, String> languageMap = new HashMap<>();
 
@@ -1656,7 +1661,8 @@ public class LoginActivity extends BaseFragment {
                 return;
             }
             String phone = PhoneFormat.stripExceptNumbers("" + codeField.getText() + phoneField.getText());
-            boolean isTestBakcend = BuildVars.DEBUG_PRIVATE_VERSION && getConnectionsManager().isTestBackend();
+            //BuildVars.DEBUG_PRIVATE_VERSION &&
+            boolean isTestBakcend = getConnectionsManager().isTestBackend();
             if (isTestBakcend != testBackend) {
                 getConnectionsManager().switchBackend(false);
                 isTestBakcend = testBackend;

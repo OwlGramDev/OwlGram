@@ -25,6 +25,7 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.components.BlurIntensityCell;
 
 public class OwlgramChatSettings extends BaseFragment {
     private int rowCount;
@@ -36,7 +37,6 @@ public class OwlgramChatSettings extends BaseFragment {
     private int showGreetings;
     private int hideKeyboardRow;
     private int playGifAsVideoRow;
-    private int separatedPhotoAndVideoRow;
     private int chatDividerRow;
     private int foldersHeaderRow;
     private int showFolderWhenForwardRow;
@@ -46,6 +46,7 @@ public class OwlgramChatSettings extends BaseFragment {
     private int showTranslateRow;
     private int showAddToSMRow;
     private int showNoQuoteForwardRow;
+    private int showReportRow;
     private int showMessageDetails;
     private int messageMenuDividerRow;
     private int audioVideoHeaderRow;
@@ -150,6 +151,11 @@ public class OwlgramChatSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showNoQuoteForward);
                 }
+            } else if (position == showReportRow){
+                OwlConfig.toggleShowReportMessage();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.showReportMessage);
+                }
             }
         });
         return fragmentView;
@@ -158,7 +164,6 @@ public class OwlgramChatSettings extends BaseFragment {
     @SuppressLint("NotifyDataSetChanged")
     private void updateRowsId() {
         rowCount = 0;
-        separatedPhotoAndVideoRow = -1;
         showFolderIconsRow = -1;
 
         chatHeaderRow = rowCount++;
@@ -167,7 +172,6 @@ public class OwlgramChatSettings extends BaseFragment {
         showGreetings = rowCount++;
         playGifAsVideoRow = rowCount++;
         hideKeyboardRow = rowCount++;
-        //separatedPhotoAndVideoRow = rowCount++;
         chatDividerRow = rowCount++;
         foldersHeaderRow = rowCount++;
         showFolderWhenForwardRow = rowCount++;
@@ -175,10 +179,11 @@ public class OwlgramChatSettings extends BaseFragment {
         foldersDividerRow = rowCount++;
 
         messageMenuHeaderRow = rowCount++;
-        showTranslateRow = rowCount++;
-        showAddToSMRow = rowCount++;
-        showMessageDetails = rowCount++;
         showNoQuoteForwardRow = rowCount++;
+        showAddToSMRow = rowCount++;
+        showTranslateRow = rowCount++;
+        showReportRow = rowCount++;
+        showMessageDetails = rowCount++;
         messageMenuDividerRow = rowCount++;
 
         audioVideoHeaderRow = rowCount++;
@@ -238,8 +243,6 @@ public class OwlgramChatSettings extends BaseFragment {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramHideKeyboardScrolling", R.string.OwlgramHideKeyboardScrolling), OwlConfig.hideKeyboard, true);
                     } else if (position == playGifAsVideoRow) {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramPlayGifAsVideo", R.string.OwlgramPlayGifAsVideo), OwlConfig.gifAsVideo, true);
-                    } else if (position == separatedPhotoAndVideoRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramSeparatedPhotoAndVideos", R.string.OwlgramSeparatedPhotoAndVideos), OwlConfig.separatedPhotoAndVideo, true);
                     } else if (position == showFolderWhenForwardRow) {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramFolderWhenForward", R.string.OwlgramFolderWhenForward), OwlConfig.showFolderWhenForward, true);
                     } else if (position == showFolderIconsRow) {
@@ -253,10 +256,16 @@ public class OwlgramChatSettings extends BaseFragment {
                     } else if (position == showAddToSMRow) {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramShowSaveMessage", R.string.OwlgramShowSaveMessage), OwlConfig.showSaveMessage, true);
                     } else if (position == showMessageDetails) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramShowDetails", R.string.OwlgramShowDetails), OwlConfig.showMessageDetails, true);
+                        textCell.setTextAndCheck(LocaleController.getString("OwlgramShowDetails", R.string.OwlgramShowDetails), OwlConfig.showMessageDetails, false);
                     } else if (position == showNoQuoteForwardRow) {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramNoQuoteForward", R.string.OwlgramNoQuoteForward), OwlConfig.showNoQuoteForward, true);
+                    } else if (position == showReportRow) {
+                        textCell.setTextAndCheck(LocaleController.getString("ReportChat", R.string.ReportChat), OwlConfig.showReportMessage, true);
                     }
+                    break;
+                case 4:
+                    BlurIntensityCell blurIntensityCell = (BlurIntensityCell) holder.itemView;
+
                     break;
             }
         }
@@ -264,7 +273,7 @@ public class OwlgramChatSettings extends BaseFragment {
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int type = holder.getItemViewType();
-            return type == 3 || type == 4;
+            return type == 3;
         }
 
         @NonNull
@@ -280,10 +289,6 @@ public class OwlgramChatSettings extends BaseFragment {
                     view = new TextCheckCell(mContext);
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
-                case 4:
-                    view = new TextSettingsCell(mContext);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-                    break;
                 default:
                     view = new ShadowSectionCell(mContext);
                     break;
@@ -296,14 +301,14 @@ public class OwlgramChatSettings extends BaseFragment {
         public int getItemViewType(int position) {
             if(position == chatDividerRow || position == foldersDividerRow || position == messageMenuDividerRow){
                 return 1;
-            }else if (position == chatHeaderRow || position == foldersHeaderRow || position == audioVideoHeaderRow ||
+            } else if (position == chatHeaderRow || position == foldersHeaderRow || position == audioVideoHeaderRow ||
                     position == messageMenuHeaderRow) {
                 return 2;
-            }else if (position == mediaSwipeByTapRow || position == jumpChannelRow || position == hideKeyboardRow ||
-                    position == playGifAsVideoRow || position == separatedPhotoAndVideoRow || position == showFolderWhenForwardRow ||
+            } else if (position == mediaSwipeByTapRow || position == jumpChannelRow || position == hideKeyboardRow ||
+                    position == playGifAsVideoRow || position == showFolderWhenForwardRow ||
                     position == showFolderIconsRow || position == rearCameraStartingRow  || position == confirmSendRow ||
                     position == showGreetings || position == showTranslateRow || position == showAddToSMRow ||
-                    position == showMessageDetails || position == showNoQuoteForwardRow) {
+                    position == showMessageDetails || position == showNoQuoteForwardRow || position == showReportRow) {
                 return 3;
             }
             return 1;

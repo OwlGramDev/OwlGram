@@ -240,7 +240,7 @@ public class UpdateCell extends LinearLayout {
     @SuppressLint("SetTextI18n")
     public void setPercentage(int percentage, long downBytes, long totBytes) {
         radialProgress.setProgress(percentage / 100F);
-        download_status.setText(AndroidUtilities.humanReadableByteCount(downBytes, false,Locale.US) + "/" + AndroidUtilities.humanReadableByteCount(totBytes, false,Locale.US));
+        download_status.setText(AndroidUtilities.formatFileSize(downBytes) + "/" + AndroidUtilities.formatFileSize(totBytes));
     }
 
     private void setTextEntities(TextView tv, String text) {

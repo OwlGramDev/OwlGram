@@ -49,7 +49,7 @@
     <string name="OwlgramSignAsRead">Mark as all read</string>
     <string name="OwlgramCreateMention">Create Mention</string>
     <string name="OwlgramVersion">OwlGram %1$s</string>
-    <string name="OwlgramCallbackCopied">Callback copied to clipboard</string>
+    <string name="OwlgramCallbackCopied">Callback copied to clipboard.</string>
     <string name="OwlgramAutoLockInstant">Instant</string>
     <string name="OwlgramMkwRowPlayer">Show MKV as Video</string>
     <string name="OwlgramAllVideoPlay">Stream All Videos</string>
@@ -93,8 +93,8 @@
     <string name="OwlgramCheckUpdates">Check</string>
     <string name="OwlgramBetaUpdates">Install beta versions</string>
     <string name="OwlgramBetaUpdatesDesc">Test new OwlGram updates before their official release</string>
-    <string name="OwlgramUpdatePopup">Notify when an update is available</string>
-    <string name="OwlgramUpdatePopupDesc">You\'ll get a notification when a new update is available</string>
+    <string name="OwlgramUpdatePopup">Notify when available</string>
+    <string name="OwlgramUpdatePopupDesc">You\'ll be notified when a new update is available</string>
     <string name="OwlgramApkChannel">APKs Channel</string>
     <string name="OwlgramNoQuoteForward">NoQuote Forward</string>
     <string name="OwlgramFileName">Name</string>
@@ -103,8 +103,17 @@
     <string name="OwlgramFileDC">Datacenter</string>
     <string name="OwlgramTranslated">translated</string>
     <string name="OwlgramForwards">Forwards</string>
-    <string name="OwlgramEdited">Edited</string>
+    <string name="OwlgramEdited">Edited Date</string>
     <string name="OwlgramAvatarAsBackground">Profile picture as background</string>
     <string name="OwlgramAvatarBlur">Blur profile picture</string>
     <string name="OwlgramAvatarDarken">Darken profile picture</string>
+    <string name="OwlgramEmojiSticker">Associated Emoji</string>
+    <string name="OwlgramMimeType">Mime Type</string>
+    <string name="OwlgramBetterAudioCall">Enhance Audio Quality</string>
+    <string name="OwlgramTestBackend">Test Backend</string>
+    <string name="OwlgramTestBackendOn">This account will connect to the test backend.</string>
+    <string name="OwlgramTestBackendOff">This account will connect to the production backend.</string>
+    <string name="OwlgramShowGradient">Shade Background</string>
+    <string name="OwlgramShowAvatar">Show Avatar</string>
+    <string name="OwlgramBlurIntensity">Blur intensity</string>
 </resources>

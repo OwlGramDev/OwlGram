@@ -30,11 +30,13 @@ import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
+import org.telegram.ui.ThemeActivity;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.components.BlurIntensityCell;
 import it.owlgram.android.components.DrawerProfilePreviewCell;
 import it.owlgram.android.helpers.PopupHelper;
 import it.owlgram.android.translator.DeepLTranslator;
@@ -43,7 +45,13 @@ import it.owlgram.android.translator.Translator;
 public class OwlgramGeneralSettings extends BaseFragment {
     private int rowCount;
     private ListAdapter listAdapter;
+    private RecyclerListView listView;
 
+    private int drawerRow;
+    private int drawerAvatarAsBackgroundRow;
+    private int drawerBlurBackgroundRow;
+    private int drawerDarkenBackgroundRow;
+    private int drawerDividerRow;
     private int divisorPrivacyRow;
     private int privacyHeaderRow;
     private int phoneNumberSwitchRow;
@@ -61,12 +69,13 @@ public class OwlgramGeneralSettings extends BaseFragment {
     private int divisorTranslationRow;
     private int callHeaderRow;
     private int confirmCallSwitchRow;
+    private int betterAudioCallRow;
     private int deepLFormalityRow;
-    private int drawerRow;
-    private int drawerAvatarAsBackgroundRow;
-    private int drawerBlurBackgroundRow;
-    private int drawerDarkenBackgroundRow;
-    private int drawerDividerRow;
+    private int showGradientRow;
+    private int showAvatarRow;
+    private int editBlurHeaderRow;
+    private int editBlurRow;
+    private int editBlurDividerRow;
 
     private DrawerProfilePreviewCell profilePreviewCell;
 
@@ -98,7 +107,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
         fragmentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
         FrameLayout frameLayout = (FrameLayout) fragmentView;
 
-        RecyclerListView listView = new RecyclerListView(context);
+        listView = new RecyclerListView(context);
         listView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         listView.setVerticalScrollBarEnabled(false);
         listView.setAdapter(listAdapter);
@@ -113,6 +122,8 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     ((TextCheckCell) view).setChecked(OwlConfig.hidePhoneNumber);
                 }
                 parentLayout.rebuildAllFragmentViews(false, false);
+                getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                listAdapter.notifyItemChanged(drawerRow, new Object());
             }else if (position == phoneContactsSwitchRow) {
                 OwlConfig.toggleHideContactNumber();
                 if (view instanceof TextCheckCell) {
@@ -187,6 +198,11 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     ((TextCheckCell) view).setChecked(OwlConfig.useSystemFont);
                 }
                 parentLayout.rebuildAllFragmentViews(true, true);
+            } else if (position == useSystemEmojiRow) {
+                OwlConfig.toggleUseSystemEmoji();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.useSystemEmoji);
+                }
             } else if (position == drawerAvatarAsBackgroundRow) {
                 OwlConfig.toggleAvatarAsDrawerBackground();
                 if (view instanceof TextCheckCell) {
@@ -199,9 +215,9 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 listAdapter.notifyItemChanged(drawerRow, new Object());
                 if (OwlConfig.avatarAsDrawerBackground) {
                     updateRowsId(false);
-                    listAdapter.notifyItemRangeInserted(drawerBlurBackgroundRow, 2);
+                    listAdapter.notifyItemRangeInserted(showGradientRow, 4 + (OwlConfig.avatarBackgroundBlur ? 3:0));
                 } else {
-                    listAdapter.notifyItemRangeRemoved(drawerBlurBackgroundRow, 2);
+                    listAdapter.notifyItemRangeRemoved(showGradientRow, 4 + (OwlConfig.avatarBackgroundBlur ? 3:0));
                     updateRowsId(false);
                 }
             } else if (position == drawerBlurBackgroundRow) {
@@ -211,10 +227,35 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 }
                 getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
                 listAdapter.notifyItemChanged(drawerRow, new Object());
+                if(OwlConfig.avatarBackgroundBlur) {
+                    listAdapter.notifyItemRangeInserted(drawerDividerRow, 3);
+                } else {
+                    listAdapter.notifyItemRangeRemoved(drawerDividerRow, 3);
+                }
+                updateRowsId(false);
             } else if (position == drawerDarkenBackgroundRow) {
                 OwlConfig.toggleAvatarBackgroundDarken();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.avatarBackgroundDarken);
+                }
+                getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                listAdapter.notifyItemChanged(drawerRow, new Object());
+            } else if (position == betterAudioCallRow) {
+                OwlConfig.toggleBetterAudioQuality();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.betterAudioQuality);
+                }
+            } else if (position == showGradientRow) {
+                OwlConfig.toggleShowGradientColor();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.showGradientColor);
+                }
+                getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                listAdapter.notifyItemChanged(drawerRow, new Object());
+            } else if (position == showAvatarRow) {
+                OwlConfig.toggleShowAvatarImage();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.showAvatarImage);
                 }
                 getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
                 listAdapter.notifyItemChanged(drawerRow, new Object());
@@ -227,14 +268,26 @@ public class OwlgramGeneralSettings extends BaseFragment {
         rowCount = 0;
         drawerBlurBackgroundRow = -1;
         drawerDarkenBackgroundRow = -1;
+        editBlurHeaderRow = -1;
+        editBlurRow = -1;
+        editBlurDividerRow = -1;
+        showGradientRow = -1;
+        showAvatarRow = -1;
 
         drawerRow = rowCount++;
         drawerAvatarAsBackgroundRow = rowCount++;
         if(OwlConfig.avatarAsDrawerBackground) {
-            drawerBlurBackgroundRow = rowCount++;
+            showGradientRow = rowCount++;
+            showAvatarRow = rowCount++;
             drawerDarkenBackgroundRow = rowCount++;
+            drawerBlurBackgroundRow = rowCount++;
         }
         drawerDividerRow = rowCount++;
+        if(OwlConfig.avatarBackgroundBlur && OwlConfig.avatarAsDrawerBackground) {
+            editBlurHeaderRow = rowCount++;
+            editBlurRow = rowCount++;
+            editBlurDividerRow = rowCount++;
+        }
         privacyHeaderRow = rowCount++;
         phoneNumberSwitchRow = rowCount++;
         phoneContactsSwitchRow = rowCount++;
@@ -253,6 +306,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
         divisorTranslationRow = rowCount++;
         callHeaderRow = rowCount++;
         confirmCallSwitchRow = rowCount++;
+        betterAudioCallRow = rowCount++;
 
         if (listAdapter != null && notify) {
             listAdapter.notifyDataSetChanged();
@@ -288,12 +342,14 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == privacyHeaderRow) {
                         headerCell.setText(LocaleController.getString("PrivacyTitle", R.string.PrivacyTitle));
-                    }else if (position == appearanceHeaderRow) {
+                    } else if (position == appearanceHeaderRow) {
                         headerCell.setText(LocaleController.getString("Appearance", R.string.Appearance));
-                    }else if (position == translationHeaderRow) {
+                    } else if (position == translationHeaderRow) {
                         headerCell.setText(LocaleController.getString("PassportTranslation", R.string.PassportTranslation));
-                    }else if (position == callHeaderRow) {
+                    } else if (position == callHeaderRow) {
                         headerCell.setText(LocaleController.getString("Calls", R.string.Calls));
+                    } else if (position == editBlurHeaderRow) {
+                        headerCell.setText(LocaleController.getString("OwlgramBlurIntensity", R.string.OwlgramBlurIntensity));
                     }
                     break;
                 case 3:
@@ -316,11 +372,17 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     }else if (position == useSystemEmojiRow) {
                         textCell.setTextAndCheck(LocaleController.getString("OwlgramUseSystemEmoji", R.string.OwlgramUseSystemEmoji), OwlConfig.useSystemEmoji, true);
                     } else if (position == drawerAvatarAsBackgroundRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramAvatarAsBackground", R.string.OwlgramAvatarAsBackground), OwlConfig.avatarAsDrawerBackground, drawerBlurBackgroundRow != -1);
+                        textCell.setTextAndCheck(LocaleController.getString("OwlgramAvatarAsBackground", R.string.OwlgramAvatarAsBackground), OwlConfig.avatarAsDrawerBackground, !OwlConfig.avatarAsDrawerBackground);
                     } else if (position == drawerBlurBackgroundRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramAvatarBlur", R.string.OwlgramAvatarBlur), OwlConfig.avatarBackgroundBlur, true);
+                        textCell.setTextAndCheck(LocaleController.getString("OwlgramAvatarBlur", R.string.OwlgramAvatarBlur), OwlConfig.avatarBackgroundBlur, !OwlConfig.avatarBackgroundBlur);
                     } else if (position == drawerDarkenBackgroundRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramAvatarDarken", R.string.OwlgramAvatarDarken), OwlConfig.avatarBackgroundDarken, false);
+                        textCell.setTextAndCheck(LocaleController.getString("OwlgramAvatarDarken", R.string.OwlgramAvatarDarken), OwlConfig.avatarBackgroundDarken, true);
+                    } else if (position == betterAudioCallRow) {
+                        textCell.setTextAndCheck(LocaleController.getString("OwlgramBetterAudioCall", R.string.OwlgramBetterAudioCall), OwlConfig.betterAudioQuality, false);
+                    } else if (position == showGradientRow) {
+                        textCell.setTextAndCheck(LocaleController.getString("OwlgramShowGradient", R.string.OwlgramShowGradient), OwlConfig.showGradientColor, true);
+                    } else if (position == showAvatarRow) {
+                        textCell.setTextAndCheck(LocaleController.getString("OwlgramShowAvatar", R.string.OwlgramShowAvatar), OwlConfig.showAvatarImage, drawerBlurBackgroundRow != -1);
                     }
                     break;
                 case 4:
@@ -403,6 +465,27 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     view = profilePreviewCell = new DrawerProfilePreviewCell(mContext);
                     view.setBackground(Theme.getThemedDrawable(mContext, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
                     break;
+                case 6:
+                    view = new BlurIntensityCell(mContext) {
+                        @Override
+                        protected void onBlurIntensityChange(int percentage, boolean layout) {
+                            super.onBlurIntensityChange(percentage, layout);
+                            OwlConfig.saveBlurIntensity(percentage);
+                            RecyclerView.ViewHolder holder = listView.findViewHolderForAdapterPosition(editBlurRow);
+                            if (holder != null && holder.itemView instanceof BlurIntensityCell) {
+                                BlurIntensityCell cell = (BlurIntensityCell) holder.itemView;
+                                if (layout) {
+                                    cell.requestLayout();
+                                } else {
+                                    cell.invalidate();
+                                }
+                            }
+                            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                            listAdapter.notifyItemChanged(drawerRow, new Object());
+                        }
+                    };
+                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    break;
                 default:
                     view = new ShadowSectionCell(mContext);
                     break;
@@ -412,20 +495,25 @@ public class OwlgramGeneralSettings extends BaseFragment {
         }
         @Override
         public int getItemViewType(int position) {
-            if(position == divisorPrivacyRow || position == divisorAppearanceRow || position == divisorTranslationRow || position == drawerDividerRow){
+            if (position == divisorPrivacyRow || position == divisorAppearanceRow || position == divisorTranslationRow ||
+                    position == drawerDividerRow || position == editBlurDividerRow){
                 return 1;
-            }else if(position == privacyHeaderRow || position == appearanceHeaderRow || position == translationHeaderRow || position == callHeaderRow){
+            } else if (position == privacyHeaderRow || position == appearanceHeaderRow || position == translationHeaderRow ||
+                    position == callHeaderRow || position == editBlurHeaderRow){
                 return 2;
-            }else if(position == phoneNumberSwitchRow || position == phoneContactsSwitchRow || position == statusBarSwitchRow ||
+            } else if (position == phoneNumberSwitchRow || position == phoneContactsSwitchRow || position == statusBarSwitchRow ||
                     position == roundedNumberSwitchRow || position == messageTimeSwitchRow || position == confirmCallSwitchRow ||
                     position == useSystemFontRow || position == useSystemEmojiRow || position == drawerAvatarAsBackgroundRow ||
-                    position == drawerDarkenBackgroundRow || position == drawerBlurBackgroundRow
+                    position == drawerDarkenBackgroundRow || position == drawerBlurBackgroundRow || position == betterAudioCallRow ||
+                    position == showGradientRow || position == showAvatarRow
             ){
                 return 3;
-            }else if(position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow){
+            } else if ( position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow){
                 return 4;
             } else if (position == drawerRow) {
                 return 5;
+            } else if (position == editBlurRow) {
+                return 6;
             }
             return 1;
         }

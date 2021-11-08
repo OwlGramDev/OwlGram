@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="OwlgramChat">Chat</string>
     <string name="OwlgramSettings">Impostazioni di OwlGram</string>
@@ -49,7 +50,7 @@
     <string name="OwlgramSignAsRead">Segna tutte come lette</string>
     <string name="OwlgramCreateMention">Crea menzione</string>
     <string name="OwlgramVersion">OwlGram %1$s</string>
-    <string name="OwlgramCallbackCopied">Callback copiata negli appunti</string>
+    <string name="OwlgramCallbackCopied">Callback copiata negli appunti.</string>
     <string name="OwlgramAutoLockInstant">Subito</string>
     <string name="OwlgramMkwRowPlayer">Mostra MKV come video</string>
     <string name="OwlgramAllVideoPlay">Riproduci in streaming tutti i video</string>
@@ -93,8 +94,27 @@
     <string name="OwlgramCheckUpdates">Verifica</string>
     <string name="OwlgramBetaUpdates">Installa versioni beta</string>
     <string name="OwlgramBetaUpdatesDesc">Prova i nuovi aggiornamenti di OwlGram prima del loro rilascio ufficiale</string>
-    <string name="OwlgramUpdatePopup">Notifica quando è disponibile un aggiornamento</string>
-    <string name="OwlgramUpdatePopupDesc">Riceverai una notifica quando un aggiornamento è disponibile</string>
+    <string name="OwlgramUpdatePopup">Notifica quando disponibile</string>
+    <string name="OwlgramUpdatePopupDesc">Riceverai una notifica quando un nuovo aggiornamento sarà disponibile</string>
     <string name="OwlgramApkChannel">Canale APK</string>
     <string name="OwlgramNoQuoteForward">Inoltra senza citare</string>
+    <string name="OwlgramFileName">Nome</string>
+    <string name="OwlgramFilePath">Percorso</string>
+    <string name="OwlgramFileSize">Dimensione</string>
+    <string name="OwlgramFileDC">Datacenter</string>
+    <string name="OwlgramTranslated">tradotto</string>
+    <string name="OwlgramForwards">Inoltri</string>
+    <string name="OwlgramEdited">Data di modifica</string>
+    <string name="OwlgramAvatarAsBackground">Immagine del profilo come sfondo</string>
+    <string name="OwlgramAvatarBlur">Sfoca immagine del profilo</string>
+    <string name="OwlgramAvatarDarken">Scurisci immagine del profilo</string>
+    <string name="OwlgramEmojiSticker">Emoji associata</string>
+    <string name="OwlgramMimeType">Tipo mime</string>
+    <string name="OwlgramBetterAudioCall">Migliora la qualità dell\'audio</string>
+    <string name="OwlgramTestBackend">Server di prova</string>
+    <string name="OwlgramTestBackendOn">Questo account si connetterà al server di prova.</string>
+    <string name="OwlgramTestBackendOff">Questo account si connetterà al server di produzione.</string>
+    <string name="OwlgramShowGradient">Ombreggia sfondo</string>
+    <string name="OwlgramShowAvatar">Mostra avatar</string>
+    <string name="OwlgramBlurIntensity">Intensità sfocatura</string>
 </resources>

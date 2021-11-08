@@ -147,6 +147,10 @@ public class MessageHelper extends BaseController {
         obj.originalMessage = messageObject.originalMessage;
         obj.originalEntities = messageObject.originalEntities;
         obj.translated = translated;
+        if (messageObject.isSponsored()) {
+            obj.sponsoredId = messageObject.sponsoredId;
+            obj.botStartParam = messageObject.botStartParam;
+        }
         ArrayList<MessageObject> arrayList = new ArrayList<>();
         arrayList.add(obj);
         getNotificationCenter().postNotificationName(NotificationCenter.replaceMessagesObjects, dialogId, arrayList, false);

@@ -20035,7 +20035,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 items.add(LocaleController.getString("BlockContact", R.string.BlockContact));
                                 options.add(23);
                                 icons.add(R.drawable.msg_block2);
-                            } else {
+                            } else if (OwlConfig.showReportMessage){
                                 items.add(LocaleController.getString("ReportChat", R.string.ReportChat));
                                 options.add(23);
                                 icons.add(R.drawable.msg_report);

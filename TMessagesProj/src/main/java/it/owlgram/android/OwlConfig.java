@@ -22,7 +22,6 @@ public class OwlConfig {
     public static boolean jumpChannel;
     public static boolean hideKeyboard;
     public static boolean gifAsVideo;
-    public static boolean separatedPhotoAndVideo;
     public static boolean showFolderWhenForward;
     public static boolean showFolderIcons;
     public static boolean useRearCamera;
@@ -39,6 +38,10 @@ public class OwlConfig {
     public static boolean avatarBackgroundDarken;
     public static boolean avatarBackgroundBlur;
     public static boolean avatarAsDrawerBackground;
+    public static boolean betterAudioQuality;
+    public static boolean showReportMessage;
+    public static boolean showGradientColor;
+    public static boolean showAvatarImage;
     public static boolean isChineseUser = false;
     public static String translationTarget = "app";
     public static String updateData;
@@ -48,6 +51,7 @@ public class OwlConfig {
     public static int remindedUpdate = 0;
     public static long lastUpdateCheck = 0;
     public static int oldDownloadedVersion = 0;
+    public static int blurIntensity = 0;
 
 
     private static boolean configLoaded;
@@ -72,7 +76,6 @@ public class OwlConfig {
             jumpChannel = preferences.getBoolean("jumpChannel", false);
             hideKeyboard = preferences.getBoolean("hideKeyboard", false);
             gifAsVideo = preferences.getBoolean("gifAsVideo", true);
-            separatedPhotoAndVideo = preferences.getBoolean("separatedPhotoAndVideo", false);
             showFolderWhenForward = preferences.getBoolean("showFolderWhenForward", true);
             //showFolderIcons = preferences.getBoolean("showFolderIcons", true);
             useRearCamera = preferences.getBoolean("useRearCamera", false);
@@ -89,12 +92,17 @@ public class OwlConfig {
             avatarBackgroundDarken = preferences.getBoolean("avatarBackgroundDarken", false);
             avatarBackgroundBlur = preferences.getBoolean("avatarBackgroundBlur", false);
             avatarAsDrawerBackground = preferences.getBoolean("avatarBackgroundBlur", false);
+            betterAudioQuality = preferences.getBoolean("betterAudioQuality", false);
+            showReportMessage = preferences.getBoolean("showReportMessage", true);
+            showGradientColor = preferences.getBoolean("showGradientColor", false);
+            showAvatarImage = preferences.getBoolean("showAvatarImage", true);
             lastUpdateCheck = preferences.getLong("lastUpdateCheck", 0);
             lastUpdateStatus = preferences.getInt("lastUpdateStatus", 0);
             remindedUpdate = preferences.getInt("remindedUpdate", 0);
             translationTarget = preferences.getString("translationTarget", "app");
             updateData = preferences.getString("updateData", "");
             oldDownloadedVersion = preferences.getInt("oldDownloadedVersion", 0);
+            blurIntensity = preferences.getInt("blurIntensity", 75);
             translationProvider = preferences.getInt("translationProvider", isChineseUser ? Translator.PROVIDER_NIU : Translator.PROVIDER_GOOGLE);
             configLoaded = true;
         }
@@ -292,6 +300,38 @@ public class OwlConfig {
         editor.apply();
     }
 
+    public static void toggleShowReportMessage() {
+        showReportMessage = !showReportMessage;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showReportMessage", showReportMessage);
+        editor.apply();
+    }
+
+    public static void toggleBetterAudioQuality() {
+        betterAudioQuality = !betterAudioQuality;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("betterAudioQuality", betterAudioQuality);
+        editor.apply();
+    }
+
+    public static void toggleShowGradientColor() {
+        showGradientColor = !showGradientColor;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showGradientColor", showGradientColor);
+        editor.apply();
+    }
+
+    public static void toggleShowAvatarImage() {
+        showAvatarImage = !showAvatarImage;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showAvatarImage", showAvatarImage);
+        editor.apply();
+    }
+
     public static void setTranslationProvider(int provider) {
         translationProvider = provider;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
@@ -328,7 +368,15 @@ public class OwlConfig {
         lastUpdateStatus = status;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("lastUpdateStatus", status);
+        editor.putInt("lastUpdateStatus", lastUpdateStatus);
+        editor.apply();
+    }
+
+    public static void saveBlurIntensity(int intensity) {
+        blurIntensity = intensity;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("blurIntensity", blurIntensity);
         editor.apply();
     }
 
@@ -336,7 +384,7 @@ public class OwlConfig {
         remindedUpdate = version;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("remindedUpdate", version);
+        editor.putInt("remindedUpdate", remindedUpdate);
         editor.apply();
     }
 
@@ -344,7 +392,7 @@ public class OwlConfig {
         oldDownloadedVersion = version;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("oldDownloadedVersion", version);
+        editor.putInt("oldDownloadedVersion", oldDownloadedVersion);
         editor.apply();
     }
 

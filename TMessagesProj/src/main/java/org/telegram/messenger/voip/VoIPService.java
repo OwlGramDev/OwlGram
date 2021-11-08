@@ -133,6 +133,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import it.owlgram.android.OwlConfig;
+
 @SuppressLint("NewApi")
 public class VoIPService extends Service implements SensorEventListener, AudioManager.OnAudioFocusChangeListener, VoIPController.ConnectionStateListener, NotificationCenter.NotificationCenterDelegate {
 
@@ -3429,13 +3431,22 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 			startForeground(ID_ONGOING_CALL_NOTIFICATION, bldr.build());
 		}
 	}
-
+	private int currentStreamType;
 	private void loadResources() {
-		if (Build.VERSION.SDK_INT >= 21) {
-			WebRtcAudioTrack.setAudioTrackUsageAttribute(AudioAttributes.USAGE_VOICE_COMMUNICATION);
+		if (chat != null && OwlConfig.betterAudioQuality) {
+			currentStreamType = AudioManager.STREAM_MUSIC;
+			if (Build.VERSION.SDK_INT >= 21) {
+				WebRtcAudioTrack.setAudioTrackUsageAttribute(AudioAttributes.USAGE_MEDIA);
+			}
+		} else {
+			currentStreamType = AudioManager.STREAM_VOICE_CALL;
+			if (Build.VERSION.SDK_INT >= 21) {
+				WebRtcAudioTrack.setAudioTrackUsageAttribute(AudioAttributes.USAGE_VOICE_COMMUNICATION);
+			}
 		}
+		WebRtcAudioTrack.setAudioStreamType(currentStreamType);
 		Utilities.globalQueue.postRunnable(() -> {
-			soundPool = new SoundPool(1, AudioManager.STREAM_VOICE_CALL, 0);
+			soundPool = new SoundPool(1, currentStreamType, 0);
 			spConnectingId = soundPool.load(this, R.raw.voip_connecting, 1);
 			spRingbackID = soundPool.load(this, R.raw.voip_ringback, 1);
 			spFailedID = soundPool.load(this, R.raw.voip_failed, 1);

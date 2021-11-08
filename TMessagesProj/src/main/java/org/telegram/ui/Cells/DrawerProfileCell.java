@@ -1,5 +1,6 @@
 package org.telegram.ui.Cells;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -21,10 +22,14 @@ import android.view.Gravity;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.palette.graphics.Palette;
+
+import com.google.android.exoplayer2.util.Log;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AndroidUtilities;
@@ -57,6 +62,7 @@ public class DrawerProfileCell extends FrameLayout {
     private AudioPlayerAlert.ClippingTextViewSwitcher phoneTextView;
     private ImageView shadowView;
     private ImageView arrowView;
+    private ImageView gradientBackground;
     private RLottieImageView darkThemeView;
     private RLottieDrawable sunDrawable;
 
@@ -89,8 +95,10 @@ public class DrawerProfileCell extends FrameLayout {
                 ImageReceiver.BitmapHolder bmp = imageReceiver.getBitmapSafe();
                 if (bmp != null) {
                     new Thread(() -> {
-                        int width = OwlConfig.avatarBackgroundBlur ? 150 : bmp.bitmap.getWidth();
-                        int height = OwlConfig.avatarBackgroundBlur ? 150 : bmp.bitmap.getHeight();
+                        int width_percentage = ((bmp.bitmap.getWidth()) * (100 - OwlConfig.blurIntensity)) / 100;
+                        int height_percentage = ((bmp.bitmap.getHeight()) * (100 - OwlConfig.blurIntensity)) / 100;
+                        int width = OwlConfig.avatarBackgroundBlur ? width_percentage : bmp.bitmap.getWidth();
+                        int height = OwlConfig.avatarBackgroundBlur ? height_percentage : bmp.bitmap.getHeight();
                         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
                         Canvas canvas = new Canvas(bitmap);
                         canvas.drawBitmap(bmp.bitmap, null, new Rect(0, 0, width, height), new Paint(Paint.FILTER_BITMAP_FLAG));
@@ -122,6 +130,9 @@ public class DrawerProfileCell extends FrameLayout {
                 lastBitmap = null;
             }
         });
+
+        gradientBackground = new ImageView(context);
+        addView(gradientBackground, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.BOTTOM));
 
         shadowView = new ImageView(context);
         shadowView.setVisibility(INVISIBLE);
@@ -270,7 +281,7 @@ public class DrawerProfileCell extends FrameLayout {
             }
         }
     }
-
+    @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
         Drawable backgroundDrawable = Theme.getCachedWallpaper();
@@ -293,6 +304,11 @@ public class DrawerProfileCell extends FrameLayout {
             currentColor = color;
             shadowView.getDrawable().setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.MULTIPLY));
         }
+        int colorBackground = Theme.getColor(Theme.key_chats_menuBackground);
+        GradientDrawable gd2 = new GradientDrawable(
+                GradientDrawable.Orientation.BOTTOM_TOP,
+                new int[] {colorBackground, AndroidUtilities.getTransparentColor(colorBackground, 0)});
+        gradientBackground.setBackground(gd2);
         color = Theme.getColor(Theme.key_chats_menuName);
         if (currentMoonColor == null || currentMoonColor != color) {
             currentMoonColor = color;
@@ -303,9 +319,17 @@ public class DrawerProfileCell extends FrameLayout {
             sunDrawable.setLayerColor("Path 5.**", currentMoonColor);
             sunDrawable.commitApplyLayerColors();
         }
-        nameTextView.setTextColor(Theme.getColor(Theme.key_chats_menuName));
+        if(AndroidUtilities.isLight(colorBackground) && OwlConfig.showGradientColor && OwlConfig.avatarAsDrawerBackground) {
+            nameTextView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+        } else {
+            nameTextView.setTextColor(Theme.getColor(Theme.key_chats_menuName));
+        }
         if (avatarAsDrawerBackground || useImageBackground) {
-            phoneTextView.getTextView().setTextColor(Theme.getColor(Theme.key_chats_menuPhone));
+            if(AndroidUtilities.isLight(colorBackground) && OwlConfig.showGradientColor && OwlConfig.avatarAsDrawerBackground) {
+                phoneTextView.getTextView().setTextColor(AndroidUtilities.getTransparentColor(Theme.getColor(Theme.key_dialogTextBlack), 0.4f));
+            } else {
+                phoneTextView.getTextView().setTextColor(Theme.getColor(Theme.key_chats_menuPhone));
+            }
             if (shadowView.getVisibility() != VISIBLE) {
                 shadowView.setVisibility(VISIBLE);
             }
@@ -340,7 +364,11 @@ public class DrawerProfileCell extends FrameLayout {
             if (shadowView.getVisibility() != visibility) {
                 shadowView.setVisibility(visibility);
             }
-            phoneTextView.getTextView().setTextColor(Theme.getColor(Theme.key_chats_menuPhoneCats));
+            if(AndroidUtilities.isLight(colorBackground) && OwlConfig.showGradientColor && OwlConfig.avatarAsDrawerBackground) {
+                phoneTextView.getTextView().setTextColor(AndroidUtilities.getTransparentColor(Theme.getColor(Theme.key_dialogTextBlack), 0.4f));
+            } else {
+                phoneTextView.getTextView().setTextColor(Theme.getColor(Theme.key_chats_menuPhoneCats));
+            }
             super.onDraw(canvas);
             darkBackColor = Theme.getColor(Theme.key_listSelector);
         }
@@ -407,10 +435,20 @@ public class DrawerProfileCell extends FrameLayout {
             ImageLocation imageLocation = ImageLocation.getForUser(user, ImageLocation.TYPE_BIG);
             avatarAsDrawerBackground = imageLocation != null;
             imageReceiver.setImage(imageLocation, "512_512", null, null, new ColorDrawable(0x00000000), 0, null, user, 1);
-            avatarImageView.setVisibility(INVISIBLE);
+            if(OwlConfig.showGradientColor) {
+                gradientBackground.setVisibility(VISIBLE);
+            } else {
+                gradientBackground.setVisibility(INVISIBLE);
+            }
+            if(OwlConfig.showAvatarImage) {
+                avatarImageView.setVisibility(VISIBLE);
+            } else {
+                avatarImageView.setVisibility(INVISIBLE);
+            }
         } else {
             avatarAsDrawerBackground = false;
             avatarImageView.setVisibility(VISIBLE);
+            gradientBackground.setVisibility(INVISIBLE);
         }
 
         applyBackground(true);

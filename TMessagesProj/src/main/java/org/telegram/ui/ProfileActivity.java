@@ -48,6 +48,7 @@ import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.util.Property;
 import android.util.SparseIntArray;
 import android.util.TypedValue;
@@ -2455,6 +2456,42 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     } catch (Exception e) {
                         FileLog.e(e);
                     }
+                } else {
+                    String username = null;
+                    if (userId != 0) {
+                        final TLRPC.User user = getMessagesController().getUser(userId);
+                        if (user != null && user.username != null) {
+                            username = user.username;
+                        }
+                    } else if (chatId != 0) {
+                        final TLRPC.Chat chat = getMessagesController().getChat(chatId);
+                        if (chat != null && chat.username != null) {
+                            username = chat.username;
+                        }
+                    }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+                    String finalUsername = username;
+                    builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy)}, (dialogInterface, i) -> {
+                        if (i == 0) {
+                            try {
+                                android.content.ClipboardManager clipboard = (android.content.ClipboardManager) ApplicationLoader.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                                String text;
+                                if (userId != 0) {
+                                    text = "@" + finalUsername;
+                                    BulletinFactory.of(this).createCopyBulletin(LocaleController.getString("UsernameCopied", R.string.UsernameCopied)).show();
+                                } else {
+                                    text = "https://" + MessagesController.getInstance(UserConfig.selectedAccount).linkPrefix + "/" + finalUsername;
+                                    BulletinFactory.of(this).createCopyBulletin(LocaleController.getString("LinkCopied", R.string.LinkCopied)).show();
+                                }
+                                android.content.ClipData clip = android.content.ClipData.newPlainText("label", text);
+                                clipboard.setPrimaryClip(clip);
+
+                            } catch (Exception e) {
+                                FileLog.e(e);
+                            }
+                        }
+                    });
+                    showDialog(builder.create());
                 }
             } else if (position == locationRow) {
                 if (chatInfo.location instanceof TLRPC.TL_channelLocation) {
@@ -4534,7 +4571,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (uid == userId) {
                 userInfo = (TLRPC.UserFull) args[1];
                 if (imageUpdater != null) {
-                    if (!TextUtils.equals(userInfo.about, currentBio)) {
+                    if (!TextUtils.equals(userInfo.about, currentBio) && !TextUtils.equals(userInfo.about, originalBio)) {
+                        originalBio = null;
                         listAdapter.notifyItemChanged(bioRow);
                     }
                 } else {
@@ -6620,7 +6658,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                     break;
                                 case 2:
                                 case 6:
-                                    if(UserObject.isUserSelf(user)){
+                                    Log.e("AAA", ""+user.id);
+                                    if(UserObject.isUserSelf(user) && chatId == 0){
                                         presentFragment(new ChangeNameActivity());
                                     }else{
                                         startCall(false);
@@ -6879,6 +6918,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         String text = chatInfo.about;
                         while (text.contains("\n\n\n")) {
                             text = text.replace("\n\n\n", "\n\n");
+                        }
+                        if(originalBio != null){
+                            text = currentBio;
                         }
                         aboutLinkCell.setText(text, true);
                     } else if (position == bioRow) {

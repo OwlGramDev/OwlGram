@@ -299,11 +299,11 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 2463
+    defaultConfig.versionCode = 2466
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            outputFileName = "Android-${defaultConfig.versionCode}.apk"
+            outputFileName = "OwlGram-${defaultConfig.versionName}-${defaultConfig.versionCode}.apk"
             output.versionCodeOverride = defaultConfig.versionCode * 10 + variant.productFlavors.get(0).abiVersionCode
         }
     }
@@ -319,7 +319,7 @@ android {
         minSdkVersion 16
         //noinspection OldTargetApi
         targetSdkVersion 30
-        versionName "1.1.0b1"
+        versionName "1.1.0"
 
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
 

@@ -49,6 +49,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 
 import androidx.core.content.FileProvider;
+import androidx.core.graphics.ColorUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -3815,16 +3816,14 @@ public class AndroidUtilities {
             }
         }
     }
-    private static final String[] BINARY_UNITS = {"B","kB","MB","GB","TB","PB","EB"};
-    private static final String[] SI_UNITS = {"B","KiB","MiB","GiB","TiB","PiB","EiB"};
-    public static String humanReadableByteCount(final long bytes, final boolean useSIUnits, final Locale locale){
-        final String[] units= useSIUnits ? SI_UNITS : BINARY_UNITS;
-        final int base = useSIUnits ? 1000 : 1024;
-        if(bytes<base){
-            return bytes + " " + units[0];
-        }
-        final int exponent = (int) (Math.log(bytes) / Math.log(base));
-        final String unit = units[exponent];
-        return String.format(locale, "%.2f %s",bytes / Math.pow(base,exponent),unit);
+
+    public static boolean isLight(int color) {
+        int red   = Color.red(color);
+        int green = Color.green(color);
+        int blue  = Color.blue(color);
+
+        float[] hsl = new float[3];
+        ColorUtils.RGBToHSL(red, green, blue, hsl);
+        return hsl[2] >= 0.5f;
     }
 }
