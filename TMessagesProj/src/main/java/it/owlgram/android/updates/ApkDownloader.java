@@ -49,7 +49,7 @@ public class ApkDownloader {
             code = pInfo.versionCode / 10;
         } catch (Exception ignored){}
         boolean isAvailableFile = apkFile().exists() && downloadTask == null;
-        if((code == OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
+        if((code >= OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
             OwlConfig.setUpdateData("");
             return false;
         }

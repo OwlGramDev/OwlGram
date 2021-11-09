@@ -15,14 +15,14 @@ import android.os.Build;
 public class BuildVars {
 
     public static boolean DEBUG_VERSION = false;
-    public static boolean LOGS_ENABLED = false;
     public static boolean DEBUG_PRIVATE_VERSION = false;
+    public static boolean LOGS_ENABLED = false;
     public static boolean USE_CLOUD_STRINGS = true;
     public static boolean CHECK_UPDATES = false;
     public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= 29;
-    public static int BUILD_VERSION = 2466;
-    public static String BUILD_VERSION_STRING = "1.1.0";
-    public static String TELEGRAM_VERSION_STRING = "8.2.1";
+    public static int BUILD_VERSION = 2469;
+    public static String BUILD_VERSION_STRING = "1.1.1";
+    public static String TELEGRAM_VERSION_STRING = "8.2.3";
     public static int APP_ID = 10029733;
     public static String APP_HASH = "d0d81009d46e774f78c0e0e622f5fa21";
     public static String SMS_HASH = isStandaloneApp() ? "w0lkcmTZkKh" : (DEBUG_VERSION ? "O2P2z+/jBpJ" : "oLeq9AcOZkT");

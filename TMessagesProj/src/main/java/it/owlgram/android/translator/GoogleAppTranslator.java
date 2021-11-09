@@ -2,6 +2,8 @@ package it.owlgram.android.translator;
 
 import android.text.TextUtils;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -84,11 +86,12 @@ public class GoogleAppTranslator extends BaseTranslator {
 
     private String getResult(String string) throws JSONException {
         StringBuilder sb = new StringBuilder();
-        JSONArray array = new JSONObject(string).getJSONArray("sentences");
+        JSONObject object = new JSONObject(string);
+        JSONArray array = object.getJSONArray("sentences");
         for (int i = 0; i < array.length(); i++) {
             sb.append(array.getJSONObject(i).getString("trans"));
         }
-        return sb.toString();
+        return object.getString("src") + ":src:" + sb.toString();
     }
 }
 

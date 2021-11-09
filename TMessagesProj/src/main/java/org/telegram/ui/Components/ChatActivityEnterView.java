@@ -140,6 +140,7 @@ import java.util.List;
 import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.translator.Translator;
 
 public class ChatActivityEnterView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate, SizeNotifierFrameLayout.SizeNotifierFrameLayoutDelegate, StickersAlert.StickersAlertDelegate {
 
@@ -3130,7 +3131,7 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
             });
             sendPopupLayout.setShownFromBotton(false);
 
-            for (int a = 0; a < 2; a++) {
+            for (int a = 0; a < 3; a++) {
                 if (a == 0 && !parentFragment.canScheduleMessage() || a == 1 && (UserObject.isUserSelf(user) || slowModeTimer > 0 && !isInScheduleMode())) {
                     continue;
                 }
@@ -3142,8 +3143,11 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
                     } else {
                         cell.setTextAndIcon(LocaleController.getString("ScheduleMessage", R.string.ScheduleMessage), R.drawable.msg_schedule);
                     }
-                } else {
+                } else if (num == 1) {
                     cell.setTextAndIcon(LocaleController.getString("SendWithoutSound", R.string.SendWithoutSound), R.drawable.input_notify_off);
+                } else {
+                    String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage();
+                    cell.setTextAndIcon(LocaleController.getString("OwlgramTranslate", R.string.OwlgramTranslate) + " (" + language + ")", R.drawable.round_translate_white_36);
                 }
                 cell.setMinimumWidth(AndroidUtilities.dp(196));
                 sendPopupLayout.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
@@ -3153,9 +3157,24 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
                     }
                     if (num == 0) {
                         AlertsCreator.createScheduleDatePickerDialog(parentActivity, parentFragment.getDialogId(), this::sendMessageInternal, resourcesProvider);
-                    } else {
+                    } else if (num == 1) {
                         sendMessageInternal(false, 0);
+                    } else {
+                        translatePreSend();
                     }
+                });
+                cell.setOnLongClickListener(view1 -> {
+                    if (num == 2) {
+                        if (sendPopupWindow != null && sendPopupWindow.isShowing()) {
+                            sendPopupWindow.dismiss();
+                        }
+                        Translator.showTranslationTargetSelector(getContext(), null, () -> {
+                            String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage();
+                            cell.setTextAndIcon(LocaleController.getString("OwlgramTranslate", R.string.OwlgramTranslate) + " (" + language + ")", R.drawable.round_translate_white_36);
+                            translatePreSend();
+                        });
+                    }
+                    return false;
                 });
             }
             sendPopupLayout.setupRadialSelectors(getThemedColor(Theme.key_dialogButtonSelector));
@@ -3196,6 +3215,23 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
         view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
 
         return false;
+    }
+
+    public void translatePreSend() {
+        Translator.translate(messageEditText.getText().toString(), new Translator.TranslateCallBack() {
+            @Override
+            public void onSuccess(Object translation) {
+                if (translation instanceof String) {
+                    String[] data_result = ((String) translation).split(":src:", 2);
+                    messageEditText.setText(data_result[data_result.length - 1]);
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Translator.handleTranslationError(getContext(), e, () -> translatePreSend(), resourcesProvider);
+            }
+        });
     }
 
     public boolean isSendButtonVisible() {

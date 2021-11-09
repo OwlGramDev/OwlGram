@@ -5882,7 +5882,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
 
             if (messageObject.isSponsored()) {
                 drawInstantView = true;
-                drawInstantViewType = 1;
+                if (messageObject.sponsoredChannelPost != 0) {
+                    drawInstantViewType = 12;
+                } else {
+                    drawInstantViewType = 1;
+                }
                 long id = MessageObject.getPeerId(messageObject.messageOwner.from_id);
                 if (id > 0) {
                     TLRPC.User user = MessagesController.getInstance(currentAccount).getUser(id);
@@ -6896,7 +6900,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (drawInstantView && instantViewLayout == null) {
             String str;
             instantWidth = AndroidUtilities.dp(12 + 9 + 12);
-            if (drawInstantViewType == 1) {
+            if (drawInstantViewType == 12) {
+                str = LocaleController.getString("OpenChannelPost", R.string.OpenChannelPost);
+            } else if (drawInstantViewType == 1) {
                 str = LocaleController.getString("OpenChannel", R.string.OpenChannel);
             } else if (drawInstantViewType == 10) {
                 str = LocaleController.getString("OpenBot", R.string.OpenBot);
@@ -6937,7 +6943,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             if (currentMessageObject.type == 12) {
                 totalHeight += AndroidUtilities.dp(14);
             }
-            if (hasNewLineForTime) {
+            if (currentMessageObject.isSponsored() && hasNewLineForTime) {
                 totalHeight += AndroidUtilities.dp(16);
             }
             if (instantViewLayout != null && instantViewLayout.getLineCount() > 0) {
@@ -9567,7 +9573,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
         }
         if(currentMessageObject.translated) {
-            timeString = LocaleController.getString("OwlgramTranslated", R.string.OwlgramTranslated);
+            timeString = LocaleController.getString("OwlgramTranslated", R.string.OwlgramTranslated) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
         }else if (currentMessageObject.isSponsored()) {
             timeString = LocaleController.getString("SponsoredMessage", R.string.SponsoredMessage);
         } else if (currentMessageObject.scheduled && currentMessageObject.messageOwner.date == 0x7FFFFFFE) {

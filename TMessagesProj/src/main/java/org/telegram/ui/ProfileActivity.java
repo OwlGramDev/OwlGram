@@ -3752,7 +3752,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             @Override
             public void onSuccess(Object translation) {
                 translatingBio = false;
-                currentBio = (String)translation;
+                String[] data_result = ((String) translation).split(":src:", 2);
+                currentBio = data_result[data_result.length - 1];
                 originalBio = bio;
                 aboutLinkCell.setTextAndValue(currentBio, LocaleController.getString("UserBio", R.string.UserBio), false);
             }

@@ -4,7 +4,7 @@
     <string name="OwlgramSettings">Impostazioni di OwlGram</string>
     <string name="OwlgramUpdates">Aggiornamenti</string>
     <string name="OwlgramOfficialChannel">Canale ufficiale</string>
-    <string name="OwlgramUsername">OwlGram</string>
+    <string name="OwlgramUsername">OwlGramIT</string>
     <string name="OwlgramSourceCode">Codice sorgente</string>
     <string name="OwlgramTranslation">Traduci OwlGram</string>
     <string name="OwlgramTranslationDesc">Aiutaci a tradurre OwlGram nella tua lingua</string>
@@ -47,7 +47,7 @@
     <string name="OwlgramCameraStarting">Inizia con la fotocamera posteriore</string>
     <string name="OwlgramSendConfirm">Conferma l\'invio</string>
     <string name="OwlgramSelectBetween">Seleziona tra</string>
-    <string name="OwlgramSignAsRead">Segna tutte come lette</string>
+    <string name="OwlgramSignAsRead">Segna tutto come letto</string>
     <string name="OwlgramCreateMention">Crea menzione</string>
     <string name="OwlgramVersion">OwlGram %1$s</string>
     <string name="OwlgramCallbackCopied">Callback copiata negli appunti.</string>
@@ -117,4 +117,5 @@
     <string name="OwlgramShowGradient">Ombreggia sfondo</string>
     <string name="OwlgramShowAvatar">Mostra avatar</string>
     <string name="OwlgramBlurIntensity">Intensità sfocatura</string>
+    <string name="OwlgramTranslated2">Traduzione (%s)</string>
 </resources>

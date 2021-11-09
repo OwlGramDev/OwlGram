@@ -116,4 +116,5 @@
     <string name="OwlgramShowGradient">Shade Background</string>
     <string name="OwlgramShowAvatar">Show Avatar</string>
     <string name="OwlgramBlurIntensity">Blur intensity</string>
+    <string name="OwlgramTranslated2">Translation (%s)</string>
 </resources>
