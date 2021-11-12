@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Timer;
@@ -266,7 +267,7 @@ public class CountrySelectActivity extends BaseFragment {
             Collections.sort(sortedCountries, String::compareTo);
 
             for (ArrayList<Country> arr : countries.values()) {
-                Collections.sort(arr, (country, country2) -> country.name.compareTo(country2.name));
+                Collections.sort(arr, Comparator.comparing(country -> country.name));
             }
         }
 

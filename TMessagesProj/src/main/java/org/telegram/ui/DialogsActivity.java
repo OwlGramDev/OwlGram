@@ -44,6 +44,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Property;
 import android.util.StateSet;
 import android.util.TypedValue;
@@ -177,6 +178,7 @@ import java.util.ArrayList;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.updates.ApkDownloader;
+import it.owlgram.android.updates.UpdateManager;
 
 public class DialogsActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
@@ -1764,6 +1766,22 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     public DialogsActivity(Bundle args) {
         super(args);
+        ApkDownloader.setDownloadDialogsListener(new ApkDownloader.UpdateListener() {
+            @Override
+            public void onPreStart() {
+                updateMenuButton(false);
+            }
+
+            @Override
+            public void onProgressChange(int percentage, long downBytes, long totBytes) {
+                updateMenuButton(true);
+            }
+
+            @Override
+            public void onFinished() {
+                updateMenuButton(true);
+            }
+        });
     }
 
     @Override
@@ -2351,7 +2369,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 break;
                             }
                         }
-                    } else if(getMessagesStorage().getMainUnreadCount() > 0){
+                    } else {
                         canShowRead = true;
                     }
                     scrimPopupWindowItems = new ActionBarMenuSubItem[4];
@@ -2390,8 +2408,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 }
                             } else if (i == 2 && finalCanShowRead) {
                                 if (dialogFilter == null) {
-                                    int folderId = tabView.getId() == Integer.MAX_VALUE ? 0 : -1;
-                                    getMessagesStorage().readAllDialogs(folderId);
+                                    getMessagesStorage().readAllDialogs(-1);
                                 } else {
                                     for (TLRPC.Dialog dialog : dialogFilter.dialogs) {
                                         if (dialog.unread_count == 0 && dialog.unread_mentions_count == 0)
@@ -6622,7 +6639,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (updateLayoutAnimator != null) {
             updateLayoutAnimator.cancel();
         }
-        if(ApkDownloader.updateDownloaded() && updateLayout != null) {
+        if(ApkDownloader.updateDownloaded() && updateLayout != null ) {
             updateLayout.setVisibility(View.VISIBLE);
             updateLayout.setTag(1);
             updateLayoutAnimator = new AnimatorSet();
@@ -6659,12 +6676,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             type = MenuDrawable.TYPE_DEFAULT;
             downloadProgress = 0.0f;
         }*/
-        if(ApkDownloader.updateDownloaded()) {
+        if(ApkDownloader.isRunningDownload()) {
+            type = MenuDrawable.TYPE_UDPATE_DOWNLOADING;
+            downloadProgress = ApkDownloader.percentage() / 100f;
+        } else if(ApkDownloader.updateDownloaded() || UpdateManager.isAvailableUpdate()) {
             type = MenuDrawable.TYPE_UDPATE_AVAILABLE;
+            downloadProgress = 0.0f;
         } else {
             type = MenuDrawable.TYPE_DEFAULT;
+            downloadProgress = 0.0f;
         }
-        downloadProgress = 0.0f;
         showUpdateButton();
         menuDrawable.setType(type, animated);
         menuDrawable.setUpdateDownloadProgress(downloadProgress, animated);

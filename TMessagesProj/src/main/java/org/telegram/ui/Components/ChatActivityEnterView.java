@@ -3172,7 +3172,7 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
                             String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage();
                             cell.setTextAndIcon(LocaleController.getString("OwlgramTranslate", R.string.OwlgramTranslate) + " (" + language + ")", R.drawable.round_translate_white_36);
                             translatePreSend();
-                        });
+                        }, resourcesProvider);
                     }
                     return false;
                 });

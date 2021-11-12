@@ -299,7 +299,7 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 2469
+    defaultConfig.versionCode = 2472
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
@@ -319,7 +319,7 @@ android {
         minSdkVersion 16
         //noinspection OldTargetApi
         targetSdkVersion 30
-        versionName "1.1.1"
+        versionName "1.1.4"
 
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
 
@@ -331,3 +331,4 @@ android {
         }
     }
 }
+apply plugin: 'com.google.gms.google-services'

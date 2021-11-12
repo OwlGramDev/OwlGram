@@ -55,11 +55,14 @@ import org.telegram.ui.Cells.ContextLinkCell;
 import org.telegram.ui.Cells.StickerCell;
 import org.telegram.ui.Cells.StickerEmojiCell;
 import org.telegram.ui.Components.AlertsCreator;
+import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.EmojiView;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
 import java.util.ArrayList;
+
+import it.owlgram.android.helpers.MessageHelper;
 
 public class ContentPreviewViewer {
 
@@ -190,6 +193,11 @@ public class ContentPreviewViewer {
                         icons.add(R.drawable.msg_delete);
                         actions.add(5);
                     }
+                    if (currentStickerSet != null && !MessageObject.isAnimatedStickerDocument(currentDocument, true)) {
+                        items.add(LocaleController.getString("SaveToGallery", R.string.SaveToGallery));
+                        icons.add(R.drawable.msg_gallery);
+                        actions.add(110);
+                    }
                 }
                 if (!MessageObject.isMaskDocument(currentDocument) && (inFavs || MediaDataController.getInstance(currentAccount).canAddStickerToFavorites() && MessageObject.isStickerHasSet(currentDocument))) {
                     items.add(inFavs ? LocaleController.getString("DeleteFromFavorites", R.string.DeleteFromFavorites) : LocaleController.getString("AddToFavorites", R.string.AddToFavorites));
@@ -232,6 +240,8 @@ public class ContentPreviewViewer {
                         MediaDataController.getInstance(currentAccount).addRecentSticker(MediaDataController.TYPE_IMAGE, parentObject, currentDocument, (int) (System.currentTimeMillis() / 1000), true);
                     } else if (actions.get(which) == 5) {
                         delegate.remove(importingSticker);
+                    } else if (actions.get(which) == 110) {
+                        MessageHelper.saveStickerToGallery(parentActivity, currentDocument, () -> {});
                     }
                 });
                 builder.setDimBehind(false);

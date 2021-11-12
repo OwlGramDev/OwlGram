@@ -64,6 +64,9 @@ public class OwlgramUpdateSettings extends BaseFragment {
             if(data.length() > 0) {
                 JSONObject jsonObject = new JSONObject(data);
                 updateAvailable = UpdateManager.loadUpdate(jsonObject);
+                if(updateAvailable.version <= UpdateManager.currentVersion()) {
+                    updateAvailable = null;
+                }
             }
         } catch (Exception ignored){}
         updateRowsId();
@@ -128,7 +131,10 @@ public class OwlgramUpdateSettings extends BaseFragment {
                 MessagesController.getInstance(currentAccount).openByUserName("OwlGramAPKs", this, 1);
             }
         });
-        ApkDownloader.setDownloadListener(new ApkDownloader.UpdateManager() {
+        ApkDownloader.setDownloadListener(new ApkDownloader.UpdateListener() {
+            @Override
+            public void onPreStart() {}
+
             @Override
             public void onProgressChange(int percentage, long downBytes, long totBytes) {
                 if(updateCell != null) {

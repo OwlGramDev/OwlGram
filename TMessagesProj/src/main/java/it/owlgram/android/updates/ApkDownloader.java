@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.os.AsyncTask;
 import android.os.PowerManager;
 
+import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.NotificationCenter;
@@ -26,7 +27,9 @@ public class ApkDownloader {
     private static boolean configLoaded;
     @SuppressLint("StaticFieldLeak")
     private static DownloadTask downloadTask;
-    private static UpdateManager updateManager;
+    private static UpdateListener updateManager;
+    private static UpdateListener updateMainManager;
+    private static UpdateListener updateDialogsManager;
 
     static {
         loadDownloadInfo();
@@ -48,7 +51,18 @@ public class ApkDownloader {
             PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
             code = pInfo.versionCode / 10;
         } catch (Exception ignored){}
-        boolean isAvailableFile = apkFile().exists() && downloadTask == null;
+        boolean isCorrupted = true;
+        try {
+            String data = OwlConfig.updateData;
+            if (data.length() > 0) {
+                JSONObject jsonObject = new JSONObject(data);
+                UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(jsonObject);
+                if(update.file_size == apkFile().length()) {
+                    isCorrupted = false;
+                }
+            }
+        } catch (Exception ignored) {}
+        boolean isAvailableFile = apkFile().exists() && downloadTask == null && !isCorrupted;
         if((code >= OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
             OwlConfig.setUpdateData("");
             return false;
@@ -78,8 +92,16 @@ public class ApkDownloader {
         }
     }
 
-    public static void setDownloadListener(UpdateManager u) {
+    public static void setDownloadListener(UpdateListener u) {
         updateManager = u;
+    }
+
+    public static void setDownloadMainListener(UpdateListener u) {
+        updateMainManager = u;
+    }
+
+    public static void setDownloadDialogsListener(UpdateListener u) {
+        updateDialogsManager = u;
     }
 
     public static boolean isRunningDownload() {
@@ -183,14 +205,34 @@ public class ApkDownloader {
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     getClass().getName());
             mWakeLock.acquire(10*60*1000L);
+            if(updateManager != null) {
+                updateManager.onPreStart();
+            }
+            if(updateMainManager != null) {
+                updateMainManager.onPreStart();
+            }
+            if(updateDialogsManager != null) {
+                updateDialogsManager.onPreStart();
+            }
         }
 
         @Override
         protected void onProgressUpdate(Object... progress) {
             super.onProgressUpdate(progress);
+            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoadProgressChanged);
             if(updateManager != null) {
                 try {
                     updateManager.onProgressChange((int) progress[0], (long) progress[1], (long) progress[2]);
+                }catch (Exception ignored) {}
+            }
+            if(updateMainManager != null) {
+                try {
+                    updateMainManager.onProgressChange((int) progress[0], (long) progress[1], (long) progress[2]);
+                }catch (Exception ignored) {}
+            }
+            if(updateDialogsManager != null) {
+                try {
+                    updateDialogsManager.onProgressChange((int) progress[0], (long) progress[1], (long) progress[2]);
                 }catch (Exception ignored) {}
             }
         }
@@ -204,6 +246,12 @@ public class ApkDownloader {
             if(updateManager != null) {
                 updateManager.onFinished();
             }
+            if(updateMainManager != null) {
+                updateMainManager.onFinished();
+            }
+            if(updateDialogsManager != null) {
+                updateDialogsManager.onFinished();
+            }
         }
 
         @Override
@@ -212,7 +260,12 @@ public class ApkDownloader {
             downloadTask = null;
             if(updateManager != null) {
                 updateManager.onFinished();
-                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoaded);
+            }
+            if(updateMainManager != null) {
+                updateMainManager.onFinished();
+            }
+            if(updateDialogsManager != null) {
+                updateDialogsManager.onFinished();
             }
         }
     }
@@ -225,7 +278,8 @@ public class ApkDownloader {
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoadFailed);
     }
 
-    public interface UpdateManager {
+    public interface UpdateListener {
+        void onPreStart();
         void onProgressChange(int percentage, long downBytes, long totBytes);
         void onFinished();
     }

@@ -116,14 +116,16 @@ public class UpdateManager {
         public String banner;
         public String link_file;
         public int version;
+        public long file_size;
 
-        UpdateAvailable(String title, String desc, String note, String banner, String link_file, int version) {
+        UpdateAvailable(String title, String desc, String note, String banner, String link_file, int version, long file_size) {
             this.title = title;
             this.desc = desc;
             this.note = note;
             this.banner = banner;
             this.version = version;
             this.link_file = link_file;
+            this.file_size = file_size;
         }
 
         @NonNull
@@ -137,6 +139,7 @@ public class UpdateManager {
                 obj.put("banner", banner);
                 obj.put("version", version);
                 obj.put("link_file", link_file);
+                obj.put("file_size", file_size);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -145,7 +148,7 @@ public class UpdateManager {
     }
 
     public static UpdateAvailable loadUpdate(JSONObject obj) throws JSONException {
-        return new UpdateAvailable(obj.getString("title"), obj.getString("desc"), obj.getString("note"), obj.getString("banner"), obj.getString("link_file"), obj.getInt("version"));
+        return new UpdateAvailable(obj.getString("title"), obj.getString("desc"), obj.getString("note"), obj.getString("banner"), obj.getString("link_file"), obj.getInt("version"), obj.getLong("file_size"));
     }
 
     private static class Http {
@@ -184,6 +187,20 @@ public class UpdateManager {
                     .next();
         }
     }
+
+    public static int currentVersion() {
+        try {
+            PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
+            return pInfo.versionCode / 10;
+        } catch (Exception e){
+            return 0;
+        }
+    }
+
+    public static boolean isAvailableUpdate() {
+        return OwlConfig.updateData.length() > 0;
+    }
+
     public interface UpdateCallback {
         void onSuccess(Object updateResult);
 

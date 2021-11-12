@@ -7514,8 +7514,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         searchBeginningButton = new ImageView(context);
         searchBeginningButton.setScaleType(ImageView.ScaleType.CENTER);
         searchBeginningButton.setImageResource(R.drawable.round_arrow_upward_white_36);
-        searchBeginningButton.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_chat_searchPanelIcons), PorterDuff.Mode.MULTIPLY));
-        searchBeginningButton.setBackgroundDrawable(Theme.createSelectorDrawable(Theme.getColor(Theme.key_actionBarActionModeDefaultSelector), 1));
+        searchBeginningButton.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_chat_searchPanelIcons), PorterDuff.Mode.MULTIPLY));
+        searchBeginningButton.setBackgroundDrawable(Theme.createSelectorDrawable(getThemedColor(Theme.key_actionBarActionModeDefaultSelector), 1));
         searchContainer.addView(searchBeginningButton, LayoutHelper.createFrame(48, 48, Gravity.RIGHT | Gravity.TOP, 0, 0, 96, 0));
         searchBeginningButton.setOnClickListener(view -> {
             jumpToDate(1375315200);
@@ -19974,6 +19974,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             options.add(6);
                             icons.add(R.drawable.msg_shareout);
                         } else if (type == 7) {
+                            if (!selectedObject.isAnimatedSticker()) {
+                                items.add(LocaleController.getString("SaveToGallery", R.string.SaveToGallery));
+                                options.add(200);
+                                icons.add(R.drawable.msg_gallery);
+                            }
                             if (selectedObject.isMask()) {
                                 items.add(LocaleController.getString("AddToMasks", R.string.AddToMasks));
                                 options.add(9);
@@ -20011,6 +20016,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 icons.add(R.drawable.msg_callback);
                             }
                         } else if (type == 9) {
+                            if (!selectedObject.isAnimatedSticker()) {
+                                items.add(LocaleController.getString("SaveToGallery", R.string.SaveToGallery));
+                                options.add(200);
+                                icons.add(R.drawable.msg_gallery);
+                            }
                             TLRPC.Document document = selectedObject.getDocument();
                             if (!getMediaDataController().isStickerInFavorites(document)) {
                                 if (MessageObject.isStickerHasSet(document)) {
@@ -21471,6 +21481,21 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 presentFragment(new MessageStatisticActivity(selectedObject));
                 break;
             }
+            case 200: {
+                if (Build.VERSION.SDK_INT >= 23 && getParentActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    getParentActivity().requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 4);
+                    selectedObject = null;
+                    selectedObjectGroup = null;
+                    selectedObjectToEditCaption = null;
+                    return;
+                }
+                getMessageHelper().saveStickerToGallery(getParentActivity(), selectedObject, () -> {
+                    if (BulletinFactory.canShowBulletin(ChatActivity.this)) {
+                        BulletinFactory.of(this).createDownloadBulletin(BulletinFactory.FileType.STICKER, themeDelegate).show();
+                    }
+                });
+                break;
+            }
             case 201: {
                 MessageObject messageObject = getMessageForTranslate();
                 if (messageObject == null) {
@@ -21575,7 +21600,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private boolean processSelectedOptionLongClick(int option) {
         switch (option) {
             case 201: {
-                Translator.showTranslationTargetSelector(getParentActivity(), null, () -> processSelectedOption(201));
+                Translator.showTranslationTargetSelector(getParentActivity(), null, () -> processSelectedOption(201), themeDelegate);
                 return true;
             }
         }

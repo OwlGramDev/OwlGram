@@ -70,10 +70,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.appindexing.Action;
 import com.google.firebase.appindexing.FirebaseUserActions;
 import com.google.firebase.appindexing.builders.AssistActionBuilder;
+import com.google.firebase.messaging.FirebaseMessaging;
 
+import org.json.JSONObject;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -3569,8 +3574,21 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             } else {
                 AndroidUtilities.openForView(SharedConfig.pendingAppUpdate.document, true, this);
             }*/
+
+            if(ApkDownloader.isRunningDownload())
+                ApkDownloader.cancel();
+
             if(ApkDownloader.updateDownloaded())
                 ApkDownloader.installUpdate(LaunchActivity.this);
+
+            try {
+                String data = OwlConfig.updateData;
+                if(data.length() > 0) {
+                    JSONObject jsonObject = new JSONObject(data);
+                    UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(jsonObject);
+                    ApkDownloader.downloadAPK(LaunchActivity.this, update.link_file, update.version);
+                }
+            } catch (Exception ignored){}
         });
         updateLayoutIcon = new RadialProgress2(updateLayout);
         updateLayoutIcon.setColors(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff);
@@ -3675,20 +3693,68 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             sideMenu.setPadding(0, 0, 0, 0);
         }
     }
+
     private void updateAppUpdateViews() {
-        if(ApkDownloader.updateDownloaded()) {
-            createUpdateUI();
-            updateLayoutIcon.setIcon(MediaActionDrawable.ICON_UPDATE, true, true);
-            updateTextView.setText(LocaleController.getString("AppUpdateNow", R.string.AppUpdateNow));
-            updateLayout.setVisibility(View.VISIBLE);
-            updateLayout.setTag(1);
-            updateLayout.animate().translationY(0).setInterpolator(CubicBezierInterpolator.EASE_OUT).setListener(null).setDuration(180).start();
-            sideMenu.setPadding(0, 0, 0, AndroidUtilities.dp(44));
+        if(ApkDownloader.updateDownloaded() || ApkDownloader.isRunningDownload() || UpdateManager.isAvailableUpdate()) {
+            if(ApkDownloader.updateDownloaded()) {
+                createUpdateUI();
+                updateLayoutIcon.setIcon(MediaActionDrawable.ICON_UPDATE, true, true);
+                updateTextView.setText(LocaleController.getString("AppUpdateNow", R.string.AppUpdateNow));
+                updateSizeTextView.setTag(1);
+                updateSizeTextView.animate().alpha(0.0f).scaleX(0.0f).scaleY(0.0f).setDuration(180).start();
+            } else if (ApkDownloader.isRunningDownload()) {
+                createUpdateUI();
+                updateLayoutIcon.setIcon(MediaActionDrawable.ICON_CANCEL, true, true);
+                int loadProgress = ApkDownloader.percentage();
+                updateLayoutIcon.setProgress(loadProgress, true);
+                updateTextView.setText(LocaleController.formatString("AppUpdateDownloading", R.string.AppUpdateDownloading, loadProgress));
+                updateSizeTextView.setTag(1);
+                updateSizeTextView.animate().alpha(0.0f).scaleX(0.0f).scaleY(0.0f).setDuration(180).start();
+            } else {
+                try {
+                    String data = OwlConfig.updateData;
+                    if(data.length() > 0) {
+                        JSONObject jsonObject = new JSONObject(data);
+                        UpdateManager.UpdateAvailable updateAvailable = UpdateManager.loadUpdate(jsonObject);
+                        if(updateAvailable.version > UpdateManager.currentVersion()) {
+                            createUpdateUI();
+                            updateLayoutIcon.setIcon(MediaActionDrawable.ICON_DOWNLOAD, true, true);
+                            updateTextView.setText(LocaleController.getString("OwlgramUpdate", R.string.OwlgramUpdate));
+                            updateSizeTextView.setTag(null);
+                            updateSizeTextView.animate().alpha(1.0f).scaleX(1.0f).scaleY(1.0f).setDuration(180).start();
+                            updateSizeTextView.setText(AndroidUtilities.formatFileSize(updateAvailable.file_size));
+                        }
+                    }
+                } catch (Exception ignored){}
+            }
+            if(updateLayout != null) {
+                updateLayout.setVisibility(View.VISIBLE);
+                updateLayout.setTag(1);
+                updateLayout.animate().translationY(0).setInterpolator(CubicBezierInterpolator.EASE_OUT).setListener(null).setDuration(180).start();
+                sideMenu.setPadding(0, 0, 0, AndroidUtilities.dp(44));
+            }
         }
     }
 
     public void checkAppUpdate() {
         updateAppUpdateViews();
+        ApkDownloader.setDownloadMainListener(new ApkDownloader.UpdateListener() {
+            @Override
+            public void onPreStart() {
+                updateAppUpdateViews();
+            }
+
+            @Override
+            public void onProgressChange(int percentage, long downBytes, long totBytes) {
+                updateLayoutIcon.setProgress((percentage / 100f), true);
+                updateTextView.setText(LocaleController.formatString("AppUpdateDownloading", R.string.AppUpdateDownloading, percentage));
+            }
+
+            @Override
+            public void onFinished() {
+                updateAppUpdateViews();
+            }
+        });
         if(!ApkDownloader.updateDownloaded()){
             UpdateManager.checkUpdates(new UpdateManager.UpdateCallback() {
                 @Override
@@ -3701,6 +3767,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                             (new UpdateAlertDialog(LaunchActivity.this, updateAvailable)).show();
                             OwlConfig.saveUpdateStatus(1);
                             OwlConfig.saveLastUpdateCheck();
+                            updateAppUpdateViews();
                         }
                     } else {
                         OwlConfig.saveUpdateStatus(0);
@@ -4687,7 +4754,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                     updateAppUpdateViews(true);
                 }
             }*/
-            updateAppUpdateViews();
             if (loadingThemeFileName != null) {
                 if (loadingThemeFileName.equals(path)) {
                     loadingThemeFileName = null;
@@ -4820,7 +4886,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         } else if (id == NotificationCenter.groupCallUpdated) {
             checkWasMutedByAdmin(false);
         } else if (id == NotificationCenter.fileLoadProgressChanged) {
-            if (updateTextView != null && SharedConfig.isAppUpdateAvailable()) {
+            /* if (updateTextView != null && SharedConfig.isAppUpdateAvailable()) {
                 String location = (String) args[0];
                 String fileName = FileLoader.getAttachFileName(SharedConfig.pendingAppUpdate.document);
                 if (fileName != null && fileName.equals(location)) {
@@ -4830,8 +4896,9 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                     updateLayoutIcon.setProgress(loadProgress, true);
                     updateTextView.setText(LocaleController.formatString("AppUpdateDownloading", R.string.AppUpdateDownloading, (int) (loadProgress * 100)));
                 }
-            }
+            }*/
         }
+        //updateAppUpdateViews();
         /* else if (id == NotificationCenter.appUpdateAvailable) {
             updateAppUpdateViews(mainFragmentsStack.size() == 1);
         } */

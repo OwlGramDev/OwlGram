@@ -111,11 +111,16 @@
     <string name="OwlgramEmojiSticker">Emoji associata</string>
     <string name="OwlgramMimeType">Tipo mime</string>
     <string name="OwlgramBetterAudioCall">Migliora la qualità dell\'audio</string>
-    <string name="OwlgramTestBackend">Server di prova</string>
+    <string name="OwlgramTestBackend">Test Backend</string>
     <string name="OwlgramTestBackendOn">Questo account si connetterà al server di prova.</string>
     <string name="OwlgramTestBackendOff">Questo account si connetterà al server di produzione.</string>
     <string name="OwlgramShowGradient">Ombreggia sfondo</string>
     <string name="OwlgramShowAvatar">Mostra avatar</string>
     <string name="OwlgramBlurIntensity">Intensità sfocatura</string>
     <string name="OwlgramTranslated2">Traduzione (%s)</string>
+    <string name="OwlgramSoundOff">Disattiva il verso del gufo</string>
+    <string name="OwlgramSoundOn">Attiva il verso del gufo</string>
+    <string name="OwlgramStickerSavedHint">Sticker salvato nella galleria.</string>
+    <string name="OwlgramBackendNumber">Numero di test</string>
+    <string name="OwlgramUpdate">Aggiorna OwlGram</string>
 </resources>

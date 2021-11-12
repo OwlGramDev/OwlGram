@@ -2612,6 +2612,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                 BuildVars.DEBUG_VERSION && !AndroidUtilities.isTablet() && Build.VERSION.SDK_INT >= 23 ? (SharedConfig.smoothKeyboard ? LocaleController.getString("DebugMenuDisableSmoothKeyboard", R.string.DebugMenuDisableSmoothKeyboard) : LocaleController.getString("DebugMenuEnableSmoothKeyboard", R.string.DebugMenuEnableSmoothKeyboard)) : null,
                                 BuildVars.DEBUG_PRIVATE_VERSION ? (SharedConfig.disableVoiceAudioEffects ? "Enable voip audio effects" : "Disable voip audio effects") : null,
                                 Build.VERSION.SDK_INT >= 21 ? (SharedConfig.noStatusBar ? "Show status bar background" : "Hide status bar background") : null,
+                                OwlConfig.owlEasterSound ? LocaleController.getString("OwlgramSoundOff", R.string.OwlgramSoundOff):LocaleController.getString("OwlgramSoundOn", R.string.OwlgramSoundOn),
                                 BuildVars.DEBUG_PRIVATE_VERSION ? "Clean app update" : null,
                                 BuildVars.DEBUG_PRIVATE_VERSION ? "Reset suggestions" : null,
                         };
@@ -2676,10 +2677,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                     }
                                 }
                             } else if (which == 15) {
+                                OwlConfig.toggleOwlEasterSound();
+                            } else if (which == 16) {
                                 SharedConfig.pendingAppUpdate = null;
                                 SharedConfig.saveConfig();
                                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
-                            } else if (which == 16) {
+                            } else if (which == 17) {
                                 Set<String> suggestions = getMessagesController().pendingSuggestions;
                                 suggestions.add("VALIDATE_PHONE_NUMBER");
                                 suggestions.add("VALIDATE_PASSWORD");
@@ -2694,9 +2697,19 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         } catch (Exception e) {
                             FileLog.e(e);
                         }
-                        SoundPool soundPool = new SoundPool(1, AudioManager.STREAM_VOICE_CALL, 0);
-                        int soundIn = soundPool.load(ApplicationLoader.applicationContext, R.raw.owl_sound, 1);
-                        Utilities.globalQueue.postRunnable(() -> soundPool.play(soundIn, 1.0f, 1.0f, 1, 0, 1.0f));
+                        if(OwlConfig.owlEasterSound) {
+                            SoundPool soundPool = new SoundPool(1, AudioManager.STREAM_MUSIC, 0);
+                            soundPool.load(ApplicationLoader.applicationContext, R.raw.owl_sound, 1);
+                            soundPool.setOnLoadCompleteListener((pool, sampleId, status) -> {
+                                if (status == 0) {
+                                    try {
+                                        pool.play(sampleId, 1.0f, 1.0f, 1, 0, 1.0f);
+                                    } catch (Exception e) {
+                                        FileLog.e(e);
+                                    }
+                                }
+                            });
+                        }
                     }
                     return true;
                 } else if (position >= membersStartRow && position < membersEndRow) {

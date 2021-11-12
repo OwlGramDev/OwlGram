@@ -42,6 +42,7 @@ public class OwlConfig {
     public static boolean showReportMessage;
     public static boolean showGradientColor;
     public static boolean showAvatarImage;
+    public static boolean owlEasterSound;
     public static boolean isChineseUser = false;
     public static String translationTarget = "app";
     public static String updateData;
@@ -91,11 +92,12 @@ public class OwlConfig {
             notifyUpdates = preferences.getBoolean("notifyUpdates", true);
             avatarBackgroundDarken = preferences.getBoolean("avatarBackgroundDarken", false);
             avatarBackgroundBlur = preferences.getBoolean("avatarBackgroundBlur", false);
-            avatarAsDrawerBackground = preferences.getBoolean("avatarBackgroundBlur", false);
+            avatarAsDrawerBackground = preferences.getBoolean("avatarAsDrawerBackground", false);
             betterAudioQuality = preferences.getBoolean("betterAudioQuality", false);
             showReportMessage = preferences.getBoolean("showReportMessage", true);
             showGradientColor = preferences.getBoolean("showGradientColor", false);
             showAvatarImage = preferences.getBoolean("showAvatarImage", true);
+            owlEasterSound = preferences.getBoolean("owlEasterSound", true);
             lastUpdateCheck = preferences.getLong("lastUpdateCheck", 0);
             lastUpdateStatus = preferences.getInt("lastUpdateStatus", 0);
             remindedUpdate = preferences.getInt("remindedUpdate", 0);
@@ -331,6 +333,15 @@ public class OwlConfig {
         editor.putBoolean("showAvatarImage", showAvatarImage);
         editor.apply();
     }
+
+    public static void toggleOwlEasterSound() {
+        owlEasterSound = !owlEasterSound;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("owlEasterSound", owlEasterSound);
+        editor.apply();
+    }
+
 
     public static void setTranslationProvider(int provider) {
         translationProvider = provider;

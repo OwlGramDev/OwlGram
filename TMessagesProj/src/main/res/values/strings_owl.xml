@@ -8,7 +8,7 @@
     <string name="OwlgramTranslation">Translate OwlGram</string>
     <string name="OwlgramTranslationDesc">Help us translate OwlGram into your language</string>
     <string name="OwlgramHidePhone">Hide my phone number</string>
-    <string name="OwlgramHidePhoneContacts">Hide phone number from others</string>
+    <string name="OwlgramHidePhoneContacts">Hide other people\'s phone number</string>
     <string name="OwlgramHideStatusBar">Transparent status bar</string>
     <string name="OwlgramMessageTime">Show seconds in time</string>
     <string name="OwlgramRoundedNumbers">Rounded numbers</string>
@@ -117,4 +117,9 @@
     <string name="OwlgramShowAvatar">Show Avatar</string>
     <string name="OwlgramBlurIntensity">Blur intensity</string>
     <string name="OwlgramTranslated2">Translation (%s)</string>
+    <string name="OwlgramSoundOff">Disable Owl Sound</string>
+    <string name="OwlgramSoundOn">Enable Owl Sound</string>
+    <string name="OwlgramStickerSavedHint">Sticker saved to gallery.</string>
+    <string name="OwlgramBackendNumber">Test Number</string>
+    <string name="OwlgramUpdate">Update OwlGram</string>
 </resources>

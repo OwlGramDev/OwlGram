@@ -66,6 +66,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -1394,37 +1396,36 @@ public class LoginActivity extends BaseFragment {
             textView2.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
             addView(textView2, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 0, 28, 0, 10));
 
-            if (newAccount) {
-                checkBoxCell = new CheckBoxCell(context, 2);
-                checkBoxCell.setText(LocaleController.getString("SyncContacts", R.string.SyncContacts), "", syncContacts, false);
-                addView(checkBoxCell, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
-                checkBoxCell.setOnClickListener(new OnClickListener() {
+            //if (newAccount) {
+            checkBoxCell = new CheckBoxCell(context, 2);
+            checkBoxCell.setText(LocaleController.getString("SyncContacts", R.string.SyncContacts), "", syncContacts, false);
+            addView(checkBoxCell, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
+            checkBoxCell.setOnClickListener(new OnClickListener() {
+                private Toast visibleToast;
 
-                    private Toast visibleToast;
-
-                    @Override
-                    public void onClick(View v) {
-                        if (getParentActivity() == null) {
-                            return;
-                        }
-                        CheckBoxCell cell = (CheckBoxCell) v;
-                        syncContacts = !syncContacts;
-                        cell.setChecked(syncContacts, true);
-                        try {
-                            if (visibleToast != null) {
-                                visibleToast.cancel();
-                            }
-                        } catch (Exception e) {
-                            FileLog.e(e);
-                        }
-                        if (syncContacts) {
-                            BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.contacts_sync_on, LocaleController.getString("SyncContactsOn", R.string.SyncContactsOn)).show();
-                        } else {
-                            BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.contacts_sync_off, LocaleController.getString("SyncContactsOff", R.string.SyncContactsOff)).show();
-                        }
+                @Override
+                public void onClick(View v) {
+                    if (getParentActivity() == null) {
+                        return;
                     }
-                });
-            }
+                    CheckBoxCell cell = (CheckBoxCell) v;
+                    syncContacts = !syncContacts;
+                    cell.setChecked(syncContacts, true);
+                    try {
+                        if (visibleToast != null) {
+                            visibleToast.cancel();
+                        }
+                    } catch (Exception e) {
+                        FileLog.e(e);
+                    }
+                    if (syncContacts) {
+                        BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.contacts_sync_on, LocaleController.getString("SyncContactsOn", R.string.SyncContactsOn)).show();
+                    } else {
+                        BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.contacts_sync_off, LocaleController.getString("SyncContactsOff", R.string.SyncContactsOff)).show();
+                    }
+                }
+            });
+            //}
 
             //if (BuildVars.DEBUG_PRIVATE_VERSION) {
             testBackendCheckBox = new CheckBoxCell(context, 2);
@@ -1437,11 +1438,23 @@ public class LoginActivity extends BaseFragment {
                 CheckBoxCell cell = (CheckBoxCell) v;
                 testBackend = !testBackend;
                 cell.setChecked(testBackend, true);
+
+                CountrySelectActivity.Country countryWithCode = new CountrySelectActivity.Country();
+                String test_code = "999";
+                countryWithCode.name = LocaleController.getString("OwlgramBackendNumber", R.string.OwlgramBackendNumber);
+                countryWithCode.code = test_code;
                 if (testBackend) {
+                    countriesArray.add(countryWithCode);
+                    codesMap.put(test_code, countryWithCode);
+                    phoneFormatMap.put(test_code, "XX X XXXX");
                     BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.chats_infotip, LocaleController.getString("OwlgramTestBackendOn", R.string.OwlgramTestBackendOn)).show();
                 } else {
+                    countriesArray.remove(countryWithCode);
+                    codesMap.remove(test_code);
+                    phoneFormatMap.remove(test_code);
                     BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.chats_infotip, LocaleController.getString("OwlgramTestBackendOff", R.string.OwlgramTestBackendOff)).show();
                 }
+                codeField.setText(codeField.getText());
             });
             //}
 
@@ -1523,7 +1536,6 @@ public class LoginActivity extends BaseFragment {
                                 CountrySelectActivity.Country countryWithCode = new CountrySelectActivity.Country();
                                 countryWithCode.name = c.default_name;
                                 countryWithCode.code = c.country_codes.get(k).country_code;
-
                                 countriesArray.add(countryWithCode);
                                 codesMap.put(c.country_codes.get(k).country_code, countryWithCode);
                                 if (c.country_codes.get(k).patterns.size() > 0) {
