@@ -1,16 +1,16 @@
-# 🦉 OwlGram
-OwlGram is an unofficial messaging app that uses Telegram's API.
+# 🦉 **OwlGram**
+OwlGram is an **unofficial** messaging app that uses **Telegram's API**.
 
 ## 🔗 Redirect
-🇮🇹 Italian  
+🇮🇹 **Italian**  
 ├ [Italian Channel](<http://t.me/OwlGramIT>)  
 └ [Italian Group](<http://t.me/OwlGramChatIT>)
 
-🇬🇧 English  
+🇬🇧 **English**  
 ├ [English Channel](<http://t.me/OwlGram>)  
 └ [English Group](<http://t.me/OwlGramChat>)
 
-🔗 Download  
+🔗 **Download**  
 ├ [Stable Releases](<http://t.me/OwlGramAPKs>)  
 └ [Beta Releases](<http://t.me/OwlGramBeta>)
 
@@ -45,5 +45,6 @@ OwlGram is an unofficial messaging app that uses Telegram's API.
 • And more...
 
 ## ✏️ Credits
-• [Nekogram](<https://gitlab.com/Nekogram/Nekogram>)  
+• **[Nekogram](<https://gitlab.com/Nekogram/Nekogram>)**  
 *[Licensed under GNU GPL-2.0](<https://github.com/OwlGramDev/OwlGram/blob/master/LICENSE>)*
+
