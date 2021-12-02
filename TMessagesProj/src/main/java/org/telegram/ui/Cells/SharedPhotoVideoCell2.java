@@ -166,7 +166,8 @@ public class SharedPhotoVideoCell2 extends View {
                 if (messageObject.strippedThumb != null) {
                     imageReceiver.setImage(null, null, null, null, messageObject.strippedThumb, 0, null, messageObject, 0);
                 } else {
-                    imageReceiver.clearImage();
+                    TLRPC.PhotoSize currentPhotoObjectThumb = FileLoader.getClosestPhotoSizeWithSize(messageObject.photoThumbs, 50);
+                    imageReceiver.setImage(null, null, ImageLocation.getForObject(currentPhotoObjectThumb, messageObject.photoThumbsObject), "b", null, 0, null, messageObject, 0);
                 }
             }
         } else {

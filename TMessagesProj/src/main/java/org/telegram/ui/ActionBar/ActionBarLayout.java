@@ -61,6 +61,8 @@ import org.telegram.ui.Components.LayoutHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import it.owlgram.android.OwlConfig;
+
 public class ActionBarLayout extends FrameLayout {
 
     public interface ActionBarLayoutDelegate {
@@ -191,12 +193,32 @@ public class ActionBarLayout extends FrameLayout {
 
         @Override
         public boolean dispatchTouchEvent(MotionEvent ev) {
-            if ((inPreviewMode || transitionAnimationPreviewMode) && (ev.getActionMasked() == MotionEvent.ACTION_DOWN || ev.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN)) {
+            boolean previewModeStatus = !OwlConfig.scrollableChatPreview && inPreviewMode;
+            if (OwlConfig.scrollableChatPreview && inPreviewMode) {
+                View view = containerView.getChildAt(0);
+                if (view != null) {
+                    int y = (int) (view.getTop() + containerView.getTranslationY() - AndroidUtilities.dp(Build.VERSION.SDK_INT < 21 ? 20 : 0));
+                    y += AndroidUtilities.dp(24);
+                    if (ev.getY() <= y) {
+                        movePreviewFragment(AndroidUtilities.dp(65));
+                    }
+                    boolean isValidTouch = ev.getX() >= AndroidUtilities.dp(8);
+                    isValidTouch &= ev.getX() <= view.getRight() - AndroidUtilities.dp(8);
+                    isValidTouch &= ev.getY() <= view.getBottom();
+                    isValidTouch &= ev.getY() >= y + AndroidUtilities.dp(55);
+                    if (!isValidTouch) {
+                        if (ev.getY() > view.getBottom()) {
+                            finishPreviewFragment();
+                        }
+                        return false;
+                    }
+                }
+            }
+            if ((previewModeStatus || transitionAnimationPreviewMode) && (ev.getActionMasked() == MotionEvent.ACTION_DOWN || ev.getActionMasked() == MotionEvent.ACTION_POINTER_DOWN)) {
                 return false;
             }
-            //
             try {
-                return (!inPreviewMode || this != containerView) && super.dispatchTouchEvent(ev);
+                return (!previewModeStatus || this != containerView) && super.dispatchTouchEvent(ev);
             } catch (Throwable e) {
                 FileLog.e(e);
             }
@@ -248,7 +270,7 @@ public class ActionBarLayout extends FrameLayout {
         }
     }
 
-    private static Drawable headerShadowDrawable;
+    public static Drawable headerShadowDrawable;
     private static Drawable layerShadowDrawable;
     private static Paint scrimPaint;
 
@@ -335,7 +357,7 @@ public class ActionBarLayout extends FrameLayout {
 
         if (layerShadowDrawable == null) {
             layerShadowDrawable = getResources().getDrawable(R.drawable.layer_shadow);
-            headerShadowDrawable = getResources().getDrawable(R.drawable.header_shadow).mutate();
+            headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : getResources().getDrawable(R.drawable.header_shadow).mutate();
             scrimPaint = new Paint();
         }
     }

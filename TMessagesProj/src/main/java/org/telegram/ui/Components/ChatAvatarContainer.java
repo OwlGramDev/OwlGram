@@ -74,6 +74,8 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
     private SharedMediaLayout.SharedMediaPreloader sharedMediaPreloader;
     private Theme.ResourcesProvider resourcesProvider;
 
+    private boolean isPreviewMode;
+
     public ChatAvatarContainer(Context context, ChatActivity chatActivity, boolean needTime) {
         this(context, chatActivity, needTime, null);
     }
@@ -197,7 +199,14 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
         return true;
     }
 
+    public void setPreviewMode(boolean status) {
+        isPreviewMode = status;
+    }
+
     private void openProfile(boolean byAvatar) {
+        if (isPreviewMode) {
+            return;
+        }
         if (byAvatar && (AndroidUtilities.isTablet() || AndroidUtilities.displaySize.x > AndroidUtilities.displaySize.y || !avatarImageView.getImageReceiver().hasNotThumb())) {
             byAvatar = false;
         }

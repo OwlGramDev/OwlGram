@@ -1802,7 +1802,7 @@ public class LocaleController {
     }
 
     public static String formatShortNumber(int number, int[] rounded) {
-        if (!OwlConfig.roundedNumbers) {
+        if (OwlConfig.roundedNumbers) {
             if (rounded != null) {
                 rounded[0] = number;
             }

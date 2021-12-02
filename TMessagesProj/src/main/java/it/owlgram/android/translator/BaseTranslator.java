@@ -85,13 +85,12 @@ abstract public class BaseTranslator {
                 } else if (query instanceof TLRPC.Poll) {
                     TLRPC.TL_poll poll = new TLRPC.TL_poll();
                     TLRPC.TL_poll original = (TLRPC.TL_poll) query;
-                    poll.question = original.question +
-                            "\n" +
-                            "--------" +
-                            "\n" + translate(original.question, tl);
+                    String[] mainItem = translate(original.question, tl).split(":src:", 2);
+                    poll.question = mainItem[mainItem.length > 1 ? 1:0];
                     for (int i = 0; i < original.answers.size(); i++) {
                         TLRPC.TL_pollAnswer answer = new TLRPC.TL_pollAnswer();
-                        answer.text = original.answers.get(i).text + " | " + translate(original.answers.get(i).text, tl);
+                        String[] item = translate(original.answers.get(i).text, tl).split(":src:", 2);
+                        answer.text = item[item.length > 1 ? 1:0];
                         answer.option = original.answers.get(i).option;
                         poll.answers.add(answer);
                     }

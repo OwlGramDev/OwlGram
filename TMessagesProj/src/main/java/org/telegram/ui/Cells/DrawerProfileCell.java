@@ -118,7 +118,7 @@ public class DrawerProfileCell extends FrameLayout {
                         AndroidUtilities.runOnUIThread(() -> {
                             if (lastBitmap != null) {
                                 imageReceiver.setCrossfadeWithOldImage(false);
-                                imageReceiver.setImageBitmap(new BitmapDrawable(null, lastBitmap), false);
+                                imageReceiver.setImageBitmap(new BitmapDrawable(null, lastBitmap));
                             }
                             imageReceiver.setCrossfadeWithOldImage(true);
                             imageReceiver.setImageBitmap(new BitmapDrawable(null, bitmap));
@@ -248,10 +248,8 @@ public class DrawerProfileCell extends FrameLayout {
         });
         addView(darkThemeView, LayoutHelper.createFrame(48, 48, Gravity.RIGHT | Gravity.BOTTOM, 0, 0, 6, 90));
 
-        if (Theme.getEventType() == 0) {
-            snowflakesEffect = new SnowflakesEffect();
-            snowflakesEffect.setColorKey(Theme.key_chats_menuName);
-        }
+        snowflakesEffect = new SnowflakesEffect();
+        snowflakesEffect.setColorKey(Theme.key_chats_menuName);
     }
 
     private void switchTheme(Theme.ThemeInfo themeInfo, boolean toDark) {
@@ -385,7 +383,7 @@ public class DrawerProfileCell extends FrameLayout {
             }
         }
 
-        if (snowflakesEffect != null) {
+        if (Theme.getEventType() == 0 || OwlConfig.eventType == 1) {
             snowflakesEffect.onDraw(this, canvas);
         }
     }
@@ -465,7 +463,7 @@ public class DrawerProfileCell extends FrameLayout {
     }
 
     public void updateColors() {
-        if (snowflakesEffect != null) {
+        if (Theme.getEventType() == 0 || OwlConfig.eventType == 1) {
             snowflakesEffect.updateColors();
         }
     }

@@ -78,6 +78,7 @@ import androidx.recyclerview.widget.LinearSmoothScrollerCustom;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import org.json.JSONObject;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -1704,7 +1705,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                 };
                 setDialogsListFrozen(true);
-                if (Utilities.random.nextInt(1000) == 1) {
+                if (Utilities.random.nextInt(1000) == 1 || OwlConfig.pacmanForced) {
                     if (pacmanAnimation == null) {
                         pacmanAnimation = new PacmanAnimation(parentPage.listView);
                     }
@@ -2381,7 +2382,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             }
                             cell.setTextAndIcon(LocaleController.getString("FilterReorder", R.string.FilterReorder), R.drawable.tabs_reorder);
                         } else if (a == 1) {
-                            if (N == 2) {
+                            if (N == 2 + (canShowRead ? 1:0)) {
                                 cell.setTextAndIcon(LocaleController.getString("FilterEditAll", R.string.FilterEditAll), R.drawable.msg_edit);
                             } else {
                                 cell.setTextAndIcon(LocaleController.getString("FilterEdit", R.string.FilterEdit), R.drawable.msg_edit);
@@ -2401,7 +2402,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 filterTabsView.setIsEditing(true);
                                 showDoneItem(true);
                             } else if (i == 1) {
-                                if (N == 2) {
+                                if (N == 2 + (finalCanShowRead ? 1:0)) {
                                     presentFragment(new FiltersSetupActivity());
                                 } else {
                                     presentFragment(new FilterCreateActivity(dialogFilter));
@@ -2845,7 +2846,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                 @Override
                 public void onLongClickRelease() {
-                    finishPreviewFragment();
+                    if (!OwlConfig.scrollableChatPreview) {
+                        finishPreviewFragment();
+                    } else {
+                        movePreviewFragment(0);
+                    }
                 }
 
                 @Override
@@ -6676,10 +6681,19 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             type = MenuDrawable.TYPE_DEFAULT;
             downloadProgress = 0.0f;
         }*/
+        boolean updateValid = false;
+        String data = OwlConfig.updateData;
+        try {
+            if(data.length() > 0) {
+                if(UpdateManager.loadUpdate(new JSONObject(data)).version > UpdateManager.currentVersion()) {
+                    updateValid = true;
+                }
+            }
+        } catch (Exception ignored){}
         if(ApkDownloader.isRunningDownload()) {
             type = MenuDrawable.TYPE_UDPATE_DOWNLOADING;
             downloadProgress = ApkDownloader.percentage() / 100f;
-        } else if(ApkDownloader.updateDownloaded() || UpdateManager.isAvailableUpdate()) {
+        } else if(ApkDownloader.updateDownloaded() || (UpdateManager.isAvailableUpdate() && updateValid)) {
             type = MenuDrawable.TYPE_UDPATE_AVAILABLE;
             downloadProgress = 0.0f;
         } else {

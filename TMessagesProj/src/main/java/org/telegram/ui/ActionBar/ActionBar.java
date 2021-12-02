@@ -52,6 +52,8 @@ import org.telegram.ui.Components.SnowflakesEffect;
 
 import java.util.ArrayList;
 
+import it.owlgram.android.OwlConfig;
+
 public class ActionBar extends FrameLayout {
 
     public static class ActionBarMenuOnItemClick {
@@ -253,8 +255,7 @@ public class ActionBar extends FrameLayout {
                         invalidate();
                     }
                 }
-
-                if (Theme.canStartHolidayAnimation()) {
+                if (OwlConfig.eventType == 1 || Theme.canStartHolidayAnimation()) {
                     if (snowflakesEffect == null) {
                         snowflakesEffect = new SnowflakesEffect();
                     }
@@ -451,6 +452,10 @@ public class ActionBar extends FrameLayout {
         menu = new ActionBarMenu(getContext(), this);
         addView(menu, 0, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.RIGHT));
         return menu;
+    }
+
+    public void removeMenu() {
+        removeView(menu);
     }
 
     public void setActionBarMenuOnItemClick(ActionBarMenuOnItemClick listener) {

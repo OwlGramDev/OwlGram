@@ -363,6 +363,10 @@ public class ActionBarMenuItem extends FrameLayout {
         popupLayout.removeInnerViews();
     }
 
+    public int getItemsCount() {
+        return popupLayout.getItemsCount() - 1;
+    }
+
     public void setShowedFromBottom(boolean value) {
         if (popupLayout == null) {
             return;

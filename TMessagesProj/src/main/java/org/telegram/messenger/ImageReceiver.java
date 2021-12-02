@@ -652,14 +652,10 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
     }
 
     public void setImageBitmap(Bitmap bitmap) {
-        setImageBitmap(bitmap != null ? new BitmapDrawable(null, bitmap) : null, true);
+        setImageBitmap(bitmap != null ? new BitmapDrawable(null, bitmap) : null);
     }
 
     public void setImageBitmap(Drawable bitmap) {
-        setImageBitmap(bitmap, true);
-    }
-
-    public void setImageBitmap(Drawable bitmap, boolean notify) {
         ImageLoader.getInstance().cancelLoadingForImageReceiver(this, true);
 
         if (crossfadeWithOldImage) {
@@ -753,17 +749,6 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
 
         if (setImageBackup != null) {
             setImageBackup.clear();
-        }
-
-        if (notify && delegate != null) {
-            delegate.didSetImage(this, currentThumbDrawable != null || staticThumbDrawable != null, true, false);
-        }
-        if (notify && parentView != null) {
-            if (invalidateAll) {
-                parentView.invalidate();
-            } else {
-                parentView.invalidate((int) imageX, (int) imageY, (int) (imageX + imageW), (int) (imageY + imageH));
-            }
         }
 
         if (delegate != null) {

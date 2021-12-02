@@ -172,6 +172,7 @@ import java.util.regex.Pattern;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateAlertDialog;
+import it.owlgram.android.settings.OwlgramSettings;
 import it.owlgram.android.updates.ApkDownloader;
 import it.owlgram.android.updates.UpdateManager;
 
@@ -632,6 +633,9 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                     drawerLayoutContainer.closeDrawer(false);
                 } else if (id == 13) {
                     Browser.openUrl(LaunchActivity.this, LocaleController.getString("TelegramFeaturesUrl", R.string.TelegramFeaturesUrl));
+                    drawerLayoutContainer.closeDrawer(false);
+                } else if (id == 201) {
+                    presentFragment(new OwlgramSettings());
                     drawerLayoutContainer.closeDrawer(false);
                 }
             }
@@ -3575,20 +3579,20 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                 AndroidUtilities.openForView(SharedConfig.pendingAppUpdate.document, true, this);
             }*/
 
-            if(ApkDownloader.isRunningDownload())
+            if(ApkDownloader.isRunningDownload()) {
                 ApkDownloader.cancel();
-
-            if(ApkDownloader.updateDownloaded())
+            } else if(ApkDownloader.updateDownloaded()) {
                 ApkDownloader.installUpdate(LaunchActivity.this);
-
-            try {
-                String data = OwlConfig.updateData;
-                if(data.length() > 0) {
-                    JSONObject jsonObject = new JSONObject(data);
-                    UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(jsonObject);
-                    ApkDownloader.downloadAPK(LaunchActivity.this, update.link_file, update.version);
-                }
-            } catch (Exception ignored){}
+            } else {
+                try {
+                    String data = OwlConfig.updateData;
+                    if(data.length() > 0) {
+                        JSONObject jsonObject = new JSONObject(data);
+                        UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(jsonObject);
+                        ApkDownloader.downloadAPK(LaunchActivity.this, update.link_file, update.version);
+                    }
+                } catch (Exception ignored){}
+            }
         });
         updateLayoutIcon = new RadialProgress2(updateLayout);
         updateLayoutIcon.setColors(0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff);
@@ -3737,6 +3741,9 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
     }
 
     public void checkAppUpdate() {
+        if(!OwlConfig.notifyUpdates) {
+            return;
+        }
         updateAppUpdateViews();
         ApkDownloader.setDownloadMainListener(new ApkDownloader.UpdateListener() {
             @Override

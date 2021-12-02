@@ -23,13 +23,15 @@ import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.Scanner;
 
+import it.owlgram.android.Copyright;
 import it.owlgram.android.OwlConfig;
 
 public class UpdateManager {
 
     public static void checkUpdates(UpdateCallback updateCallback) {
         Locale locale = LocaleController.getInstance().getCurrentLocale();
-        new MyAsyncTask().request(locale.getLanguage(), OwlConfig.betaUpdates, updateCallback).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        boolean betMode = OwlConfig.betaUpdates && Copyright.isNoCopyrightFeaturesEnabled();
+        new MyAsyncTask().request(locale.getLanguage(), betMode, updateCallback).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @SuppressWarnings("deprecation")

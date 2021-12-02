@@ -341,7 +341,6 @@ public class EditTextCaption extends EditTextBoldCursor {
     }
 
     private boolean performMenuAction(int itemId) {
-        Log.e("TEST", "_" + itemId);
         if (itemId == R.id.menu_regular) {
             makeSelectedRegular();
             return true;

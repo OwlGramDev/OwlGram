@@ -11,7 +11,7 @@
     <string name="OwlgramHidePhoneContacts">Hide other people\'s phone number</string>
     <string name="OwlgramHideStatusBar">Transparent status bar</string>
     <string name="OwlgramMessageTime">Show seconds in time</string>
-    <string name="OwlgramRoundedNumbers">Rounded numbers</string>
+    <string name="OwlgramRoundedNumbers">Disable number rounding</string>
     <string name="OwlgramTranslationProvider">Translation Provider</string>
     <string name="OwlgramDestinationLanguage">Target Language</string>
     <string name="OwlgramConfirmCall">Prompt before calling</string>
@@ -122,4 +122,28 @@
     <string name="OwlgramStickerSavedHint">Sticker saved to gallery.</string>
     <string name="OwlgramBackendNumber">Test Number</string>
     <string name="OwlgramUpdate">Update OwlGram</string>
+    <string name="OwlgramSideBarIconSet">Sidebar icon set</string>
+    <string name="OwlgramPacmanForced">Force Pac-Man Animation</string>
+    <string name="OwlgramSideBarOrderHint">Customize side menu items to suit your needs.</string>
+    <string name="OwlgramSuggestedMenuItems">Recommended Menu Items</string>
+    <string name="OwlgramMenuItems">Menu Items</string>
+    <string name="OwlgramButtonStyle">Action Panel</string>
+    <string name="OwlgramButtonSquared">Squared</string>
+    <string name="OwlgramButtonRounded">Rounded</string>
+    <string name="OwlgramButtonIceled">Iceled</string>
+    <string name="OwlgramButtonPills">Pills</string>
+    <!-- HARRY POTTER CITATION B.1 C.4 -->
+    <string name="OwlgramStickerMsg1">What else is missing?</string>
+    <string name="OwlgramStickerMsg2">Gallopin\' Gorgons, that reminds me</string>
+    <string name="OwlgramStickerSize">Sticker size</string>
+    <string name="OwlgramResetStickerSize">Reset sticker size</string>
+    <string name="OwlgramSmartButtons">Group shortcuts</string>
+    <string name="OwlgramScrollablePreview">Scrollable chat preview</string>
+    <string name="OwlgramAppBarShadow">Disable title bar shadow</string>
+    <string name="OwlgramNotificationColor">Accent color as notification color</string>
+    <string name="OwlgramDescCamera">Allows you to record video messages with the rear camera instead of the front camera.</string>
+    <string name="OwlgramDescSeconds">10:45 → 10:45:22</string>
+    <string name="OwlgramDescRounded">35.7k → 35.702</string>
+    <string name="OwlgramDescCall">Show confirmation dialog each time you call anyone.</string>
+    <string name="OwlgramDeleteCacheFile">Clear from cache</string>
 </resources>

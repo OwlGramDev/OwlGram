@@ -12,7 +12,7 @@
     <string name="OwlgramHidePhoneContacts">Nascondi il numero di telefono altrui</string>
     <string name="OwlgramHideStatusBar">Barra di stato trasparente</string>
     <string name="OwlgramMessageTime">Mostra i secondi nell\'orario</string>
-    <string name="OwlgramRoundedNumbers">Numeri arrotondati</string>
+    <string name="OwlgramRoundedNumbers">Disattiva l\'arrotondamento dei numeri</string>
     <string name="OwlgramTranslationProvider">Fornitore di traduzione</string>
     <string name="OwlgramDestinationLanguage">Lingua di destinazione</string>
     <string name="OwlgramConfirmCall">Avvisa prima di chiamare</string>
@@ -94,8 +94,8 @@
     <string name="OwlgramCheckUpdates">Verifica</string>
     <string name="OwlgramBetaUpdates">Installa versioni beta</string>
     <string name="OwlgramBetaUpdatesDesc">Prova i nuovi aggiornamenti di OwlGram prima del loro rilascio ufficiale</string>
-    <string name="OwlgramUpdatePopup">Notifica quando disponibile</string>
-    <string name="OwlgramUpdatePopupDesc">Riceverai una notifica quando un nuovo aggiornamento sarà disponibile</string>
+    <string name="OwlgramUpdatePopup">Aggiorna automaticamente</string>
+    <string name="OwlgramUpdatePopupDesc">Avvisa quando disponibile</string>
     <string name="OwlgramApkChannel">Canale APK</string>
     <string name="OwlgramNoQuoteForward">Inoltra senza citare</string>
     <string name="OwlgramFileName">Nome</string>
@@ -123,4 +123,28 @@
     <string name="OwlgramStickerSavedHint">Sticker salvato nella galleria.</string>
     <string name="OwlgramBackendNumber">Numero di test</string>
     <string name="OwlgramUpdate">Aggiorna OwlGram</string>
+    <string name="OwlgramSideBarIconSet">Set di icone del menu laterale</string>
+    <string name="OwlgramPacmanForced">Forza l\'animazione di Pac-Man</string>
+    <string name="OwlgramSideBarOrderHint">Personalizza gli elementi del menu laterale per soddisfare le tue esigenze.</string>
+    <string name="OwlgramSuggestedMenuItems">Elementi del menu consigliati</string>
+    <string name="OwlgramMenuItems">Elementi del menu</string>
+    <string name="OwlgramButtonStyle">Action Panel</string>
+    <string name="OwlgramButtonSquared">Quadrato</string>
+    <string name="OwlgramButtonRounded">Arrotondato</string>
+    <string name="OwlgramButtonIceled">Iceled</string>
+    <string name="OwlgramButtonPills">Pillola</string>
+    <!-- HARRY POTTER CITATION B.1 C.4 -->
+    <string name="OwlgramStickerMsg1">Cos\'altro manca?</string>
+    <string name="OwlgramStickerMsg2">Per mille fulmini! L\'avevo dimenticato</string>
+    <string name="OwlgramStickerSize">Dimensione sticker</string>
+    <string name="OwlgramResetStickerSize">Ripristina dimensione sticker</string>
+    <string name="OwlgramSmartButtons">Group shortcuts</string>
+    <string name="OwlgramScrollablePreview">Anteprima della chat scorrevole</string>
+    <string name="OwlgramAppBarShadow">Disattiva l\'ombra della barra del titolo</string>
+    <string name="OwlgramNotificationColor">Colore dell\'accento come colore di notifica</string>
+    <string name="OwlgramDescCamera">Ti permette di registrare i videomessaggi con la fotocamera posteriore invece della fotocamera anteriore.</string>
+    <string name="OwlgramDescSeconds">10:45 → 10:45:22</string>
+    <string name="OwlgramDescRounded">35.7k → 35.702</string>
+    <string name="OwlgramDescCall">Mostra una finestra di conferma ogni volta che chiami qualcuno.</string>
+    <string name="OwlgramDeleteCacheFile">Elimina dalla cache</string>
 </resources>

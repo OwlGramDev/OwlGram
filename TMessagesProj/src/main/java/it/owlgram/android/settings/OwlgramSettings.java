@@ -23,7 +23,6 @@ import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextDetailSettingsCell;
-import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
@@ -79,17 +78,17 @@ public class OwlgramSettings extends BaseFragment{
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         listView.setOnItemClickListener((view, position, x, y) -> {
-            if(position == channelUpdatesRow){
+            if (position == channelUpdatesRow) {
                 MessagesController.getInstance(currentAccount).openByUserName(LocaleController.getString("OwlgramUsername", R.string.OwlgramUsername), this, 1);
             } else if (position == sourceCodeRow) {
                 Browser.openUrl(getParentActivity(), "https://github.com/OwlGramDev/OwlGram");
             } else if (position == supportTranslationRow) {
                 Browser.openUrl(getParentActivity(), "https://crowdin.com/project/owlgram");
-            } else if (position == generalSettingsRow){
+            } else if (position == generalSettingsRow) {
                 presentFragment(new OwlgramGeneralSettings());
-            } else if (position == chatSettingsRow){
+            } else if (position == chatSettingsRow) {
                 presentFragment(new OwlgramChatSettings());
-            } else if (position == updateSettingsRow){
+            } else if (position == updateSettingsRow) {
                 presentFragment(new OwlgramUpdateSettings());
             }
         });
@@ -145,29 +144,29 @@ public class OwlgramSettings extends BaseFragment{
                     textCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                     if (position == generalSettingsRow) {
                         textCell.setTextAndIcon(LocaleController.getString("General", R.string.General), R.drawable.outline_pack, true);
-                    }else if(position == chatSettingsRow){
+                    } else if (position == chatSettingsRow){
                         textCell.setTextAndIcon(LocaleController.getString("OwlgramChat", R.string.OwlgramChat), R.drawable.menu_chats, true);
-                    }else if(position == updateSettingsRow){
-                        textCell.setTextAndIcon(LocaleController.getString("OwlgramUpdates", R.string.OwlgramUpdates), R.drawable.round_update_white_36, true);
-                    }else if (position == channelUpdatesRow) {
+                    } else if (position == updateSettingsRow){
+                        textCell.setTextAndIcon(LocaleController.getString("OwlgramUpdates", R.string.OwlgramUpdates), R.drawable.round_update_white_28, false);
+                    } else if (position == channelUpdatesRow) {
                         textCell.setTextAndValueAndIcon(LocaleController.getString("OwlgramOfficialChannel", R.string.OwlgramOfficialChannel), "@" + LocaleController.getString("OwlgramUsername", R.string.OwlgramUsername), R.drawable.msg_channel, true);
-                    }else if (position == sourceCodeRow) {
-                        textCell.setTextAndIcon(LocaleController.getString("OwlgramSourceCode", R.string.OwlgramSourceCode), R.drawable.outline_source_white_36, true);
+                    } else if (position == sourceCodeRow) {
+                        textCell.setTextAndIcon(LocaleController.getString("OwlgramSourceCode", R.string.OwlgramSourceCode), R.drawable.outline_source_white_28, true);
                     }
                     break;
                 case 3:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == categoryHeaderRow) {
                         headerCell.setText(LocaleController.getString("Settings", R.string.Settings));
-                    }else if (position == infoHeaderRow){
+                    } else if (position == infoHeaderRow){
                         headerCell.setText(LocaleController.getString("Info", R.string.Info));
                     }
                     break;
                 case 4:
                     TextDetailSettingsCell textDetailCell = (TextDetailSettingsCell) holder.itemView;
                     textDetailCell.setMultilineDetail(true);
-                    if(position == supportTranslationRow) {
-                        textDetailCell.setTextAndValueAndIcon(LocaleController.getString("OwlgramTranslation", R.string.OwlgramTranslation), LocaleController.getString("OwlgramTranslationDesc", R.string.OwlgramTranslationDesc), R.drawable.round_translate_white_36, false);
+                    if (position == supportTranslationRow) {
+                        textDetailCell.setTextAndValueAndIcon(LocaleController.getString("OwlgramTranslation", R.string.OwlgramTranslation), LocaleController.getString("OwlgramTranslationDesc", R.string.OwlgramTranslationDesc), R.drawable.round_translate_white_28, false);
                     }
                     break;
             }

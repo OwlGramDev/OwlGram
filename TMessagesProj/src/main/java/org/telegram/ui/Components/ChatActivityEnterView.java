@@ -3147,7 +3147,7 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
                     cell.setTextAndIcon(LocaleController.getString("SendWithoutSound", R.string.SendWithoutSound), R.drawable.input_notify_off);
                 } else {
                     String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage();
-                    cell.setTextAndIcon(LocaleController.getString("OwlgramTranslate", R.string.OwlgramTranslate) + " (" + language + ")", R.drawable.round_translate_white_36);
+                    cell.setTextAndIcon(LocaleController.getString("OwlgramTranslate", R.string.OwlgramTranslate) + " (" + language + ")", R.drawable.round_translate_white_28);
                 }
                 cell.setMinimumWidth(AndroidUtilities.dp(196));
                 sendPopupLayout.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
@@ -3170,7 +3170,7 @@ public class ChatActivityEnterView extends FrameLayout implements NotificationCe
                         }
                         Translator.showTranslationTargetSelector(getContext(), null, () -> {
                             String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage();
-                            cell.setTextAndIcon(LocaleController.getString("OwlgramTranslate", R.string.OwlgramTranslate) + " (" + language + ")", R.drawable.round_translate_white_36);
+                            cell.setTextAndIcon(LocaleController.getString("OwlgramTranslate", R.string.OwlgramTranslate) + " (" + language + ")", R.drawable.round_translate_white_28);
                             translatePreSend();
                         }, resourcesProvider);
                     }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="OwlgramChat">Sohbetler</string>
+    <string name="OwlgramChat">Sohbet</string>
     <string name="OwlgramSettings">OwlGram Ayarları</string>
     <string name="OwlgramUpdates">Güncellemeler</string>
     <string name="OwlgramOfficialChannel">Resmi Kanal</string>
@@ -12,7 +12,7 @@
     <string name="OwlgramHidePhoneContacts">Telefon numaramı diğerlerinden gizle</string>
     <string name="OwlgramHideStatusBar">Şeffaf durum çubuğu</string>
     <string name="OwlgramMessageTime">Zamanı saniye olarak göster</string>
-    <string name="OwlgramRoundedNumbers">Sayıları yuvarla</string>
+    <string name="OwlgramRoundedNumbers">Disable number rounding</string>
     <string name="OwlgramTranslationProvider">Çeviri Sağlayıcısı</string>
     <string name="OwlgramDestinationLanguage">Hedef Dil</string>
     <string name="OwlgramConfirmCall">Aramadan önce sor</string>
@@ -51,7 +51,7 @@
     <string name="OwlgramCreateMention">Mention oluştur</string>
     <string name="OwlgramVersion">OwlGram %1$s</string>
     <string name="OwlgramCallbackCopied">Callback panoya kopyalandı.</string>
-    <string name="OwlgramAutoLockInstant">Instant</string>
+    <string name="OwlgramAutoLockInstant">Hızlı</string>
     <string name="OwlgramMkwRowPlayer">MKV\'yi Video Olarak Göster</string>
     <string name="OwlgramAllVideoPlay">Tüm Videoları Yayınla</string>
     <string name="OwlgramUserRestrictionsSendStickers">Sticker Gönder</string>
@@ -94,8 +94,8 @@
     <string name="OwlgramCheckUpdates">Kontrol Et</string>
     <string name="OwlgramBetaUpdates">Beta versiyonunu yükle</string>
     <string name="OwlgramBetaUpdatesDesc">Resmi sürüm yayınlanmadan önce OwlGram güncellemelerini test et</string>
-    <string name="OwlgramUpdatePopup">Kullanılabilir olduğunda bildir</string>
-    <string name="OwlgramUpdatePopupDesc">Yeni güncelleme geldiğinde bildirim alacaksınız</string>
+    <string name="OwlgramUpdatePopup">Aggiorna automaticamente</string>
+    <string name="OwlgramUpdatePopupDesc">Kullanılabilir olduğunda bildir</string>
     <string name="OwlgramApkChannel">APK Kanalı</string>
     <string name="OwlgramNoQuoteForward">Alıntılamadan İlet</string>
     <string name="OwlgramFileName">İsim</string>
@@ -118,8 +118,33 @@
     <string name="OwlgramShowAvatar">Avatarı Göster</string>
     <string name="OwlgramBlurIntensity">Bulanıklık seviyesi</string>
     <string name="OwlgramTranslated2">Çeviri (%s)</string>
-    <string name="OwlgramSoundOff">Disable Owl Sound</string>
-    <string name="OwlgramSoundOn">Enable Owl Sound</string>
-    <string name="OwlgramStickerSavedHint">Sticker saved to gallery.</string>
-    <string name="OwlgramBackendNumber">Test Number</string>
+    <string name="OwlgramSoundOff">Ses devre dışı</string>
+    <string name="OwlgramSoundOn">İptal Sesini Etkinleştir</string>
+    <string name="OwlgramStickerSavedHint">Video galeriye kaydedildi.</string>
+    <string name="OwlgramBackendNumber">Test numarasi</string>
+    <string name="OwlgramUpdate">OwlGram\'ı güncelle</string>
+    <string name="OwlgramSideBarIconSet">Sidebar icon set</string>
+    <string name="OwlgramPacmanForced">Force Pac-Man Animation</string>
+    <string name="OwlgramSideBarOrderHint">Customize side menu items to suit your needs.</string>
+    <string name="OwlgramSuggestedMenuItems">Recommended Menu Items</string>
+    <string name="OwlgramMenuItems">Menu Items</string>
+    <string name="OwlgramButtonStyle">Action Panel</string>
+    <string name="OwlgramButtonSquared">Squared</string>
+    <string name="OwlgramButtonRounded">Rounded</string>
+    <string name="OwlgramButtonIceled">Iceled</string>
+    <string name="OwlgramButtonPills">Pills</string>
+    <!-- HARRY POTTER CITATION B.1 C.4 -->
+    <string name="OwlgramStickerMsg1">What else is missing?</string>
+    <string name="OwlgramStickerMsg2">Gallopin\' Gorgons, that reminds me</string>
+    <string name="OwlgramStickerSize">Sticker size</string>
+    <string name="OwlgramResetStickerSize">Reset sticker size</string>
+    <string name="OwlgramSmartButtons">Group shortcuts</string>
+    <string name="OwlgramScrollablePreview">Scrollable chat preview</string>
+    <string name="OwlgramAppBarShadow">Disable title bar shadow</string>
+    <string name="OwlgramNotificationColor">Accent color as notification color</string>
+    <string name="OwlgramDescCamera">Allows you to record video messages with the rear camera instead of the front camera.</string>
+    <string name="OwlgramDescSeconds">10:45 → 10:45:22</string>
+    <string name="OwlgramDescRounded">35.7k → 35.702</string>
+    <string name="OwlgramDescCall">Show confirmation dialog each time you call anyone.</string>
+    <string name="OwlgramDeleteCacheFile">Clear from cache</string>
 </resources>

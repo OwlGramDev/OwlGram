@@ -3,8 +3,10 @@ package it.owlgram.android;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
+import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.R;
+import org.telegram.ui.ActionBar.Theme;
 
 import java.util.Date;
 
@@ -43,9 +45,16 @@ public class OwlConfig {
     public static boolean showGradientColor;
     public static boolean showAvatarImage;
     public static boolean owlEasterSound;
+    public static boolean pacmanForced;
+    public static boolean scrollableChatPreview;
+    public static boolean smartButtons;
+    public static boolean disableAppBarShadow;
+    public static boolean accentAsNotificationColor;
+    public static boolean showDeleteDownloadedFile;
     public static boolean isChineseUser = false;
     public static String translationTarget = "app";
     public static String updateData;
+    public static String drawerItems;
     public static int deepLFormality = DeepLTranslator.FORMALITY_DEFAULT;
     public static int translationProvider = Translator.PROVIDER_GOOGLE;
     public static int lastUpdateStatus = 0;
@@ -53,6 +62,9 @@ public class OwlConfig {
     public static long lastUpdateCheck = 0;
     public static int oldDownloadedVersion = 0;
     public static int blurIntensity = 0;
+    public static int eventType = 0;
+    public static int buttonStyleType = 0;
+    public static float stickerSize = 0.0f;
 
 
     private static boolean configLoaded;
@@ -71,7 +83,7 @@ public class OwlConfig {
             hidePhoneNumber = preferences.getBoolean("hidePhoneNumber", true);
             hideContactNumber = preferences.getBoolean("hideContactNumber", true);
             fullTime = preferences.getBoolean("fullTime", false);
-            roundedNumbers = preferences.getBoolean("roundedNumbers", true);
+            roundedNumbers = preferences.getBoolean("roundedNumbers", false);
             confirmCall = preferences.getBoolean("confirmCall", true);
             mediaFlipByTap = preferences.getBoolean("mediaFlipByTap", false);
             jumpChannel = preferences.getBoolean("jumpChannel", false);
@@ -98,13 +110,23 @@ public class OwlConfig {
             showGradientColor = preferences.getBoolean("showGradientColor", false);
             showAvatarImage = preferences.getBoolean("showAvatarImage", true);
             owlEasterSound = preferences.getBoolean("owlEasterSound", true);
+            pacmanForced = preferences.getBoolean("pacmanForced", false);
+            scrollableChatPreview = preferences.getBoolean("scrollableChatPreview", true);
+            smartButtons = preferences.getBoolean("smartButtons", false);
+            disableAppBarShadow = preferences.getBoolean("disableAppBarShadow", false);
+            accentAsNotificationColor =  preferences.getBoolean("accentAsNotificationColor", false);
+            showDeleteDownloadedFile =  preferences.getBoolean("showDeleteDownloadedFile", false);
             lastUpdateCheck = preferences.getLong("lastUpdateCheck", 0);
             lastUpdateStatus = preferences.getInt("lastUpdateStatus", 0);
             remindedUpdate = preferences.getInt("remindedUpdate", 0);
             translationTarget = preferences.getString("translationTarget", "app");
             updateData = preferences.getString("updateData", "");
+            drawerItems = preferences.getString("drawerItems", "[]");
             oldDownloadedVersion = preferences.getInt("oldDownloadedVersion", 0);
+            eventType = preferences.getInt("eventType", 0);
+            buttonStyleType = preferences.getInt("buttonStyleType", 0);
             blurIntensity = preferences.getInt("blurIntensity", 75);
+            stickerSize = preferences.getFloat("stickerSize", 14.0f);
             translationProvider = preferences.getInt("translationProvider", isChineseUser ? Translator.PROVIDER_NIU : Translator.PROVIDER_GOOGLE);
             configLoaded = true;
         }
@@ -342,6 +364,53 @@ public class OwlConfig {
         editor.apply();
     }
 
+    public static void togglePacmanForced() {
+        pacmanForced = !pacmanForced;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("pacmanForced", pacmanForced);
+        editor.apply();
+    }
+
+    public static void toggleSmartButtons() {
+        smartButtons = !smartButtons;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("smartButtons", smartButtons);
+        editor.apply();
+    }
+
+    public static void toggleScrollableChatPreview() {
+        scrollableChatPreview = !scrollableChatPreview;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("scrollableChatPreview", scrollableChatPreview);
+        editor.apply();
+    }
+
+    public static void toggleAppBarShadow() {
+        disableAppBarShadow = !disableAppBarShadow;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("disableAppBarShadow", disableAppBarShadow);
+        editor.apply();
+    }
+
+    public static void toggleAccentColor() {
+        accentAsNotificationColor = !accentAsNotificationColor;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("accentAsNotificationColor", accentAsNotificationColor);
+        editor.apply();
+    }
+
+    public static void toggleShowDeleteDownloadedFile() {
+        showDeleteDownloadedFile = !showDeleteDownloadedFile;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showDeleteDownloadedFile", showDeleteDownloadedFile);
+        editor.apply();
+    }
 
     public static void setTranslationProvider(int provider) {
         translationProvider = provider;
@@ -364,6 +433,14 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("deepLFormality", deepLFormality);
+        editor.apply();
+    }
+
+    public static void setStickerSize(float size) {
+        stickerSize = size;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putFloat("stickerSize", stickerSize);
         editor.apply();
     }
 
@@ -407,12 +484,55 @@ public class OwlConfig {
         editor.apply();
     }
 
+    public static void saveButtonStyle(int type) {
+        buttonStyleType = type;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("buttonStyleType", buttonStyleType);
+        editor.apply();
+    }
+
+    public static void saveEventType(int type) {
+        eventType = type;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("eventType", eventType);
+        editor.apply();
+    }
+
     public static void setUpdateData(String data) {
         updateData = data;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("updateData", updateData);
         editor.apply();
+    }
+
+    public static void setDrawerItems(String data) {
+        drawerItems = data;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("drawerItems", drawerItems);
+        editor.apply();
+    }
+
+    public static int getNotificationColor() {
+        if (accentAsNotificationColor) {
+            int color = 0;
+            if (Theme.getActiveTheme().hasAccentColors()) {
+                color = Theme.getActiveTheme().getAccentColor(Theme.getActiveTheme().currentAccentId);
+            }
+            if (color == 0) {
+                color = Theme.getColor(Theme.key_actionBarDefault) | 0xff000000;
+            }
+            float brightness = AndroidUtilities.computePerceivedBrightness(color);
+            if (brightness >= 0.721f || brightness <= 0.279f) {
+                color = Theme.getColor(Theme.key_windowBackgroundWhiteBlueHeader) | 0xff000000;
+            }
+            return color;
+        } else {
+            return 0xff11acfa;
+        }
     }
 
 }

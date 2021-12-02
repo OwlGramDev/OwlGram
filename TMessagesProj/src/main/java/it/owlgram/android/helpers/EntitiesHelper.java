@@ -133,9 +133,24 @@ public class EntitiesHelper {
         return string;
     }
 
+    private static String fixDoubleSpace(String string) {
+        String[] list_params = new String[]{"b", "i", "u", "s", "p", "c", "q", "a"};
+        for (String list_param : list_params) {
+            string = string.replace(" <" + list_param + "> ", " <" + list_param + ">");
+            string = string.replace(" </" + list_param + "> ", "</" + list_param + "> ");
+        }
+        string = string.replace("<a> ", "<a>");
+        string = string.replace(" </a>", "</a> ");
+        return string;
+    }
+
     public static TextWithMention getEntities(String text, ArrayList<TLRPC.MessageEntity> entities) {
         ArrayList<TLRPC.MessageEntity> returnEntities = new ArrayList<>();
         ArrayList<TLRPC.MessageEntity> copyEntities = new ArrayList<>(entities);
+        text = text.replace("</ ", "</");
+        text = fixDoubleSpace(text);
+        text = text.replace("\n", "§");
+
         Pattern p = Pattern.compile("<(.*?)>(.*?)</\\1>");
         Matcher m = p.matcher(text);
         String new_text = text;
@@ -230,6 +245,7 @@ public class EntitiesHelper {
                 }
             }
         }
+        new_text = new_text.replace("§", "\n");
         TextWithMention textWithMention = new TextWithMention();
         textWithMention.text = new_text;
         textWithMention.entities = returnEntities;

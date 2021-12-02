@@ -22,15 +22,16 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.ui.ActionBar.ActionBar;
+import org.telegram.ui.ActionBar.ActionBarLayout;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.ShadowSectionCell;
+import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
-import org.telegram.ui.ThemeActivity;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -38,6 +39,8 @@ import java.util.Locale;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.BlurIntensityCell;
 import it.owlgram.android.components.DrawerProfilePreviewCell;
+import it.owlgram.android.components.DynamicButtonSelector;
+import it.owlgram.android.components.ThemeSelectorDrawerCell;
 import it.owlgram.android.helpers.PopupHelper;
 import it.owlgram.android.translator.DeepLTranslator;
 import it.owlgram.android.translator.Translator;
@@ -59,6 +62,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
     private int appearanceHeaderRow;
     private int useSystemFontRow;
     private int useSystemEmojiRow;
+    private int forcePacmanRow;
     private int statusBarSwitchRow;
     private int messageTimeSwitchRow;
     private int roundedNumberSwitchRow;
@@ -76,6 +80,16 @@ public class OwlgramGeneralSettings extends BaseFragment {
     private int editBlurHeaderRow;
     private int editBlurRow;
     private int editBlurDividerRow;
+    private int themeDrawerHeader;
+    private int themeDrawerRow;
+    private int themeDrawerDividerRow;
+    private int menuItemsRow;
+    private int dynamicButtonHeaderRow;
+    private int dynamicButtonRow;
+    private int smartButtonsRow;
+    private int dynamicDividerRow;
+    private int appBarShadowRow;
+    private int notificationAccentRow;
 
     private DrawerProfilePreviewCell profilePreviewCell;
 
@@ -85,6 +99,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
         updateRowsId(true);
         return true;
     }
+
     @Override
     public View createView(Context context) {
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
@@ -259,10 +274,35 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 }
                 getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
                 listAdapter.notifyItemChanged(drawerRow, new Object());
+            } else if (position == forcePacmanRow) {
+                OwlConfig.togglePacmanForced();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.pacmanForced);
+                }
+            } else if (position == menuItemsRow) {
+                presentFragment(new DrawerOrderSettings());
+            } else if (position == smartButtonsRow) {
+                OwlConfig.toggleSmartButtons();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.smartButtons);
+                }
+            } else if (position == appBarShadowRow) {
+                OwlConfig.toggleAppBarShadow();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.disableAppBarShadow);
+                }
+                ActionBarLayout.headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : parentLayout.getResources().getDrawable(R.drawable.header_shadow).mutate();
+                parentLayout.rebuildAllFragmentViews(true, true);
+            } else if (position == notificationAccentRow) {
+                OwlConfig.toggleAccentColor();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.accentAsNotificationColor);
+                }
             }
         });
         return fragmentView;
     }
+
     @SuppressLint("NotifyDataSetChanged")
     private void updateRowsId(boolean notify) {
         rowCount = 0;
@@ -276,18 +316,27 @@ public class OwlgramGeneralSettings extends BaseFragment {
 
         drawerRow = rowCount++;
         drawerAvatarAsBackgroundRow = rowCount++;
-        if(OwlConfig.avatarAsDrawerBackground) {
+        if (OwlConfig.avatarAsDrawerBackground) {
             showGradientRow = rowCount++;
             showAvatarRow = rowCount++;
             drawerDarkenBackgroundRow = rowCount++;
             drawerBlurBackgroundRow = rowCount++;
         }
         drawerDividerRow = rowCount++;
-        if(OwlConfig.avatarBackgroundBlur && OwlConfig.avatarAsDrawerBackground) {
+        if (OwlConfig.avatarBackgroundBlur && OwlConfig.avatarAsDrawerBackground) {
             editBlurHeaderRow = rowCount++;
             editBlurRow = rowCount++;
             editBlurDividerRow = rowCount++;
         }
+        themeDrawerHeader = rowCount++;
+        themeDrawerRow = rowCount++;
+        menuItemsRow = rowCount++;
+        themeDrawerDividerRow = rowCount++;
+
+        dynamicButtonHeaderRow = rowCount++;
+        dynamicButtonRow = rowCount++;
+        dynamicDividerRow = rowCount++;
+
         privacyHeaderRow = rowCount++;
         phoneNumberSwitchRow = rowCount++;
         phoneContactsSwitchRow = rowCount++;
@@ -295,9 +344,13 @@ public class OwlgramGeneralSettings extends BaseFragment {
         appearanceHeaderRow = rowCount++;
         useSystemFontRow = rowCount++;
         useSystemEmojiRow = rowCount++;
+        forcePacmanRow = rowCount++;
         statusBarSwitchRow = rowCount++;
         messageTimeSwitchRow = rowCount++;
         roundedNumberSwitchRow = rowCount++;
+        smartButtonsRow = rowCount++;
+        appBarShadowRow = rowCount++;
+        notificationAccentRow = rowCount++;
         divisorAppearanceRow = rowCount++;
         translationHeaderRow = rowCount++;
         translationProviderSelectRow = rowCount++;
@@ -321,6 +374,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
             listAdapter.notifyDataSetChanged();
         }
     }
+
     private class ListAdapter extends RecyclerListView.SelectionAdapter {
         private final Context mContext;
 
@@ -350,39 +404,51 @@ public class OwlgramGeneralSettings extends BaseFragment {
                         headerCell.setText(LocaleController.getString("Calls", R.string.Calls));
                     } else if (position == editBlurHeaderRow) {
                         headerCell.setText(LocaleController.getString("OwlgramBlurIntensity", R.string.OwlgramBlurIntensity));
+                    } else if (position == themeDrawerHeader) {
+                        headerCell.setText(LocaleController.getString("OwlgramSideBarIconSet", R.string.OwlgramSideBarIconSet));
+                    } else if (position == dynamicButtonHeaderRow) {
+                        headerCell.setText(LocaleController.getString("OwlgramButtonStyle", R.string.OwlgramButtonStyle));
                     }
                     break;
                 case 3:
-                    TextCheckCell textCell = (TextCheckCell) holder.itemView;
-                    textCell.setEnabled(true, null);
+                    TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
+                    textCheckCell.setEnabled(true, null);
                     if(position == phoneNumberSwitchRow){
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramHidePhone", R.string.OwlgramHidePhone), OwlConfig.hidePhoneNumber, true);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramHidePhone", R.string.OwlgramHidePhone), OwlConfig.hidePhoneNumber, true);
                     } else if (position == phoneContactsSwitchRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramHidePhoneContacts", R.string.OwlgramHidePhoneContacts), OwlConfig.hideContactNumber, true);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramHidePhoneContacts", R.string.OwlgramHidePhoneContacts), OwlConfig.hideContactNumber, true);
                     } else if (position == statusBarSwitchRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramHideStatusBar", R.string.OwlgramHideStatusBar), SharedConfig.noStatusBar, true);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramHideStatusBar", R.string.OwlgramHideStatusBar), SharedConfig.noStatusBar, true);
                     }else if (position == messageTimeSwitchRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramMessageTime", R.string.OwlgramMessageTime), OwlConfig.fullTime, true);
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("OwlgramMessageTime", R.string.OwlgramMessageTime), LocaleController.getString("OwlgramDescSeconds", R.string.OwlgramDescSeconds), OwlConfig.fullTime, true, true);
                     }else if (position == roundedNumberSwitchRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramRoundedNumbers", R.string.OwlgramRoundedNumbers), OwlConfig.roundedNumbers, true);
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("OwlgramRoundedNumbers", R.string.OwlgramRoundedNumbers), LocaleController.getString("OwlgramDescRounded", R.string.OwlgramDescRounded), OwlConfig.roundedNumbers, true, true);
                     }else if (position == confirmCallSwitchRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramConfirmCall", R.string.OwlgramConfirmCall), OwlConfig.confirmCall, true);
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("OwlgramConfirmCall", R.string.OwlgramConfirmCall), LocaleController.getString("OwlgramDescCall", R.string.OwlgramDescCall), OwlConfig.confirmCall, true, true);
                     }else if (position == useSystemFontRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramUseSystemFont", R.string.OwlgramUseSystemFont), OwlConfig.useSystemFont, true);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramUseSystemFont", R.string.OwlgramUseSystemFont), OwlConfig.useSystemFont, true);
                     }else if (position == useSystemEmojiRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramUseSystemEmoji", R.string.OwlgramUseSystemEmoji), OwlConfig.useSystemEmoji, true);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramUseSystemEmoji", R.string.OwlgramUseSystemEmoji), OwlConfig.useSystemEmoji, true);
                     } else if (position == drawerAvatarAsBackgroundRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramAvatarAsBackground", R.string.OwlgramAvatarAsBackground), OwlConfig.avatarAsDrawerBackground, !OwlConfig.avatarAsDrawerBackground);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramAvatarAsBackground", R.string.OwlgramAvatarAsBackground), OwlConfig.avatarAsDrawerBackground, !OwlConfig.avatarAsDrawerBackground);
                     } else if (position == drawerBlurBackgroundRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramAvatarBlur", R.string.OwlgramAvatarBlur), OwlConfig.avatarBackgroundBlur, !OwlConfig.avatarBackgroundBlur);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramAvatarBlur", R.string.OwlgramAvatarBlur), OwlConfig.avatarBackgroundBlur, !OwlConfig.avatarBackgroundBlur);
                     } else if (position == drawerDarkenBackgroundRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramAvatarDarken", R.string.OwlgramAvatarDarken), OwlConfig.avatarBackgroundDarken, true);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramAvatarDarken", R.string.OwlgramAvatarDarken), OwlConfig.avatarBackgroundDarken, true);
                     } else if (position == betterAudioCallRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramBetterAudioCall", R.string.OwlgramBetterAudioCall), OwlConfig.betterAudioQuality, false);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramBetterAudioCall", R.string.OwlgramBetterAudioCall), OwlConfig.betterAudioQuality, false);
                     } else if (position == showGradientRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramShowGradient", R.string.OwlgramShowGradient), OwlConfig.showGradientColor, true);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramShowGradient", R.string.OwlgramShowGradient), OwlConfig.showGradientColor, true);
                     } else if (position == showAvatarRow) {
-                        textCell.setTextAndCheck(LocaleController.getString("OwlgramShowAvatar", R.string.OwlgramShowAvatar), OwlConfig.showAvatarImage, drawerBlurBackgroundRow != -1);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramShowAvatar", R.string.OwlgramShowAvatar), OwlConfig.showAvatarImage, drawerBlurBackgroundRow != -1);
+                    } else if (position == forcePacmanRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramPacmanForced", R.string.OwlgramPacmanForced), OwlConfig.pacmanForced, true);
+                    } else if (position == smartButtonsRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramSmartButtons", R.string.OwlgramSmartButtons), OwlConfig.smartButtons, true);
+                    } else if (position == appBarShadowRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramAppBarShadow", R.string.OwlgramAppBarShadow), OwlConfig.disableAppBarShadow, true);
+                    } else if (position == notificationAccentRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramNotificationColor", R.string.OwlgramNotificationColor), OwlConfig.accentAsNotificationColor, true);
                     }
                     break;
                 case 4:
@@ -437,12 +503,19 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     DrawerProfilePreviewCell cell = (DrawerProfilePreviewCell) holder.itemView;
                     cell.setUser(getUserConfig().getCurrentUser(), false);
                     break;
+                case 8:
+                    TextCell textCell = (TextCell) holder.itemView;
+                    textCell.setColors(Theme.key_windowBackgroundWhiteBlueText4, Theme.key_windowBackgroundWhiteBlueText4);
+                    if (position == menuItemsRow) {
+                        textCell.setTextAndIcon(LocaleController.getString("OwlgramMenuItems", R.string.OwlgramMenuItems), R.drawable.msg_colors, false);
+                    }
+                    break;
             }
         }
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int type = holder.getItemViewType();
-            return type == 3 || type == 4;
+            return type == 3 || type == 4 || type == 8;
         }
         @NonNull
         @Override
@@ -486,6 +559,28 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     };
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
+                case 7:
+                    view = new ThemeSelectorDrawerCell(mContext, OwlConfig.eventType) {
+                        @Override
+                        protected void onSelectedEvent(int eventSelected) {
+                            super.onSelectedEvent(eventSelected);
+                            OwlConfig.saveEventType(eventSelected);
+                            listAdapter.notifyItemChanged(drawerRow, new Object());
+                            Theme.lastHolidayCheckTime = 0;
+                            Theme.dialogs_holidayDrawable = null;
+                            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                        }
+                    };
+                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    break;
+                case 8:
+                    view = new TextCell(mContext);
+                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    break;
+                case 9:
+                    view = new DynamicButtonSelector(mContext);
+                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    break;
                 default:
                     view = new ShadowSectionCell(mContext);
                     break;
@@ -496,16 +591,19 @@ public class OwlgramGeneralSettings extends BaseFragment {
         @Override
         public int getItemViewType(int position) {
             if (position == divisorPrivacyRow || position == divisorAppearanceRow || position == divisorTranslationRow ||
-                    position == drawerDividerRow || position == editBlurDividerRow){
+                    position == drawerDividerRow || position == editBlurDividerRow || position == themeDrawerDividerRow ||
+                    position == dynamicDividerRow){
                 return 1;
             } else if (position == privacyHeaderRow || position == appearanceHeaderRow || position == translationHeaderRow ||
-                    position == callHeaderRow || position == editBlurHeaderRow){
+                    position == callHeaderRow || position == editBlurHeaderRow || position == themeDrawerHeader ||
+                    position == dynamicButtonHeaderRow){
                 return 2;
             } else if (position == phoneNumberSwitchRow || position == phoneContactsSwitchRow || position == statusBarSwitchRow ||
                     position == roundedNumberSwitchRow || position == messageTimeSwitchRow || position == confirmCallSwitchRow ||
                     position == useSystemFontRow || position == useSystemEmojiRow || position == drawerAvatarAsBackgroundRow ||
                     position == drawerDarkenBackgroundRow || position == drawerBlurBackgroundRow || position == betterAudioCallRow ||
-                    position == showGradientRow || position == showAvatarRow
+                    position == showGradientRow || position == showAvatarRow || position == forcePacmanRow || position == smartButtonsRow ||
+                    position == appBarShadowRow || position == notificationAccentRow
             ){
                 return 3;
             } else if ( position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow){
@@ -514,6 +612,12 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 return 5;
             } else if (position == editBlurRow) {
                 return 6;
+            } else if (position == themeDrawerRow) {
+                return 7;
+            } else if (position == menuItemsRow) {
+                return 8;
+            } else if (position  == dynamicButtonRow) {
+                return 9;
             }
             return 1;
         }

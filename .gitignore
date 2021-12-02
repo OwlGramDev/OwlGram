@@ -17,3 +17,4 @@ obj/
 local.properties
 *.keystore
 *.jsk
+*.zip
