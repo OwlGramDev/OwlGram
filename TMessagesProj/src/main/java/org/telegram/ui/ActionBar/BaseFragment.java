@@ -63,6 +63,7 @@ public abstract class BaseFragment {
     protected ActionBarLayout parentLayout;
     protected ActionBar actionBar;
     protected boolean inPreviewMode;
+    protected boolean inMenuMode;
     protected boolean inBubbleMode;
     protected int classGuid;
     protected Bundle arguments;
@@ -124,6 +125,14 @@ public abstract class BaseFragment {
         return inBubbleMode;
     }
 
+    public boolean getInPreviewMode() {
+        return inPreviewMode;
+    }
+
+    public boolean getInPassivePreviewMode() {
+        return parentLayout != null && parentLayout.isInPassivePreviewMode();
+    }
+
     protected void setInPreviewMode(boolean value) {
         inPreviewMode = value;
         if (actionBar != null) {
@@ -133,6 +142,10 @@ public abstract class BaseFragment {
                 actionBar.setOccupyStatusBar(Build.VERSION.SDK_INT >= 21);
             }
         }
+    }
+
+    protected void setInMenuMode(boolean value) {
+        inMenuMode = value;
     }
 
     protected void onPreviewOpenAnimationEnd() {
@@ -363,19 +376,23 @@ public abstract class BaseFragment {
     }
 
     public boolean presentFragmentAsPreview(BaseFragment fragment) {
-        return parentLayout != null && parentLayout.presentFragmentAsPreview(fragment);
+        return allowPresentFragment() && parentLayout != null && parentLayout.presentFragmentAsPreview(fragment);
+    }
+
+    public boolean presentFragmentAsPreviewWithMenu(BaseFragment fragment, View menu) {
+        return allowPresentFragment() && parentLayout != null && parentLayout.presentFragmentAsPreviewWithMenu(fragment, menu);
     }
 
     public boolean presentFragment(BaseFragment fragment) {
-        return parentLayout != null && parentLayout.presentFragment(fragment);
+        return allowPresentFragment() && parentLayout != null && parentLayout.presentFragment(fragment);
     }
 
     public boolean presentFragment(BaseFragment fragment, boolean removeLast) {
-        return parentLayout != null && parentLayout.presentFragment(fragment, removeLast);
+        return allowPresentFragment() && parentLayout != null && parentLayout.presentFragment(fragment, removeLast);
     }
 
     public boolean presentFragment(BaseFragment fragment, boolean removeLast, boolean forceWithoutAnimation) {
-        return parentLayout != null && parentLayout.presentFragment(fragment, removeLast, forceWithoutAnimation, true, false);
+        return allowPresentFragment() && parentLayout != null && parentLayout.presentFragment(fragment, removeLast, forceWithoutAnimation, true, false, null);
     }
 
     public Activity getParentActivity() {
@@ -719,4 +736,9 @@ public abstract class BaseFragment {
     public Theme.ResourcesProvider getResourceProvider() {
         return null;
     }
+
+    protected boolean allowPresentFragment() {
+        return true;
+    }
+
 }

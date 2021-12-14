@@ -127,7 +127,14 @@ public class EntitiesHelper {
         for (String list_param : list_params) {
             string = string.replace("\n</" + list_param + ">", "</" + list_param + ">\n");
         }
-        if(string.contains("\n</")){
+        boolean found_any_replaces = false;
+        for (String list_param : list_params) {
+            if (string.contains("\n</" + list_param + ">")) {
+                found_any_replaces = true;
+                break;
+            }
+        }
+        if (found_any_replaces){
             return fixEndString(string);
         }
         return string;

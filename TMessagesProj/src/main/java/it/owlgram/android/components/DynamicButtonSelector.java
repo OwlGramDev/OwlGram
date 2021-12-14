@@ -20,10 +20,11 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.NumberPicker;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.components.dynamic.IceladButtonCell;
+import it.owlgram.android.components.dynamic.IceledButtonCell;
 import it.owlgram.android.components.dynamic.PillsButtonCell;
 import it.owlgram.android.components.dynamic.SquaredButtonCell;
 import it.owlgram.android.components.dynamic.RoundedButtonCell;
+import it.owlgram.android.components.dynamic.LinearButtonCell;
 
 public class DynamicButtonSelector extends LinearLayout {
     Paint pickerDividersPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -32,6 +33,7 @@ public class DynamicButtonSelector extends LinearLayout {
             LocaleController.getString("OwlgramButtonRounded", R.string.OwlgramButtonRounded),
             LocaleController.getString("OwlgramButtonIceled", R.string.OwlgramButtonIceled),
             LocaleController.getString("OwlgramButtonPills", R.string.OwlgramButtonPills),
+            LocaleController.getString("OwlgramButtonLinear", R.string.OwlgramButtonLinear),
     };
 
     private final LinearLayout mainLayout;
@@ -112,18 +114,20 @@ public class DynamicButtonSelector extends LinearLayout {
     private void loadButtons(int index) {
         mainLayout.removeAllViews();
         for (int i = 0; i < 4; i++ ) {
-            mainLayout.addView(getButtonPreview(index));
+            mainLayout.addView(getButtonPreview(index, i));
         }
     }
 
-    private LinearLayout getButtonPreview(int index) {
+    private LinearLayout getButtonPreview(int index, int pos) {
         switch (index) {
             case 1:
                 return RoundedButtonCell.getButtonPreview(getContext());
             case 2:
-                return IceladButtonCell.getButtonPreview(getContext());
+                return IceledButtonCell.getButtonPreview(getContext());
             case 3:
                 return PillsButtonCell.getButtonPreview(getContext());
+            case 4:
+                return LinearButtonCell.getButtonPreview(getContext(), pos);
             default:
                 return SquaredButtonCell.getButtonPreview(getContext());
         }

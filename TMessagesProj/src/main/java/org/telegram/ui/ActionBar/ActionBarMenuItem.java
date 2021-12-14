@@ -665,9 +665,9 @@ public class ActionBarMenuItem extends FrameLayout {
             }
         });
 
-        // if (measurePopup) {
-        container.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x - AndroidUtilities.dp(40), MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.y, MeasureSpec.AT_MOST));
-        measurePopup = false;
+       // if (measurePopup) {
+            container.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x - AndroidUtilities.dp(40), MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.y, MeasureSpec.AT_MOST));
+            measurePopup = false;
         //}
         processedPopupClick = false;
         popupWindow.setFocusable(true);
@@ -844,35 +844,35 @@ public class ActionBarMenuItem extends FrameLayout {
             ChangeBounds changeBounds = new ChangeBounds();
             changeBounds.setDuration(150);
             transition.addTransition(new Visibility() {
-                @Override
-                public Animator onAppear(ViewGroup sceneRoot, View view, TransitionValues startValues, TransitionValues endValues) {
-                    if (view instanceof SearchFilterView) {
-                        AnimatorSet set = new AnimatorSet();
-                        set.playTogether(
-                                ObjectAnimator.ofFloat(view, View.ALPHA, 0, 1f),
-                                ObjectAnimator.ofFloat(view, View.SCALE_X, 0.5f, 1f),
-                                ObjectAnimator.ofFloat(view, View.SCALE_Y, 0.5f, 1f)
-                        );
-                        set.setInterpolator(CubicBezierInterpolator.DEFAULT);
-                        return set;
-                    }
-                    return ObjectAnimator.ofFloat(view, View.ALPHA, 0, 1f);
-                }
-                @Override
-                public Animator onDisappear(ViewGroup sceneRoot, View view, TransitionValues startValues, TransitionValues endValues) {
-                    if (view instanceof SearchFilterView) {
-                        AnimatorSet set = new AnimatorSet();
-                        set.playTogether(
-                                ObjectAnimator.ofFloat(view, View.ALPHA, view.getAlpha(), 0f),
-                                ObjectAnimator.ofFloat(view, View.SCALE_X,  view.getScaleX(), 0.5f),
-                                ObjectAnimator.ofFloat(view, View.SCALE_Y,  view.getScaleX(), 0.5f)
-                        );
-                        set.setInterpolator(CubicBezierInterpolator.DEFAULT);
-                        return set;
-                    }
-                    return ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0);
-                }
-            }.setDuration(150)).addTransition(changeBounds);
+                        @Override
+                        public Animator onAppear(ViewGroup sceneRoot, View view, TransitionValues startValues, TransitionValues endValues) {
+                            if (view instanceof SearchFilterView) {
+                                AnimatorSet set = new AnimatorSet();
+                                set.playTogether(
+                                        ObjectAnimator.ofFloat(view, View.ALPHA, 0, 1f),
+                                        ObjectAnimator.ofFloat(view, View.SCALE_X, 0.5f, 1f),
+                                        ObjectAnimator.ofFloat(view, View.SCALE_Y, 0.5f, 1f)
+                                );
+                                set.setInterpolator(CubicBezierInterpolator.DEFAULT);
+                                return set;
+                            }
+                            return ObjectAnimator.ofFloat(view, View.ALPHA, 0, 1f);
+                        }
+                        @Override
+                        public Animator onDisappear(ViewGroup sceneRoot, View view, TransitionValues startValues, TransitionValues endValues) {
+                            if (view instanceof SearchFilterView) {
+                                AnimatorSet set = new AnimatorSet();
+                                set.playTogether(
+                                        ObjectAnimator.ofFloat(view, View.ALPHA, view.getAlpha(), 0f),
+                                        ObjectAnimator.ofFloat(view, View.SCALE_X,  view.getScaleX(), 0.5f),
+                                        ObjectAnimator.ofFloat(view, View.SCALE_Y,  view.getScaleX(), 0.5f)
+                                );
+                                set.setInterpolator(CubicBezierInterpolator.DEFAULT);
+                                return set;
+                            }
+                            return ObjectAnimator.ofFloat(view, View.ALPHA, 1f, 0);
+                        }
+                    }.setDuration(150)).addTransition(changeBounds);
             transition.setOrdering(TransitionSet.ORDERING_TOGETHER);
             transition.setInterpolator(CubicBezierInterpolator.EASE_OUT);
             int selectedAccount = UserConfig.selectedAccount;
@@ -1594,6 +1594,24 @@ public class ActionBarMenuItem extends FrameLayout {
         if (view != null && view.getVisibility() != GONE) {
             view.setVisibility(GONE);
             measurePopup = true;
+            checkHideMenuItem();
+        }
+    }
+
+    /**
+     * Hides this menu item if no subitems are available
+     */
+    public void checkHideMenuItem() {
+        boolean isVisible = false;
+        for (int i = 0; i < popupLayout.getItemsCount(); i++) {
+            if (popupLayout.getItemAt(i).getVisibility() == VISIBLE) {
+                isVisible = true;
+                break;
+            }
+        }
+        int v = isVisible ? VISIBLE : GONE;
+        if (v != getVisibility()) {
+            setVisibility(v);
         }
     }
 
@@ -1605,6 +1623,7 @@ public class ActionBarMenuItem extends FrameLayout {
             popupLayout.getItemAt(a).setVisibility(GONE);
         }
         measurePopup = true;
+        checkHideMenuItem();
     }
 
     public boolean isSubItemVisible(int id) {
@@ -1623,6 +1642,7 @@ public class ActionBarMenuItem extends FrameLayout {
         if (view != null && view.getVisibility() != VISIBLE) {
             view.setVisibility(VISIBLE);
             measurePopup = true;
+            checkHideMenuItem();
         }
     }
 

@@ -8,6 +8,8 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -22,9 +24,10 @@ import org.telegram.ui.ActionBar.Theme;
 import java.util.Objects;
 
 @SuppressLint("ViewConstructor")
-public class IceladButtonCell extends SimpleActionCell {
+public class IceledButtonCell extends SimpleActionCell {
 
-    public IceladButtonCell(Context context, String text, int iconId, int color, int myId) {
+    @SuppressLint("ClickableViewAccessibility")
+    public IceledButtonCell(Context context, String text, int iconId, int color, int myId) {
         super(context);
         int colorWhite = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText);
 
@@ -44,7 +47,13 @@ public class IceladButtonCell extends SimpleActionCell {
 
         ImageView mt = new ImageView(context);
         mt.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        mt.setOnClickListener(view -> onItemClick(myId));
+        mt.setClickable(true);
+        mt.setOnTouchListener((View view, MotionEvent motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                onItemClick(myId);
+            }
+            return false;
+        });
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(colorWhite, 0.2f)));
         mt.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
@@ -129,6 +138,7 @@ public class IceladButtonCell extends SimpleActionCell {
 
     public ThemeInfo getTheme() {
         return new ThemeInfo(
+                Theme.getColor(Theme.key_dialogTextBlue),
                 AndroidUtilities.getTransparentColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText), 0.03f),
                 AndroidUtilities.dp(10)
         );

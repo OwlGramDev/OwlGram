@@ -9,6 +9,8 @@ import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
 
+import com.google.android.exoplayer2.util.Log;
+
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
@@ -64,7 +66,6 @@ public class RenderView extends TextureView {
                 if (surface == null || internal != null) {
                     return;
                 }
-
                 internal = new CanvasInternal(surface);
                 internal.setBufferSize(width, height);
                 updateTransform();

@@ -25,7 +25,6 @@ public class ChatThemeController extends BaseController {
     private static final long reloadTimeoutMs = 2 * 60 * 60 * 1000;
     public static volatile DispatchQueue chatThemeQueue = new DispatchQueue("chatThemeQueue");
 
-    //private static final HashMap<Long, Bitmap> themeIdWallpaperMap = new HashMap<>();
     private static final HashMap<Long, Bitmap> themeIdWallpaperThumbMap = new HashMap<>();
     private static List<EmojiThemes> allChatThemes;
     private static volatile long themesHash;
@@ -47,7 +46,7 @@ public class ChatThemeController extends BaseController {
         preloadSticker("❌");
         if (!allChatThemes.isEmpty()) {
             for (EmojiThemes chatTheme : allChatThemes) {
-                preloadSticker(chatTheme.getEmoticon());
+               preloadSticker(chatTheme.getEmoticon());
             }
         }
     }

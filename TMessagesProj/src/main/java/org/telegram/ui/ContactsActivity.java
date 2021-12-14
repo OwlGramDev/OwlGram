@@ -279,7 +279,7 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
                 listViewAdapter.notifyDataSetChanged();
                 listView.setFastScrollVisible(true);
                 listView.setVerticalScrollBarEnabled(false);
-                // emptyView.setText(LocaleController.getString("NoContacts", R.string.NoContacts));
+               // emptyView.setText(LocaleController.getString("NoContacts", R.string.NoContacts));
                 if (floatingButtonContainer != null) {
                     floatingButtonContainer.setVisibility(View.VISIBLE);
                     floatingHidden = true;
@@ -354,7 +354,7 @@ public class ContactsActivity extends BaseFragment implements NotificationCenter
                 if (listView != null && listView.getAdapter() == this) {
                     int count = super.getItemCount();
                     if (needPhonebook) {
-                        //  emptyView.setVisibility(count == 2 ? View.VISIBLE : View.GONE);
+                      //  emptyView.setVisibility(count == 2 ? View.VISIBLE : View.GONE);
                         listView.setFastScrollVisible(count != 2);
                     } else {
                         //emptyView.setVisibility(count == 0 ? View.VISIBLE : View.GONE);

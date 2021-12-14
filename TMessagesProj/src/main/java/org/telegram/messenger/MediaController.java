@@ -3151,7 +3151,6 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                         FileLog.e(e);
                     }
                     String name = messageObject.getFileName();
-                    // &&
                     if (!TextUtils.isEmpty(name)) {
                         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("media_saved_pos", Activity.MODE_PRIVATE);
                         float pos = preferences.getFloat(name, -1);
@@ -3925,6 +3924,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
 
             new Thread(() -> {
                 try {
+
                     boolean result = true;
                     if (Build.VERSION.SDK_INT >= 29) {
                         try {
@@ -3946,10 +3946,8 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                             }
                             if (selectedType == 0) {
                                 uriToInsert = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                                    File dirDest = new File(Environment.DIRECTORY_PICTURES, "Telegram");
-                                    contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, dirDest + File.separator);
-                                }
+                                File dirDest = new File(Environment.DIRECTORY_PICTURES, "Telegram");
+                                contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, dirDest + File.separator);
                                 contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, AndroidUtilities.generateFileName(0, extension));
                                 contentValues.put(MediaStore.Images.Media.MIME_TYPE, mimeType);
                             } else if (selectedType == 1) {
@@ -4825,6 +4823,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         MediaCodecVideoConvertor videoConvertor = new MediaCodecVideoConvertor();
         boolean error = videoConvertor.convertVideo(videoPath, cacheFile,
                 rotationValue, isSecret,
+                originalWidth, originalHeight,
                 resultWidth, resultHeight,
                 framerate, bitrate, originalBitrate,
                 startTime, endTime, avatarStartTime,

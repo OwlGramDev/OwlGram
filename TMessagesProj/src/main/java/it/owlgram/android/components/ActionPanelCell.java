@@ -10,11 +10,12 @@ import androidx.cardview.widget.CardView;
 import org.telegram.messenger.AndroidUtilities;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.components.dynamic.IceladButtonCell;
+import it.owlgram.android.components.dynamic.IceledButtonCell;
 import it.owlgram.android.components.dynamic.PillsButtonCell;
 import it.owlgram.android.components.dynamic.SquaredButtonCell;
 import it.owlgram.android.components.dynamic.SimpleActionCell;
 import it.owlgram.android.components.dynamic.RoundedButtonCell;
+import it.owlgram.android.components.dynamic.LinearButtonCell;
 
 @SuppressLint("ViewConstructor")
 public class ActionPanelCell extends LinearLayout {
@@ -39,10 +40,10 @@ public class ActionPanelCell extends LinearLayout {
         shimmerFrameLayout.setLayoutParams(new CardView.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         LinearLayout placeholderLayout = new LinearLayout(context);
         placeholderLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        placeholderLayout.addView(getShimmerButton(context));
-        placeholderLayout.addView(getShimmerButton(context));
-        placeholderLayout.addView(getShimmerButton(context));
-        placeholderLayout.addView(getShimmerButton(context));
+        placeholderLayout.addView(getShimmerButton(context, 0));
+        placeholderLayout.addView(getShimmerButton(context, 1));
+        placeholderLayout.addView(getShimmerButton(context, 2));
+        placeholderLayout.addView(getShimmerButton(context, 3));
         mainLayout.setVisibility(GONE);
         addView(mainLayout);
         shimmerFrameLayout.addView(placeholderLayout);
@@ -63,14 +64,16 @@ public class ActionPanelCell extends LinearLayout {
 
     protected void onItemClick(int itemId) {}
 
-    public LinearLayout getShimmerButton(Context context) {
+    public LinearLayout getShimmerButton(Context context, int pos) {
         switch (OwlConfig.buttonStyleType) {
             case 1:
                 return RoundedButtonCell.getShimmerButton(context);
             case 2:
-                return IceladButtonCell.getShimmerButton(context);
+                return IceledButtonCell.getShimmerButton(context);
             case 3:
                 return PillsButtonCell.getShimmerButton(context);
+            case 4:
+                return LinearButtonCell.getShimmerButton(context, pos);
             default:
                 return SquaredButtonCell.getShimmerButton(context);
         }
@@ -89,7 +92,7 @@ public class ActionPanelCell extends LinearLayout {
                     }
                 };
             case 2:
-                return new IceladButtonCell(context, text, iconId, color, myId) {
+                return new IceledButtonCell(context, text, iconId, color, myId) {
                     @Override
                     protected void onItemClick(int id) {
                         super.onItemClick(id);
@@ -98,6 +101,14 @@ public class ActionPanelCell extends LinearLayout {
                 };
             case 3:
                 return new PillsButtonCell(context, text, iconId, color, myId) {
+                    @Override
+                    protected void onItemClick(int id) {
+                        super.onItemClick(id);
+                        ActionPanelCell.this.onItemClick(id);
+                    }
+                };
+            case 4:
+                return new LinearButtonCell(context, text, iconId, color, myId) {
                     @Override
                     protected void onItemClick(int id) {
                         super.onItemClick(id);

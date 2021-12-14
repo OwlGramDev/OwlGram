@@ -1430,7 +1430,7 @@ public class FilteredSearchView extends FrameLayout implements NotificationCente
     }
 
     int lastAccount;
-
+    
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();

@@ -166,9 +166,17 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         listView.setOnItemLongClickListener((view, position) -> {
-            TextDetailSettingsCell textDetailCell = (TextDetailSettingsCell) view;
-            AndroidUtilities.addToClipboard(textDetailCell.getTextView().getText().toString());
-            BulletinFactory.of(DetailsActivity.this).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
+            if (getMessagesController().isChatNoForwards(fromChat)) {
+                if(fromChat != null && fromChat.broadcast) {
+                    BulletinFactory.of(DetailsActivity.this).createSimpleBulletin(R.raw.ic_ban, LocaleController.getString("ForwardsRestrictedInfoChannel", R.string.ForwardsRestrictedInfoChannel)).show();
+                } else {
+                    BulletinFactory.of(DetailsActivity.this).createSimpleBulletin(R.raw.ic_ban, LocaleController.getString("ForwardsRestrictedInfoGroup", R.string.ForwardsRestrictedInfoGroup)).show();
+                }
+            } else {
+                TextDetailSettingsCell textDetailCell = (TextDetailSettingsCell) view;
+                AndroidUtilities.addToClipboard(textDetailCell.getTextView().getText().toString());
+                BulletinFactory.of(DetailsActivity.this).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
+            }
             return true;
         });
         return fragmentView;

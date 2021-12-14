@@ -33,9 +33,12 @@ import it.owlgram.android.components.dynamic.SimpleActionCell;
 
 
 public class DatacenterCell extends LinearLayout {
-    TextView tv;
-    TextView tv2;
-    ImageView iv;
+    private final TextView tv;
+    private final TextView tv2;
+    private final ImageView iv;
+    private int color_icon;
+    private int DC_CACHE = -1;
+    private long ID_CACHE = -1;
     private final LinearLayout mainLayout;
     private final ShimmerFrameLayout shimmerFrameLayout;
     private final CardView mainCardView;
@@ -48,7 +51,7 @@ public class DatacenterCell extends LinearLayout {
 
         int colorIcon = Theme.getColor(Theme.key_windowBackgroundWhiteGrayText);
         int colorText = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText);
-        int blueColor = Theme.getColor(Theme.key_dialogTextBlue);
+        int blueColor = color_icon = Theme.getColor(Theme.key_dialogTextBlue);
 
         shimmerFrameLayout = new ShimmerFrameLayout(context);
         Shimmer.AlphaHighlightBuilder shimmer = new Shimmer.AlphaHighlightBuilder();
@@ -164,14 +167,19 @@ public class DatacenterCell extends LinearLayout {
     public void setTheme(SimpleActionCell.ThemeInfo themeInfo) {
         mainCardView.setCardBackgroundColor(themeInfo.background);
         mainCardView.setRadius(themeInfo.radius);
+        color_icon = themeInfo.colorIcon;
+        if (ID_CACHE != -1) {
+            setIdAndDC(ID_CACHE, DC_CACHE);
+        }
     }
 
     public void setIdAndDC(long id, int DC){
+        DC_CACHE = DC;
+        ID_CACHE = id;
         mainLayout.setVisibility(VISIBLE);
         removeView(shimmerFrameLayout);
         DC = DC != 0 ? DC:-1;
         String DC_NAME = LocaleController.getString("NumberUnknown", R.string.NumberUnknown);
-        int blueColor = Theme.getColor(Theme.key_dialogTextBlue);
         int DC_ICON = R.drawable.menu_secret_hw;
         switch (DC){
             case 1:
@@ -197,7 +205,7 @@ public class DatacenterCell extends LinearLayout {
         tv.setText(DC_NAME);
         tv2.setText(String.valueOf(id));
         Drawable d = ContextCompat.getDrawable(getContext(), DC_ICON);
-        Objects.requireNonNull(d).setColorFilter(blueColor, PorterDuff.Mode.SRC_ATOP);
+        Objects.requireNonNull(d).setColorFilter(color_icon, PorterDuff.Mode.SRC_ATOP);
         iv.setImageBitmap(drawableToBitmap(d));
     }
     public static Bitmap drawableToBitmap (@NonNull Drawable drawable) {

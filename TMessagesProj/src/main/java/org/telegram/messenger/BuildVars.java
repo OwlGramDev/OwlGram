@@ -15,18 +15,21 @@ import android.os.Build;
 public class BuildVars {
 
     public static boolean DEBUG_VERSION = false;
-    public static boolean DEBUG_PRIVATE_VERSION = false;
     public static boolean LOGS_ENABLED = false;
     public static boolean USE_CLOUD_STRINGS = true;
     public static boolean CHECK_UPDATES = false;
     public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= 29;
-    public static int BUILD_VERSION = 2480;
-    public static String BUILD_VERSION_STRING = "1.2.0";
-    public static String TELEGRAM_VERSION_STRING = "8.2.7";
+    public static int BUILD_VERSION = 2497;
+    public static String BUILD_VERSION_STRING = "1.3.0";
+    public static int TELEGRAM_BUILD_VERSION = 2495;
+    public static String TELEGRAM_VERSION_STRING = "8.3.1";
     public static int APP_ID = 10029733;
     public static String APP_HASH = "d0d81009d46e774f78c0e0e622f5fa21";
+
+    public static boolean DEBUG_PRIVATE_VERSION = false;
+
     public static String SMS_HASH = isStandaloneApp() ? "w0lkcmTZkKh" : (DEBUG_VERSION ? "O2P2z+/jBpJ" : "oLeq9AcOZkT");
-    public static String PLAYSTORE_APP_URL = "https://play.google.com/store/apps/details?id=it.owlgram.android";
+    public static String PLAYSTORE_APP_URL = "https://play.google.com/store/apps/details?id=org.telegram.messenger";
 
     static {
         if (ApplicationLoader.applicationContext != null) {

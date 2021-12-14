@@ -99,7 +99,7 @@ public class ActionButtonManager {
                 if (data.length() <= 1 && canSearchMembers) {
                     data.put("search");
                 }
-                if (!canEdit || !chat.megagroup || !hasAdminRights) {
+                if (!canEdit || !hasAdminRights) {
                     data.put("info");
                 }
             }

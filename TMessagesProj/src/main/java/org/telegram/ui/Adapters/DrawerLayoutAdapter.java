@@ -358,6 +358,9 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
                     case "telegram_features":
                         items.add(new Item(13, LocaleController.getString("TelegramFeatures", R.string.TelegramFeatures), helpIcon));
                         break;
+                    case "archived_messages":
+                        items.add(new Item(202, LocaleController.getString("ArchivedChats", R.string.ArchivedChats), R.drawable.msg_archive));
+                        break;
                 }
             }
 

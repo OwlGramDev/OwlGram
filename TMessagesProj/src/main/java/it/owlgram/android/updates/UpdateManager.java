@@ -28,6 +28,33 @@ import it.owlgram.android.OwlConfig;
 
 public class UpdateManager {
 
+    public static void isDownloadedUpdate(UpdateUICallback updateUICallback) {
+        new UpdateBackgroundTask().request(updateUICallback).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public interface UpdateUICallback {
+        void onResult(boolean result);
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private static class UpdateBackgroundTask extends AsyncTask<Void, Integer, Boolean> {
+        UpdateUICallback updateUICallback;
+        public UpdateBackgroundTask request(UpdateUICallback updateUICallback) {
+            this.updateUICallback = updateUICallback;
+            return this;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            return ApkDownloader.updateDownloaded();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            updateUICallback.onResult(result);
+        }
+    }
+
     public static void checkUpdates(UpdateCallback updateCallback) {
         Locale locale = LocaleController.getInstance().getCurrentLocale();
         boolean betMode = OwlConfig.betaUpdates && Copyright.isNoCopyrightFeaturesEnabled();

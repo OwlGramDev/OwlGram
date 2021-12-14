@@ -408,7 +408,7 @@ public class CameraController implements MediaRecorder.OnInfoListener {
 //                        scaleFactor = 1;
 //                    }
                     options.inJustDecodeBounds = false;
-                    //    options.inSampleSize = (int) scaleFactor;
+                //    options.inSampleSize = (int) scaleFactor;
                     options.inPurgeable = true;
                     bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, options);
                 } catch (Throwable e) {

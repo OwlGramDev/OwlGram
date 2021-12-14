@@ -52,6 +52,7 @@ public class OwlConfig {
     public static boolean accentAsNotificationColor;
     public static boolean showDeleteDownloadedFile;
     public static boolean isChineseUser = false;
+    public static boolean hideAllTab;
     public static String translationTarget = "app";
     public static String updateData;
     public static String drawerItems;
@@ -114,8 +115,9 @@ public class OwlConfig {
             scrollableChatPreview = preferences.getBoolean("scrollableChatPreview", true);
             smartButtons = preferences.getBoolean("smartButtons", false);
             disableAppBarShadow = preferences.getBoolean("disableAppBarShadow", false);
-            accentAsNotificationColor =  preferences.getBoolean("accentAsNotificationColor", false);
-            showDeleteDownloadedFile =  preferences.getBoolean("showDeleteDownloadedFile", false);
+            accentAsNotificationColor = preferences.getBoolean("accentAsNotificationColor", false);
+            showDeleteDownloadedFile = preferences.getBoolean("showDeleteDownloadedFile", false);
+            hideAllTab = preferences.getBoolean("hideAllTab", false);
             lastUpdateCheck = preferences.getLong("lastUpdateCheck", 0);
             lastUpdateStatus = preferences.getInt("lastUpdateStatus", 0);
             remindedUpdate = preferences.getInt("remindedUpdate", 0);
@@ -409,6 +411,14 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showDeleteDownloadedFile", showDeleteDownloadedFile);
+        editor.apply();
+    }
+
+    public static void toggleHideAllTab() {
+        hideAllTab = !hideAllTab;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("hideAllTab", hideAllTab);
         editor.apply();
     }
 

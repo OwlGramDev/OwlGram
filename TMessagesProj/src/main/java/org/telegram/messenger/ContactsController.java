@@ -843,7 +843,7 @@ public class ContactsController extends BaseController {
             /*if (schedule) {
                 try {
                     AccountManager am = AccountManager.get(ApplicationLoader.applicationContext);
-                    Account[] accounts = am.getAccountsByType("it.owlgram.android");
+                    Account[] accounts = am.getAccountsByType("org.telegram.account");
                     boolean recreateAccount = false;
                     if (getUserConfig().isClientActivated()) {
                         if (accounts.length != 1) {

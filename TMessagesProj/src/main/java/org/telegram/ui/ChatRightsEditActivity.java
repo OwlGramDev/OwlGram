@@ -157,8 +157,8 @@ public class ChatRightsEditActivity extends BaseFragment {
         if (myAdminRights == null) {
             myAdminRights = new TLRPC.TL_chatAdminRights();
             myAdminRights.change_info = myAdminRights.post_messages = myAdminRights.edit_messages =
-            myAdminRights.delete_messages = myAdminRights.ban_users = myAdminRights.invite_users =
-            myAdminRights.pin_messages = myAdminRights.add_admins = myAdminRights.manage_call = true;
+                    myAdminRights.delete_messages = myAdminRights.ban_users = myAdminRights.invite_users =
+                            myAdminRights.pin_messages = myAdminRights.add_admins = myAdminRights.manage_call = true;
         }
         if (type == TYPE_ADMIN) {
             adminRights = new TLRPC.TL_chatAdminRights();
@@ -193,17 +193,17 @@ public class ChatRightsEditActivity extends BaseFragment {
             if (defaultBannedRights == null) {
                 defaultBannedRights = new TLRPC.TL_chatBannedRights();
                 defaultBannedRights.view_messages = defaultBannedRights.send_media = defaultBannedRights.send_messages =
-                defaultBannedRights.embed_links = defaultBannedRights.send_stickers = defaultBannedRights.send_gifs =
-                defaultBannedRights.send_games = defaultBannedRights.send_inline = defaultBannedRights.send_polls =
-                defaultBannedRights.invite_users = defaultBannedRights.change_info = defaultBannedRights.pin_messages = false;
+                        defaultBannedRights.embed_links = defaultBannedRights.send_stickers = defaultBannedRights.send_gifs =
+                                defaultBannedRights.send_games = defaultBannedRights.send_inline = defaultBannedRights.send_polls =
+                                        defaultBannedRights.invite_users = defaultBannedRights.change_info = defaultBannedRights.pin_messages = false;
             }
 
             bannedRights = new TLRPC.TL_chatBannedRights();
             if (rightsBanned == null) {
                 bannedRights.view_messages = bannedRights.send_media = bannedRights.send_messages =
-                bannedRights.embed_links = bannedRights.send_stickers = bannedRights.send_gifs =
-                bannedRights.send_games = bannedRights.send_inline = bannedRights.send_polls =
-                bannedRights.invite_users = bannedRights.change_info = bannedRights.pin_messages = false;
+                        bannedRights.embed_links = bannedRights.send_stickers = bannedRights.send_gifs =
+                                bannedRights.send_games = bannedRights.send_inline = bannedRights.send_polls =
+                                        bannedRights.invite_users = bannedRights.change_info = bannedRights.pin_messages = false;
             } else {
                 bannedRights.view_messages = rightsBanned.view_messages;
                 bannedRights.send_messages = rightsBanned.send_messages;
@@ -959,9 +959,9 @@ public class ChatRightsEditActivity extends BaseFragment {
             if (delegate != null) {
                 delegate.didSetRights(
                         adminRights.change_info || adminRights.post_messages || adminRights.edit_messages ||
-                        adminRights.delete_messages || adminRights.ban_users || adminRights.invite_users ||
-                        adminRights.pin_messages || adminRights.add_admins || adminRights.anonymous || adminRights.manage_call ||
-                        adminRights.other ? 1 : 0, adminRights, bannedRights, currentRank);
+                                adminRights.delete_messages || adminRights.ban_users || adminRights.invite_users ||
+                                adminRights.pin_messages || adminRights.add_admins || adminRights.anonymous || adminRights.manage_call ||
+                                adminRights.other ? 1 : 0, adminRights, bannedRights, currentRank);
             }
         } else if (currentType == TYPE_BANNED) {
             MessagesController.getInstance(currentAccount).setParticipantBannedRole(chatId, currentUser, null, bannedRights, isChannel, getFragmentForAlert(1));

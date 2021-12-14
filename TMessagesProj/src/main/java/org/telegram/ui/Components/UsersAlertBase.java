@@ -162,7 +162,7 @@ public class UsersAlertBase extends BottomSheet {
                     if (scrollOffsetY + backgroundPaddingTop + AndroidUtilities.dp(13) < AndroidUtilities.statusBarHeight * 2 && listView.canScrollVertically(1)) {
                         RecyclerListView.Holder holder = (RecyclerListView.Holder) listView.findViewHolderForAdapterPosition(0);
                         if (holder != null && holder.itemView.getTop() > 0) {
-                            listView.smoothScrollBy(0, holder.itemView.getTop());
+                             listView.smoothScrollBy(0, holder.itemView.getTop());
                         }
                     }
                 }

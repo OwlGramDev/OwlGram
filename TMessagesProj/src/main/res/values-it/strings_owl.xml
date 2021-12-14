@@ -40,10 +40,9 @@
     <string name="OwlgramJumpChannel">Disattiva \"Passa al canale successivo\"</string>
     <string name="OwlgramHideKeyboardScrolling">Nascondi la tastiera mentre scorri</string>
     <string name="OwlgramPlayGifAsVideo">Riproduci le GIF come video</string>
-    <string name="OwlgramSeparatedPhotoAndVideos">Schede separate per foto e video</string>
     <string name="OwlgramFolderWhenForward">Mostra le cartelle durante l\'inoltro</string>
     <string name="OwlgramShowFolderIcons">Mostra le icone delle cartelle</string>
-    <string name="OwlgramAudioVideo">Messaggi vocali/Videomessaggi</string>
+    <string name="OwlgramAudioVideo">Media</string>
     <string name="OwlgramCameraStarting">Inizia con la fotocamera posteriore</string>
     <string name="OwlgramSendConfirm">Conferma l\'invio</string>
     <string name="OwlgramSelectBetween">Seleziona tra</string>
@@ -82,7 +81,7 @@
     <string name="OwlgramUpdateInstall">Installa</string>
     <string name="OwlgramUpdateDownload">Scarica</string>
     <string name="OwlgramUpdateRemind">Ricordamelo più tardi</string>
-    <string name="OwlgramInAppUpdates">Aggiornamenti In-App</string>
+    <string name="OwlgramInAppUpdates">Aggiornamenti in-app</string>
     <string name="OwlgramNoUpdate">OwlGram è aggiornato</string>
     <string name="OwlgramNeverChecked">Mai verificato</string>
     <string name="OwlgramCheckFailed">Impossibile verificare gli aggiornamenti</string>
@@ -105,9 +104,9 @@
     <string name="OwlgramTranslated">tradotto</string>
     <string name="OwlgramForwards">Inoltri</string>
     <string name="OwlgramEdited">Data di modifica</string>
-    <string name="OwlgramAvatarAsBackground">Immagine del profilo come sfondo</string>
-    <string name="OwlgramAvatarBlur">Sfoca immagine del profilo</string>
-    <string name="OwlgramAvatarDarken">Scurisci immagine del profilo</string>
+    <string name="OwlgramAvatarAsBackground">Foto del profilo come sfondo</string>
+    <string name="OwlgramAvatarBlur">Sfoca foto del profilo</string>
+    <string name="OwlgramAvatarDarken">Scurisci foto del profilo</string>
     <string name="OwlgramEmojiSticker">Emoji associata</string>
     <string name="OwlgramMimeType">Tipo mime</string>
     <string name="OwlgramBetterAudioCall">Migliora la qualità dell\'audio</string>
@@ -128,17 +127,18 @@
     <string name="OwlgramSideBarOrderHint">Personalizza gli elementi del menu laterale per soddisfare le tue esigenze.</string>
     <string name="OwlgramSuggestedMenuItems">Elementi del menu consigliati</string>
     <string name="OwlgramMenuItems">Elementi del menu</string>
-    <string name="OwlgramButtonStyle">Action Panel</string>
+    <string name="OwlgramButtonStyle">Stile bottoni di Owlgram</string>
     <string name="OwlgramButtonSquared">Quadrato</string>
     <string name="OwlgramButtonRounded">Arrotondato</string>
     <string name="OwlgramButtonIceled">Iceled</string>
     <string name="OwlgramButtonPills">Pillola</string>
+    <string name="OwlgramButtonLinear">Lineare</string>
     <!-- HARRY POTTER CITATION B.1 C.4 -->
     <string name="OwlgramStickerMsg1">Cos\'altro manca?</string>
     <string name="OwlgramStickerMsg2">Per mille fulmini! L\'avevo dimenticato</string>
     <string name="OwlgramStickerSize">Dimensione sticker</string>
     <string name="OwlgramResetStickerSize">Ripristina dimensione sticker</string>
-    <string name="OwlgramSmartButtons">Group shortcuts</string>
+    <string name="OwlgramSmartButtons">Shortcut gruppi</string>
     <string name="OwlgramScrollablePreview">Anteprima della chat scorrevole</string>
     <string name="OwlgramAppBarShadow">Disattiva l\'ombra della barra del titolo</string>
     <string name="OwlgramNotificationColor">Colore dell\'accento come colore di notifica</string>
@@ -147,4 +147,8 @@
     <string name="OwlgramDescRounded">35.7k → 35.702</string>
     <string name="OwlgramDescCall">Mostra una finestra di conferma ogni volta che chiami qualcuno.</string>
     <string name="OwlgramDeleteCacheFile">Elimina dalla cache</string>
+    <string name="OwlgramMutualContact">Contatto reciproco</string>
+    <string name="OwlgramMutualContactDescription">Questo contatto è un contatto reciproco.</string>
+    <string name="OwlgramVersionBased">Basato su Telegram %1$s</string>
+    <string name="OwlgramHideAllTab">Nascondi scheda \"Tutte le Chat\"</string>
 </resources>

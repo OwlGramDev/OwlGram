@@ -255,6 +255,7 @@ public class ActionBar extends FrameLayout {
                         invalidate();
                     }
                 }
+
                 if (OwlConfig.eventType == 1 || Theme.canStartHolidayAnimation()) {
                     if (snowflakesEffect == null) {
                         snowflakesEffect = new SnowflakesEffect();

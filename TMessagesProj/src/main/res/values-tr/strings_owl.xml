@@ -5,16 +5,16 @@
     <string name="OwlgramUpdates">Güncellemeler</string>
     <string name="OwlgramOfficialChannel">Resmi Kanal</string>
     <string name="OwlgramUsername">OwlGram</string>
-    <string name="OwlgramSourceCode">Kaynak Kod</string>
+    <string name="OwlgramSourceCode">Kaynak Kodu</string>
     <string name="OwlgramTranslation">OwlGram Çeviri</string>
     <string name="OwlgramTranslationDesc">OwlGram\'ı kendi dilinize çevirmek için bize yardım edin</string>
     <string name="OwlgramHidePhone">Telefon numaramı gizle</string>
     <string name="OwlgramHidePhoneContacts">Telefon numaramı diğerlerinden gizle</string>
     <string name="OwlgramHideStatusBar">Şeffaf durum çubuğu</string>
-    <string name="OwlgramMessageTime">Zamanı saniye olarak göster</string>
+    <string name="OwlgramMessageTime">Show seconds in time</string>
     <string name="OwlgramRoundedNumbers">Disable number rounding</string>
     <string name="OwlgramTranslationProvider">Çeviri Sağlayıcısı</string>
-    <string name="OwlgramDestinationLanguage">Hedef Dil</string>
+    <string name="OwlgramDestinationLanguage">Şu dile çevir</string>
     <string name="OwlgramConfirmCall">Aramadan önce sor</string>
     <string name="OwlgramUseSystemFont">Sistem Fontunu Kullan</string>
     <string name="OwlgramUseSystemEmoji">Sistem Emojilerini Kullan</string>
@@ -25,7 +25,7 @@
     <string name="OwlgramProviderYandex">Yandex Çeviri</string>
     <string name="OwlgramProviderDeepLTranslate">DeepL Çeviri</string>
     <string name="OwlgramProviderNiuTrans">Niu Trans</string>
-    <string name="OwlgramTranslationTarget">Hedef dil</string>
+    <string name="OwlgramTranslationTarget">Şu dile çevir</string>
     <string name="OwlgramUseGoogleTranslate">Google\'ı kullan</string>
     <string name="OwlgramResetLanguage">Dili sıfırla</string>
     <string name="OwlgramDeepLFormality">Formalite</string>
@@ -34,18 +34,17 @@
     <string name="OwlgramDeepLFormalityLess">Daha Az</string>
     <string name="OwlgramTranslate">Çeviri</string>
     <string name="OwlgramUndoTranslate">Çeviriyi geri al</string>
-    <string name="OwlgramFormatterDay24HSec">SS:dd:ss</string>
-    <string name="OwlgramFormatterDay12HSec">s:dd:ss a</string>
+    <string name="OwlgramFormatterDay24HSec">HH:mm:ss</string>
+    <string name="OwlgramFormatterDay12HSec">h:mm:ss a</string>
     <string name="OwlgramMediaFlipByTap">\"Tıklayarak Medyayı Geç\"i devre dışı bırak</string>
     <string name="OwlgramJumpChannel">\"Sonraki Kanala Geç\"i devre dışı bırak</string>
     <string name="OwlgramHideKeyboardScrolling">Kaydırırken klavyeyi gizle</string>
     <string name="OwlgramPlayGifAsVideo">GIFleri video olarak oynat</string>
-    <string name="OwlgramSeparatedPhotoAndVideos">Fotoğraflar ve videolar için ayrı kartlar</string>
     <string name="OwlgramFolderWhenForward">İletirken klasörleri göster</string>
     <string name="OwlgramShowFolderIcons">Klasör ikonlarını göster</string>
-    <string name="OwlgramAudioVideo">Ses/Video Mesajları</string>
+    <string name="OwlgramAudioVideo">Media</string>
     <string name="OwlgramCameraStarting">Kamerayı arka kamera ile başlat</string>
-    <string name="OwlgramSendConfirm">Gönderirken onayla</string>
+    <string name="OwlgramSendConfirm">Confirm sending</string>
     <string name="OwlgramSelectBetween">Arasında seç</string>
     <string name="OwlgramSignAsRead">Hepsini okundu olarak işaretle</string>
     <string name="OwlgramCreateMention">Mention oluştur</string>
@@ -94,7 +93,7 @@
     <string name="OwlgramCheckUpdates">Kontrol Et</string>
     <string name="OwlgramBetaUpdates">Beta versiyonunu yükle</string>
     <string name="OwlgramBetaUpdatesDesc">Resmi sürüm yayınlanmadan önce OwlGram güncellemelerini test et</string>
-    <string name="OwlgramUpdatePopup">Aggiorna automaticamente</string>
+    <string name="OwlgramUpdatePopup">Notify when available</string>
     <string name="OwlgramUpdatePopupDesc">Kullanılabilir olduğunda bildir</string>
     <string name="OwlgramApkChannel">APK Kanalı</string>
     <string name="OwlgramNoQuoteForward">Alıntılamadan İlet</string>
@@ -133,6 +132,7 @@
     <string name="OwlgramButtonRounded">Rounded</string>
     <string name="OwlgramButtonIceled">Iceled</string>
     <string name="OwlgramButtonPills">Pills</string>
+    <string name="OwlgramButtonLinear">Linear</string>
     <!-- HARRY POTTER CITATION B.1 C.4 -->
     <string name="OwlgramStickerMsg1">What else is missing?</string>
     <string name="OwlgramStickerMsg2">Gallopin\' Gorgons, that reminds me</string>
@@ -147,4 +147,8 @@
     <string name="OwlgramDescRounded">35.7k → 35.702</string>
     <string name="OwlgramDescCall">Show confirmation dialog each time you call anyone.</string>
     <string name="OwlgramDeleteCacheFile">Clear from cache</string>
+    <string name="OwlgramMutualContact">Mutual contact</string>
+    <string name="OwlgramMutualContactDescription">This contact is a mutual contact.</string>
+    <string name="OwlgramVersionBased">Based on Telegram %1$s</string>
+    <string name="OwlgramHideAllTab">Hide \"All Chats\" tab</string>
 </resources>

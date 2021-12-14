@@ -11,9 +11,11 @@ public class SimpleActionCell extends LinearLayout {
     public ThemeInfo getTheme() {return null;}
 
     public static class ThemeInfo {
+        public final int colorIcon;
         public final int background;
         public final int radius;
-        public ThemeInfo(int background, int radius) {
+        public ThemeInfo(int colorIcon, int background, int radius) {
+            this.colorIcon = colorIcon;
             this.background = background;
             this.radius = radius;
         }

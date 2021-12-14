@@ -25,7 +25,8 @@ public class MenuOrderManager {
             "new_channel",
             "new_secret_chat",
             "invite_friends",
-            "telegram_features"
+            "telegram_features",
+            "archived_messages"
     };
 
     static {
@@ -250,6 +251,13 @@ public class MenuOrderManager {
                 new EditableMenuItem(
                         list_items[10],
                         LocaleController.getString("TelegramFeatures", R.string.TelegramFeatures),
+                        false
+                )
+        );
+        list.add(
+                new EditableMenuItem(
+                        list_items[11],
+                        LocaleController.getString("ArchivedChats", R.string.ArchivedChats),
                         false
                 )
         );

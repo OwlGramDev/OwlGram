@@ -59,7 +59,6 @@ import android.util.SparseArray;
 import org.telegram.messenger.support.LongSparseIntArray;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
-import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.BubbleActivity;
 import org.telegram.ui.LaunchActivity;
 import org.telegram.ui.PopupNotificationActivity;
@@ -141,7 +140,7 @@ public class NotificationsController extends BaseController {
         }
         audioManager = (AudioManager) ApplicationLoader.applicationContext.getSystemService(Context.AUDIO_SERVICE);
     }
-
+    
     private static volatile NotificationsController[] Instance = new NotificationsController[UserConfig.MAX_ACCOUNT_COUNT];
 
     public static NotificationsController getInstance(int num) {
@@ -1224,13 +1223,13 @@ public class NotificationsController extends BaseController {
                             try {
                                 for (int i = 0, N = MessagesController.getInstance(a).allDialogs.size(); i < N; i++) {
                                     TLRPC.Dialog dialog = MessagesController.getInstance(a).allDialogs.get(i);
-                                    if (DialogObject.isChatDialog(dialog.id)) {
+                                    if (dialog != null && DialogObject.isChatDialog(dialog.id)) {
                                         TLRPC.Chat chat = getMessagesController().getChat(-dialog.id);
                                         if (ChatObject.isNotInChat(chat)) {
                                             continue;
                                         }
                                     }
-                                    if (dialog.unread_count != 0) {
+                                    if (dialog != null && dialog.unread_count != 0) {
                                         count += dialog.unread_count;
                                     }
                                 }
@@ -4726,5 +4725,4 @@ public class NotificationsController extends BaseController {
             return "EnableChannel2";
         }
     }
-
 }

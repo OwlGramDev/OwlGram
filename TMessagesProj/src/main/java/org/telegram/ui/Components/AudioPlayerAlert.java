@@ -519,7 +519,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
 
         playerShadow = new View(context);
         playerShadow.setBackgroundColor(getThemedColor(Theme.key_dialogShadowLine));
-        
+
         playerLayout = new FrameLayout(context) {
             @Override
             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
@@ -1427,7 +1427,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
             if (UserConfig.selectedAccount != currentAccount) {
                 parentActivity.switchToAccount(currentAccount, true);
             }
-            
+
             Bundle args = new Bundle();
             long did = messageObject.getDialogId();
             if (DialogObject.isEncryptedDialog(did)) {
@@ -1862,6 +1862,17 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
                 optionsButton.setVisibility(View.INVISIBLE);
             } else {
                 optionsButton.setVisibility(View.VISIBLE);
+            }
+            if (MessagesController.getInstance(currentAccount).isChatNoForwards(messageObject.getChatId())) {
+                optionsButton.hideSubItem(1);
+                optionsButton.hideSubItem(2);
+                optionsButton.hideSubItem(5);
+                optionsButton.setAdditionalYOffset(-AndroidUtilities.dp(16));
+            } else {
+                optionsButton.showSubItem(1);
+                optionsButton.showSubItem(2);
+                optionsButton.showSubItem(5);
+                optionsButton.setAdditionalYOffset(-AndroidUtilities.dp(157));
             }
             checkIfMusicDownloaded(messageObject);
             updateProgress(messageObject, !sameMessageObject);

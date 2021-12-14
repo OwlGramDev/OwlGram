@@ -123,7 +123,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
     private ImageView muteImageView;
     private float progress;
     private CameraInfo selectedCamera;
-    private boolean isFrontface = true;
+    private boolean isFrontface = !OwlConfig.useRearCamera;
     private volatile boolean cameraReady;
     private AnimatorSet muteAnimation;
     private TLRPC.InputFile file;
@@ -540,7 +540,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             textureOverlayView.setImageResource(R.drawable.icplaceholder);
         }
         cameraReady = false;
-        isFrontface = !OwlConfig.useRearCamera;
+        isFrontface = true;
         selectedCamera = null;
         recordedTime = 0;
         progress = 0;
@@ -2611,7 +2611,9 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
         if (zoom > 0f) {
             finishZoomTransition = ValueAnimator.ofFloat(zoom, 0);
             finishZoomTransition.addUpdateListener(valueAnimator -> {
-                cameraSession.setZoom((float) valueAnimator.getAnimatedValue());
+                if (cameraSession != null) {
+                    cameraSession.setZoom((float) valueAnimator.getAnimatedValue());
+                }
             });
             finishZoomTransition.addListener(new AnimatorListenerAdapter() {
                 @Override

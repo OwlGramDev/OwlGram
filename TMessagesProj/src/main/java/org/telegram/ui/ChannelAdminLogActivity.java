@@ -505,7 +505,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
     public View createView(Context context) {
         if (chatMessageCellsCache.isEmpty()) {
             for (int a = 0; a < 8; a++) {
-                chatMessageCellsCache.add(new ChatMessageCell(this, context));
+                chatMessageCellsCache.add(new ChatMessageCell(context));
             }
         }
 
@@ -2039,7 +2039,7 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
                     view = chatMessageCellsCache.get(0);
                     chatMessageCellsCache.remove(0);
                 } else {
-                    view = new ChatMessageCell(null, mContext);
+                    view = new ChatMessageCell(mContext);
                 }
                 ChatMessageCell chatMessageCell = (ChatMessageCell) view;
                 chatMessageCell.setDelegate(new ChatMessageCell.ChatMessageCellDelegate() {

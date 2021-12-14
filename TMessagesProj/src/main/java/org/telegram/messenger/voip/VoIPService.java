@@ -3431,6 +3431,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 			startForeground(ID_ONGOING_CALL_NOTIFICATION, bldr.build());
 		}
 	}
+
 	private int currentStreamType;
 	private void loadResources() {
 		if (chat != null && OwlConfig.betterAudioQuality) {

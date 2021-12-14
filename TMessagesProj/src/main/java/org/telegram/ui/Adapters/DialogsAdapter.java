@@ -775,7 +775,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
 
         private boolean preloadIsAvilable() {
             return false;
-            // return DownloadController.getInstance(UserConfig.selectedAccount).getCurrentDownloadMask() != 0;
+           // return DownloadController.getInstance(UserConfig.selectedAccount).getCurrentDownloadMask() != 0;
         }
 
         public void updateList() {

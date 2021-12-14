@@ -255,6 +255,7 @@ public class Emoji {
                 canvas.drawText(EmojiData.data[info.page][info.emojiIndex], getBounds().left, getBounds().bottom, textPaint);
                 return;
             }*/
+
             Rect b;
             if (fullSize) {
                 b = getDrawRect();

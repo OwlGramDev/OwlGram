@@ -38,7 +38,6 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -48,13 +47,6 @@ import android.provider.CallLog;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.Settings;
-
-import androidx.core.content.FileProvider;
-import androidx.core.graphics.ColorUtils;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
-
 import android.telephony.TelephonyManager;
 import android.text.Layout;
 import android.text.Selection;
@@ -73,8 +65,8 @@ import android.util.StateSet;
 import android.util.TypedValue;
 import android.view.ContextThemeWrapper;
 import android.view.Display;
-import android.view.MotionEvent;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,6 +87,12 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import androidx.core.content.FileProvider;
+import androidx.core.graphics.ColorUtils;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import com.android.internal.telephony.ITelephony;
 import com.google.android.gms.auth.api.phone.SmsRetriever;
@@ -154,8 +152,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import it.owlgram.android.OwlConfig;
 
 public class AndroidUtilities {
 
@@ -1320,23 +1316,6 @@ public class AndroidUtilities {
 
     public static Typeface getTypeface(String assetPath) {
         synchronized (typefaceCache) {
-            if (OwlConfig.useSystemFont && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                if (assetPath.contains("medium") && assetPath.contains("italic")) {
-                    return Typeface.create("sans-serif-medium", Typeface.ITALIC);
-                }
-                if (assetPath.contains("medium")) {
-                    return Typeface.create("sans-serif-medium", Typeface.NORMAL);
-                }
-                if (assetPath.contains("italic")) {
-                    return Typeface.create((Typeface) null, Typeface.ITALIC);
-                }
-                if (assetPath.contains("mono")) {
-                    return Typeface.MONOSPACE;
-                }
-                if (assetPath.contains("mw_bold")) {
-                    return Typeface.create("serif", Typeface.BOLD);
-                }
-            }
             if (!typefaceCache.containsKey(assetPath)) {
                 try {
                     Typeface t;
@@ -2273,6 +2252,10 @@ public class AndroidUtilities {
 
     }
 
+    public static void appCenterLog(Throwable e) {
+
+    }
+
     public static void addToClipboard(CharSequence str) {
         try {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) ApplicationLoader.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE);
@@ -2306,7 +2289,7 @@ public class AndroidUtilities {
     }
 
     private static File getAlbumDir(boolean secretChat) {
-        if (secretChat || !BuildVars.NO_SCOPED_STORAGE || (Build.VERSION.SDK_INT >= 23 && ApplicationLoader.applicationContext.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
+        if (secretChat || !BuildVars.NO_SCOPED_STORAGE ||(Build.VERSION.SDK_INT >= 23 && ApplicationLoader.applicationContext.checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
             return FileLoader.getDirectory(FileLoader.MEDIA_DIR_IMAGE);
         }
         File storageDir = null;
@@ -3342,7 +3325,7 @@ public class AndroidUtilities {
             r = g = b = (int) (brightness * 255.0f + 0.5f);
         } else {
             float h = (hue - (float) Math.floor(hue)) * 6.0f;
-            float f = h - (float) Math.floor(h);
+            float f = h - (float) java.lang.Math.floor(h);
             float p = brightness * (1.0f - saturation);
             float q = brightness * (1.0f - saturation * f);
             float t = brightness * (1.0f - (saturation * (1.0f - f)));
@@ -3793,6 +3776,7 @@ public class AndroidUtilities {
             return preferences.getInt(key, (int) defaultValue);
         }
     }
+
     public static int getTransparentColor(int color, float opacity){
         int alpha = Color.alpha(color);
         int red = Color.red(color);

@@ -1191,8 +1191,8 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                         if (adminRights == null) {
                             adminRights = new TLRPC.TL_chatAdminRights();
                             adminRights.change_info = adminRights.post_messages = adminRights.edit_messages =
-                            adminRights.delete_messages = adminRights.ban_users = adminRights.invite_users =
-                            adminRights.pin_messages = adminRights.add_admins = true;
+                                    adminRights.delete_messages = adminRights.ban_users = adminRights.invite_users =
+                                            adminRights.pin_messages = adminRights.add_admins = true;
                             if (!isChannel) {
                                 adminRights.manage_call = true;
                             }
@@ -1205,8 +1205,8 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                     if (participant instanceof TLRPC.TL_chatParticipantCreator) {
                         adminRights = new TLRPC.TL_chatAdminRights();
                         adminRights.change_info = adminRights.post_messages = adminRights.edit_messages =
-                        adminRights.delete_messages = adminRights.ban_users = adminRights.invite_users =
-                        adminRights.pin_messages = adminRights.add_admins = true;
+                                adminRights.delete_messages = adminRights.ban_users = adminRights.invite_users =
+                                        adminRights.pin_messages = adminRights.add_admins = true;
                         if (!isChannel) {
                             adminRights.manage_call = true;
                         }
@@ -1476,8 +1476,8 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                 admin.date = (int) (System.currentTimeMillis() / 1000);
                 admin.admin_rights = new TLRPC.TL_chatAdminRights();
                 admin.admin_rights.change_info = admin.admin_rights.post_messages = admin.admin_rights.edit_messages =
-                admin.admin_rights.delete_messages = admin.admin_rights.ban_users = admin.admin_rights.invite_users =
-                admin.admin_rights.pin_messages = admin.admin_rights.add_admins = true;
+                        admin.admin_rights.delete_messages = admin.admin_rights.ban_users = admin.admin_rights.invite_users =
+                                admin.admin_rights.pin_messages = admin.admin_rights.add_admins = true;
                 if (!isChannel) {
                     admin.admin_rights.manage_call = true;
                 }
@@ -2879,9 +2879,11 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                         peerObject = object;
                     } else if (object instanceof TLRPC.ChannelParticipant) {
                         long peerId = MessageObject.getPeerId(((TLRPC.ChannelParticipant) object).peer);
-                        if (peerId > 0) {
+                        if (peerId >= 0) {
                             TLRPC.User user = getMessagesController().getUser(peerId);
-                            un = user.username;
+                            if (user != null) {
+                                un = user.username;
+                            }
                             peerObject = user;
                         } else {
                             TLRPC.Chat chat = getMessagesController().getChat(-peerId);

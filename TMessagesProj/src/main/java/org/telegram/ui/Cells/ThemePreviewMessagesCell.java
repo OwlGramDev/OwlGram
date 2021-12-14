@@ -126,7 +126,7 @@ public class ThemePreviewMessagesCell extends LinearLayout {
         message2.replyMessageObject = replyMessageObject;
 
         for (int a = 0; a < cells.length; a++) {
-            cells[a] = new ChatMessageCell(null, context);
+            cells[a] = new ChatMessageCell(context);
             cells[a].setDelegate(new ChatMessageCell.ChatMessageCellDelegate() {
 
             });

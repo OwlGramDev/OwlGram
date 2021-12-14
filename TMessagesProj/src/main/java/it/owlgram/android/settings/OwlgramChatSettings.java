@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenu;
@@ -60,6 +61,7 @@ public class OwlgramChatSettings extends BaseFragment {
     private int rearCameraStartingRow;
     private int confirmSendRow;
     private int showDeleteRow;
+    private int showHideAllTab;
 
     @Override
     public boolean onFragmentCreate() {
@@ -184,6 +186,12 @@ public class OwlgramChatSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showDeleteDownloadedFile);
                 }
+            } else if (position == showHideAllTab){
+                OwlConfig.toggleHideAllTab();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.hideAllTab);
+                }
+                getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
             }
         });
         return fragmentView;
@@ -206,6 +214,7 @@ public class OwlgramChatSettings extends BaseFragment {
         scrollableRow = rowCount++;
         chatDividerRow = rowCount++;
         foldersHeaderRow = rowCount++;
+        showHideAllTab = rowCount++;
         showFolderWhenForwardRow = rowCount++;
         //showFolderIconsRow = rowCount++;
         foldersDividerRow = rowCount++;
@@ -300,6 +309,8 @@ public class OwlgramChatSettings extends BaseFragment {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ReportChat", R.string.ReportChat), OwlConfig.showReportMessage, true);
                     } else if (position == scrollableRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramScrollablePreview", R.string.OwlgramScrollablePreview), OwlConfig.scrollableChatPreview, true);
+                    } else if (position == showHideAllTab) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OwlgramHideAllTab", R.string.OwlgramHideAllTab), OwlConfig.hideAllTab, true);
                     }
                     break;
             }
@@ -359,7 +370,7 @@ public class OwlgramChatSettings extends BaseFragment {
                     position == showFolderIconsRow || position == rearCameraStartingRow  || position == confirmSendRow ||
                     position == showGreetings || position == showTranslateRow || position == showAddToSMRow ||
                     position == showMessageDetails || position == showNoQuoteForwardRow || position == showReportRow ||
-                    position == scrollableRow || position == showDeleteRow) {
+                    position == scrollableRow || position == showDeleteRow || position == showHideAllTab) {
                 return 3;
             } else if (position == stickerSizeRow) {
                 return 4;

@@ -71,7 +71,7 @@ public class StickerSizePreviewMessagesCell extends LinearLayout {
         attributeImageSize.h = 512;
         attributeImageSize.w = 512;
         message.media.document.attributes.add(attributeImageSize);
-        message.message = "";
+        message.message = "\uD83E\uDD89";
         message.out = true;
         message.peer_id = new TLRPC.TL_peerUser();
         message.peer_id.user_id = 0;
@@ -106,7 +106,7 @@ public class StickerSizePreviewMessagesCell extends LinearLayout {
         messageObjects[1].replyMessageObject = messageObjects[0];
 
         for (int a = 0; a < cells.length; a++) {
-            cells[a] = new ChatMessageCell(null, context);
+            cells[a] = new ChatMessageCell(context);
             cells[a].setDelegate(new ChatMessageCell.ChatMessageCellDelegate() {});
             cells[a].isChat = false;
             cells[a].setFullyDraw(true);

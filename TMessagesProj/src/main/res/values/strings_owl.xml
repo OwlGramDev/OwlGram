@@ -132,6 +132,7 @@
     <string name="OwlgramButtonRounded">Rounded</string>
     <string name="OwlgramButtonIceled">Iceled</string>
     <string name="OwlgramButtonPills">Pills</string>
+    <string name="OwlgramButtonLinear">Linear</string>
     <!-- HARRY POTTER CITATION B.1 C.4 -->
     <string name="OwlgramStickerMsg1">What else is missing?</string>
     <string name="OwlgramStickerMsg2">Gallopin\' Gorgons, that reminds me</string>
@@ -146,4 +147,8 @@
     <string name="OwlgramDescRounded">35.7k → 35.702</string>
     <string name="OwlgramDescCall">Show confirmation dialog each time you call anyone.</string>
     <string name="OwlgramDeleteCacheFile">Clear from cache</string>
+    <string name="OwlgramMutualContact">Mutual contact</string>
+    <string name="OwlgramMutualContactDescription">This contact is a mutual contact.</string>
+    <string name="OwlgramVersionBased">Based on Telegram %1$s</string>
+    <string name="OwlgramHideAllTab">Hide "All Chats" tab</string>
 </resources>

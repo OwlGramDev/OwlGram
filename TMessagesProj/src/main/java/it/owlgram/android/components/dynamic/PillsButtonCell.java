@@ -8,6 +8,8 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -24,6 +26,7 @@ import java.util.Objects;
 @SuppressLint("ViewConstructor")
 public class PillsButtonCell extends SimpleActionCell {
 
+    @SuppressLint("ClickableViewAccessibility")
     public PillsButtonCell(Context context, String text, int iconId, int color, int myId) {
         super(context);
         setLayoutParams(new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f));
@@ -42,7 +45,13 @@ public class PillsButtonCell extends SimpleActionCell {
 
         ImageView mt = new ImageView(context);
         mt.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        mt.setOnClickListener(view -> onItemClick(myId));
+        mt.setClickable(true);
+        mt.setOnTouchListener((View view, MotionEvent motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                onItemClick(myId);
+            }
+            return false;
+        });
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(color, 0.5f)));
         mt.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
@@ -127,6 +136,7 @@ public class PillsButtonCell extends SimpleActionCell {
 
     public ThemeInfo getTheme() {
         return new ThemeInfo(
+                Theme.getColor(Theme.key_dialogTextBlue),
                 AndroidUtilities.getTransparentColor(Theme.getColor(Theme.key_dialogTextBlue), 0.15f),
                 AndroidUtilities.dp(20)
         );

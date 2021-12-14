@@ -423,10 +423,10 @@ public class DrawerLayoutContainer extends FrameLayout {
 
             if ((allowOpenDrawerBySwipe || drawerOpened) && allowOpenDrawer && parentActionBarLayout.fragmentsStack.size() == 1) {
                 if (ev != null && (ev.getAction() == MotionEvent.ACTION_DOWN || ev.getAction() == MotionEvent.ACTION_MOVE) && !startedTracking && !maybeStartTracking) {
-                    View scrollingChild = findScrollingChild(this, ev.getX(),ev.getY());
-                    if (scrollingChild != null) {
-                        return false;
-                    }
+                   View scrollingChild = findScrollingChild(this, ev.getX(),ev.getY());
+                   if (scrollingChild != null) {
+                       return false;
+                   }
                     parentActionBarLayout.getHitRect(rect);
                     startedTrackingX = (int) ev.getX();
                     startedTrackingY = (int) ev.getY();

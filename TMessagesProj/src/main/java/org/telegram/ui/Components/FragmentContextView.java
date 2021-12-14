@@ -1067,8 +1067,8 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             setTopPadding(AndroidUtilities.dp2(getStyleHeight()));
         }
 
-         speakerAmplitude = 0;
-         micAmplitude = 0;
+        speakerAmplitude = 0;
+        micAmplitude = 0;
     }
 
     @Override

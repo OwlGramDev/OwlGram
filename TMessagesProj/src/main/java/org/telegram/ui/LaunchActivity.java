@@ -119,6 +119,7 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.DrawerLayoutContainer;
 import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Adapters.DialogsAdapter;
 import org.telegram.ui.Adapters.DrawerLayoutAdapter;
 import org.telegram.ui.Cells.DrawerAddCell;
 import org.telegram.ui.Cells.DrawerProfileCell;
@@ -636,6 +637,11 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                     drawerLayoutContainer.closeDrawer(false);
                 } else if (id == 201) {
                     presentFragment(new OwlgramSettings());
+                    drawerLayoutContainer.closeDrawer(false);
+                } else if (id == 202) {
+                    Bundle args = new Bundle();
+                    args.putInt("folderId", 1);
+                    presentFragment(new DialogsActivity(args));
                     drawerLayoutContainer.closeDrawer(false);
                 }
             }
@@ -1958,12 +1964,12 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                         String msgID = data.getQueryParameter("message_id");
                                         if (userID != null) {
                                             try {
-                                                push_user_id = Integer.parseInt(userID);
+                                                push_user_id = Long.parseLong(userID);
                                             } catch (NumberFormatException ignore) {
                                             }
                                         } else if (chatID != null) {
                                             try {
-                                                push_chat_id = Integer.parseInt(chatID);
+                                                push_chat_id = Long.parseLong(chatID);
                                             } catch (NumberFormatException ignore) {
                                             }
                                         }
@@ -2612,7 +2618,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
     }
 
     private void runImportRequest(final Uri importUri,
-                                ArrayList<Uri> documents) {
+                                  ArrayList<Uri> documents) {
         final int intentAccount = UserConfig.selectedAccount;
         final AlertDialog progressDialog = new AlertDialog(this, 3);
         final int[] requestId = new int[]{0};
@@ -3699,92 +3705,97 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
     }
 
     private void updateAppUpdateViews() {
-        if(ApkDownloader.updateDownloaded() || ApkDownloader.isRunningDownload() || UpdateManager.isAvailableUpdate()) {
-            if(ApkDownloader.updateDownloaded()) {
-                createUpdateUI();
-                updateLayoutIcon.setIcon(MediaActionDrawable.ICON_UPDATE, true, true);
-                updateTextView.setText(LocaleController.getString("AppUpdateNow", R.string.AppUpdateNow));
-                updateSizeTextView.setTag(1);
-                updateSizeTextView.animate().alpha(0.0f).scaleX(0.0f).scaleY(0.0f).setDuration(180).start();
-            } else if (ApkDownloader.isRunningDownload()) {
-                createUpdateUI();
-                updateLayoutIcon.setIcon(MediaActionDrawable.ICON_CANCEL, true, true);
-                int loadProgress = ApkDownloader.percentage();
-                updateLayoutIcon.setProgress(loadProgress, true);
-                updateTextView.setText(LocaleController.formatString("AppUpdateDownloading", R.string.AppUpdateDownloading, loadProgress));
-                updateSizeTextView.setTag(1);
-                updateSizeTextView.animate().alpha(0.0f).scaleX(0.0f).scaleY(0.0f).setDuration(180).start();
-            } else {
-                try {
-                    String data = OwlConfig.updateData;
-                    if(data.length() > 0) {
-                        JSONObject jsonObject = new JSONObject(data);
-                        UpdateManager.UpdateAvailable updateAvailable = UpdateManager.loadUpdate(jsonObject);
-                        if(updateAvailable.version > UpdateManager.currentVersion()) {
-                            createUpdateUI();
-                            updateLayoutIcon.setIcon(MediaActionDrawable.ICON_DOWNLOAD, true, true);
-                            updateTextView.setText(LocaleController.getString("OwlgramUpdate", R.string.OwlgramUpdate));
-                            updateSizeTextView.setTag(null);
-                            updateSizeTextView.animate().alpha(1.0f).scaleX(1.0f).scaleY(1.0f).setDuration(180).start();
-                            updateSizeTextView.setText(AndroidUtilities.formatFileSize(updateAvailable.file_size));
+        UpdateManager.isDownloadedUpdate(result -> {
+            if (result || ApkDownloader.isRunningDownload() || UpdateManager.isAvailableUpdate()) {
+                if(result) {
+                    createUpdateUI();
+                    updateLayoutIcon.setIcon(MediaActionDrawable.ICON_UPDATE, true, true);
+                    updateTextView.setText(LocaleController.getString("AppUpdateNow", R.string.AppUpdateNow));
+                    updateSizeTextView.setTag(1);
+                    updateSizeTextView.animate().alpha(0.0f).scaleX(0.0f).scaleY(0.0f).setDuration(180).start();
+                } else if (ApkDownloader.isRunningDownload()) {
+                    createUpdateUI();
+                    updateLayoutIcon.setIcon(MediaActionDrawable.ICON_CANCEL, true, true);
+                    int loadProgress = ApkDownloader.percentage();
+                    updateLayoutIcon.setProgress(loadProgress, true);
+                    updateTextView.setText(LocaleController.formatString("AppUpdateDownloading", R.string.AppUpdateDownloading, loadProgress));
+                    updateSizeTextView.setTag(1);
+                    updateSizeTextView.animate().alpha(0.0f).scaleX(0.0f).scaleY(0.0f).setDuration(180).start();
+                } else {
+                    try {
+                        String data = OwlConfig.updateData;
+                        if(data.length() > 0) {
+                            JSONObject jsonObject = new JSONObject(data);
+                            UpdateManager.UpdateAvailable updateAvailable = UpdateManager.loadUpdate(jsonObject);
+                            if(updateAvailable.version > UpdateManager.currentVersion()) {
+                                createUpdateUI();
+                                updateLayoutIcon.setIcon(MediaActionDrawable.ICON_DOWNLOAD, true, true);
+                                updateTextView.setText(LocaleController.getString("OwlgramUpdate", R.string.OwlgramUpdate));
+                                updateSizeTextView.setTag(null);
+                                updateSizeTextView.animate().alpha(1.0f).scaleX(1.0f).scaleY(1.0f).setDuration(180).start();
+                                updateSizeTextView.setText(AndroidUtilities.formatFileSize(updateAvailable.file_size));
+                            }
                         }
-                    }
-                } catch (Exception ignored){}
+                    } catch (Exception ignored){}
+                }
+                if(updateLayout != null) {
+                    updateLayout.setVisibility(View.VISIBLE);
+                    updateLayout.setTag(1);
+                    updateLayout.animate().translationY(0).setInterpolator(CubicBezierInterpolator.EASE_OUT).setListener(null).setDuration(180).start();
+                    sideMenu.setPadding(0, 0, 0, AndroidUtilities.dp(44));
+                }
             }
-            if(updateLayout != null) {
-                updateLayout.setVisibility(View.VISIBLE);
-                updateLayout.setTag(1);
-                updateLayout.animate().translationY(0).setInterpolator(CubicBezierInterpolator.EASE_OUT).setListener(null).setDuration(180).start();
-                sideMenu.setPadding(0, 0, 0, AndroidUtilities.dp(44));
-            }
-        }
+        });
     }
 
     public void checkAppUpdate() {
         if(!OwlConfig.notifyUpdates) {
             return;
         }
-        updateAppUpdateViews();
-        ApkDownloader.setDownloadMainListener(new ApkDownloader.UpdateListener() {
-            @Override
-            public void onPreStart() {
-                updateAppUpdateViews();
-            }
-
-            @Override
-            public void onProgressChange(int percentage, long downBytes, long totBytes) {
-                updateLayoutIcon.setProgress((percentage / 100f), true);
-                updateTextView.setText(LocaleController.formatString("AppUpdateDownloading", R.string.AppUpdateDownloading, percentage));
-            }
-
-            @Override
-            public void onFinished() {
-                updateAppUpdateViews();
-            }
-        });
-        if(!ApkDownloader.updateDownloaded()){
-            UpdateManager.checkUpdates(new UpdateManager.UpdateCallback() {
+        UpdateManager.isDownloadedUpdate(result -> {
+            updateAppUpdateViews();
+            ApkDownloader.setDownloadMainListener(new ApkDownloader.UpdateListener() {
                 @Override
-                public void onSuccess(Object updateResult) {
-                    if(updateResult instanceof UpdateManager.UpdateAvailable) {
-                        long passed_time = (new Date().getTime() - OwlConfig.lastUpdateCheck) / 1000;
-                        if(passed_time >= 3600 * 8 || OwlConfig.lastUpdateStatus != 1) {
-                            OwlConfig.setUpdateData(updateResult.toString());
-                            UpdateManager.UpdateAvailable updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
-                            (new UpdateAlertDialog(LaunchActivity.this, updateAvailable)).show();
-                            OwlConfig.saveUpdateStatus(1);
-                            OwlConfig.saveLastUpdateCheck();
-                            updateAppUpdateViews();
-                        }
-                    } else {
-                        OwlConfig.saveUpdateStatus(0);
-                    }
+                public void onPreStart() {
+                    updateAppUpdateViews();
                 }
 
                 @Override
-                public void onError(Exception e) {}
+                public void onProgressChange(int percentage, long downBytes, long totBytes) {
+                    updateLayoutIcon.setProgress((percentage / 100f), true);
+                    updateTextView.setText(LocaleController.formatString("AppUpdateDownloading", R.string.AppUpdateDownloading, percentage));
+                }
+
+                @Override
+                public void onFinished() {
+                    updateAppUpdateViews();
+                }
             });
-        }
+            if(!result){
+                UpdateManager.checkUpdates(new UpdateManager.UpdateCallback() {
+                    @Override
+                    public void onSuccess(Object updateResult) {
+                        if(updateResult instanceof UpdateManager.UpdateAvailable) {
+                            long passed_time = (new Date().getTime() - OwlConfig.lastUpdateCheck) / 1000;
+                            if(passed_time >= 3600 * 8 || OwlConfig.lastUpdateStatus != 1) {
+                                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
+                                OwlConfig.setUpdateData(updateResult.toString());
+                                UpdateManager.UpdateAvailable updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
+                                (new UpdateAlertDialog(LaunchActivity.this, updateAvailable)).show();
+                                OwlConfig.saveUpdateStatus(1);
+                                OwlConfig.saveLastUpdateCheck();
+                                updateAppUpdateViews();
+                            }
+                        } else {
+                            OwlConfig.saveUpdateStatus(0);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Exception e) {}
+                });
+            }
+        });
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -3877,7 +3888,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
     public void showBulletin(Function<BulletinFactory, Bulletin> createBulletin) {
         BaseFragment topFragment = null;
         if (!layerFragmentsStack.isEmpty()) {
-             topFragment = layerFragmentsStack.get(layerFragmentsStack.size() - 1);
+            topFragment = layerFragmentsStack.get(layerFragmentsStack.size() - 1);
         } else if (!rightFragmentsStack.isEmpty()) {
             topFragment = rightFragmentsStack.get(rightFragmentsStack.size() - 1);
         } else if (!mainFragmentsStack.isEmpty()) {
@@ -4832,7 +4843,6 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                     updateAppUpdateViews(true);
                 }
             }*/
-            updateAppUpdateViews();
         } else if (id == NotificationCenter.screenStateChanged) {
             if (ApplicationLoader.mainInterfacePaused) {
                 return;
