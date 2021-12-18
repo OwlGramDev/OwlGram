@@ -114,7 +114,7 @@ public class UpdateManager {
                     return new UpdateNotAvailable();
                 } else {
                     int remoteVersion = obj.getInt("version");
-                    if (remoteVersion > code) {
+                    if (remoteVersion > code || BuildVars.IGNORE_VERSION_CHECK) {
                         return loadUpdate(obj);
                     } else {
                         return new UpdateNotAvailable();
@@ -220,7 +220,7 @@ public class UpdateManager {
     public static int currentVersion() {
         try {
             PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
-            return pInfo.versionCode / 10;
+            return (pInfo.versionCode / 10) - (BuildVars.IGNORE_VERSION_CHECK ? 1:0);
         } catch (Exception e){
             return 0;
         }

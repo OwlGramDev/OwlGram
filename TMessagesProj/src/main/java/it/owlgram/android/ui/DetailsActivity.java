@@ -166,18 +166,21 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         listView.setOnItemLongClickListener((view, position) -> {
-            if (getMessagesController().isChatNoForwards(fromChat)) {
-                if(fromChat != null && fromChat.broadcast) {
-                    BulletinFactory.of(DetailsActivity.this).createSimpleBulletin(R.raw.ic_ban, LocaleController.getString("ForwardsRestrictedInfoChannel", R.string.ForwardsRestrictedInfoChannel)).show();
+            if (view instanceof TextDetailSettingsCell) {
+                if (getMessagesController().isChatNoForwards(fromChat)) {
+                    if(fromChat != null && fromChat.broadcast) {
+                        BulletinFactory.of(DetailsActivity.this).createSimpleBulletin(R.raw.ic_ban, LocaleController.getString("ForwardsRestrictedInfoChannel", R.string.ForwardsRestrictedInfoChannel)).show();
+                    } else {
+                        BulletinFactory.of(DetailsActivity.this).createSimpleBulletin(R.raw.ic_ban, LocaleController.getString("ForwardsRestrictedInfoGroup", R.string.ForwardsRestrictedInfoGroup)).show();
+                    }
                 } else {
-                    BulletinFactory.of(DetailsActivity.this).createSimpleBulletin(R.raw.ic_ban, LocaleController.getString("ForwardsRestrictedInfoGroup", R.string.ForwardsRestrictedInfoGroup)).show();
+                    TextDetailSettingsCell textDetailCell = (TextDetailSettingsCell) view;
+                    AndroidUtilities.addToClipboard(textDetailCell.getTextView().getText().toString());
+                    BulletinFactory.of(DetailsActivity.this).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
                 }
-            } else {
-                TextDetailSettingsCell textDetailCell = (TextDetailSettingsCell) view;
-                AndroidUtilities.addToClipboard(textDetailCell.getTextView().getText().toString());
-                BulletinFactory.of(DetailsActivity.this).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
+                return true;
             }
-            return true;
+            return false;
         });
         return fragmentView;
     }
@@ -532,7 +535,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int type = holder.getItemViewType();
-            return type == 3 || type == 4;
+            return type == 3;
         }
 
         @NonNull

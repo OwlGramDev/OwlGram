@@ -6693,11 +6693,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private void updateMenuButton(boolean animated) {
-        Log.e("TEST", "BTEST");
         if (menuDrawable == null || updateLayout == null) {
             return;
         }
-        Log.e("TEST", "B2TEST");
         AtomicInteger type = new AtomicInteger();
         AtomicReference<Float> downloadProgress = new AtomicReference<>((float) 0);
         /*if (SharedConfig.isAppUpdateAvailable()) {
@@ -6714,9 +6712,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             type = MenuDrawable.TYPE_DEFAULT;
             downloadProgress = 0.0f;
         }*/
-        Log.e("TEST", "B3TEST");
         UpdateManager.isDownloadedUpdate(result -> {
-            Log.e("TEST", "ATEST");
             boolean updateValid = false;
             String data = OwlConfig.updateData;
             try {

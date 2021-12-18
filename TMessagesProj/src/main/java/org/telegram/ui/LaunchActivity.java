@@ -171,6 +171,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import it.owlgram.android.Copyright;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateAlertDialog;
 import it.owlgram.android.settings.OwlgramSettings;
@@ -3590,14 +3591,18 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             } else if(ApkDownloader.updateDownloaded()) {
                 ApkDownloader.installUpdate(LaunchActivity.this);
             } else {
-                try {
-                    String data = OwlConfig.updateData;
-                    if(data.length() > 0) {
-                        JSONObject jsonObject = new JSONObject(data);
-                        UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(jsonObject);
-                        ApkDownloader.downloadAPK(LaunchActivity.this, update.link_file, update.version);
-                    }
-                } catch (Exception ignored){}
+                if(Copyright.isNoCopyrightFeaturesEnabled()){
+                    try {
+                        String data = OwlConfig.updateData;
+                        if(data.length() > 0) {
+                            JSONObject jsonObject = new JSONObject(data);
+                            UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(jsonObject);
+                            ApkDownloader.downloadAPK(LaunchActivity.this, update.link_file, update.version);
+                        }
+                    } catch (Exception ignored){}
+                } else {
+                    Browser.openUrl(getApplicationContext(), BuildVars.PLAYSTORE_APP_URL);
+                }
             }
         });
         updateLayoutIcon = new RadialProgress2(updateLayout);

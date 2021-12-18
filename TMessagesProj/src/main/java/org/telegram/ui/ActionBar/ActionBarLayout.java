@@ -89,6 +89,7 @@ public class ActionBarLayout extends FrameLayout {
 
         public LayoutContainer(Context context) {
             super(context);
+            setClickable(true);
             setWillNotDraw(false);
         }
 
@@ -195,7 +196,6 @@ public class ActionBarLayout extends FrameLayout {
         @Override
         public boolean dispatchTouchEvent(MotionEvent ev) {
             boolean previewModeStatus = !OwlConfig.scrollableChatPreview && inPreviewMode;
-            Log.e("TEST", ev.toString());
             if (OwlConfig.scrollableChatPreview && inPreviewMode) {
                 View view = containerView.getChildAt(0);
                 if (view != null) {

@@ -62,7 +62,7 @@ public class SquaredButtonCell extends SimpleActionCell {
         mt.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
         ImageView iv = new ImageView(context);
-        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(AndroidUtilities.dp(33), AndroidUtilities.dp(33));
+        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(AndroidUtilities.dp(30), AndroidUtilities.dp(30));
         layoutParams2.setMargins(0,0,0,AndroidUtilities.dp(5));
         iv.setLayoutParams(layoutParams2);
         Drawable d = ContextCompat.getDrawable(context, iconId);

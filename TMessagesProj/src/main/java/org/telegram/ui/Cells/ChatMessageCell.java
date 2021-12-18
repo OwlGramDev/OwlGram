@@ -2045,11 +2045,23 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                             }
                             BulletinFactory.of(this.baseFragment).createCopyBulletin(LocaleController.getString("OwlgramCallbackCopied", R.string.OwlgramCallbackCopied)).show();
                         }
-                    }else{
+                    } else {
                         BottomSheet.Builder builder = new BottomSheet.Builder(getContext());
                         final String urlFinal = botButton.button.url;
                         builder.setTitle(urlFinal);
-                        builder.setItems(new CharSequence[]{LocaleController.getString("Open", R.string.Open), LocaleController.getString("Copy", R.string.Copy)}, (dialog, which) -> {});
+                        builder.setItems(new CharSequence[]{LocaleController.getString("Open", R.string.Open), LocaleController.getString("Copy", R.string.Copy)}, (dialog, which) -> {
+                            if (which == 0) {
+                                Browser.openUrl(getContext(), urlFinal);
+                            } else if (which == 1) {
+                                String url = urlFinal;
+                                if (url.startsWith("mailto:")) {
+                                    url = url.substring(7);
+                                } else if (url.startsWith("tel:")) {
+                                    url = url.substring(4);
+                                }
+                                AndroidUtilities.addToClipboard(url);
+                            }
+                        });
                         BottomSheet sheet = builder.create();
                         sheet.setCanceledOnTouchOutside(true);
                         sheet.show();
