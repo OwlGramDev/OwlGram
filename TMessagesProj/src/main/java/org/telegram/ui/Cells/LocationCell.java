@@ -181,11 +181,11 @@ public class LocationCell extends FrameLayout {
 
         if (needDivider) {
             canvas.drawLine(
-                LocaleController.isRTL ? 0 : AndroidUtilities.dp(72),
-                getHeight() - 1,
-                LocaleController.isRTL ? getWidth() - AndroidUtilities.dp(72) : getWidth(),
-                getHeight() - 1,
-                Theme.dividerPaint
+                    LocaleController.isRTL ? 0 : AndroidUtilities.dp(72),
+                    getHeight() - 1,
+                    LocaleController.isRTL ? getWidth() - AndroidUtilities.dp(72) : getWidth(),
+                    getHeight() - 1,
+                    Theme.dividerPaint
             );
         }
     }

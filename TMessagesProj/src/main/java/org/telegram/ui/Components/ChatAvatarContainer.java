@@ -74,10 +74,12 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
     private SharedMediaLayout.SharedMediaPreloader sharedMediaPreloader;
     private Theme.ResourcesProvider resourcesProvider;
 
+    private boolean isPreviewMode;
+
     public ChatAvatarContainer(Context context, ChatActivity chatActivity, boolean needTime) {
         this(context, chatActivity, needTime, null);
     }
-    
+
     public ChatAvatarContainer(Context context, ChatActivity chatActivity, boolean needTime, Theme.ResourcesProvider resourcesProvider) {
         super(context);
         this.resourcesProvider = resourcesProvider;
@@ -197,7 +199,14 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
         return true;
     }
 
+    public void setPreviewMode(boolean status) {
+        isPreviewMode = status;
+    }
+
     private void openProfile(boolean byAvatar) {
+        if (isPreviewMode) {
+            return;
+        }
         if (byAvatar && (AndroidUtilities.isTablet() || AndroidUtilities.displaySize.x > AndroidUtilities.displaySize.y || !avatarImageView.getImageReceiver().hasNotThumb())) {
             byAvatar = false;
         }
@@ -762,6 +771,9 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
         super.onInitializeAccessibilityNodeInfo(info);
         if (info.isClickable() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             info.addAction(new AccessibilityNodeInfo.AccessibilityAction(AccessibilityNodeInfo.ACTION_CLICK, LocaleController.getString("OpenProfile", R.string.OpenProfile)));
+        }
+        if (info.isLongClickable() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            info.addAction(new AccessibilityNodeInfo.AccessibilityAction(AccessibilityNodeInfo.ACTION_LONG_CLICK, LocaleController.getString("Search", R.string.Search)));
         }
     }
 

@@ -137,6 +137,10 @@ public class TextCheckCell extends FrameLayout {
         setWillNotDraw(!divider);
     }
 
+    public void setText(String text) {
+        textView.setText(text);
+    }
+
     public void setColors(String key, String switchKey, String switchKeyChecked, String switchThumb, String switchThumbChecked) {
         textView.setTextColor(Theme.getColor(key));
         checkBox.setColors(switchKey, switchKeyChecked, switchThumb, switchThumbChecked);

@@ -58,6 +58,10 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import androidx.camera.core.MeteringPointFactory;
+import androidx.camera.core.Preview;
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
 import com.google.android.exoplayer2.ExoPlayer;
@@ -109,6 +113,10 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL;
 
+import it.owlgram.android.OwlConfig;
+import it.owlgram.android.camera.CameraXController;
+import it.owlgram.android.camera.CameraXUtilities;
+
 @TargetApi(18)
 public class InstantCameraView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
 
@@ -121,7 +129,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
     private ImageView muteImageView;
     private float progress;
     private CameraInfo selectedCamera;
-    private boolean isFrontface = true;
+    private boolean isFrontface = !OwlConfig.useRearCamera;
     private volatile boolean cameraReady;
     private AnimatorSet muteAnimation;
     private TLRPC.InputFile file;
@@ -157,6 +165,10 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
     private TextureView textureView;
     private BackupImageView textureOverlayView;
     private CameraSession cameraSession;
+    @TargetApi(21)
+    private CameraXController cameraXController;
+    @TargetApi(21)
+    private final CameraXController.CameraLifecycle camLifecycle = new CameraXController.CameraLifecycle();
     private boolean needDrawFlickerStub;
 
     private float panTranslationY;
@@ -312,10 +324,17 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
         switchCameraButton.setContentDescription(LocaleController.getString("AccDescrSwitchCamera", R.string.AccDescrSwitchCamera));
         addView(switchCameraButton, LayoutHelper.createFrame(62, 62, Gravity.LEFT | Gravity.BOTTOM, 8, 0, 0, 0));
         switchCameraButton.setOnClickListener(v -> {
-            if (!cameraReady || cameraSession == null || !cameraSession.isInitied() || cameraThread == null) {
-                return;
+            if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+                if (!cameraReady || cameraSession == null || !cameraSession.isInitied() || cameraThread == null) {
+                    return;
+                }
+                switchCamera();
+            } else {
+                if(!cameraXController.isInitied() || cameraThread == null){
+                    return;
+                }
+                switchCameraX();
             }
-            switchCamera();
             ObjectAnimator animator = ObjectAnimator.ofFloat(switchCameraButton, View.SCALE_X, 0.0f).setDuration(100);
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override
@@ -442,9 +461,13 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
     }
 
     public void destroy(boolean async, final Runnable beforeDestroyRunnable) {
-        if (cameraSession != null) {
-            cameraSession.destroy();
-            CameraController.getInstance().close(cameraSession, !async ? new CountDownLatch(1) : null, beforeDestroyRunnable);
+        if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+            if (cameraSession != null) {
+                cameraSession.destroy();
+                CameraController.getInstance().close(cameraSession, !async ? new CountDownLatch(1) : null, beforeDestroyRunnable);
+            }
+        } else {
+            camLifecycle.stop();
         }
     }
 
@@ -538,7 +561,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             textureOverlayView.setImageResource(R.drawable.icplaceholder);
         }
         cameraReady = false;
-        isFrontface = true;
+        isFrontface = !OwlConfig.useRearCamera;
         selectedCamera = null;
         recordedTime = 0;
         progress = 0;
@@ -590,8 +613,12 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                     cameraThread.shutdown(0);
                     cameraThread = null;
                 }
-                if (cameraSession != null) {
-                    CameraController.getInstance().close(cameraSession, null, null);
+                if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+                    if (cameraSession != null) {
+                        CameraController.getInstance().close(cameraSession, null, null);
+                    }
+                } else {
+                    camLifecycle.stop();
                 }
                 return true;
             }
@@ -847,6 +874,18 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
         textureView = null;
         cameraContainer.setImageReceiver(null);
     }
+    @TargetApi(21)
+    private void switchCameraX(){
+        saveLastCameraBitmap();
+        if (lastBitmap != null) {
+            textureOverlayView.setImageBitmap(lastBitmap);
+            textureOverlayView.setAlpha(1f);
+        }
+        cameraXController.switchCamera();
+        isFrontface = !isFrontface;
+        cameraReady = false;
+        cameraThread.reinitForNewCamera();
+    }
 
     private void switchCamera() {
         saveLastCameraBitmap();
@@ -947,16 +986,32 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             }
 
             surfaceTexture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
-            cameraSession = new CameraSession(selectedCamera, previewSize, pictureSize, ImageFormat.JPEG, true);
-            cameraThread.setCurrentSession(cameraSession);
-            CameraController.getInstance().openRound(cameraSession, surfaceTexture, () -> {
-                if (cameraSession != null) {
-                    if (BuildVars.LOGS_ENABLED) {
-                        FileLog.d("camera initied");
+            if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+                cameraSession = new CameraSession(selectedCamera, previewSize, pictureSize, ImageFormat.JPEG, true);
+                cameraThread.setCurrentSession(cameraSession);
+                CameraController.getInstance().openRound(cameraSession, surfaceTexture, () -> {
+                    if (cameraSession != null) {
+                        if (BuildVars.LOGS_ENABLED) {
+                            FileLog.d("camera initied");
+                        }
+                        cameraSession.setInitied();
                     }
-                    cameraSession.setInitied();
-                }
-            }, () -> cameraThread.setCurrentSession(cameraSession));
+                }, () -> cameraThread.setCurrentSession(cameraSession));
+            } else {
+                MeteringPointFactory factory = new SurfaceOrientedMeteringPointFactory(previewSize.getWidth(), previewSize.getHeight());
+                Preview.SurfaceProvider surfaceProvider = request -> {
+                    Surface surface = new Surface(surfaceTexture);
+                    request.provideSurface(surface, ContextCompat.getMainExecutor(getContext()), result -> {});
+                };
+                cameraXController = new CameraXController(camLifecycle, factory, surfaceProvider);
+                cameraXController.setStableFPSPreviewOnly(true);
+                cameraXController.initCamera(getContext(), isFrontface, ()-> {
+                    if (cameraThread != null) {
+                        cameraThread.setOrientation();
+                    }
+                });
+                camLifecycle.start();
+            }
         });
     }
 
@@ -1063,6 +1118,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
         private final int DO_SHUTDOWN_MESSAGE = 1;
         private final int DO_REINIT_MESSAGE = 2;
         private final int DO_SETSESSION_MESSAGE = 3;
+        private final int DO_SETORIENTATION_MESSAGE = 4;
 
         private int drawProgram;
         private int vertexMatrixHandle;
@@ -1285,6 +1341,14 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             }
         }
 
+        @TargetApi(21)
+        public void setOrientation() {
+            Handler handler = getHandler();
+            if (handler != null) {
+                sendMessage(handler.obtainMessage(DO_SETORIENTATION_MESSAGE), 0);
+            }
+        }
+
         private void onDraw(Integer cameraId) {
             if (!initied) {
                 return;
@@ -1303,7 +1367,15 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             if (!recording) {
                 videoEncoder.startRecording(cameraFile, EGL14.eglGetCurrentContext());
                 recording = true;
-                int orientation = currentSession.getCurrentOrientation();
+                int orientation = 0;
+                if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+                    orientation = currentSession.getCurrentOrientation();
+                } else {
+                    float temp = scaleX;
+                    //noinspection SuspiciousNameCombination
+                    scaleX = scaleY;
+                    scaleY = temp;
+                }
                 if (orientation == 90 || orientation == 270) {
                     float temp = scaleX;
                     scaleX = scaleY;
@@ -1408,6 +1480,13 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                         currentSession = newSession;
                     }
                     break;
+                }
+                case DO_SETORIENTATION_MESSAGE: {
+                    int rotationAngle = cameraXController.getDisplayOrientation();
+                    android.opengl.Matrix.setIdentityM(mMVPMatrix, 0);
+                    if (rotationAngle != 0) {
+                        android.opengl.Matrix.rotateM(mMVPMatrix, 0, rotationAngle, 0, 0, 1);
+                    }
                 }
             }
         }

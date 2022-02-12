@@ -52,6 +52,8 @@ import org.telegram.ui.Components.LayoutHelper;
 
 import java.util.ArrayList;
 
+import it.owlgram.android.helpers.MessageHelper;
+
 public abstract class BaseFragment {
 
     private boolean isFinished;
@@ -631,6 +633,10 @@ public abstract class BaseFragment {
 
     public UserConfig getUserConfig() {
         return getAccountInstance().getUserConfig();
+    }
+
+    public MessageHelper getMessageHelper() {
+        return MessageHelper.getInstance(currentAccount);
     }
 
     public void setFragmentPanTranslationOffset(int offset) {

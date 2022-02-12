@@ -26,6 +26,7 @@ import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.support.LongSparseIntArray;
+import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenu;
@@ -51,6 +52,10 @@ import java.util.Collections;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import it.owlgram.android.components.IconSelectorAlert;
+import it.owlgram.android.components.UpdateAlertDialog;
+import it.owlgram.android.helpers.FolderIconHelper;
 
 public class FilterCreateActivity extends BaseFragment {
 
@@ -95,6 +100,7 @@ public class FilterCreateActivity extends BaseFragment {
     private MessagesController.DialogFilter filter;
     private boolean creatingNew;
     private String newFilterName;
+    private String newFilterEmoticon;
     private int newFilterFlags;
     private ArrayList<Long> newAlwaysShow;
     private ArrayList<Long> newNeverShow;
@@ -103,6 +109,7 @@ public class FilterCreateActivity extends BaseFragment {
     private static final int MAX_NAME_LENGTH = 12;
 
     private static final int done_button = 1;
+    private IconSelectorAlert iconSelectorAlert;
 
     @SuppressWarnings("FieldCanBeLocal")
     public static class HintInnerCell extends FrameLayout {
@@ -152,6 +159,7 @@ public class FilterCreateActivity extends BaseFragment {
             creatingNew = true;
         }
         newFilterName = filter.name;
+        newFilterEmoticon = filter.emoticon;
         newFilterFlags = filter.flags;
         newAlwaysShow = new ArrayList<>(filter.alwaysShow);
         if (alwaysShow != null) {
@@ -422,6 +430,14 @@ public class FilterCreateActivity extends BaseFragment {
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            iconSelectorAlert.dismiss();
+        } catch (Exception ignored) {}
+    }
+
+    @Override
     public boolean onBackPressed() {
         return checkDiscard();
     }
@@ -552,13 +568,13 @@ public class FilterCreateActivity extends BaseFragment {
     }
 
     private void processDone() {
-        saveFilterToServer(filter, newFilterFlags, newFilterName, newAlwaysShow, newNeverShow, newPinned, creatingNew, false, hasUserChanged, true, true, this, () -> {
+        saveFilterToServer(filter, newFilterFlags, newFilterEmoticon, newFilterName, newAlwaysShow, newNeverShow, newPinned, creatingNew, false, hasUserChanged, true, true, this, () -> {
             getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
             finishFragment();
         });
     }
 
-    private static void processAddFilter(MessagesController.DialogFilter filter, int newFilterFlags, String newFilterName, ArrayList<Long> newAlwaysShow, ArrayList<Long> newNeverShow, boolean creatingNew, boolean atBegin, boolean hasUserChanged, boolean resetUnreadCounter, BaseFragment fragment, Runnable onFinish) {
+    private static void processAddFilter(MessagesController.DialogFilter filter, int newFilterFlags, String newFilterEmoticon, String newFilterName, ArrayList<Long> newAlwaysShow, ArrayList<Long> newNeverShow, boolean creatingNew, boolean atBegin, boolean hasUserChanged, boolean resetUnreadCounter, BaseFragment fragment, Runnable onFinish) {
         if (filter.flags != newFilterFlags || hasUserChanged) {
             filter.pendingUnreadCount = -1;
             if (resetUnreadCounter) {
@@ -567,6 +583,7 @@ public class FilterCreateActivity extends BaseFragment {
         }
         filter.flags = newFilterFlags;
         filter.name = newFilterName;
+        filter.emoticon = newFilterEmoticon;
         filter.neverShow = newNeverShow;
         filter.alwaysShow = newAlwaysShow;
         if (creatingNew) {
@@ -580,7 +597,7 @@ public class FilterCreateActivity extends BaseFragment {
         }
     }
 
-    public static void saveFilterToServer(MessagesController.DialogFilter filter, int newFilterFlags, String newFilterName, ArrayList<Long> newAlwaysShow, ArrayList<Long> newNeverShow, LongSparseIntArray newPinned, boolean creatingNew, boolean atBegin, boolean hasUserChanged, boolean resetUnreadCounter, boolean progress, BaseFragment fragment, Runnable onFinish) {
+    public static void saveFilterToServer(MessagesController.DialogFilter filter, int newFilterFlags, String newFilterEmoticon, String newFilterName, ArrayList<Long> newAlwaysShow, ArrayList<Long> newNeverShow, LongSparseIntArray newPinned, boolean creatingNew, boolean atBegin, boolean hasUserChanged, boolean resetUnreadCounter, boolean progress, BaseFragment fragment, Runnable onFinish) {
         if (fragment == null || fragment.getParentActivity() == null) {
             return;
         }
@@ -606,6 +623,8 @@ public class FilterCreateActivity extends BaseFragment {
         req.filter.exclude_archived = (newFilterFlags & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_ARCHIVED) != 0;
         req.filter.id = filter.id;
         req.filter.title = newFilterName;
+        req.filter.flags |= ConnectionsManager.FileTypeVideo;
+        req.filter.emoticon = newFilterEmoticon;
         MessagesController messagesController = fragment.getMessagesController();
         ArrayList<Long> pinArray = new ArrayList<>();
         if (newPinned.size() != 0) {
@@ -681,11 +700,11 @@ public class FilterCreateActivity extends BaseFragment {
                 } catch (Exception e) {
                     FileLog.e(e);
                 }
-                processAddFilter(filter, newFilterFlags, newFilterName, newAlwaysShow, newNeverShow, creatingNew, atBegin, hasUserChanged, resetUnreadCounter, fragment, onFinish);
+                processAddFilter(filter, newFilterFlags, newFilterEmoticon, newFilterName, newAlwaysShow, newNeverShow, creatingNew, atBegin, hasUserChanged, resetUnreadCounter, fragment, onFinish);
             }
         }));
         if (!progress) {
-            processAddFilter(filter, newFilterFlags, newFilterName, newAlwaysShow, newNeverShow, creatingNew, atBegin, hasUserChanged, resetUnreadCounter, fragment, onFinish);
+            processAddFilter(filter, newFilterFlags, newFilterEmoticon, newFilterName, newAlwaysShow, newNeverShow, creatingNew, atBegin, hasUserChanged, resetUnreadCounter, fragment, onFinish);
         }
     }
 
@@ -715,6 +734,9 @@ public class FilterCreateActivity extends BaseFragment {
             }
         }
         if (!TextUtils.equals(filter.name, newFilterName)) {
+            return true;
+        }
+        if (!TextUtils.equals(filter.emoticon, newFilterEmoticon)) {
             return true;
         }
         if (filter.flags != newFilterFlags) {
@@ -796,7 +818,20 @@ public class FilterCreateActivity extends BaseFragment {
                     break;
                 }
                 case 2: {
-                    PollEditTextCell cell = new PollEditTextCell(mContext, null);
+                    PollEditTextCell cell = new PollEditTextCell(mContext, false, null, view1 -> {
+                        iconSelectorAlert = new IconSelectorAlert(mContext) {
+                            @Override
+                            protected void onItemClick(int pos) {
+                                super.onItemClick(pos);
+                                ImageView pollEditTextCell = (ImageView) view1;
+                                pollEditTextCell.setImageResource(FolderIconHelper.icons[pos]);
+                                newFilterEmoticon = FolderIconHelper.emojis[pos];
+                                checkDoneButton(true);
+                            }
+                        };
+                        iconSelectorAlert.show();
+                    });
+                    cell.setIcon(FolderIconHelper.getTabIcon(newFilterEmoticon, false));
                     cell.createErrorTextView();
                     cell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     cell.addTextWatcher(new TextWatcher() {

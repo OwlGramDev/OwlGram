@@ -23,7 +23,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -116,7 +115,6 @@ import org.telegram.ui.Components.VerticalPositionAutoAnimator;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -126,6 +124,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import it.owlgram.android.OwlConfig;
 
 @SuppressLint("HardwareIds")
 public class LoginActivity extends BaseFragment {
@@ -272,6 +272,10 @@ public class LoginActivity extends BaseFragment {
                 }
             }
         });
+
+        if (OwlConfig.getActiveAccounts() == 0) {
+            OwlConfig.updateCurrentVersion();
+        }
 
         currentDoneType = DONE_TYPE_FLOATING;
         doneButtonVisible[DONE_TYPE_FLOATING] = true;
@@ -711,6 +715,7 @@ public class LoginActivity extends BaseFragment {
             showDoneAnimation[currentDoneType] = new AnimatorSet();
             if (show) {
                 if (floating) {
+                    floatingButtonContainer.setVisibility(View.VISIBLE);
                     if (floatingButtonContainer.getVisibility() != View.VISIBLE) {
                         floatingButtonContainer.setTranslationY(AndroidUtilities.dpf2(70f));
                         floatingButtonContainer.setVisibility(View.VISIBLE);
@@ -1303,7 +1308,6 @@ public class LoginActivity extends BaseFragment {
             });
 
             phoneField = new HintEditText(context) {
-
                 @Override
                 public boolean onKeyDown(int keyCode, KeyEvent event) {
                     if (keyCode == KeyEvent.KEYCODE_DEL && phoneField.length() == 0) {
@@ -1313,7 +1317,6 @@ public class LoginActivity extends BaseFragment {
                     }
                     return super.onKeyDown(keyCode, event);
                 }
-
 
                 @Override
                 public boolean onTouchEvent(MotionEvent event) {
@@ -1429,51 +1432,67 @@ public class LoginActivity extends BaseFragment {
             textView2.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
             addView(textView2, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 0, 28, 0, 10));
 
-            if (newAccount) {
-                checkBoxCell = new CheckBoxCell(context, 2);
-                checkBoxCell.setText(LocaleController.getString("SyncContacts", R.string.SyncContacts), "", syncContacts, false);
-                addView(checkBoxCell, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
-                checkBoxCell.setOnClickListener(new OnClickListener() {
+            //if (newAccount) {
+            checkBoxCell = new CheckBoxCell(context, 2);
+            checkBoxCell.setText(LocaleController.getString("SyncContacts", R.string.SyncContacts), "", syncContacts, false);
+            addView(checkBoxCell, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
+            checkBoxCell.setOnClickListener(new OnClickListener() {
+                private Toast visibleToast;
 
-                    private Toast visibleToast;
-
-                    @Override
-                    public void onClick(View v) {
-                        if (getParentActivity() == null) {
-                            return;
-                        }
-                        CheckBoxCell cell = (CheckBoxCell) v;
-                        syncContacts = !syncContacts;
-                        cell.setChecked(syncContacts, true);
-                        try {
-                            if (visibleToast != null) {
-                                visibleToast.cancel();
-                            }
-                        } catch (Exception e) {
-                            FileLog.e(e);
-                        }
-                        if (syncContacts) {
-                            BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.contacts_sync_on, LocaleController.getString("SyncContactsOn", R.string.SyncContactsOn)).show();
-                        } else {
-                            BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.contacts_sync_off, LocaleController.getString("SyncContactsOff", R.string.SyncContactsOff)).show();
-                        }
-                    }
-                });
-            }
-
-            if (BuildVars.DEBUG_PRIVATE_VERSION) {
-                testBackendCheckBox = new CheckBoxCell(context, 2);
-                testBackendCheckBox.setText("Test Backend", "", testBackend, false);
-                addView(testBackendCheckBox, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
-                testBackendCheckBox.setOnClickListener(v -> {
+                @Override
+                public void onClick(View v) {
                     if (getParentActivity() == null) {
                         return;
                     }
                     CheckBoxCell cell = (CheckBoxCell) v;
-                    testBackend = !testBackend;
-                    cell.setChecked(testBackend, true);
-                });
-            }
+                    syncContacts = !syncContacts;
+                    cell.setChecked(syncContacts, true);
+                    try {
+                        if (visibleToast != null) {
+                            visibleToast.cancel();
+                        }
+                    } catch (Exception e) {
+                        FileLog.e(e);
+                    }
+                    if (syncContacts) {
+                        BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.contacts_sync_on, LocaleController.getString("SyncContactsOn", R.string.SyncContactsOn)).show();
+                    } else {
+                        BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.contacts_sync_off, LocaleController.getString("SyncContactsOff", R.string.SyncContactsOff)).show();
+                    }
+                }
+            });
+            //}
+
+            //if (BuildVars.DEBUG_PRIVATE_VERSION) {
+            testBackendCheckBox = new CheckBoxCell(context, 2);
+            testBackendCheckBox.setText(LocaleController.getString("TestBackend", R.string.TestBackend), "", testBackend, false);
+            addView(testBackendCheckBox, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
+            testBackendCheckBox.setOnClickListener(v -> {
+                if (getParentActivity() == null) {
+                    return;
+                }
+                CheckBoxCell cell = (CheckBoxCell) v;
+                testBackend = !testBackend;
+                cell.setChecked(testBackend, true);
+
+                CountrySelectActivity.Country countryWithCode = new CountrySelectActivity.Country();
+                String test_code = "999";
+                countryWithCode.name = LocaleController.getString("TestBackendNumber", R.string.TestBackendNumber);
+                countryWithCode.code = test_code;
+                if (testBackend) {
+                    countriesArray.add(countryWithCode);
+                    codesMap.put(test_code, countryWithCode);
+                    phoneFormatMap.put(test_code, "XX X XXXX");
+                    BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.chats_infotip, LocaleController.getString("TestBackendOn", R.string.TestBackendOn)).show();
+                } else {
+                    countriesArray.remove(countryWithCode);
+                    codesMap.remove(test_code);
+                    phoneFormatMap.remove(test_code);
+                    BulletinFactory.of((FrameLayout) fragmentView, null).createSimpleBulletin(R.raw.chats_infotip, LocaleController.getString("TestBackendOff", R.string.TestBackendOff)).show();
+                }
+                codeField.setText(codeField.getText());
+            });
+            //}
 
             HashMap<String, String> languageMap = new HashMap<>();
 
@@ -1553,7 +1572,6 @@ public class LoginActivity extends BaseFragment {
                                 CountrySelectActivity.Country countryWithCode = new CountrySelectActivity.Country();
                                 countryWithCode.name = c.default_name;
                                 countryWithCode.code = c.country_codes.get(k).country_code;
-
                                 countriesArray.add(countryWithCode);
                                 codesMap.put(c.country_codes.get(k).country_code, countryWithCode);
                                 if (c.country_codes.get(k).patterns.size() > 0) {
@@ -1658,7 +1676,6 @@ public class LoginActivity extends BaseFragment {
                         if (preferences.getBoolean("firstlogin", true) || getParentActivity().shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE) || getParentActivity().shouldShowRequestPermissionRationale(Manifest.permission.READ_CALL_LOG)) {
                             preferences.edit().putBoolean("firstlogin", false).commit();
                             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-
                             builder.setPositiveButton(LocaleController.getString("Contin", R.string.Continue), null);
                             int resId;
                             if (!allowCall && (!allowCancelCall || !allowReadCallLog)) {
@@ -1703,7 +1720,8 @@ public class LoginActivity extends BaseFragment {
                 return;
             }
             String phone = PhoneFormat.stripExceptNumbers("" + codeField.getText() + phoneField.getText());
-            boolean isTestBakcend = BuildVars.DEBUG_PRIVATE_VERSION && getConnectionsManager().isTestBackend();
+            //BuildVars.DEBUG_PRIVATE_VERSION &&
+            boolean isTestBakcend = getConnectionsManager().isTestBackend();
             if (isTestBakcend != testBackend) {
                 getConnectionsManager().switchBackend(false);
                 isTestBakcend = testBackend;
@@ -1860,9 +1878,6 @@ public class LoginActivity extends BaseFragment {
                             permissionsShowItems.clear();
                             if (!allowCall) {
                                 permissionsShowItems.add(Manifest.permission.READ_PHONE_STATE);
-                            }
-                            if (!allowReadPhoneNumbers) {
-                                permissionsShowItems.add(Manifest.permission.READ_PHONE_NUMBERS);
                             }
                             if (!permissionsShowItems.isEmpty()) {
                                 SharedPreferences preferences = MessagesController.getGlobalMainSettings();
@@ -2437,10 +2452,10 @@ public class LoginActivity extends BaseFragment {
                 }
                 pref = PhoneFormat.getInstance().format("+" + pref);
                 for  (int i = 0; i < length; i++) {
-                   int index = pref.lastIndexOf("0");
-                   if (index >= 0) {
-                       pref = pref.substring(0,  index);
-                   }
+                    int index = pref.lastIndexOf("0");
+                    if (index >= 0) {
+                        pref = pref.substring(0,  index);
+                    }
                 }
                 pref = pref.replaceAll("\\)", "");
                 pref = pref.replaceAll("\\(", "");
@@ -2567,7 +2582,6 @@ public class LoginActivity extends BaseFragment {
             }
         }
 
-
         @Override
         public void onNextPressed(String code) {
             if (currentViewNum == AUTH_TYPE_MISSED_CALL) {
@@ -2603,7 +2617,6 @@ public class LoginActivity extends BaseFragment {
             destroyTimer();
             int reqId = ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
                 boolean ok = false;
-
                 if (error == null) {
                     nextPressed = false;
                     ok = true;

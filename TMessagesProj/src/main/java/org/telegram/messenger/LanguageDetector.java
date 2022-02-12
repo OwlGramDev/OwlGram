@@ -14,8 +14,8 @@ public class LanguageDetector {
 
     public static void detectLanguage(String text, StringCallback onSuccess, ExceptionCallback onFail) {
         com.google.mlkit.nl.languageid.LanguageIdentification.getClient()
-            .identifyLanguage(text)
-            .addOnSuccessListener(onSuccess::run)
-            .addOnFailureListener(onFail::run);
+                .identifyLanguage(text)
+                .addOnSuccessListener(onSuccess::run)
+                .addOnFailureListener(onFail::run);
     }
 }

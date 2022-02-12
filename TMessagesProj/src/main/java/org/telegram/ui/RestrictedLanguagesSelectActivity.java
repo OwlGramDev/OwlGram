@@ -367,7 +367,7 @@ public class RestrictedLanguagesSelectActivity extends BaseFragment implements N
 //                    } catch (Exception e) {
 //                        FileLog.e(e);
 //                    }
-                    processSearch(query);
+            processSearch(query);
 //                }
 //            }, 100, 300);
         }
@@ -376,13 +376,13 @@ public class RestrictedLanguagesSelectActivity extends BaseFragment implements N
     private void processSearch(final String query) {
 //        Utilities.searchQueue.postRunnable(() -> {
 
-            String q = query.trim().toLowerCase();
-            if (q.length() == 0) {
-                updateSearchResults(new ArrayList<>());
-                return;
-            }
-            long time = System.currentTimeMillis();
-            ArrayList<LocaleController.LocaleInfo> resultArray = new ArrayList<>();
+        String q = query.trim().toLowerCase();
+        if (q.length() == 0) {
+            updateSearchResults(new ArrayList<>());
+            return;
+        }
+        long time = System.currentTimeMillis();
+        ArrayList<LocaleController.LocaleInfo> resultArray = new ArrayList<>();
 
 //            for (int a = 0, N = unofficialLanguages.size(); a < N; a++) {
 //                LocaleController.LocaleInfo c = unofficialLanguages.get(a);
@@ -391,14 +391,14 @@ public class RestrictedLanguagesSelectActivity extends BaseFragment implements N
 //                }
 //            }
 
-            for (int a = 0, N = sortedLanguages.size(); a < N; a++) {
-                LocaleController.LocaleInfo c = sortedLanguages.get(a);
-                if (c.name.toLowerCase().startsWith(query) || c.nameEnglish.toLowerCase().startsWith(query)) {
-                    resultArray.add(c);
-                }
+        for (int a = 0, N = sortedLanguages.size(); a < N; a++) {
+            LocaleController.LocaleInfo c = sortedLanguages.get(a);
+            if (c.name.toLowerCase().startsWith(query) || c.nameEnglish.toLowerCase().startsWith(query)) {
+                resultArray.add(c);
             }
+        }
 
-            updateSearchResults(resultArray);
+        updateSearchResults(resultArray);
 //        });
     }
 
@@ -503,7 +503,7 @@ public class RestrictedLanguagesSelectActivity extends BaseFragment implements N
 //                    if (!unofficialLanguages.isEmpty() && position == unofficialLanguages.size()) {
 //                        sectionCell.setBackgroundDrawable(Theme.getThemedDrawable(mContext, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
 //                    } else {
-                        sectionCell.setBackgroundDrawable(Theme.getThemedDrawable(mContext, R.drawable.greydivider_bottom, Theme.key_windowBackgroundGrayShadow));
+                    sectionCell.setBackgroundDrawable(Theme.getThemedDrawable(mContext, R.drawable.greydivider_bottom, Theme.key_windowBackgroundGrayShadow));
 //                    }
                     break;
                 }

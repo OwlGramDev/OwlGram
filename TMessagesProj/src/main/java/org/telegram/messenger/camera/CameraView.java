@@ -84,8 +84,10 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL;
 
+import it.owlgram.android.camera.BaseCameraView;
+
 @SuppressLint("NewApi")
-public class CameraView extends FrameLayout implements TextureView.SurfaceTextureListener {
+public class CameraView extends BaseCameraView implements TextureView.SurfaceTextureListener {
 
     private Size previewSize;
     private Size pictureSize;

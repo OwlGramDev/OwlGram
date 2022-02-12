@@ -32,6 +32,7 @@ import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.SharedConfig;
 import org.telegram.tgnet.TLRPC;
 
 import java.io.File;
@@ -121,6 +122,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
     private int renderingWidth;
     private float scaleFactor = 1f;
     public final boolean isWebmSticker;
+    private boolean wasStopped;
 
     private View parentView;
     private ArrayList<View> secondParentViews = new ArrayList<>();
@@ -276,10 +278,14 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
                         }
                         if (backgroundBitmap != null) {
                             lastFrameDecodeTime = System.currentTimeMillis();
-
+                            int oldTime = metaData[3];
                             if (getVideoFrame(nativePtr, backgroundBitmap, metaData, backgroundBitmap.getRowBytes(), false, startTime, endTime) == 0) {
                                 AndroidUtilities.runOnUIThread(uiRunnableNoFrame);
                                 return;
+                            }
+                            if (oldTime != 0 && metaData[3] == 0 && !SharedConfig.loopStickers && isWebmSticker && renderingWidth == 0) {
+                                isRunning = false;
+                                wasStopped = true;
                             }
 
                             if (seekWas) {
@@ -388,6 +394,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
     }
 
     public void addParent(View view) {
+        wasStopped = false;
         if (!parents.contains(view)) {
             parents.add(view);
             if (isRunning) {
@@ -534,7 +541,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable {
 
     @Override
     public void start() {
-        if (isRunning) {
+        if (isRunning || wasStopped) {
             return;
         }
         isRunning = true;

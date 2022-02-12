@@ -119,17 +119,17 @@ public class TranslateAlert extends Dialog {
         titleView.setScaleX(lerp(1f, 0.9473f, t));
         titleView.setScaleY(lerp(1f, 0.9473f, t));
         titleLayout.setMargins(
-            dp(lerp(22, 72, t)),
-            dp(lerp(22, 8, t)),
-            titleLayout.rightMargin,
-            titleLayout.bottomMargin
+                dp(lerp(22, 72, t)),
+                dp(lerp(22, 8, t)),
+                titleLayout.rightMargin,
+                titleLayout.bottomMargin
         );
         titleView.setLayoutParams(titleLayout);
         subtitleLayout.setMargins(
-            dp(lerp(22, 72, t)) - LoadingTextView2.paddingHorizontal,
-            dp(lerp(47, 30, t)) - LoadingTextView2.paddingVertical,
-            subtitleLayout.rightMargin,
-            subtitleLayout.bottomMargin
+                dp(lerp(22, 72, t)) - LoadingTextView2.paddingHorizontal,
+                dp(lerp(47, 30, t)) - LoadingTextView2.paddingVertical,
+                subtitleLayout.rightMargin,
+                subtitleLayout.bottomMargin
         );
         subtitleView.setLayoutParams(subtitleLayout);
 
@@ -143,10 +143,10 @@ public class TranslateAlert extends Dialog {
         header.setLayoutParams(headerLayout);
 
         scrollViewLayout.setMargins(
-            scrollViewLayout.leftMargin,
-            (int) lerp(dp(70), dp(56), t),
-            scrollViewLayout.rightMargin,
-            scrollViewLayout.bottomMargin
+                scrollViewLayout.leftMargin,
+                (int) lerp(dp(70), dp(56), t),
+                scrollViewLayout.rightMargin,
+                scrollViewLayout.bottomMargin
         );
         scrollView.setLayoutParams(scrollViewLayout);
     }
@@ -195,14 +195,14 @@ public class TranslateAlert extends Dialog {
     private int minHeight(boolean full) {
         int textsViewHeight = textsView == null ? 0 : textsView.getMeasuredHeight();
         int height =
-            textsViewHeight +
-            dp(
-                66 + // header
-                1 +  // button separator
-                16 + // button top padding
-                48 + // button
-                16   // button bottom padding
-            );
+                textsViewHeight +
+                        dp(
+                                66 + // header
+                                        1 +  // button separator
+                                        16 + // button top padding
+                                        48 + // button
+                                        16   // button bottom padding
+                        );
         if (firstMinHeight < 0 && textsViewHeight > 0)
             firstMinHeight = height;
         if (firstMinHeight > 0 && textBlocks.size() > 1 && !full)
@@ -211,8 +211,8 @@ public class TranslateAlert extends Dialog {
     }
     private boolean canExpand() {
         return (
-            textsView.getBlocksCount() < textBlocks.size() ||
-            minHeight(true) >= (AndroidUtilities.displayMetrics.heightPixels * heightMaxPercent)
+                textsView.getBlocksCount() < textBlocks.size() ||
+                        minHeight(true) >= (AndroidUtilities.displayMetrics.heightPixels * heightMaxPercent)
         );
     }
     private void updateCanExpand() {
@@ -290,22 +290,22 @@ public class TranslateAlert extends Dialog {
                 int minHeight = (int) (AndroidUtilities.displayMetrics.heightPixels * heightMaxPercent);
                 if (textsView != null && textsView.getMeasuredHeight() <= 0) {
                     textsView.measure(
-                        MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec) - textsView.getPaddingLeft() - textsView.getPaddingRight() - textsContainerView.getPaddingLeft() - textsContainerView.getPaddingRight(), MeasureSpec.EXACTLY),
-                        0
+                            MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec) - textsView.getPaddingLeft() - textsView.getPaddingRight() - textsContainerView.getPaddingLeft() - textsContainerView.getPaddingRight(), MeasureSpec.EXACTLY),
+                            0
                     );
                 }
                 int fromHeight = Math.min(minHeight, minHeight());
                 int height = (int) (fromHeight + (AndroidUtilities.displayMetrics.heightPixels - fromHeight) * containerOpenAnimationT);
                 updateCanExpand();
                 super.onMeasure(
-                    MeasureSpec.makeMeasureSpec(
-                        (int) Math.max(fullWidth * 0.8f, Math.min(dp(480), fullWidth)),
-                        MeasureSpec.getMode(widthMeasureSpec)
-                    ),
-                    MeasureSpec.makeMeasureSpec(
-                        height,
-                        MeasureSpec.EXACTLY
-                    )
+                        MeasureSpec.makeMeasureSpec(
+                                (int) Math.max(fullWidth * 0.8f, Math.min(dp(480), fullWidth)),
+                                MeasureSpec.getMode(widthMeasureSpec)
+                        ),
+                        MeasureSpec.makeMeasureSpec(
+                                height,
+                                MeasureSpec.EXACTLY
+                        )
                 );
             }
 
@@ -405,13 +405,13 @@ public class TranslateAlert extends Dialog {
         }
 
         header.addView(subtitleView, subtitleLayout = LayoutHelper.createFrame(
-            LayoutHelper.MATCH_PARENT,
-            LayoutHelper.WRAP_CONTENT,
-            Gravity.TOP | (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT),
-            22 - LoadingTextView2.paddingHorizontal / AndroidUtilities.density,
-            47 - LoadingTextView2.paddingVertical / AndroidUtilities.density,
-            22 - LoadingTextView2.paddingHorizontal / AndroidUtilities.density,
-            0
+                LayoutHelper.MATCH_PARENT,
+                LayoutHelper.WRAP_CONTENT,
+                Gravity.TOP | (LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT),
+                22 - LoadingTextView2.paddingHorizontal / AndroidUtilities.density,
+                47 - LoadingTextView2.paddingVertical / AndroidUtilities.density,
+                22 - LoadingTextView2.paddingHorizontal / AndroidUtilities.density,
+                0
         ));
 
         backButton = new ImageView(context);
@@ -492,11 +492,11 @@ public class TranslateAlert extends Dialog {
                 if (id == android.R.id.copy && isFocused()) {
                     android.content.ClipboardManager clipboard = (android.content.ClipboardManager) ApplicationLoader.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE);
                     android.content.ClipData clip = android.content.ClipData.newPlainText(
-                    "label",
-                        getText().subSequence(
-                            Math.max(0, Math.min(getSelectionStart(), getSelectionEnd())),
-                            Math.max(0, Math.max(getSelectionStart(), getSelectionEnd()))
-                        )
+                            "label",
+                            getText().subSequence(
+                                    Math.max(0, Math.min(getSelectionStart(), getSelectionEnd())),
+                                    Math.max(0, Math.max(getSelectionStart(), getSelectionEnd()))
+                            )
                     );
                     clipboard.setPrimaryClip(clip);
                     BulletinFactory.of(bulletinContainer, null).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
@@ -526,10 +526,10 @@ public class TranslateAlert extends Dialog {
 
         textsView = new TextBlocksLayout(context, dp(16), Theme.getColor(Theme.key_dialogTextBlack), allTextsView);
         textsView.setPadding(
-            dp(22) - LoadingTextView2.paddingHorizontal,
-            dp(12) - LoadingTextView2.paddingVertical,
-            dp(22) - LoadingTextView2.paddingHorizontal,
-            dp(12) - LoadingTextView2.paddingVertical
+                dp(22) - LoadingTextView2.paddingHorizontal,
+                dp(12) - LoadingTextView2.paddingVertical,
+                dp(22) - LoadingTextView2.paddingHorizontal,
+                dp(12) - LoadingTextView2.paddingVertical
         );
         for (CharSequence blockText : textBlocks)
             textsView.addBlock(blockText);
@@ -680,9 +680,9 @@ public class TranslateAlert extends Dialog {
             buttonView.getGlobalVisibleRect(buttonRect);
             if (pressedLink == null && /*!(scrollRect.contains((int) x, (int) y) && !canExpand() && containerOpenAnimationT < .5f && !scrolling) &&*/ !hasSelection()) {
                 if (
-                    !backRect.contains((int) x, (int) y) &&
-                    !buttonRect.contains((int) x, (int) y) &&
-                    event.getAction() == MotionEvent.ACTION_DOWN
+                        !backRect.contains((int) x, (int) y) &&
+                                !buttonRect.contains((int) x, (int) y) &&
+                                event.getAction() == MotionEvent.ACTION_DOWN
                 ) {
                     fromScrollRect = scrollRect.contains((int) x, (int) y) && (containerOpenAnimationT > 0 || !canExpand());
                     maybeScrolling = true;
@@ -706,7 +706,7 @@ public class TranslateAlert extends Dialog {
                         allowScroll = false;
                     }
                     float fullHeight = AndroidUtilities.displayMetrics.heightPixels,
-                          minHeight = Math.min(minHeight(), fullHeight * heightMaxPercent);
+                            minHeight = Math.min(minHeight(), fullHeight * heightMaxPercent);
                     float scrollYPx = minHeight * (1f - -Math.min(Math.max(fromScrollY, -1), 0)) + (fullHeight - minHeight) * Math.min(1, Math.max(fromScrollY, 0)) + dy;
                     float scrollY = scrollYPx > minHeight ? (scrollYPx - minHeight) / (fullHeight - minHeight) : -(1f - scrollYPx / minHeight);
                     if (!canExpand()) {
@@ -722,12 +722,12 @@ public class TranslateAlert extends Dialog {
                             maybeScrolling = false;
                             allowScroll = true;
                             scrollYTo(
-                                Math.abs(dy) > dp(16) ?
-                                    Math.round(fromScrollY) + (scrollY > fromScrollY ? 1f : -1f) * (float) Math.ceil(Math.abs(fromScrollY - scrollY)) :
-                                    Math.round(fromScrollY),
-                                () -> {
-                                    contentView.post(this::checkForNextLoading);
-                                }
+                                    Math.abs(dy) > dp(16) ?
+                                            Math.round(fromScrollY) + (scrollY > fromScrollY ? 1f : -1f) * (float) Math.ceil(Math.abs(fromScrollY - scrollY)) :
+                                            Math.round(fromScrollY),
+                                    () -> {
+                                        contentView.post(this::checkForNextLoading);
+                                    }
                             );
                         }
                         return true;
@@ -769,9 +769,9 @@ public class TranslateAlert extends Dialog {
         params.flags |= WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
         if (Build.VERSION.SDK_INT >= 21) {
             params.flags |=
-                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
-                WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR |
-                WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
+                            WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR |
+                            WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
         }
         params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -924,113 +924,113 @@ public class TranslateAlert extends Dialog {
         CharSequence blockText = textBlocks.get(blockIndex);
 
         fetchTranslation(
-            blockText,
-            Math.min((blockIndex + 1) * 1000, 3500),
-            (String translatedText, String sourceLanguage) -> {
-                loaded = true;
-                Spannable spannable = new SpannableStringBuilder(translatedText);
-                try {
-                    MessageObject.addUrlsByPattern(false, spannable, false, 0, 0, true);
-                    URLSpan[] urlSpans = spannable.getSpans(0, spannable.length(), URLSpan.class);
-                    for (int i = 0; i < urlSpans.length; ++i) {
-                        URLSpan urlSpan = urlSpans[i];
-                        int start = spannable.getSpanStart(urlSpan),
-                            end = spannable.getSpanEnd(urlSpan);
-                        if (start == -1 || end == -1) {
-                            continue;
-                        }
-                        spannable.removeSpan(urlSpan);
-                        spannable.setSpan(
-                            new ClickableSpan() {
-                                @Override
-                                public void onClick(@NonNull View view) {
-                                    if (onLinkPress != null) {
-                                        onLinkPress.run(urlSpan);
-                                        fastHide = true;
-                                        dismiss();
-                                    } else {
-                                        AlertsCreator.showOpenUrlAlert(fragment, urlSpan.getURL(), false, false);
-                                    }
-                                }
+                blockText,
+                Math.min((blockIndex + 1) * 1000, 3500),
+                (String translatedText, String sourceLanguage) -> {
+                    loaded = true;
+                    Spannable spannable = new SpannableStringBuilder(translatedText);
+                    try {
+                        MessageObject.addUrlsByPattern(false, spannable, false, 0, 0, true);
+                        URLSpan[] urlSpans = spannable.getSpans(0, spannable.length(), URLSpan.class);
+                        for (int i = 0; i < urlSpans.length; ++i) {
+                            URLSpan urlSpan = urlSpans[i];
+                            int start = spannable.getSpanStart(urlSpan),
+                                    end = spannable.getSpanEnd(urlSpan);
+                            if (start == -1 || end == -1) {
+                                continue;
+                            }
+                            spannable.removeSpan(urlSpan);
+                            spannable.setSpan(
+                                    new ClickableSpan() {
+                                        @Override
+                                        public void onClick(@NonNull View view) {
+                                            if (onLinkPress != null) {
+                                                onLinkPress.run(urlSpan);
+                                                fastHide = true;
+                                                dismiss();
+                                            } else {
+                                                AlertsCreator.showOpenUrlAlert(fragment, urlSpan.getURL(), false, false);
+                                            }
+                                        }
 
-                                @Override
-                                public void updateDrawState(@NonNull TextPaint ds) {
-                                    int alpha = Math.min(ds.getAlpha(), ds.getColor() >> 24 & 0xff);
-                                    if (!(urlSpan instanceof URLSpanNoUnderline)) {
-                                        ds.setUnderlineText(true);
-                                    }
-                                    ds.setColor(Theme.getColor(Theme.key_dialogTextLink));
-                                    ds.setAlpha(alpha);
-                                }
-                            },
-                            start, end,
-                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                        );
+                                        @Override
+                                        public void updateDrawState(@NonNull TextPaint ds) {
+                                            int alpha = Math.min(ds.getAlpha(), ds.getColor() >> 24 & 0xff);
+                                            if (!(urlSpan instanceof URLSpanNoUnderline)) {
+                                                ds.setUnderlineText(true);
+                                            }
+                                            ds.setColor(Theme.getColor(Theme.key_dialogTextLink));
+                                            ds.setAlpha(alpha);
+                                        }
+                                    },
+                                    start, end,
+                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                            );
+                        }
+
+                        AndroidUtilities.addLinks(spannable, Linkify.WEB_URLS);
+                        urlSpans = spannable.getSpans(0, spannable.length(), URLSpan.class);
+                        for (int i = 0; i < urlSpans.length; ++i) {
+                            URLSpan urlSpan = urlSpans[i];
+                            int start = spannable.getSpanStart(urlSpan),
+                                    end = spannable.getSpanEnd(urlSpan);
+                            if (start == -1 || end == -1) {
+                                continue;
+                            }
+                            spannable.removeSpan(urlSpan);
+                            spannable.setSpan(
+                                    new ClickableSpan() {
+                                        @Override
+                                        public void onClick(@NonNull View view) {
+                                            AlertsCreator.showOpenUrlAlert(fragment, urlSpan.getURL(), false, false);
+                                        }
+
+                                        @Override
+                                        public void updateDrawState(@NonNull TextPaint ds) {
+                                            int alpha = Math.min(ds.getAlpha(), ds.getColor() >> 24 & 0xff);
+                                            if (!(urlSpan instanceof URLSpanNoUnderline))
+                                                ds.setUnderlineText(true);
+                                            ds.setColor(Theme.getColor(Theme.key_dialogTextLink));
+                                            ds.setAlpha(alpha);
+                                        }
+                                    },
+                                    start, end,
+                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                            );
+                        }
+
+                        spannable = (Spannable) Emoji.replaceEmoji(spannable, allTextsView.getPaint().getFontMetricsInt(), dp(14), false);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
-                    AndroidUtilities.addLinks(spannable, Linkify.WEB_URLS);
-                    urlSpans = spannable.getSpans(0, spannable.length(), URLSpan.class);
-                    for (int i = 0; i < urlSpans.length; ++i) {
-                        URLSpan urlSpan = urlSpans[i];
-                        int start = spannable.getSpanStart(urlSpan),
-                            end = spannable.getSpanEnd(urlSpan);
-                        if (start == -1 || end == -1) {
-                            continue;
-                        }
-                        spannable.removeSpan(urlSpan);
-                        spannable.setSpan(
-                            new ClickableSpan() {
-                                @Override
-                                public void onClick(@NonNull View view) {
-                                    AlertsCreator.showOpenUrlAlert(fragment, urlSpan.getURL(), false, false);
-                                }
+                    allTexts = new SpannableStringBuilder(allTexts == null ? "" : allTexts).append(blockIndex == 0 ? "" : "\n").append(spannable);
+                    textsView.setWholeText(allTexts);
 
-                                @Override
-                                public void updateDrawState(@NonNull TextPaint ds) {
-                                    int alpha = Math.min(ds.getAlpha(), ds.getColor() >> 24 & 0xff);
-                                    if (!(urlSpan instanceof URLSpanNoUnderline))
-                                        ds.setUnderlineText(true);
-                                    ds.setColor(Theme.getColor(Theme.key_dialogTextLink));
-                                    ds.setAlpha(alpha);
-                                }
-                            },
-                            start, end,
-                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                        );
+                    LoadingTextView2 block = textsView.getBlockAt(blockIndex);
+                    if (block != null) {
+                        block.loaded(spannable, () -> contentView.post(this::checkForNextLoading));
                     }
 
-                    spannable = (Spannable) Emoji.replaceEmoji(spannable, allTextsView.getPaint().getFontMetricsInt(), dp(14), false);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                    if (sourceLanguage != null) {
+                        fromLanguage = sourceLanguage;
+                        updateSourceLanguage();
+                    }
 
-                allTexts = new SpannableStringBuilder(allTexts == null ? "" : allTexts).append(blockIndex == 0 ? "" : "\n").append(spannable);
-                textsView.setWholeText(allTexts);
+                    blockIndex++;
+                    loading = false;
+                },
+                (boolean rateLimit) -> {
+                    if (rateLimit) {
+                        Toast.makeText(getContext(), LocaleController.getString("TranslationFailedAlert1", R.string.TranslationFailedAlert1), Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getContext(), LocaleController.getString("TranslationFailedAlert2", R.string.TranslationFailedAlert2), Toast.LENGTH_SHORT).show();
+                    }
 
-                LoadingTextView2 block = textsView.getBlockAt(blockIndex);
-                if (block != null) {
-                    block.loaded(spannable, () -> contentView.post(this::checkForNextLoading));
+                    if (blockIndex == 0) {
+                        dismiss();
+                    }
                 }
-
-                if (sourceLanguage != null) {
-                    fromLanguage = sourceLanguage;
-                    updateSourceLanguage();
-                }
-
-                blockIndex++;
-                loading = false;
-            },
-            (boolean rateLimit) -> {
-                if (rateLimit) {
-                    Toast.makeText(getContext(), LocaleController.getString("TranslationFailedAlert1", R.string.TranslationFailedAlert1), Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), LocaleController.getString("TranslationFailedAlert2", R.string.TranslationFailedAlert2), Toast.LENGTH_SHORT).show();
-                }
-
-                if (blockIndex == 0) {
-                    dismiss();
-                }
-            }
         );
         return true;
     }
@@ -1269,8 +1269,8 @@ public class TranslateAlert extends Dialog {
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
             final int count = getBlocksCount();
             final int innerWidthMeasureSpec = MeasureSpec.makeMeasureSpec(
-                MeasureSpec.getSize(widthMeasureSpec) - getPaddingLeft() - getPaddingRight(),
-                MeasureSpec.getMode(widthMeasureSpec)
+                    MeasureSpec.getSize(widthMeasureSpec) - getPaddingLeft() - getPaddingRight(),
+                    MeasureSpec.getMode(widthMeasureSpec)
             );
             for (int i = 0; i < count; ++i) {
                 LoadingTextView2 block = getBlockAt(i);
@@ -1296,14 +1296,14 @@ public class TranslateAlert extends Dialog {
             }
 
             wholeTextView.measure(
-                MeasureSpec.makeMeasureSpec(r - l - getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(b - t - getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY)
+                    MeasureSpec.makeMeasureSpec(r - l - getPaddingLeft() - getPaddingRight(), MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(b - t - getPaddingTop() - getPaddingBottom(), MeasureSpec.EXACTLY)
             );
             wholeTextView.layout(
-                getPaddingLeft(),
-                getPaddingTop(),
-                (r - l) - getPaddingRight(),
-                getPaddingTop() + wholeTextView.getMeasuredHeight()
+                    getPaddingLeft(),
+                    getPaddingTop(),
+                    (r - l) - getPaddingRight(),
+                    getPaddingTop() + wholeTextView.getMeasuredHeight()
             );
         }
     }
@@ -1312,7 +1312,7 @@ public class TranslateAlert extends Dialog {
     public static class InlineLoadingTextView extends ViewGroup {
 
         public static final int paddingHorizontal = dp(6),
-                                paddingVertical = 0;
+                paddingVertical = 0;
 
 
         public boolean showLoadingText = true;
@@ -1360,7 +1360,7 @@ public class TranslateAlert extends Dialog {
             addView(toTextView);
 
             int c1 = Theme.getColor(Theme.key_dialogBackground),
-                c2 = Theme.getColor(Theme.key_dialogBackgroundGray);
+                    c2 = Theme.getColor(Theme.key_dialogBackgroundGray);
             LinearGradient gradient = new LinearGradient(0, 0, gradientWidth, 0, new int[]{ c1, c2, c1 }, new float[] { 0, 0.67f, 1f }, Shader.TileMode.REPEAT);
             loadingPaint.setShader(gradient);
 
@@ -1375,14 +1375,14 @@ public class TranslateAlert extends Dialog {
             fromTextView.measure(0, 0);
             toTextView.measure(0, 0);
             super.onMeasure(
-                MeasureSpec.makeMeasureSpec(
-                    (int) AndroidUtilities.lerp(fromTextView.getMeasuredWidth(), toTextView.getMeasuredWidth(), loadingT) + getPaddingLeft() + getPaddingRight(),
-                    MeasureSpec.EXACTLY
-                ),
-                MeasureSpec.makeMeasureSpec(
-                    Math.max(fromTextView.getMeasuredHeight(), toTextView.getMeasuredHeight()),
-                    MeasureSpec.EXACTLY
-                )
+                    MeasureSpec.makeMeasureSpec(
+                            (int) AndroidUtilities.lerp(fromTextView.getMeasuredWidth(), toTextView.getMeasuredWidth(), loadingT) + getPaddingLeft() + getPaddingRight(),
+                            MeasureSpec.EXACTLY
+                    ),
+                    MeasureSpec.makeMeasureSpec(
+                            Math.max(fromTextView.getMeasuredHeight(), toTextView.getMeasuredHeight()),
+                            MeasureSpec.EXACTLY
+                    )
             );
         }
 
@@ -1482,8 +1482,8 @@ public class TranslateAlert extends Dialog {
             float cx = LocaleController.isRTL ? Math.max(w / 2f, w - 8f) : Math.min(w / 2f, 8f),
                     cy = Math.min(h / 2f, 8f),
                     R = (float) Math.sqrt(Math.max(
-                        Math.max(cx*cx + cy*cy, (w-cx)*(w-cx) + cy*cy),
-                        Math.max(cx*cx + (h-cy)*(h-cy), (w-cx)*(w-cx) + (h-cy)*(h-cy))
+                            Math.max(cx*cx + cy*cy, (w-cx)*(w-cx) + cy*cy),
+                            Math.max(cx*cx + (h-cy)*(h-cy), (w-cx)*(w-cx) + (h-cy)*(h-cy))
                     )),
                     r = loadingT * R;
             inPath.reset();
@@ -1540,7 +1540,7 @@ public class TranslateAlert extends Dialog {
     public static class LoadingTextView2 extends ViewGroup {
 
         public static final int paddingHorizontal = dp(6),
-                                paddingVertical = dp(1.5f);
+                paddingVertical = dp(1.5f);
 
         public boolean showLoadingText = true;
 
@@ -1589,7 +1589,7 @@ public class TranslateAlert extends Dialog {
             addView(toTextView);
 
             int c1 = Theme.getColor(Theme.key_dialogBackground),
-                c2 = Theme.getColor(Theme.key_dialogBackgroundGray);
+                    c2 = Theme.getColor(Theme.key_dialogBackgroundGray);
             LinearGradient gradient = new LinearGradient(0, 0, gradientWidth, 0, new int[]{ c1, c2, c1 }, new float[] { 0, 0.67f, 1f }, Shader.TileMode.REPEAT);
             loadingPaint.setShader(gradient);
 
@@ -1659,7 +1659,7 @@ public class TranslateAlert extends Dialog {
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
             int width = MeasureSpec.getSize(widthMeasureSpec),
-                innerWidth = width - getPaddingLeft() - getPaddingRight();
+                    innerWidth = width - getPaddingLeft() - getPaddingRight();
             if (fromTextView.getMeasuredWidth() <= 0 || lastWidth != innerWidth) {
                 measureChild(fromTextView, innerWidth);
                 updateLoadingPath();
@@ -1669,8 +1669,8 @@ public class TranslateAlert extends Dialog {
             }
             lastWidth = innerWidth;
             super.onMeasure(
-                MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(height(), MeasureSpec.EXACTLY)
+                    MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                    MeasureSpec.makeMeasureSpec(height(), MeasureSpec.EXACTLY)
             );
         }
 
@@ -1733,7 +1733,7 @@ public class TranslateAlert extends Dialog {
                                 l = Math.min(s, e),
                                 r = Math.max(s, e);
                         int start = loadingLayout.getLineStart(i),
-                              end = loadingLayout.getLineEnd(i);
+                                end = loadingLayout.getLineEnd(i);
                         boolean hasNonEmptyChar = false;
                         for (int j = start; j < end; ++j) {
                             char c = text.charAt(j);
@@ -1745,10 +1745,10 @@ public class TranslateAlert extends Dialog {
                         if (!hasNonEmptyChar)
                             continue;
                         fetchedPathRect.set(
-                            l - paddingHorizontal,
-                            loadingLayout.getLineTop(i) - paddingVertical,
-                            r + paddingHorizontal,
-                            loadingLayout.getLineBottom(i) + paddingVertical
+                                l - paddingHorizontal,
+                                loadingLayout.getLineTop(i) - paddingVertical,
+                                r + paddingHorizontal,
+                                loadingLayout.getLineBottom(i) + paddingVertical
                         );
                         loadingPath.addRoundRect(fetchedPathRect, dp(4), dp(4), Path.Direction.CW);
                     }
@@ -1758,9 +1758,9 @@ public class TranslateAlert extends Dialog {
 
         private final RectF rect = new RectF();
         private final Path inPath = new Path(),
-                           tempPath = new Path(),
-                           loadingPath = new Path(),
-                           shadePath = new Path();
+                tempPath = new Path(),
+                loadingPath = new Path(),
+                shadePath = new Path();
         private final Paint loadingPaint = new Paint();
         private final float gradientWidth = dp(350f);
         @Override
@@ -1768,12 +1768,12 @@ public class TranslateAlert extends Dialog {
             float w = getWidth(), h = getHeight();
 
             float cx = LocaleController.isRTL ? Math.max(w / 2f, w - 8f) : Math.min(w / 2f, 8f),
-                  cy = Math.min(h / 2f, 8f),
-                  R = (float) Math.sqrt(Math.max(
-                    Math.max(cx*cx + cy*cy, (w-cx)*(w-cx) + cy*cy),
-                    Math.max(cx*cx + (h-cy)*(h-cy), (w-cx)*(w-cx) + (h-cy)*(h-cy))
-                  )),
-                  r = loadingT * R;
+                    cy = Math.min(h / 2f, 8f),
+                    R = (float) Math.sqrt(Math.max(
+                            Math.max(cx*cx + cy*cy, (w-cx)*(w-cx) + cy*cy),
+                            Math.max(cx*cx + (h-cy)*(h-cy), (w-cx)*(w-cx) + (h-cy)*(h-cy))
+                    )),
+                    r = loadingT * R;
             inPath.reset();
             inPath.addCircle(cx, cy, r, Path.Direction.CW);
 

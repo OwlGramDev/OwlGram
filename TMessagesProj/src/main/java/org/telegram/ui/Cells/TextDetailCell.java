@@ -68,8 +68,8 @@ public class TextDetailCell extends FrameLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(
-            MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(60) + (needDivider ? 1 : 0), MeasureSpec.EXACTLY)
+                MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(60) + (needDivider ? 1 : 0), MeasureSpec.EXACTLY)
         );
     }
 
@@ -121,11 +121,11 @@ public class TextDetailCell extends FrameLayout {
     protected void onDraw(Canvas canvas) {
         if (needDivider) {
             canvas.drawLine(
-                LocaleController.isRTL ? 0 : AndroidUtilities.dp(20),
-                getMeasuredHeight() - 1,
-                getMeasuredWidth() - (LocaleController.isRTL ? AndroidUtilities.dp(20) : 0),
-                getMeasuredHeight() - 1,
-                Theme.dividerPaint
+                    LocaleController.isRTL ? 0 : AndroidUtilities.dp(20),
+                    getMeasuredHeight() - 1,
+                    getMeasuredWidth() - (LocaleController.isRTL ? AndroidUtilities.dp(20) : 0),
+                    getMeasuredHeight() - 1,
+                    Theme.dividerPaint
             );
         }
     }

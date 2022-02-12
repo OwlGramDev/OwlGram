@@ -38,6 +38,9 @@ import android.view.ViewPropertyAnimator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import com.google.android.exoplayer2.util.Log;
+
+import org.checkerframework.checker.units.qual.A;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
@@ -51,6 +54,8 @@ import org.telegram.ui.Components.SizeNotifierFrameLayout;
 import org.telegram.ui.Components.SnowflakesEffect;
 
 import java.util.ArrayList;
+
+import it.owlgram.android.OwlConfig;
 
 public class ActionBar extends FrameLayout {
 
@@ -237,7 +242,6 @@ public class ActionBar extends FrameLayout {
         if (supportsHolidayImage && !titleOverlayShown && !LocaleController.isRTL && (child == titleTextView[0] || child == titleTextView[1])) {
             Drawable drawable = Theme.getCurrentHolidayDrawable();
             if (drawable != null) {
-
                 SimpleTextView titleView = (SimpleTextView) child;
                 if (titleView.getVisibility() == View.VISIBLE && titleView.getText() instanceof String) {
                     TextPaint textPaint = titleView.getTextPaint();
@@ -253,21 +257,29 @@ public class ActionBar extends FrameLayout {
                         invalidate();
                     }
                 }
-
-                if (Theme.canStartHolidayAnimation()) {
-                    if (snowflakesEffect == null) {
-                        snowflakesEffect = new SnowflakesEffect(0);
-                    }
-                } else if (!manualStart) {
-                    if (snowflakesEffect != null) {
-                        snowflakesEffect = null;
-                    }
+            }
+            if (((Theme.canStartHolidayAnimation() && OwlConfig.eventType == 0) || OwlConfig.eventType == 1) && OwlConfig.showSnowFalling) {
+                if (snowflakesEffect == null) {
+                    fireworksEffect = null;
+                    snowflakesEffect = new SnowflakesEffect(0);
                 }
+            } else if (((Theme.getEventType() == 3 && OwlConfig.eventType == 0) || OwlConfig.eventType == 4) && OwlConfig.showFireworks) {
+                if (fireworksEffect == null || snowflakesEffect != null ) {
+                    snowflakesEffect = null;
+                    fireworksEffect = new FireworksEffect();
+                }
+            } else if (!manualStart) {
                 if (snowflakesEffect != null) {
-                    snowflakesEffect.onDraw(this, canvas);
-                } else if (fireworksEffect != null) {
-                    fireworksEffect.onDraw(this, canvas);
+                    snowflakesEffect = null;
                 }
+                if (fireworksEffect != null) {
+                    fireworksEffect = null;
+                }
+            }
+            if (snowflakesEffect != null) {
+                snowflakesEffect.onDraw(this, canvas);
+            } else if (fireworksEffect != null) {
+                fireworksEffect.onDraw(this, canvas);
             }
         }
         if (clip) {
@@ -451,6 +463,10 @@ public class ActionBar extends FrameLayout {
         menu = new ActionBarMenu(getContext(), this);
         addView(menu, 0, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.RIGHT));
         return menu;
+    }
+
+    public void removeMenu() {
+        removeView(menu);
     }
 
     public void setActionBarMenuOnItemClick(ActionBarMenuOnItemClick listener) {

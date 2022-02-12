@@ -212,7 +212,7 @@ public class FlickerLoadingView extends View {
             while (h < getMeasuredHeight() || isSingleCell) {
                 for (int i = 0; i < getColumnsCount(); i++) {
                     if (k == 0 && i < skipDrawItemsCount) {
-                         continue;
+                        continue;
                     }
                     int x = i * (photoWidth + AndroidUtilities.dp(2));
                     canvas.drawRect(x, h, x + photoWidth, h + photoWidth, paint);

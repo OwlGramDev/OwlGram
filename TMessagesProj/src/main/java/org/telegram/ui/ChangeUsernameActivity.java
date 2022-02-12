@@ -414,6 +414,7 @@ public class ChangeUsernameActivity extends BaseFragment {
 
         progressDialog.setOnCancelListener(dialog -> ConnectionsManager.getInstance(currentAccount).cancelRequest(reqId, true));
         progressDialog.show();
+        parentLayout.rebuildAllFragmentViews(false, false);
     }
 
     @Override

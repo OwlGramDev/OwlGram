@@ -32,6 +32,7 @@ public final class BulletinFactory {
     public static final int ICON_TYPE_WARNING = 1;
 
     public enum FileType {
+        STICKER("StickerSavedHint", R.string.StickerSavedHint, Icon.SAVED_TO_GALLERY),
 
         PHOTO("PhotoSavedHint", R.string.PhotoSavedHint, Icon.SAVED_TO_GALLERY),
         PHOTOS("PhotosSavedHint", Icon.SAVED_TO_GALLERY),

@@ -35,6 +35,7 @@ import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
 import org.telegram.ui.Cells.HeaderCell;
+import org.telegram.ui.Cells.RadioCell;
 import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Components.CombinedDrawable;
 import org.telegram.ui.Components.LayoutHelper;
@@ -49,6 +50,8 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import it.owlgram.android.OwlConfig;
+
 public class FiltersSetupActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
     private RecyclerListView listView;
@@ -58,6 +61,11 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
     private boolean orderChanged;
 
     private int filterHelpRow;
+    private int folderStyleHeaderRow;
+    private int folderStyleTitlesRow;
+    private int folderStyleEmojiTitlesRow;
+    private int folderStyleEmojiRow;
+    private int folderStyleSectionRow;
     private int recommendedHeaderRow;
     private int recommendedStartRow;
     private int recommendedEndRow;
@@ -390,6 +398,11 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
         ArrayList<TLRPC.TL_dialogFilterSuggested> suggestedFilters = getMessagesController().suggestedFilters;
         rowCount = 0;
         filterHelpRow = rowCount++;
+        folderStyleHeaderRow = rowCount++;
+        folderStyleTitlesRow = rowCount++;
+        folderStyleEmojiRow = rowCount++;
+        folderStyleEmojiTitlesRow = rowCount++;
+        folderStyleSectionRow = rowCount++;
         int count = getMessagesController().dialogFilters.size();
         if (!suggestedFilters.isEmpty() && count < 10) {
             recommendedHeaderRow = rowCount++;
@@ -468,7 +481,21 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         listView.setAdapter(adapter = new ListAdapter(context));
         listView.setOnItemClickListener((view, position, x, y) -> {
-            if (position >= filtersStartRow && position < filtersEndRow) {
+            if (position == folderStyleTitlesRow || position == folderStyleEmojiRow || position == folderStyleEmojiTitlesRow) {
+                int oldRow = getCurrentSelectedStylePosition();
+                if (position == folderStyleTitlesRow) {
+                    OwlConfig.setTabMode(0);
+                } else if (position == folderStyleEmojiRow) {
+                    OwlConfig.setTabMode(2);
+                } else {
+                    OwlConfig.setTabMode(1);
+                }
+                RadioCell oldRadioCell = (RadioCell) listView.getChildAt(oldRow);
+                RadioCell currRadioCell = (RadioCell) listView.getChildAt(position);
+                oldRadioCell.setChecked(false, true);
+                currRadioCell.setChecked(true, true);
+                getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
+            } else if (position >= filtersStartRow && position < filtersEndRow) {
                 presentFragment(new FilterCreateActivity(getMessagesController().dialogFilters.get(position - filtersStartRow)));
             } else if (position == createFilterRow) {
                 presentFragment(new FilterCreateActivity());
@@ -476,6 +503,18 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
         });
 
         return fragmentView;
+    }
+
+    private int getCurrentSelectedStylePosition() {
+        switch (OwlConfig.tabMode) {
+            case 0:
+                return folderStyleTitlesRow;
+            case 1:
+                return folderStyleEmojiTitlesRow;
+            case 2:
+            default:
+                return folderStyleEmojiRow;
+        }
     }
 
     @Override
@@ -627,6 +666,10 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
                     view = new TextCell(mContext);
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
+                case 6:
+                    view = new RadioCell(mContext);
+                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    break;
                 case 5:
                 default:
                     SuggestedFilterCell suggestedFilterCell = new SuggestedFilterCell(mContext);
@@ -681,7 +724,7 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
                             filter.flags |= MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_MUTED;
                         }
                         ignoreUpdates = true;
-                        FilterCreateActivity.saveFilterToServer(filter, filter.flags, filter.name, filter.alwaysShow, filter.neverShow, filter.pinnedDialogs, true, true, true, true, false, FiltersSetupActivity.this, () -> {
+                        FilterCreateActivity.saveFilterToServer(filter, filter.flags, filter.emoticon, filter.name, filter.alwaysShow, filter.neverShow, filter.pinnedDialogs, true, true, true, true, false, FiltersSetupActivity.this, () -> {
                             getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
                             ignoreUpdates = false;
                             ArrayList<TLRPC.TL_dialogFilterSuggested> suggestedFilters = getMessagesController().suggestedFilters;
@@ -726,6 +769,8 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
                         headerCell.setText(LocaleController.getString("Filters", R.string.Filters));
                     } else if (position == recommendedHeaderRow) {
                         headerCell.setText(LocaleController.getString("FilterRecommended", R.string.FilterRecommended));
+                    } else if (position == folderStyleHeaderRow) {
+                        headerCell.setText(LocaleController.getString("FoldersType", R.string.FoldersType));
                     }
                     break;
                 }
@@ -761,21 +806,35 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
                     filterCell.setFilter(getMessagesController().suggestedFilters.get(position - recommendedStartRow), recommendedStartRow != recommendedEndRow - 1);
                     break;
                 }
+                case 6: {
+                    RadioCell radioCell = (RadioCell) holder.itemView;
+                    if (position == folderStyleTitlesRow) {
+                        radioCell.setText(LocaleController.getString("FoldersTypeTitles", R.string.FoldersTypeTitles), OwlConfig.tabMode == 0, true);
+                    } else if (position == folderStyleEmojiRow) {
+                        radioCell.setText(LocaleController.getString("FoldersTypeIcons", R.string.FoldersTypeIcons), OwlConfig.tabMode == 2, true);
+                    } else if (position == folderStyleEmojiTitlesRow) {
+                        radioCell.setText(LocaleController.getString("FoldersTypeIconsTitles", R.string.FoldersTypeIconsTitles), OwlConfig.tabMode == 1, true);
+                    }
+
+                    break;
+                }
             }
         }
 
         @Override
         public int getItemViewType(int position) {
-            if (position == filtersHeaderRow || position == recommendedHeaderRow) {
+            if (position == filtersHeaderRow || position == recommendedHeaderRow || position == folderStyleHeaderRow) {
                 return 0;
             } else if (position == filterHelpRow) {
                 return 1;
             } else if (position >= filtersStartRow && position < filtersEndRow) {
                 return 2;
-            } else if (position == createSectionRow || position == recommendedSectionRow) {
+            } else if (position == createSectionRow || position == recommendedSectionRow || position == folderStyleSectionRow) {
                 return 3;
             } else if (position == createFilterRow) {
                 return 4;
+            } else if (position == folderStyleTitlesRow || position == folderStyleEmojiTitlesRow || position == folderStyleEmojiRow) {
+                return 6;
             } else {
                 return 5;
             }

@@ -500,8 +500,8 @@ public class QrActivity extends BaseFragment {
 
         AnimatorSet animator = new AnimatorSet();
         animator.playTogether(
-            ObjectAnimator.ofFloat(fragmentView, View.TRANSLATION_X, isOpen ? 0 : AndroidUtilities.dp(48)),
-            ObjectAnimator.ofFloat(fragmentView, View.ALPHA, isOpen ? 1f : 0f)
+                ObjectAnimator.ofFloat(fragmentView, View.TRANSLATION_X, isOpen ? 0 : AndroidUtilities.dp(48)),
+                ObjectAnimator.ofFloat(fragmentView, View.ALPHA, isOpen ? 1f : 0f)
         );
         if (!isOpen)
             animator.setInterpolator(new DecelerateInterpolator(1.5f));

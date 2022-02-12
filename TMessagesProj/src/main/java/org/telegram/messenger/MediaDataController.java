@@ -74,6 +74,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import it.owlgram.android.OwlConfig;
+
 @SuppressWarnings("unchecked")
 public class MediaDataController extends BaseController {
     private static Pattern BOLD_PATTERN = Pattern.compile("\\*\\*(.+?)\\*\\*"),
@@ -426,7 +428,7 @@ public class MediaDataController extends BaseController {
 
     public ArrayList<TLRPC.Document> getRecentStickers(int type) {
         ArrayList<TLRPC.Document> arrayList = recentStickers[type];
-        return new ArrayList<>(arrayList.subList(0, Math.min(arrayList.size(), 20)));
+        return new ArrayList<>(arrayList.subList(0, Math.min(arrayList.size(), OwlConfig.maxRecentStickers)));
     }
 
     public ArrayList<TLRPC.Document> getRecentStickersNoCopy(int type) {
@@ -488,7 +490,7 @@ public class MediaDataController extends BaseController {
                     AndroidUtilities.runOnUIThread(() -> getMediaDataController().loadRecents(MediaDataController.TYPE_FAVE, false, false, true));
                 }
             });
-            maxCount = getMessagesController().maxFaveStickersCount;
+            maxCount = OwlConfig.unlimitedFavoriteStickers ? Integer.MAX_VALUE : getMessagesController().maxFaveStickersCount;
         } else {
             if (type == TYPE_IMAGE && remove) {
                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_STICKER, document, StickerSetBulletinLayout.TYPE_REMOVED_FROM_RECENT);
@@ -883,6 +885,9 @@ public class MediaDataController extends BaseController {
     }
 
     public void loadRecents(int type, boolean gif, boolean cache, boolean force) {
+        if (OwlConfig.unlimitedFavoriteStickers && type == TYPE_FAVE && !cache) {
+            return;
+        }
         if (gif) {
             if (loadingRecentGifs) {
                 return;
@@ -1052,7 +1057,7 @@ public class MediaDataController extends BaseController {
                         if (type == TYPE_GREETINGS) {
                             maxCount = 200;
                         } else if (type == TYPE_FAVE) {
-                            maxCount = getMessagesController().maxFaveStickersCount;
+                            maxCount = OwlConfig.unlimitedFavoriteStickers ? Integer.MAX_VALUE : getMessagesController().maxFaveStickersCount;
                         } else {
                             maxCount = getMessagesController().maxRecentStickersCount;
                         }

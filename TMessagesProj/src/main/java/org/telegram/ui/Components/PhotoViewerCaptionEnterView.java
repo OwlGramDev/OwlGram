@@ -19,6 +19,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Vibrator;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
@@ -54,6 +55,8 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.ui.ActionBar.AdjustPanLayoutHelper;
 import org.telegram.ui.ActionBar.FloatingToolbar;
 import org.telegram.ui.ActionBar.Theme;
+
+import it.owlgram.android.helpers.EntitiesHelper;
 
 public class PhotoViewerCaptionEnterView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate, SizeNotifierFrameLayoutPhoto.SizeNotifierFrameLayoutPhotoDelegate {
 
@@ -112,6 +115,7 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
 
     private TextPaint lengthTextPaint;
     private String lengthText;
+    public boolean isPaste = false;
     private final Theme.ResourcesProvider resourcesProvider;
 
     public PhotoViewerCaptionEnterView(Context context, SizeNotifierFrameLayoutPhoto parent, final View window, Theme.ResourcesProvider resourcesProvider) {
@@ -198,6 +202,14 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
                 rectangle.bottom += AndroidUtilities.dp(1000);
                 return super.requestRectangleOnScreen(rectangle);
             }
+
+            @Override
+            public boolean onTextContextMenuItem(int id) {
+                if (id == android.R.id.paste) {
+                    isPaste = true;
+                }
+                return super.onTextContextMenuItem(id);
+            }
         };
         messageEditText.setOnFocusChangeListener((view, focused) -> {
             if (focused) {
@@ -270,6 +282,13 @@ public class PhotoViewerCaptionEnterView extends FrameLayout implements Notifica
                 if (count - before > 1) {
                     processChange = true;
                 }
+                if (isPaste) {
+                    try {
+                        EntitiesHelper.applySpannableToEditText(messageEditText, start, start + count);
+                        messageEditText.onSpansChanged();
+                    } catch (Exception ignored) {}
+                }
+                isPaste = false;
             }
 
             @Override

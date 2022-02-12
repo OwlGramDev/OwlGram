@@ -15,8 +15,13 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -42,6 +47,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.util.Log;
+
+import org.checkerframework.checker.units.qual.A;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.LocaleController;
@@ -54,6 +62,9 @@ import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
 
 import java.util.ArrayList;
+
+import it.owlgram.android.OwlConfig;
+import it.owlgram.android.helpers.FolderIconHelper;
 
 public class FilterTabsView extends FrameLayout {
 
@@ -72,16 +83,21 @@ public class FilterTabsView extends FrameLayout {
     private class Tab {
         public int id;
         public String title;
+        public String emoticon;
         public int titleWidth;
+        public int iconWidth;
         public int counter;
 
-        public Tab(int i, String t) {
+        public Tab(int i, String t, String e) {
             id = i;
-            title = t;
+            title = OwlConfig.tabMode != 2 ? t:"";
+            emoticon = i != Integer.MAX_VALUE ? e:"\uD83D\uDCAC";
         }
 
         public int getWidth(boolean store) {
+            iconWidth = FolderIconHelper.getTotalIconWidth();
             int width = titleWidth = (int) Math.ceil(textPaint.measureText(title));
+            width += iconWidth;
             int c;
             if (store) {
                 c = delegate.getTabCounter(id);
@@ -107,7 +123,7 @@ public class FilterTabsView extends FrameLayout {
             if (TextUtils.equals(title, newTitle)) {
                 return false;
             }
-            title = newTitle;
+            title = OwlConfig.tabMode != 2 ? newTitle:"";
             return true;
         }
     }
@@ -196,7 +212,7 @@ public class FilterTabsView extends FrameLayout {
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            int w = currentTab.getWidth(false) + AndroidUtilities.dp(32) + additionalTabWidth;
+            int w = currentTab.getWidth(false) + FolderIconHelper.getPaddingTab() + additionalTabWidth;
             setMeasuredDimension(w, MeasureSpec.getSize(heightMeasureSpec));
         }
 
@@ -258,6 +274,7 @@ public class FilterTabsView extends FrameLayout {
             }
 
             float counterWidth;
+            int emoticonWidth = FolderIconHelper.getIconWidth();
             int countWidth;
             String counterText;
 
@@ -284,9 +301,12 @@ public class FilterTabsView extends FrameLayout {
             if (currentTab.id != Integer.MAX_VALUE && (isEditing || editingStartAnimationProgress != 0)) {
                 countWidth = (int) (countWidth + (AndroidUtilities.dp(20) - countWidth) * editingStartAnimationProgress);
             }
-
-            tabWidth = currentTab.titleWidth + ((countWidth != 0 && !animateCounterRemove) ? countWidth + AndroidUtilities.dp(6 * (counterText != null ? 1.0f : editingStartAnimationProgress)) : 0);
-            float textX = (getMeasuredWidth() - tabWidth) / 2f;
+            if (OwlConfig.tabMode != 2) {
+                tabWidth = currentTab.iconWidth + currentTab.titleWidth + ((countWidth != 0 && !animateCounterRemove) ? countWidth + AndroidUtilities.dp(6 * (counterText != null ? 1.0f : editingStartAnimationProgress)) : 0);
+            } else {
+                tabWidth = currentTab.iconWidth + ((countWidth != 0 && !animateCounterRemove) ? countWidth + AndroidUtilities.dp(6 * (counterText != null ? 1.0f : editingStartAnimationProgress)) : 0);
+            }
+            float textX = ((getMeasuredWidth() - tabWidth) / 2f) + currentTab.iconWidth;
             if (animateTextX) {
                 textX = textX * changeProgress + animateFromTextX * (1f - changeProgress);
             }
@@ -330,11 +350,55 @@ public class FilterTabsView extends FrameLayout {
             } else {
                 if (textLayout != null) {
                     canvas.save();
-                    canvas.translate(textX + textOffsetX, (getMeasuredHeight() - textHeight) / 2f + 1);
+                    canvas.translate( textX + textOffsetX, (getMeasuredHeight() - textHeight) / 2f + 1);
                     textLayout.draw(canvas);
                     canvas.restore();
                 }
             }
+
+            // TAB ICON
+            if (textLayout != null && OwlConfig.tabMode != 0) {
+                int y_offset = (int)((getMeasuredHeight() - emoticonWidth) / 2f);
+                int x_offset = (int)((getMeasuredWidth() - tabWidth) / 2f);
+                int alphaAnimation = 0;
+                if (animateToKey == null) {
+                    if ((animatingIndicator || manualScrollingToId != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
+                        alphaAnimation = (int)(255 * animatingIndicatorProgress);
+                        if (currentTab.id == id2) {
+                            alphaAnimation = 255 - alphaAnimation;
+                        }
+                    } else if (currentTab.id == id1) {
+                        alphaAnimation = 255;
+                    }
+                } else {
+                    if ((animatingIndicator || manualScrollingToPosition != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
+                        alphaAnimation = (int)(255 * animationValue);
+                        if (currentTab.id == id2) {
+                            alphaAnimation = 255 - alphaAnimation;
+                        }
+                    } else if (currentTab.id == id1) {
+                        alphaAnimation = 255;
+                    }
+                }
+                canvas.save();
+
+                PorterDuffColorFilter colorFilter = new PorterDuffColorFilter(textPaint.getColor(), PorterDuff.Mode.SRC_ATOP);
+                Rect boundRect = new Rect(x_offset, y_offset,emoticonWidth + x_offset,y_offset + emoticonWidth);
+
+                Drawable icon_active = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.emoticon, true));
+                icon_active.setBounds(boundRect);
+                icon_active.setColorFilter(colorFilter);
+                icon_active.setAlpha(alphaAnimation);
+                icon_active.draw(canvas);
+
+                Drawable icon = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.emoticon, false));
+                icon.setBounds(boundRect);
+                icon.setColorFilter(colorFilter);
+                icon.setAlpha(255 - alphaAnimation);
+                icon.draw(canvas);
+                canvas.restore();
+            }
+            // END TAB ICON
 
             if (animateCounterEnter || counterText != null || currentTab.id != Integer.MAX_VALUE && (isEditing || editingStartAnimationProgress != 0)) {
                 if (aBackgroundColorKey == null) {
@@ -361,14 +425,15 @@ public class FilterTabsView extends FrameLayout {
                 if (animateTextChange) {
                     titleWidth = animateFromTitleWidth * (1f - changeProgress) + currentTab.titleWidth * changeProgress;
                 }
+                int textSpace = OwlConfig.tabMode != 2 ? AndroidUtilities.dp(6):0;
                 if (animateTextChange && titleAnimateOutLayout == null) {
-                    x = textX - titleXOffset + titleOffsetX + titleWidth + AndroidUtilities.dp(6);
+                    x = textX - titleXOffset + titleOffsetX + titleWidth + textSpace;
                 } else {
-                    x = textX + titleWidth + AndroidUtilities.dp(6);
+                    x = textX + titleWidth + textSpace;
                 }
-                int countTop = (getMeasuredHeight() - AndroidUtilities.dp(20)) / 2;
 
-                if (currentTab.id != Integer.MAX_VALUE && (isEditing || editingStartAnimationProgress != 0) && counterText == null) {
+                int countTop = (getMeasuredHeight() - AndroidUtilities.dp(20)) / 2;
+                if ( (isEditing || editingStartAnimationProgress != 0) && counterText == null) {
                     counterPaint.setAlpha((int) (editingStartAnimationProgress * 255));
                 } else {
                     counterPaint.setAlpha(255);
@@ -505,7 +570,7 @@ public class FilterTabsView extends FrameLayout {
             } else {
                 countWidth = 0;
             }
-            int tabWidth = currentTab.titleWidth + (countWidth != 0 ? countWidth + AndroidUtilities.dp(6 * (counterText != null ? 1.0f : editingStartAnimationProgress)) : 0);
+            int tabWidth = currentTab.iconWidth + currentTab.titleWidth + (countWidth != 0 ? countWidth + AndroidUtilities.dp(6 * (counterText != null ? 1.0f : editingStartAnimationProgress)) : 0);
             int textX = (getMeasuredWidth() - tabWidth) / 2;
 
             if (textX != lastTextX) {
@@ -949,7 +1014,7 @@ public class FilterTabsView extends FrameLayout {
         return animatingIndicator;
     }
 
-    private void scrollToTab(int id, int position) {
+    public void scrollToTab(int id, int position) {
         boolean scrollingForward = currentPosition < position;
         scrollingToChild = -1;
         previousPosition = currentPosition;
@@ -1017,7 +1082,7 @@ public class FilterTabsView extends FrameLayout {
         selectedTabId = -1;
     }
 
-    public void addTab(int id, int stableId, String text) {
+    public void addTab(int id, int stableId, String text, String emoticon) {
         int position = tabs.size();
         if (position == 0 && selectedTabId == -1) {
             selectedTabId = id;
@@ -1029,8 +1094,8 @@ public class FilterTabsView extends FrameLayout {
             currentPosition = position;
         }
 
-        Tab tab = new Tab(id, text);
-        allTabsWidth += tab.getWidth(true) + AndroidUtilities.dp(32);
+        Tab tab = new Tab(id, text, emoticon);
+        allTabsWidth += tab.getWidth(true) + FolderIconHelper.getPaddingTab();
         tabs.add(tab);
     }
 
@@ -1085,7 +1150,7 @@ public class FilterTabsView extends FrameLayout {
             int tabWidth = tabs.get(a).getWidth(false);
             positionToWidth.put(a, tabWidth);
             positionToX.put(a, xOffset + additionalTabWidth / 2);
-            xOffset += tabWidth + AndroidUtilities.dp(32) + additionalTabWidth;
+            xOffset += tabWidth + FolderIconHelper.getPaddingTab() + additionalTabWidth;
         }
     }
 
@@ -1116,10 +1181,10 @@ public class FilterTabsView extends FrameLayout {
                         int prevW = positionToWidth.get(idx1);
                         int newW = positionToWidth.get(idx2);
                         if (additionalTabWidth != 0) {
-                            indicatorX = (int) (prevX + (newX - prevX) * animatingIndicatorProgress) + AndroidUtilities.dp(16);
+                            indicatorX = (int) (prevX + (newX - prevX) * animatingIndicatorProgress) + (FolderIconHelper.getPaddingTab() >> 1);
                         } else {
                             int x = positionToX.get(position);
-                            indicatorX = (int) (prevX + (newX - prevX) * animatingIndicatorProgress) - (x - holder.itemView.getLeft()) + AndroidUtilities.dp(16);
+                            indicatorX = (int) (prevX + (newX - prevX) * animatingIndicatorProgress) - (x - holder.itemView.getLeft()) + (FolderIconHelper.getPaddingTab() >> 1);
                         }
                         indicatorWidth = (int) (prevW + (newW - prevW) * animatingIndicatorProgress);
                     }
@@ -1199,9 +1264,9 @@ public class FilterTabsView extends FrameLayout {
         if (!tabs.isEmpty()) {
             int width = MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(7) - AndroidUtilities.dp(7);
             Tab firstTab = tabs.get(0);
-            firstTab.setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
+            if (!OwlConfig.hideAllTab) firstTab.setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
             int tabWith = firstTab.getWidth(false);
-            firstTab.setTitle(allTabsWidth > width ? LocaleController.getString("FilterAllChatsShort", R.string.FilterAllChatsShort) : LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
+            if (!OwlConfig.hideAllTab) firstTab.setTitle(allTabsWidth > width ? LocaleController.getString("FilterAllChatsShort", R.string.FilterAllChatsShort) : LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
             int trueTabsWidth = allTabsWidth - tabWith;
             trueTabsWidth += firstTab.getWidth(false);
             int prevWidth = additionalTabWidth;
@@ -1352,9 +1417,9 @@ public class FilterTabsView extends FrameLayout {
                 invalidated = true;
                 requestLayout();
                 allTabsWidth = 0;
-                tabs.get(0).setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
+                if (!OwlConfig.hideAllTab) tabs.get(0).setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
                 for (int b = 0; b < N; b++) {
-                    allTabsWidth += tabs.get(b).getWidth(true) + AndroidUtilities.dp(32);
+                    allTabsWidth += tabs.get(b).getWidth(true) + FolderIconHelper.getPaddingTab();
                 }
                 break;
             }
@@ -1383,9 +1448,9 @@ public class FilterTabsView extends FrameLayout {
             listView.setItemAnimator(itemAnimator);
             adapter.notifyDataSetChanged();
             allTabsWidth = 0;
-            tabs.get(0).setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
+            if (!OwlConfig.hideAllTab) tabs.get(0).setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
             for (int b = 0, N = tabs.size(); b < N; b++) {
-                allTabsWidth += tabs.get(b).getWidth(true) + AndroidUtilities.dp(32);
+                allTabsWidth += tabs.get(b).getWidth(true) + FolderIconHelper.getPaddingTab();
             }
         }
     }
@@ -1433,6 +1498,11 @@ public class FilterTabsView extends FrameLayout {
             int idx1 = fromIndex - 1;
             int idx2 = toIndex - 1;
             int count = tabs.size() - 1;
+            if (OwlConfig.hideAllTab) {
+                idx1++;
+                idx2++;
+                count++;
+            }
             if (idx1 < 0 || idx2 < 0 || idx1 >= count || idx2 >= count) {
                 return;
             }
@@ -1495,7 +1565,7 @@ public class FilterTabsView extends FrameLayout {
 
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            if (!isEditing || viewHolder.getAdapterPosition() == 0) {
+            if (!isEditing || (!OwlConfig.hideAllTab && viewHolder.getAdapterPosition() == 0)) {
                 return makeMovementFlags(0, 0);
             }
             return makeMovementFlags(ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, 0);
@@ -1503,7 +1573,7 @@ public class FilterTabsView extends FrameLayout {
 
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
-            if (source.getAdapterPosition() == 0 || target.getAdapterPosition() == 0) {
+            if (!OwlConfig.hideAllTab && (source.getAdapterPosition() == 0 || target.getAdapterPosition() == 0)) {
                 return false;
             }
             adapter.swapElements(source.getAdapterPosition(), target.getAdapterPosition());

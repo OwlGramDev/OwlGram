@@ -15,6 +15,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Build;
 import android.text.Layout;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.StaticLayout;
@@ -57,6 +58,8 @@ import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.RestrictedLanguagesSelectActivity;
 
 import java.util.ArrayList;
+
+import it.owlgram.android.helpers.EntitiesHelper;
 
 public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.SelectableView> {
 
@@ -1266,13 +1269,13 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
             private void updateTranslateButton(Menu menu) {
                 String translateToLanguage = LocaleController.getInstance().getCurrentLocale().getLanguage();
                 menu.getItem(2).setVisible(
-                    onTranslateListener != null && (
-                        (
-                            translateFromLanguage != null &&
-                            (!translateFromLanguage.equals(translateToLanguage) || translateFromLanguage.equals("und")) &&
-                            !RestrictedLanguagesSelectActivity.getRestrictedLanguages().contains(translateFromLanguage)
-                        ) || !LanguageDetector.hasSupport()
-                    )
+                        onTranslateListener != null && (
+                                (
+                                        translateFromLanguage != null &&
+                                                (!translateFromLanguage.equals(translateToLanguage) || translateFromLanguage.equals("und")) &&
+                                                !RestrictedLanguagesSelectActivity.getRestrictedLanguages().contains(translateFromLanguage)
+                                ) || !LanguageDetector.hasSupport()
+                        )
                 );
             }
 
@@ -1381,6 +1384,7 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
         if (str == null) {
             return;
         }
+        str = new SpannableString(EntitiesHelper.getSpannableFromSpanEntities(str));
         android.content.ClipboardManager clipboard = (android.content.ClipboardManager) ApplicationLoader.applicationContext.getSystemService(Context.CLIPBOARD_SERVICE);
         android.content.ClipData clip = android.content.ClipData.newPlainText("label", str);
         clipboard.setPrimaryClip(clip);

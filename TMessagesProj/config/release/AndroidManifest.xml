@@ -19,8 +19,8 @@
 
     <application
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:icon="@mipmap/owl_gram"
+        android:roundIcon="@mipmap/owl_gram_round"
         android:label="@string/AppName"
         android:theme="@style/Theme.TMessages.Start"
         android:name=".ApplicationLoader"
@@ -30,7 +30,7 @@
         android:requestLegacyExternalStorage="true"
         tools:replace="android:supportsRtl">
 
-        <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyA-t0jLPjUt2FxrA8VPK2EiYHcYcboIR6k" />
+        <meta-data android:name="com.google.android.maps.v2.API_KEY" android:value="AIzaSyCJ9kDCicADQWJYvQf_yyjPe_-y7zRoqLs" />
 
         <service
             android:name=".GcmPushListenerService">

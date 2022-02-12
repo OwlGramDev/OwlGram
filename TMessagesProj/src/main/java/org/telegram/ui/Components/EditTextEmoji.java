@@ -52,6 +52,8 @@ public class EditTextEmoji extends FrameLayout implements NotificationCenter.Not
     private int lastSizeChangeValue1;
     private boolean lastSizeChangeValue2;
     private int innerTextChange;
+    public boolean isPaste = false;
+
     AdjustPanLayoutHelper adjustPanLayoutHelper;
 
     private EditTextEmojiDelegate delegate;
@@ -130,6 +132,14 @@ public class EditTextEmoji extends FrameLayout implements NotificationCenter.Not
                     FileLog.e(e);
                 }
                 return false;
+            }
+
+            @Override
+            public boolean onTextContextMenuItem(int id) {
+                if (id == android.R.id.paste) {
+                    isPaste = true;
+                }
+                return super.onTextContextMenuItem(id);
             }
 
             @Override

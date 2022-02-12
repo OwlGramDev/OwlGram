@@ -322,7 +322,7 @@ public class TextureViewRenderer extends TextureView
                 }
             };
             orientationHelper.start();
-       }
+        }
     }
 
     /**
@@ -444,7 +444,7 @@ public class TextureViewRenderer extends TextureView
             size = videoLayoutMeasure.measure(isCamera, widthSpec, heightSpec, rotatedFrameWidth, rotatedFrameHeight);
         }
         setMeasuredDimension(size.x, size.y);
-       // logD("onMeasure(). New size: " + size.x + "x" + size.y);
+        // logD("onMeasure(). New size: " + size.x + "x" + size.y);
         if (rotatedFrameWidth != 0 && rotatedFrameHeight != 0) {
             eglRenderer.setLayoutAspectRatio(getMeasuredWidth() / (float) getMeasuredHeight());
         }

@@ -45,6 +45,7 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.CheckBoxCell;
 import org.telegram.ui.Cells.TextCheckCell;
+import org.telegram.ui.Components.AlertsCreator;
 import org.telegram.ui.Components.BetterRatingView;
 import org.telegram.ui.Components.EditTextBoldCursor;
 import org.telegram.ui.Components.JoinCallAlert;
@@ -61,6 +62,8 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Set;
 
+import it.owlgram.android.OwlConfig;
+
 public class VoIPHelper {
 
 	public static long lastCallTime = 0;
@@ -68,6 +71,10 @@ public class VoIPHelper {
 	private static final int VOIP_SUPPORT_ID = 4244000;
 
 	public static void startCall(TLRPC.User user, boolean videoCall, boolean canVideoCall, final Activity activity, TLRPC.UserFull userFull, AccountInstance accountInstance) {
+		startCall(user, videoCall, canVideoCall, activity, userFull, accountInstance, false);
+	}
+
+	public static void startCall(TLRPC.User user, boolean videoCall, boolean canVideoCall, final Activity activity, TLRPC.UserFull userFull, AccountInstance accountInstance, boolean confirmed) {
 		if (userFull != null && userFull.phone_calls_private) {
 			new AlertDialog.Builder(activity)
 					.setTitle(LocaleController.getString("VoipFailed", R.string.VoipFailed))
@@ -93,6 +100,13 @@ public class VoIPHelper {
 				bldr.show();
 			} catch (Exception e) {
 				FileLog.e(e);
+			}
+			return;
+		}
+		if (OwlConfig.confirmCall && !confirmed) {
+			final BaseFragment lastFragment = ((LaunchActivity) activity).getActionBarLayout().getLastFragment();
+			if (lastFragment != null) {
+				AlertsCreator.createCallDialogAlert(lastFragment, lastFragment.getMessagesController().getUser(user.id), videoCall);
 			}
 			return;
 		}
@@ -719,10 +733,10 @@ public class VoIPHelper {
 		return new File(logsDir, callId + ".log").getAbsolutePath();
 	}
 
-    public static void showGroupCallAlert(BaseFragment fragment, TLRPC.Chat currentChat, TLRPC.InputPeer peer, boolean recreate, AccountInstance accountInstance) {
+	public static void showGroupCallAlert(BaseFragment fragment, TLRPC.Chat currentChat, TLRPC.InputPeer peer, boolean recreate, AccountInstance accountInstance) {
 		if (fragment == null || fragment.getParentActivity() == null) {
 			return;
 		}
 		JoinCallAlert.checkFewUsers(fragment.getParentActivity(), -currentChat.id, accountInstance, param -> startCall(currentChat, peer, null, true, fragment.getParentActivity(), fragment, accountInstance));
-    }
+	}
 }

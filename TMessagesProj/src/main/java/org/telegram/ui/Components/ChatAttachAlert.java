@@ -93,6 +93,8 @@ import androidx.dynamicanimation.animation.SpringAnimation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import it.owlgram.android.helpers.EntitiesHelper;
+
 public class ChatAttachAlert extends BottomSheet implements NotificationCenter.NotificationCenterDelegate, BottomSheet.BottomSheetDelegateInterface {
 
     private final NumberTextView captionLimitView;
@@ -581,7 +583,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
     public ChatAttachAlert(Context context, final BaseFragment parentFragment, boolean forceDarkTheme, boolean showingFromDialog) {
         this(context, parentFragment, forceDarkTheme, showingFromDialog, null);
     }
-    
+
     @SuppressLint("ClickableViewAccessibility")
     public ChatAttachAlert(Context context, final BaseFragment parentFragment, boolean forceDarkTheme, boolean showingFromDialog, Theme.ResourcesProvider resourcesProvider) {
         super(context, false, resourcesProvider);
@@ -1430,7 +1432,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
             @Override
             protected void bottomPanelTranslationY(float translation) {
                 bottomPannelTranslation = translation;
-           //     buttonsRecyclerView.setTranslationY(translation);
+                //     buttonsRecyclerView.setTranslationY(translation);
                 frameLayout2.setTranslationY(translation);
                 writeButtonContainer.setTranslationY(translation);
                 selectedCountView.setTranslationY(translation);
@@ -1454,6 +1456,13 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                 if ((count - before) >= 1) {
                     processChange = true;
                 }
+                if (commentTextView.isPaste) {
+                    try {
+                        EntitiesHelper.applySpannableToEditText(commentTextView.getEditText(), start, start + count);
+                        commentTextView.getEditText().onSpansChanged();
+                    } catch (Exception ignored) {}
+                }
+                commentTextView.isPaste = false;
             }
 
             @Override

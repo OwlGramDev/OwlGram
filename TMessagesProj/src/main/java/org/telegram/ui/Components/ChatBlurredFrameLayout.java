@@ -58,7 +58,7 @@ public class ChatBlurredFrameLayout extends FrameLayout {
 
     @Override
     protected void onAttachedToWindow() {
-        if (SharedConfig.chatBlurEnabled() && chatActivity != null) {
+        if (chatActivity != null) {
             chatActivity.contentView.blurBehindViews.add(this);
         }
         super.onAttachedToWindow();
@@ -66,7 +66,7 @@ public class ChatBlurredFrameLayout extends FrameLayout {
 
     @Override
     protected void onDetachedFromWindow() {
-        if (chatActivity != null) {
+        if (SharedConfig.chatBlurEnabled() && chatActivity != null) {
             chatActivity.contentView.blurBehindViews.remove(this);
         }
         super.onDetachedFromWindow();

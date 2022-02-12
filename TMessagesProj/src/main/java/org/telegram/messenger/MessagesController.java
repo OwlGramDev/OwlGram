@@ -69,7 +69,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
-public class MessagesController extends BaseController implements NotificationCenter.NotificationCenterDelegate {
+import it.owlgram.android.Copyright;
+import it.owlgram.android.OwlConfig;
+
+public class  MessagesController extends BaseController implements NotificationCenter.NotificationCenterDelegate {
 
     private ConcurrentHashMap<Long, TLRPC.Chat> chats = new ConcurrentHashMap<>(100, 1.0f, 2);
     private ConcurrentHashMap<Integer, TLRPC.EncryptedChat> encryptedChats = new ConcurrentHashMap<>(10, 1.0f, 2);
@@ -142,7 +145,7 @@ public class MessagesController extends BaseController implements NotificationCe
     private LongSparseArray<SparseArray<MessageObject>> pollsToCheck = new LongSparseArray<>();
     private int pollsToCheckSize;
     private long lastViewsCheckTime;
-    
+
     public ArrayList<DialogFilter> dialogFilters = new ArrayList<>();
     public SparseArray<DialogFilter> dialogFiltersById = new SparseArray<>();
     private boolean loadingSuggestedFilters;
@@ -549,6 +552,7 @@ public class MessagesController extends BaseController implements NotificationCe
         public ArrayList<Long> neverShow = new ArrayList<>();
         public LongSparseIntArray pinnedDialogs = new LongSparseIntArray();
         public ArrayList<TLRPC.Dialog> dialogs = new ArrayList<>();
+        public String emoticon;
 
         private static int dialogFilterPointer = 10;
         public int localId = dialogFilterPointer++;
@@ -825,7 +829,7 @@ public class MessagesController extends BaseController implements NotificationCe
         webFileDatacenterId = mainPreferences.getInt("webFileDatacenterId", ConnectionsManager.native_isTestBackend(currentAccount) != 0 ? 2 : 4);
         suggestedLangCode = mainPreferences.getString("suggestedLangCode", "en");
         animatedEmojisZoom = mainPreferences.getFloat("animatedEmojisZoom", 0.625f);
-        qrLoginCamera = mainPreferences.getBoolean("qrLoginCamera", false);
+        qrLoginCamera = mainPreferences.getBoolean("qrLoginCamera", true);
         saveGifsWithStickers = mainPreferences.getBoolean("saveGifsWithStickers", false);
         filtersEnabled = mainPreferences.getBoolean("filtersEnabled", false);
         showFiltersTooltip = mainPreferences.getBoolean("showFiltersTooltip", false);
@@ -10868,12 +10872,13 @@ public class MessagesController extends BaseController implements NotificationCe
                 } else {
                     newTaskId = taskId;
                 }
-
-                getConnectionsManager().sendRequest(req, (response, error) -> {
-                    if (newTaskId != 0) {
-                        getMessagesStorage().removePendingTask(newTaskId);
-                    }
-                });
+                if (!OwlConfig.unlimitedPinnedDialogs) {
+                    getConnectionsManager().sendRequest(req, (response, error) -> {
+                        if (newTaskId != 0) {
+                            getMessagesStorage().removePendingTask(newTaskId);
+                        }
+                    });
+                }
             }
         }
         getMessagesStorage().setDialogPinned(dialogId, dialog.pinnedNum);
@@ -10881,6 +10886,9 @@ public class MessagesController extends BaseController implements NotificationCe
     }
 
     public void loadPinnedDialogs(final int folderId, long newDialogId, ArrayList<Long> order) {
+        if (OwlConfig.unlimitedPinnedDialogs) {
+            return;
+        }
         if (loadingPinnedDialogs.indexOfKey(folderId) >= 0 || getUserConfig().isPinnedDialogsLoaded(folderId)) {
             return;
         }
@@ -14561,6 +14569,27 @@ public class MessagesController extends BaseController implements NotificationCe
         return clearingHistoryDialogs.get(did) != null;
     }
 
+    public void loadTabDialogs(MessagesController.DialogFilter dialogFilter) {
+        sortingDialogFilter = dialogFilter;
+        Collections.sort(allDialogs, dialogDateComparator);
+        ArrayList<TLRPC.Dialog> dialogsByFilter = sortingDialogFilter.dialogs;
+        for (int a = 0, N = allDialogs.size(); a < N; a++) {
+            TLRPC.Dialog d = allDialogs.get(a);
+            if (d instanceof TLRPC.TL_dialog) {
+                long dialogId = d.id;
+                if (DialogObject.isEncryptedDialog(dialogId)) {
+                    TLRPC.EncryptedChat encryptedChat = getEncryptedChat(DialogObject.getEncryptedChatId(dialogId));
+                    if (encryptedChat != null) {
+                        dialogId = encryptedChat.user_id;
+                    }
+                }
+                if (sortingDialogFilter.includesDialog(getAccountInstance(), dialogId, d)) {
+                    dialogsByFilter.add(d);
+                }
+            }
+        }
+    }
+
     public void sortDialogs(LongSparseArray<TLRPC.Chat> chatsDict) {
         dialogsServerOnly.clear();
         dialogsCanAddUsers.clear();
@@ -14734,7 +14763,7 @@ public class MessagesController extends BaseController implements NotificationCe
         }
         for (int a = 0, N = reasons.size(); a < N; a++) {
             TLRPC.TL_restrictionReason reason = reasons.get(a);
-            if ("all".equals(reason.platform) || !BuildVars.isStandaloneApp() && !BuildVars.isBetaApp() && "android".equals(reason.platform)) {
+            if ("all".equals(reason.platform) || !BuildVars.isStandaloneApp() && !BuildVars.isBetaApp() && "android".equals(reason.platform) && !Copyright.isNoCopyrightFeaturesEnabled()) {
                 return reason.text;
             }
         }
@@ -14779,7 +14808,7 @@ public class MessagesController extends BaseController implements NotificationCe
         } else {
             reason = getRestrictionReason(user.restriction_reason);
         }
-        if (reason != null) {
+        if (reason != null && !Copyright.isNoCopyrightFeaturesEnabled()) {
             showCantOpenAlert(fragment, reason);
             return false;
         }

@@ -11338,7 +11338,7 @@ public class TLRPC {
             }
             notify_settings = PeerNotifySettings.TLdeserialize(stream, stream.readInt32(exception), exception);
             if ((flags & 8192) != 0) {
-                exported_invite = (TLRPC.TL_chatInviteExported) ExportedChatInvite.TLdeserialize(stream, stream.readInt32(exception), exception);
+                exported_invite = (TL_chatInviteExported) ExportedChatInvite.TLdeserialize(stream, stream.readInt32(exception), exception);
             }
             if ((flags & 8) != 0) {
                 int magic = stream.readInt32(exception);
@@ -11431,7 +11431,7 @@ public class TLRPC {
             }
             notify_settings = PeerNotifySettings.TLdeserialize(stream, stream.readInt32(exception), exception);
             if ((flags & 8192) != 0) {
-                exported_invite = (TLRPC.TL_chatInviteExported) ExportedChatInvite.TLdeserialize(stream, stream.readInt32(exception), exception);
+                exported_invite = (TL_chatInviteExported) ExportedChatInvite.TLdeserialize(stream, stream.readInt32(exception), exception);
             }
             if ((flags & 8) != 0) {
                 int magic = stream.readInt32(exception);
@@ -11551,7 +11551,7 @@ public class TLRPC {
             chat_photo = Photo.TLdeserialize(stream, stream.readInt32(exception), exception);
             notify_settings = PeerNotifySettings.TLdeserialize(stream, stream.readInt32(exception), exception);
             if ((flags & 8388608) != 0) {
-                exported_invite = (TLRPC.TL_chatInviteExported) ExportedChatInvite.TLdeserialize(stream, stream.readInt32(exception), exception);
+                exported_invite = (TL_chatInviteExported) ExportedChatInvite.TLdeserialize(stream, stream.readInt32(exception), exception);
             }
             int magic = stream.readInt32(exception);
             if (magic != 0x1cb5c415) {
@@ -11744,7 +11744,7 @@ public class TLRPC {
             }
             notify_settings = PeerNotifySettings.TLdeserialize(stream, stream.readInt32(exception), exception);
             if ((flags & 8192) != 0) {
-                exported_invite = (TLRPC.TL_chatInviteExported) ExportedChatInvite.TLdeserialize(stream, stream.readInt32(exception), exception);
+                exported_invite = (TL_chatInviteExported) ExportedChatInvite.TLdeserialize(stream, stream.readInt32(exception), exception);
             }
             if ((flags & 8) != 0) {
                 int magic = stream.readInt32(exception);
@@ -12475,7 +12475,7 @@ public class TLRPC {
             chat_photo = Photo.TLdeserialize(stream, stream.readInt32(exception), exception);
             notify_settings = PeerNotifySettings.TLdeserialize(stream, stream.readInt32(exception), exception);
             if ((flags & 8388608) != 0) {
-                exported_invite = (TLRPC.TL_chatInviteExported) ExportedChatInvite.TLdeserialize(stream, stream.readInt32(exception), exception);
+                exported_invite = (TL_chatInviteExported) ExportedChatInvite.TLdeserialize(stream, stream.readInt32(exception), exception);
             }
             int magic = stream.readInt32(exception);
             if (magic != 0x1cb5c415) {
@@ -13403,7 +13403,7 @@ public class TLRPC {
             if (exported_invite != null) {
                 exported_invite.serializeToStream(stream);
             } else {
-                new TLRPC.TL_chatInviteEmpty_layer122().serializeToStream(stream);
+                new TL_chatInviteEmpty_layer122().serializeToStream(stream);
             }
             stream.writeInt32(0x1cb5c415);
             int count = bot_info.size();
@@ -34848,7 +34848,7 @@ public class TLRPC {
 
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt64(exception);
             date = stream.readInt32(exception);
         }
@@ -34886,7 +34886,7 @@ public class TLRPC {
 
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt64(exception);
             inviter_id = stream.readInt64(exception);
             date = stream.readInt32(exception);
@@ -34906,7 +34906,7 @@ public class TLRPC {
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
             flags = stream.readInt32(exception);
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt64(exception);
             admin_rights = TL_chatAdminRights.TLdeserialize(stream, stream.readInt32(exception), exception);
             if ((flags & 1) != 0) {
@@ -34933,7 +34933,7 @@ public class TLRPC {
             flags = stream.readInt32(exception);
             can_edit = (flags & 1) != 0;
             self = (flags & 2) != 0;
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt64(exception);
             if ((flags & 2) != 0) {
                 inviter_id = stream.readInt64(exception);
@@ -34995,7 +34995,7 @@ public class TLRPC {
         public void readParams(AbstractSerializedData stream, boolean exception) {
             flags = stream.readInt32(exception);
             left = (flags & 1) != 0;
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
             kicked_by = stream.readInt32(exception);
             date = stream.readInt32(exception);
@@ -35032,7 +35032,7 @@ public class TLRPC {
 
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
         }
 
@@ -35071,7 +35071,7 @@ public class TLRPC {
 
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
         }
 
@@ -35086,7 +35086,7 @@ public class TLRPC {
 
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
             date = stream.readInt32(exception);
         }
@@ -35103,7 +35103,7 @@ public class TLRPC {
 
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
             kicked_by = stream.readInt32(exception);
             date = stream.readInt32(exception);
@@ -35122,7 +35122,7 @@ public class TLRPC {
 
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
             inviter_id = stream.readInt32(exception);
             date = stream.readInt32(exception);
@@ -35144,7 +35144,7 @@ public class TLRPC {
             flags = stream.readInt32(exception);
             can_edit = (flags & 1) != 0;
             self = (flags & 2) != 0;
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
             if ((flags & 2) != 0) {
                 inviter_id = stream.readInt32(exception);
@@ -35181,7 +35181,7 @@ public class TLRPC {
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
             flags = stream.readInt32(exception);
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
             if ((flags & 1) != 0) {
                 rank = stream.readString(exception);
@@ -35204,7 +35204,7 @@ public class TLRPC {
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
             flags = stream.readInt32(exception);
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
             admin_rights = TL_chatAdminRights.TLdeserialize(stream, stream.readInt32(exception), exception);
             if ((flags & 1) != 0) {
@@ -35228,7 +35228,7 @@ public class TLRPC {
 
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
             inviter_id = stream.readInt32(exception);
             date = stream.readInt32(exception);
@@ -35247,7 +35247,7 @@ public class TLRPC {
 
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
             inviter_id = stream.readInt32(exception);
             date = stream.readInt32(exception);
@@ -35268,7 +35268,7 @@ public class TLRPC {
         public void readParams(AbstractSerializedData stream, boolean exception) {
             flags = stream.readInt32(exception);
             can_edit = (flags & 1) != 0;
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
             inviter_id = stream.readInt32(exception);
             promoted_by = stream.readInt32(exception);
@@ -35297,7 +35297,7 @@ public class TLRPC {
             flags = stream.readInt32(exception);
             can_edit = (flags & 1) != 0;
             self = (flags & 2) != 0;
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
             if ((flags & 2) != 0) {
                 inviter_id = stream.readInt32(exception);
@@ -39125,7 +39125,7 @@ public class TLRPC {
         public void readParams(AbstractSerializedData stream, boolean exception) {
             flags = stream.readInt32(exception);
             left = (flags & 1) != 0;
-            peer = new TLRPC.TL_peerUser();
+            peer = new TL_peerUser();
             peer.user_id = stream.readInt32(exception);
             kicked_by = stream.readInt32(exception);
             date = stream.readInt32(exception);
@@ -40613,12 +40613,12 @@ public class TLRPC {
         public void readParams(AbstractSerializedData stream, boolean exception) {
             flags = stream.readInt32(exception);
             if ((flags & 1) != 0) {
-                from_id = new TLRPC.TL_peerChannel();
+                from_id = new TL_peerChannel();
                 from_id.user_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
             if ((flags & 2) != 0) {
-                from_id = new TLRPC.TL_peerChannel();
+                from_id = new TL_peerChannel();
                 from_id.channel_id = stream.readInt32(exception);
             }
             if ((flags & 4) != 0) {
@@ -40709,7 +40709,7 @@ public class TLRPC {
         public void readParams(AbstractSerializedData stream, boolean exception) {
             flags = stream.readInt32(exception);
             if ((flags & 1) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             if ((flags & 32) != 0) {
@@ -40717,7 +40717,7 @@ public class TLRPC {
             }
             date = stream.readInt32(exception);
             if ((flags & 2) != 0) {
-                from_id = new TLRPC.TL_peerChannel();
+                from_id = new TL_peerChannel();
                 from_id.channel_id = stream.readInt32(exception);
             }
             if ((flags & 4) != 0) {
@@ -40775,7 +40775,7 @@ public class TLRPC {
         public void readParams(AbstractSerializedData stream, boolean exception) {
             flags = stream.readInt32(exception);
             if ((flags & 1) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             if ((flags & 32) != 0) {
@@ -40783,7 +40783,7 @@ public class TLRPC {
             }
             date = stream.readInt32(exception);
             if ((flags & 2) != 0) {
-                from_id = new TLRPC.TL_peerChannel();
+                from_id = new TL_peerChannel();
                 from_id.channel_id = stream.readInt32(exception);
             }
             if ((flags & 4) != 0) {
@@ -40835,12 +40835,12 @@ public class TLRPC {
         public void readParams(AbstractSerializedData stream, boolean exception) {
             flags = stream.readInt32(exception);
             if ((flags & 1) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
             if ((flags & 2) != 0) {
-                from_id = new TLRPC.TL_peerChannel();
+                from_id = new TL_peerChannel();
                 from_id.channel_id = stream.readInt32(exception);
             }
             if ((flags & 4) != 0) {
@@ -40877,12 +40877,12 @@ public class TLRPC {
         public void readParams(AbstractSerializedData stream, boolean exception) {
             flags = stream.readInt32(exception);
             if ((flags & 1) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
             if ((flags & 2) != 0) {
-                from_id = new TLRPC.TL_peerChannel();
+                from_id = new TL_peerChannel();
                 from_id.channel_id = stream.readInt32(exception);
             }
             if ((flags & 4) != 0) {
@@ -53734,7 +53734,7 @@ public class TLRPC {
             mentioned = (flags & 16) != 0;
             media_unread = (flags & 32) != 0;
             id = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             date = stream.readInt32(exception);
@@ -53769,7 +53769,7 @@ public class TLRPC {
             post = (flags & 16384) != 0;
             id = stream.readInt32(exception);
             if ((flags & 256) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
@@ -53780,7 +53780,7 @@ public class TLRPC {
                 via_bot_id = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -53890,7 +53890,7 @@ public class TLRPC {
             with_my_score = (flags & 1073741824) != 0;
             id = stream.readInt32(exception);
             if ((flags & 256) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
@@ -53904,7 +53904,7 @@ public class TLRPC {
                 via_bot_id = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -54006,7 +54006,7 @@ public class TLRPC {
             media_unread = (flags & 32) != 0;
             id = stream.readInt32(exception);
             if ((flags & 256) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
@@ -54026,7 +54026,7 @@ public class TLRPC {
                 via_bot_id = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -54122,7 +54122,7 @@ public class TLRPC {
             media_unread = (flags & 32) != 0;
             id = stream.readInt32(exception);
             if ((flags & 256) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
@@ -54139,7 +54139,7 @@ public class TLRPC {
                 fwd_from.date = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -54233,11 +54233,11 @@ public class TLRPC {
             media_unread = (flags & 32) != 0;
             id = stream.readInt32(exception);
             fwd_from = new TL_messageFwdHeader();
-            fwd_from.from_id = new TLRPC.TL_peerUser();
+            fwd_from.from_id = new TL_peerUser();
             fwd_from.from_id.user_id = stream.readInt32(exception);
             fwd_from.flags |= 1;
             fwd_from.date = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             date = stream.readInt32(exception);
@@ -54986,7 +54986,7 @@ public class TLRPC {
             edit_hide = (flags & 2097152) != 0;
             id = stream.readInt32(exception);
             if ((flags & 256) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
@@ -54997,7 +54997,7 @@ public class TLRPC {
                 via_bot_id = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -55149,7 +55149,7 @@ public class TLRPC {
             edit_hide = (flags & 2097152) != 0;
             id = stream.readInt32(exception);
             if ((flags & 256) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
@@ -55160,7 +55160,7 @@ public class TLRPC {
                 via_bot_id = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -55306,7 +55306,7 @@ public class TLRPC {
             edit_hide = (flags & 2097152) != 0;
             id = stream.readInt32(exception);
             if ((flags & 256) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
@@ -55317,7 +55317,7 @@ public class TLRPC {
                 via_bot_id = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -55469,7 +55469,7 @@ public class TLRPC {
             edit_hide = (flags & 2097152) != 0;
             id = stream.readInt32(exception);
             if ((flags & 256) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
@@ -55480,7 +55480,7 @@ public class TLRPC {
                 via_bot_id = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -55611,7 +55611,7 @@ public class TLRPC {
             legacy = (flags & 524288) != 0;
             id = stream.readInt32(exception);
             if ((flags & 256) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
@@ -55622,7 +55622,7 @@ public class TLRPC {
                 via_bot_id = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -55737,18 +55737,18 @@ public class TLRPC {
             mentioned = (flags & 16) != 0;
             media_unread = (flags & 32) != 0;
             id = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             if ((flags & 4) != 0) {
                 fwd_from = new TL_messageFwdHeader();
-                fwd_from.from_id = new TLRPC.TL_peerUser();
+                fwd_from.from_id = new TL_peerUser();
                 fwd_from.from_id.user_id = stream.readInt32(exception);
                 fwd_from.flags |= 1;
                 fwd_from.date = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -55831,18 +55831,18 @@ public class TLRPC {
             mentioned = (flags & 16) != 0;
             media_unread = (flags & 32) != 0;
             id = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             if ((flags & 4) != 0) {
                 fwd_from = new TL_messageFwdHeader();
-                fwd_from.from_id = new TLRPC.TL_peerUser();
+                fwd_from.from_id = new TL_peerUser();
                 fwd_from.from_id.user_id = stream.readInt32(exception);
                 fwd_from.flags |= 1;
                 fwd_from.date = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -55922,7 +55922,7 @@ public class TLRPC {
             post = (flags & 16384) != 0;
             id = stream.readInt32(exception);
             if ((flags & 256) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
@@ -55963,18 +55963,18 @@ public class TLRPC {
             mentioned = (flags & 16) != 0;
             media_unread = (flags & 32) != 0;
             id = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             if ((flags & 4) != 0) {
                 fwd_from = new TL_messageFwdHeader();
-                fwd_from.from_id = new TLRPC.TL_peerUser();
+                fwd_from.from_id = new TL_peerUser();
                 fwd_from.from_id.user_id = stream.readInt32(exception);
                 fwd_from.flags |= 1;
                 fwd_from.date = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -56025,18 +56025,18 @@ public class TLRPC {
             mentioned = (flags & 16) != 0;
             media_unread = (flags & 32) != 0;
             id = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             if ((flags & 4) != 0) {
                 fwd_from = new TL_messageFwdHeader();
-                fwd_from.from_id = new TLRPC.TL_peerUser();
+                fwd_from.from_id = new TL_peerUser();
                 fwd_from.from_id.user_id = stream.readInt32(exception);
                 fwd_from.flags |= 1;
                 fwd_from.date = stream.readInt32(exception);
             }
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);
@@ -56082,7 +56082,7 @@ public class TLRPC {
             mentioned = (flags & 16) != 0;
             media_unread = (flags & 32) != 0;
             id = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             date = stream.readInt32(exception);
@@ -56116,7 +56116,7 @@ public class TLRPC {
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
             id = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             out = stream.readBool(exception);
@@ -56145,11 +56145,11 @@ public class TLRPC {
         public void readParams(AbstractSerializedData stream, boolean exception) {
             id = stream.readInt32(exception);
             fwd_from = new TL_messageFwdHeader();
-            fwd_from.from_id = new TLRPC.TL_peerUser();
+            fwd_from.from_id = new TL_peerUser();
             fwd_from.from_id.user_id = stream.readInt32(exception);
             fwd_from.flags |= 1;
             fwd_from.date = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             out = stream.readBool(exception);
@@ -56184,7 +56184,7 @@ public class TLRPC {
 
         public void readParams(AbstractSerializedData stream, boolean exception) {
             id = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             out = stream.readBool(exception);
@@ -56223,7 +56223,7 @@ public class TLRPC {
             media_unread = (flags & 32) != 0;
             id = stream.readInt32(exception);
             ttl = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             date = stream.readInt32(exception);
@@ -56303,7 +56303,7 @@ public class TLRPC {
             media_unread = (flags & 32) != 0;
             id = stream.readInt32(exception);
             ttl = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             date = stream.readInt32(exception);
@@ -56377,7 +56377,7 @@ public class TLRPC {
             media_unread = (flags & 32) != 0;
             id = stream.readInt32(exception);
             ttl = stream.readInt32(exception);
-            from_id = new TLRPC.TL_peerUser();
+            from_id = new TL_peerUser();
             from_id.user_id = stream.readInt32(exception);
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             date = stream.readInt32(exception);
@@ -56519,12 +56519,12 @@ public class TLRPC {
             legacy = (flags & 524288) != 0;
             id = stream.readInt32(exception);
             if ((flags & 256) != 0) {
-                from_id = new TLRPC.TL_peerUser();
+                from_id = new TL_peerUser();
                 from_id.user_id = stream.readInt32(exception);
             }
             peer_id = Peer.TLdeserialize(stream, stream.readInt32(exception), exception);
             if ((flags & 8) != 0) {
-                reply_to = new TLRPC.TL_messageReplyHeader();
+                reply_to = new TL_messageReplyHeader();
                 reply_to.reply_to_msg_id = stream.readInt32(exception);
             }
             date = stream.readInt32(exception);

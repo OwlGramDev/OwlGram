@@ -116,6 +116,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import it.owlgram.android.OwlConfig;
+
 @SuppressWarnings("unchecked")
 public class SharedMediaLayout extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
 
@@ -434,6 +436,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
     private MediaSearchAdapter linksSearchAdapter;
     private GroupUsersSearchAdapter groupUsersSearchAdapter;
     private MediaPage[] mediaPages = new MediaPage[2];
+    private ActionBarMenuItem forwardNoQuoteItem;
     private ActionBarMenuItem deleteItem;
     private ActionBarMenuItem searchItem;
     public ImageView photoVideoOptionsItem;
@@ -1106,6 +1109,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
     private SharedMediaPreloader sharedMediaPreloader;
 
     private final static int forward = 100;
+    private final static int forward_noquote = 1001;
     private final static int delete = 101;
     private final static int gotochat = 102;
 
@@ -1478,6 +1482,15 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             actionModeLayout.addView(gotoItem, new LinearLayout.LayoutParams(AndroidUtilities.dp(54), ViewGroup.LayoutParams.MATCH_PARENT));
             actionModeViews.add(gotoItem);
             gotoItem.setOnClickListener(v -> onActionBarItemClick(v, gotochat));
+
+            forwardNoQuoteItem = new ActionBarMenuItem(context, null, Theme.getColor(Theme.key_actionBarActionModeDefaultSelector), Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2), false);
+            forwardNoQuoteItem.setIcon(R.drawable.msg_forward_noquote);
+            forwardNoQuoteItem.setContentDescription(LocaleController.getString("NoQuoteForward", R.string.NoQuoteForward));
+            forwardNoQuoteItem.setDuplicateParentStateEnabled(false);
+            actionModeLayout.addView(forwardNoQuoteItem, new LinearLayout.LayoutParams(AndroidUtilities.dp(54), ViewGroup.LayoutParams.MATCH_PARENT));
+            actionModeViews.add(forwardNoQuoteItem);
+            forwardNoQuoteItem.setOnClickListener(v -> onActionBarItemClick(v, forward_noquote));
+            forwardNoQuoteItem.setVisibility(OwlConfig.showNoQuoteForward ? View.VISIBLE:View.GONE);
 
             forwardItem = new ActionBarMenuItem(context, null, Theme.getColor(Theme.key_actionBarActionModeDefaultSelector), Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2), false);
             forwardItem.setIcon(R.drawable.msg_forward);
@@ -2222,10 +2235,13 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
     private void updateForwardItem() {
         boolean noforwards = profileActivity.getMessagesController().isChatNoForwards(-dialog_id) || hasNoforwardsMessage();
         forwardItem.setAlpha(noforwards ? 0.5f : 1f);
+        forwardNoQuoteItem.setAlpha(noforwards ? 0.5f : 1f);
         if (noforwards && forwardItem.getBackground() != null) {
             forwardItem.setBackground(null);
+            forwardNoQuoteItem.setBackground(null);
         } else if (!noforwards && forwardItem.getBackground() == null) {
             forwardItem.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_actionBarActionModeDefaultSelector), 5));
+            forwardNoQuoteItem.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_actionBarActionModeDefaultSelector), 5));
         }
     }
     private boolean hasNoforwardsMessage() {
@@ -3099,7 +3115,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 actionBar.closeSearchField();
                 cantDeleteMessagesCount = 0;
             }, null, null);
-        } else if (id == forward) {
+        } else if (id == forward || id == forward_noquote) {
             if (info != null) {
                 TLRPC.Chat chat = profileActivity.getMessagesController().getChat(info.id);
                 if (profileActivity.getMessagesController().isChatNoForwards(chat)) {
@@ -3148,12 +3164,15 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                         if (message != null) {
                             profileActivity.getSendMessagesHelper().sendMessage(message.toString(), did, null, null, null, true, null, null, null, true, 0, null);
                         }
-                        profileActivity.getSendMessagesHelper().sendMessage(fmessages, did, false, false, true, 0);
+                        profileActivity.getSendMessagesHelper().sendMessage(fmessages, did, id == forward_noquote, false, true, 0);
                     }
                     fragment1.finishFragment();
                 } else {
                     long did = dids.get(0);
                     Bundle args1 = new Bundle();
+                    if (id == forward_noquote) {
+                        args1.putBoolean("forward_noquote", true);
+                    }
                     args1.putBoolean("scrollToTopOnResume", true);
                     if (DialogObject.isEncryptedDialog(did)) {
                         args1.putInt("enc_id", DialogObject.getEncryptedChatId(did));
@@ -6361,6 +6380,10 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
         if (gotoItem != null) {
             arrayList.add(new ThemeDescription(gotoItem.getIconView(), ThemeDescription.FLAG_IMAGECOLOR, null, null, null, null, Theme.key_windowBackgroundWhiteGrayText2));
             arrayList.add(new ThemeDescription(gotoItem, ThemeDescription.FLAG_BACKGROUNDFILTER, null, null, null, null, Theme.key_actionBarActionModeDefaultSelector));
+        }
+        if (forwardNoQuoteItem != null) {
+            arrayList.add(new ThemeDescription(forwardNoQuoteItem.getIconView(), ThemeDescription.FLAG_IMAGECOLOR, null, null, null, null, Theme.key_windowBackgroundWhiteGrayText2));
+            arrayList.add(new ThemeDescription(forwardNoQuoteItem, ThemeDescription.FLAG_BACKGROUNDFILTER, null, null, null, null, Theme.key_actionBarActionModeDefaultSelector));
         }
         if (forwardItem != null) {
             arrayList.add(new ThemeDescription(forwardItem.getIconView(), ThemeDescription.FLAG_IMAGECOLOR, null, null, null, null, Theme.key_windowBackgroundWhiteGrayText2));

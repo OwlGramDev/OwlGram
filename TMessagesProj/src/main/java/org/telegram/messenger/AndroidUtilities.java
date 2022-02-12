@@ -18,6 +18,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.view.ContextThemeWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -90,6 +91,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.core.content.FileProvider;
+import androidx.core.graphics.ColorUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -2194,7 +2196,7 @@ public class AndroidUtilities {
             FileLog.d("wasInBackground = " + wasInBackground + " appLocked = " + SharedConfig.appLocked + " autoLockIn = " + SharedConfig.autoLockIn + " lastPauseTime = " + SharedConfig.lastPauseTime + " uptime = " + uptime);
         }
         return SharedConfig.passcodeHash.length() > 0 && wasInBackground &&
-                (SharedConfig.appLocked ||
+                (SharedConfig.appLocked || SharedConfig.autoLockIn == Integer.MAX_VALUE ||
                         SharedConfig.autoLockIn != 0 && SharedConfig.lastPauseTime != 0 && !SharedConfig.appLocked && (SharedConfig.lastPauseTime + SharedConfig.autoLockIn) <= uptime ||
                         uptime + 5 < SharedConfig.lastPauseTime);
     }
@@ -3962,5 +3964,51 @@ public class AndroidUtilities {
             FileLog.e(e);
         }
         return null;
+    }
+
+    public static int getTransparentColor(int color, float opacity){
+        int alpha = Color.alpha(color);
+        int red = Color.red(color);
+        int green = Color.green(color);
+        int blue = Color.blue(color);
+
+        // Set alpha based on your logic, here I'm making it 25% of it's initial value.
+        alpha *= opacity;
+
+        return Color.argb(alpha, red, green, blue);
+    }
+
+    public static String capitalize(String name){
+        String capitalizeString = "";
+        if(!name.trim().equals("")){
+            capitalizeString = name.substring(0,1).toUpperCase() + name.substring(1);
+        }
+        return capitalizeString;
+    }
+
+    public static void selectionSort(ArrayList<CharSequence> x, ArrayList<String> y) {
+        for (int i = 0; i < x.size() - 1; i++) {
+            for (int j = i + 1; j < x.size(); j++) {
+                if (x.get(i).toString().compareTo(x.get(j).toString()) > 0) {
+                    CharSequence temp = x.get(i);
+                    x.set(i, x.get(j));
+                    x.set(j, temp);
+
+                    String tempStr = y.get(i);
+                    y.set(i, y.get(j));
+                    y.set(j, tempStr);
+                }
+            }
+        }
+    }
+
+    public static boolean isLight(int color) {
+        int red   = Color.red(color);
+        int green = Color.green(color);
+        int blue  = Color.blue(color);
+
+        float[] hsl = new float[3];
+        ColorUtils.RGBToHSL(red, green, blue, hsl);
+        return hsl[2] >= 0.5f;
     }
 }

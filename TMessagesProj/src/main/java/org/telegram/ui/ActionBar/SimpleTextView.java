@@ -669,7 +669,7 @@ public class SimpleTextView extends View implements Drawable.Callback {
                 canvas.save();
                 float partOffset = 0;
                 if (partLayout.getText().length() == 1) {
-                     partOffset = fullTextMaxLines == 1 ? AndroidUtilities.dp(0.5f) : AndroidUtilities.dp(4);
+                    partOffset = fullTextMaxLines == 1 ? AndroidUtilities.dp(0.5f) : AndroidUtilities.dp(4);
                 }
                 if (layout.getLineLeft(0) != 0) {
                     canvas.translate(-layout.getLineWidth(0) + partOffset, 0);

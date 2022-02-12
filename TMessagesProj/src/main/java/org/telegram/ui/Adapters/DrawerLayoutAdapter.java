@@ -34,6 +34,9 @@ import java.util.Collections;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import it.owlgram.android.OwlConfig;
+import it.owlgram.android.helpers.MenuOrderManager;
+
 public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
 
     private Context mContext;
@@ -237,6 +240,9 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
             return;
         }
         int eventType = Theme.getEventType();
+        if (OwlConfig.eventType > 0) {
+            eventType = OwlConfig.eventType - 1;
+        }
         int newGroupIcon;
         int newSecretIcon;
         int newChannelIcon;
@@ -249,8 +255,8 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
         int peopleNearbyIcon;
         if (eventType == 0) {
             newGroupIcon = R.drawable.menu_groups_ny;
-            //newSecretIcon = R.drawable.menu_secret_ny;
-            //newChannelIcon = R.drawable.menu_channel_ny;
+            newSecretIcon = R.drawable.menu_secret_ny;
+            newChannelIcon = R.drawable.menu_channel_ny;
             contactsIcon = R.drawable.menu_contacts_ny;
             callsIcon = R.drawable.menu_calls_ny;
             savedIcon = R.drawable.menu_bookmarks_ny;
@@ -260,8 +266,8 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
             peopleNearbyIcon = R.drawable.menu_nearby_ny;
         } else if (eventType == 1) {
             newGroupIcon = R.drawable.menu_groups_14;
-            //newSecretIcon = R.drawable.menu_secret_14;
-            //newChannelIcon = R.drawable.menu_broadcast_14;
+            newSecretIcon = R.drawable.menu_secret_14;
+            newChannelIcon = R.drawable.menu_broadcast_14;
             contactsIcon = R.drawable.menu_contacts_14;
             callsIcon = R.drawable.menu_calls_14;
             savedIcon = R.drawable.menu_bookmarks_14;
@@ -271,8 +277,8 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
             peopleNearbyIcon = R.drawable.menu_secret_14;
         } else if (eventType == 2) {
             newGroupIcon = R.drawable.menu_groups_hw;
-            //newSecretIcon = R.drawable.menu_secret_hw;
-            //newChannelIcon = R.drawable.menu_broadcast_hw;
+            newSecretIcon = R.drawable.menu_secret_hw;
+            newChannelIcon = R.drawable.menu_broadcast_hw;
             contactsIcon = R.drawable.menu_contacts_hw;
             callsIcon = R.drawable.menu_calls_hw;
             savedIcon = R.drawable.menu_bookmarks_hw;
@@ -280,10 +286,21 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
             inviteIcon = R.drawable.menu_invite_hw;
             helpIcon = R.drawable.menu_help_hw;
             peopleNearbyIcon = R.drawable.menu_secret_hw;
+        } else if (eventType == 3) {
+            newGroupIcon = R.drawable.menu_groups_cn;
+            newSecretIcon = R.drawable.menu_secret_cn;
+            newChannelIcon = R.drawable.menu_broadcast_cn;
+            contactsIcon = R.drawable.menu_contacts_cn;
+            callsIcon = R.drawable.menu_calls_cn;
+            savedIcon = R.drawable.menu_bookmarks_cn;
+            settingsIcon = R.drawable.menu_settings_cn;
+            inviteIcon = R.drawable.menu_invite_cn;
+            helpIcon = R.drawable.menu_help_hw;
+            peopleNearbyIcon = R.drawable.menu_nearby_cn;
         } else {
             newGroupIcon = R.drawable.menu_groups;
-            //newSecretIcon = R.drawable.menu_secret;
-            //newChannelIcon = R.drawable.menu_broadcast;
+            newSecretIcon = R.drawable.menu_secret;
+            newChannelIcon = R.drawable.menu_broadcast;
             contactsIcon = R.drawable.menu_contacts;
             callsIcon = R.drawable.menu_calls;
             savedIcon = R.drawable.menu_saved;
@@ -292,19 +309,76 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
             helpIcon = R.drawable.menu_help;
             peopleNearbyIcon = R.drawable.menu_nearby;
         }
-        items.add(new Item(2, LocaleController.getString("NewGroup", R.string.NewGroup), newGroupIcon));
-        //items.add(new Item(3, LocaleController.getString("NewSecretChat", R.string.NewSecretChat), newSecretIcon));
-        //items.add(new Item(4, LocaleController.getString("NewChannel", R.string.NewChannel), newChannelIcon));
-        items.add(new Item(6, LocaleController.getString("Contacts", R.string.Contacts), contactsIcon));
-        items.add(new Item(10, LocaleController.getString("Calls", R.string.Calls), callsIcon));
-        if (hasGps) {
-            items.add(new Item(12, LocaleController.getString("PeopleNearby", R.string.PeopleNearby), peopleNearbyIcon));
+        int item_size = MenuOrderManager.sizeAvailable();
+        for(int i = 0; i < item_size; i++) {
+            MenuOrderManager.EditableMenuItem data = MenuOrderManager.getSingleAvailableMenuItem(i);
+            if (data != null) {
+                boolean can_add_divider = false;
+                if(data.id.equals("telegram_features") || data.id.equals("invite_friends")) {
+                    MenuOrderManager.EditableMenuItem previousData = MenuOrderManager.getSingleAvailableMenuItem(i - 1);
+                    if (i + 1 < item_size) {
+                        MenuOrderManager.EditableMenuItem next_item = MenuOrderManager.getSingleAvailableMenuItem(i + 1);
+                        if (next_item != null) {
+                            if (next_item.id.equals("telegram_features") || next_item.id.equals("invite_friends")) {
+                                can_add_divider = true;
+                            }
+                        }
+                    } else if (i == item_size - 1) {
+                        if (previousData != null && !(previousData.id.equals("telegram_features") || previousData.id.equals("invite_friends"))) {
+                            can_add_divider = true;
+                        }
+                    }
+                    if (can_add_divider) {
+                        items.add(null); // divider
+                    }
+                }
+
+                switch (data.id) {
+                    case "new_group":
+                        items.add(new Item(2, LocaleController.getString("NewGroup", R.string.NewGroup), newGroupIcon));
+                        break;
+                    case "new_channel":
+                        items.add(new Item(4, LocaleController.getString("NewChannel", R.string.NewChannel), newChannelIcon));
+                        break;
+                    case "new_secret_chat":
+                        items.add(new Item(3, LocaleController.getString("NewSecretChat", R.string.NewSecretChat), newSecretIcon));
+                        break;
+                    case "contacts":
+                        items.add(new Item(6, LocaleController.getString("Contacts", R.string.Contacts), contactsIcon));
+                        break;
+                    case "calls":
+                        items.add(new Item(10, LocaleController.getString("Calls", R.string.Calls), callsIcon));
+                        break;
+                    case "nearby_people":
+                        if (hasGps) {
+                            items.add(new Item(12, LocaleController.getString("PeopleNearby", R.string.PeopleNearby), peopleNearbyIcon));
+                        }
+                        break;
+                    case "saved_message":
+                        items.add(new Item(11, LocaleController.getString("SavedMessages", R.string.SavedMessages), savedIcon));
+                        break;
+                    case "settings":
+                        items.add(new Item(8, LocaleController.getString("Settings", R.string.Settings), settingsIcon));
+                        break;
+                    case "owlgram_settings":
+                        items.add(new Item(201, LocaleController.getString("OwlSetting", R.string.OwlSetting), settingsIcon));
+                        break;
+                    case "invite_friends":
+                        items.add(new Item(7, LocaleController.getString("InviteFriends", R.string.InviteFriends), inviteIcon));
+                        break;
+                    case "telegram_features":
+                        items.add(new Item(13, LocaleController.getString("TelegramFeatures", R.string.TelegramFeatures), helpIcon));
+                        break;
+                    case "archived_messages":
+                        items.add(new Item(202, LocaleController.getString("ArchivedChats", R.string.ArchivedChats), R.drawable.msg_archive));
+                        break;
+                    case "datacenter_status":
+                        items.add(new Item(203, LocaleController.getString("DatacenterStatus", R.string.DatacenterStatus), R.drawable.round_construction_white));
+                        break;
+                }
+            }
+
         }
-        items.add(new Item(11, LocaleController.getString("SavedMessages", R.string.SavedMessages), savedIcon));
-        items.add(new Item(8, LocaleController.getString("Settings", R.string.Settings), settingsIcon));
-        items.add(null); // divider
-        items.add(new Item(7, LocaleController.getString("InviteFriends", R.string.InviteFriends), inviteIcon));
-        items.add(new Item(13, LocaleController.getString("TelegramFeatures", R.string.TelegramFeatures), helpIcon));
     }
 
     public int getId(int position) {

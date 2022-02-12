@@ -56,11 +56,14 @@ import org.telegram.ui.Cells.ContextLinkCell;
 import org.telegram.ui.Cells.StickerCell;
 import org.telegram.ui.Cells.StickerEmojiCell;
 import org.telegram.ui.Components.AlertsCreator;
+import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.EmojiView;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
 import java.util.ArrayList;
+
+import it.owlgram.android.helpers.MessageHelper;
 
 public class ContentPreviewViewer {
 
@@ -191,6 +194,11 @@ public class ContentPreviewViewer {
                         icons.add(R.drawable.msg_delete);
                         actions.add(5);
                     }
+                    if (currentStickerSet != null && !MessageObject.isAnimatedStickerDocument(currentDocument, true)) {
+                        items.add(LocaleController.getString("SaveToGallery", R.string.SaveToGallery));
+                        icons.add(R.drawable.msg_gallery);
+                        actions.add(110);
+                    }
                 }
                 if (!MessageObject.isMaskDocument(currentDocument) && (inFavs || MediaDataController.getInstance(currentAccount).canAddStickerToFavorites() && MessageObject.isStickerHasSet(currentDocument))) {
                     items.add(inFavs ? LocaleController.getString("DeleteFromFavorites", R.string.DeleteFromFavorites) : LocaleController.getString("AddToFavorites", R.string.AddToFavorites));
@@ -233,6 +241,8 @@ public class ContentPreviewViewer {
                         MediaDataController.getInstance(currentAccount).addRecentSticker(MediaDataController.TYPE_IMAGE, parentObject, currentDocument, (int) (System.currentTimeMillis() / 1000), true);
                     } else if (actions.get(which) == 5) {
                         delegate.remove(importingSticker);
+                    } else if (actions.get(which) == 110) {
+                        MessageHelper.saveStickerToGallery(parentActivity, currentDocument, () -> {});
                     }
                 });
                 builder.setDimBehind(false);
@@ -277,6 +287,11 @@ public class ContentPreviewViewer {
                     icons.add(R.drawable.outline_send);
                     actions.add(0);
                 }
+                if (!delegate.isInScheduleMode()) {
+                    items.add(LocaleController.getString("SendWithoutSound", R.string.SendWithoutSound));
+                    icons.add(R.drawable.input_notify_off);
+                    actions.add(6);
+                }
                 if (delegate.canSchedule()) {
                     items.add(LocaleController.getString("Schedule", R.string.Schedule));
                     icons.add(R.drawable.msg_timer);
@@ -306,8 +321,8 @@ public class ContentPreviewViewer {
                     if (parentActivity == null) {
                         return;
                     }
-                    if (actions.get(which) == 0) {
-                        delegate.sendGif(currentDocument != null ? currentDocument : inlineResult, parentObject, true, 0);
+                    if (actions.get(which) == 0 || actions.get(which) == 6) {
+                        delegate.sendGif(currentDocument != null ? currentDocument : inlineResult, parentObject, actions.get(which) == 0, 0);
                     } else if (actions.get(which) == 1) {
                         MediaDataController.getInstance(currentAccount).removeRecentGif(currentDocument);
                         delegate.gifAddedOrDeleted();

@@ -196,7 +196,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
     private boolean isVisible;
     private boolean collapsed;
     private boolean attachedToWindow;
-    
+
     private int currentAccount;
 
     private int lastBlockNum = 1;
@@ -10668,14 +10668,14 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             }
         }
 
-		@Override
-		public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
-			super.onInitializeAccessibilityNodeInfo(info);
-			info.setEnabled(true);
+        @Override
+        public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
+            super.onInitializeAccessibilityNodeInfo(info);
+            info.setEnabled(true);
             if (textLayout == null)
                 return;
-			info.setText(textLayout.getText());
-		}
+            info.setText(textLayout.getText());
+        }
 
         @Override
         public void fillTextLayoutBlocks(ArrayList<TextSelectionHelper.TextLayoutBlock> blocks) {

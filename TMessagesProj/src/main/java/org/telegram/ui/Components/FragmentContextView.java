@@ -35,6 +35,7 @@ import android.text.Spanned;
 import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
@@ -598,7 +599,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             if (currentStyle == 0) {
                 MessageObject messageObject = MediaController.getInstance().getPlayingMessageObject();
                 if (fragment != null && messageObject != null) {
-                    if (messageObject.isMusic()) {
+                    if (messageObject.isMusic() || messageObject.isVoice()) {
                         if (getContext() instanceof LaunchActivity) {
                             fragment.showDialog(new AudioPlayerAlert(getContext(), resourcesProvider));
                         }
@@ -1072,8 +1073,8 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             setTopPadding(AndroidUtilities.dp2(getStyleHeight()));
         }
 
-         speakerAmplitude = 0;
-         micAmplitude = 0;
+        speakerAmplitude = 0;
+        micAmplitude = 0;
     }
 
     @Override
@@ -1539,7 +1540,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 } else {
                     isMusic = true;
                     if (playbackSpeedButton != null) {
-                        if (messageObject.getDuration() >= 10 * 60) {
+                        /*if (messageObject.getDuration() >= 10 * 60) {
                             playbackSpeedButton.setAlpha(1.0f);
                             playbackSpeedButton.setEnabled(true);
                             titleTextView.setPadding(0, 0, AndroidUtilities.dp(44), 0);
@@ -1548,7 +1549,11 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                             playbackSpeedButton.setAlpha(0.0f);
                             playbackSpeedButton.setEnabled(false);
                             titleTextView.setPadding(0, 0, 0, 0);
-                        }
+                        }*/
+                        playbackSpeedButton.setAlpha(1.0f);
+                        playbackSpeedButton.setEnabled(true);
+                        titleTextView.setPadding(0, 0, AndroidUtilities.dp(44), 0);
+                        updatePlaybackButton();
                     } else {
                         titleTextView.setPadding(0, 0, 0, 0);
                     }

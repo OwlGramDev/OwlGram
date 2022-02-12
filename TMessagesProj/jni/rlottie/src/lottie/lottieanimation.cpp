@@ -123,10 +123,10 @@ void AnimationImpl::init(const std::shared_ptr<LOTModel> &model)
  * @param path  add the details
  */
 std::unique_ptr<Animation> Animation::loadFromData(
-    std::string jsonData, const std::string &key,
-    std::map<int32_t, int32_t> *colorReplacement,
-    FitzModifier fitzModifier,
-    const std::string &resourcePath)
+        std::string jsonData, const std::string &key,
+        std::map<int32_t, int32_t> *colorReplacement,
+        FitzModifier fitzModifier,
+        const std::string &resourcePath)
 {
     if (jsonData.empty()) {
         vWarning << "jason data is empty";
@@ -279,10 +279,10 @@ void Animation::resetCurrentFrame() {
 
 Surface::Surface(uint32_t *buffer, size_t width, size_t height,
                  size_t bytesPerLine)
-    : mBuffer(buffer),
-      mWidth(width),
-      mHeight(height),
-      mBytesPerLine(bytesPerLine)
+        : mBuffer(buffer),
+          mWidth(width),
+          mHeight(height),
+          mBytesPerLine(bytesPerLine)
 {
     mDrawArea.w = mWidth;
     mDrawArea.h = mHeight;

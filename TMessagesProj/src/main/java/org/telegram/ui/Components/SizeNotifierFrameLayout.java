@@ -40,6 +40,8 @@ import org.telegram.ui.ActionBar.Theme;
 
 import java.util.ArrayList;
 
+import it.owlgram.android.OwlConfig;
+
 public class SizeNotifierFrameLayout extends FrameLayout {
 
     private Rect rect = new Rect();
@@ -373,7 +375,7 @@ public class SizeNotifierFrameLayout extends FrameLayout {
     }
 
     private void checkSnowflake(Canvas canvas) {
-        if (Theme.canStartHolidayAnimation()) {
+        if (Theme.canStartHolidayAnimation() && (OwlConfig.showSnowFalling || OwlConfig.eventType != 1)) {
             if (snowflakesEffect == null) {
                 snowflakesEffect = new SnowflakesEffect(1);
             }

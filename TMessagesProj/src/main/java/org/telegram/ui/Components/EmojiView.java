@@ -3399,7 +3399,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                 gifTabsCount++;
                 TLRPC.Document document = MediaDataController.getInstance(currentAccount).getEmojiAnimatedSticker(emoji);
                 final View iconTab = gifTabs.addEmojiTab(3 + i, emojiDrawable, document);
-               // iconTab.setPadding(hPadding, vPadding, hPadding, vPadding);
+                // iconTab.setPadding(hPadding, vPadding, hPadding, vPadding);
                 iconTab.setContentDescription(emoji);
             }
         }
@@ -4047,7 +4047,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
 
             TLRPC.Document document = set.cover;
             if (!set.covers.isEmpty()) {
-                 document = set.covers.get(0);
+                document = set.covers.get(0);
             }
             TLObject object = FileLoader.getClosestPhotoSizeWithSize(set.set.thumbs, 90);
             SvgHelper.SvgDrawable svgThumb = DocumentObject.getSvgThumb(set.set.thumbs, Theme.key_emptyListPlaceholder, 0.2f);

@@ -232,7 +232,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                     }
                     localeInfo = sortedLanguages.get(position);
                 }
-                if (localeInfo == null || localeInfo.pathToFile == null || localeInfo.isRemote() && localeInfo.serverIndex != Integer.MAX_VALUE) {
+                if (localeInfo == null || localeInfo.pathToFile == null || localeInfo.builtIn || localeInfo.isRemote() && localeInfo.serverIndex != Integer.MAX_VALUE) {
                     return false;
                 }
                 final LocaleController.LocaleInfo finalLocaleInfo = localeInfo;
@@ -356,7 +356,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
 //                } catch (Exception e) {
 //                    FileLog.e(e);
 //                }
-                processSearch(query);
+            processSearch(query);
 //                }
 //            }, 100, 300);
         }
@@ -430,9 +430,9 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             showButtonCheck = new TextCheckCell(context);
             showButtonCheck.setBackground(Theme.createSelectorWithBackgroundDrawable(Theme.getColor(Theme.key_windowBackgroundWhite), Theme.getColor(Theme.key_listSelector)));
             showButtonCheck.setTextAndCheck(
-                LocaleController.getString("ShowTranslateButton", R.string.ShowTranslateButton),
-                value,
-                value
+                    LocaleController.getString("ShowTranslateButton", R.string.ShowTranslateButton),
+                    value,
+                    value
             );
             showButtonCheck.setOnClickListener(e -> {
                 preferences.edit().putBoolean("translate_button", !getValue()).apply();
@@ -561,9 +561,9 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
         }
         int height() {
             return Math.max(AndroidUtilities.dp(40), header.getMeasuredHeight()) +
-                   Math.max(AndroidUtilities.dp(50), showButtonCheck.getMeasuredHeight()) +
-                   Math.max(Math.max(AndroidUtilities.dp(50), doNotTranslateCell.getMeasuredHeight()), (info2.getMeasuredHeight() <= 0 ? AndroidUtilities.dp(51) : info2.getMeasuredHeight())) +
-                   (info.getMeasuredHeight() <= 0 ? AndroidUtilities.dp(62) : info.getMeasuredHeight());/* + header2.getHeight()*/
+                    Math.max(AndroidUtilities.dp(50), showButtonCheck.getMeasuredHeight()) +
+                    Math.max(Math.max(AndroidUtilities.dp(50), doNotTranslateCell.getMeasuredHeight()), (info2.getMeasuredHeight() <= 0 ? AndroidUtilities.dp(51) : info2.getMeasuredHeight())) +
+                    (info.getMeasuredHeight() <= 0 ? AndroidUtilities.dp(62) : info.getMeasuredHeight());/* + header2.getHeight()*/
         }
 
         @Override
