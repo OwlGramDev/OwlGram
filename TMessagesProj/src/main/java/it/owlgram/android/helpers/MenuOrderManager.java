@@ -58,7 +58,6 @@ public class MenuOrderManager {
         data.put(list_items[2]);
         data.put(list_items[3]);
         data.put(list_items[4]);
-        data.put(list_items[12]);
         data.put(list_items[5]);
         data.put(list_items[9]);
         data.put(list_items[10]);
