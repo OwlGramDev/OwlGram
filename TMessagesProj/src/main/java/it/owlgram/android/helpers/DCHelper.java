@@ -32,7 +32,7 @@ public class DCHelper {
     public static String getDCIp(int dc_id) {
         switch (dc_id){
             case 1:
-                return "149.154.175.53";
+                return "149.154.175.50";
             case 2:
                 return "149.154.167.51";
             case 3:
