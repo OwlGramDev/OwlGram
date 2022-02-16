@@ -11,6 +11,7 @@ import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.UserConfig;
 import org.telegram.ui.ActionBar.Theme;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import it.owlgram.android.camera.CameraXUtilities;
@@ -60,7 +61,6 @@ public class OwlConfig {
     public static boolean hideAllTab;
     public static boolean showSantaHat;
     public static boolean showSnowFalling;
-    public static boolean showFireworks;
     public static boolean useCameraXOptimizedMode;
     public static boolean disableProximityEvents;
     public static boolean swipeToPiP;
@@ -153,7 +153,6 @@ public class OwlConfig {
             translationProvider = preferences.getInt("translationProvider", isChineseUser ? Translator.PROVIDER_NIU : Translator.PROVIDER_GOOGLE);
             showSantaHat = preferences.getBoolean("showSantaHat", true);
             showSnowFalling = preferences.getBoolean("showSnowFalling", true);
-            showFireworks = preferences.getBoolean("showFireworks", true);
             cameraType = preferences.getInt("cameraType", CameraXUtilities.getDefault());
             cameraXFps = preferences.getInt("cameraXFps", SharedConfig.getDevicePerformanceClass() == SharedConfig.PERFORMANCE_CLASS_HIGH ? 60:30);
             useCameraXOptimizedMode = preferences.getBoolean("useCameraXOptimizedMode", SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_HIGH);
@@ -485,14 +484,6 @@ public class OwlConfig {
         editor.apply();
     }
 
-    public static void toggleShowFireworks() {
-        showFireworks = !showFireworks;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showFireworks", showFireworks);
-        editor.apply();
-    }
-
     public static void toggleCameraXOptimizedMode() {
         useCameraXOptimizedMode = !useCameraXOptimizedMode;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
@@ -728,4 +719,11 @@ public class OwlConfig {
         return devOptEnabled || betterAudioQuality || unlimitedFavoriteStickers || unlimitedPinnedDialogs || maxRecentStickers != 20;
     }
 
+    public static boolean canShowFireworks() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        int monthOfYear = calendar.get(Calendar.MONTH);
+        int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        return monthOfYear == 1 && dayOfMonth == 1;
+    }
 }

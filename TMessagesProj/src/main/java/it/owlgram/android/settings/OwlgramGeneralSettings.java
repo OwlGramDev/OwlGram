@@ -96,7 +96,6 @@ public class OwlgramGeneralSettings extends BaseFragment {
     private int notificationAccentRow;
     private int showSantaHatRow;
     private int showFallingSnowRow;
-    private int showFireworksRow;
 
     private DrawerProfilePreviewCell profilePreviewCell;
 
@@ -328,14 +327,6 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 Theme.lastHolidayCheckTime = 0;
                 Theme.dialogs_holidayDrawable = null;
                 getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
-            } else if (position == showFireworksRow) {
-                OwlConfig.toggleShowFireworks();
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.showFireworks);
-                }
-                Theme.lastHolidayCheckTime = 0;
-                Theme.dialogs_holidayDrawable = null;
-                getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
             }
         });
         return fragmentView;
@@ -353,7 +344,6 @@ public class OwlgramGeneralSettings extends BaseFragment {
         showAvatarRow = -1;
         showSantaHatRow = -1;
         showFallingSnowRow = -1;
-        showFireworksRow = -1;
 
         drawerRow = rowCount++;
         drawerAvatarAsBackgroundRow = rowCount++;
@@ -390,9 +380,6 @@ public class OwlgramGeneralSettings extends BaseFragment {
         if (((Theme.getEventType() == 0 && OwlConfig.eventType == 0) || OwlConfig.eventType == 1)) {
             showSantaHatRow = rowCount++;
             showFallingSnowRow = rowCount++;
-        }
-        if (((Theme.getEventType() == 3 && OwlConfig.eventType == 0) || OwlConfig.eventType == 4)) {
-            showFireworksRow = rowCount++;
         }
         messageTimeSwitchRow = rowCount++;
         roundedNumberSwitchRow = rowCount++;
@@ -501,8 +488,6 @@ public class OwlgramGeneralSettings extends BaseFragment {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ChristmasHat", R.string.ChristmasHat), OwlConfig.showSantaHat, true);
                     } else if (position == showFallingSnowRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("FallingSnow", R.string.FallingSnow), OwlConfig.showSnowFalling, true);
-                    } else if (position == showFireworksRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("Fireworks", R.string.Fireworks), OwlConfig.showFireworks, true);
                     }
                     break;
                 case 4:
@@ -702,7 +687,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     position == drawerDarkenBackgroundRow || position == drawerBlurBackgroundRow || position == showGradientRow ||
                     position == showAvatarRow || position == forcePacmanRow || position == smartButtonsRow ||
                     position == appBarShadowRow || position == notificationAccentRow || position == showSantaHatRow ||
-                    position == showFallingSnowRow || position == showFireworksRow
+                    position == showFallingSnowRow
             ){
                 return 3;
             } else if ( position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow ||
