@@ -263,7 +263,7 @@ public class ActionBar extends FrameLayout {
                     fireworksEffect = null;
                     snowflakesEffect = new SnowflakesEffect(0);
                 }
-            } else if (((Theme.getEventType() == 3 && OwlConfig.eventType == 0) || OwlConfig.eventType == 4) && OwlConfig.canShowFireworks()) {
+            } else if ((Theme.getEventType() == 3 && OwlConfig.eventType == 0) || OwlConfig.eventType == 4 && OwlConfig.canShowFireworks()) {
                 if (fireworksEffect == null || snowflakesEffect != null ) {
                     snowflakesEffect = null;
                     fireworksEffect = new FireworksEffect();
