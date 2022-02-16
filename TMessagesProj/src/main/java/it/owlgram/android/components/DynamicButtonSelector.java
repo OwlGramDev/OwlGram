@@ -51,7 +51,7 @@ public class DynamicButtonSelector extends LinearLayout {
                 super.onDraw(canvas);
                 int selectedStyle = OwlConfig.buttonStyleType;
                 int w = ((getMeasuredWidth() - AndroidUtilities.dp(30)) >> 2) * 4;
-                int maxWidth = ((getMeasuredHeight() - AndroidUtilities.dp(60)) * 4);
+                int maxWidth = ((getMeasuredHeight() - AndroidUtilities.dp(40)) * 4);
                 w = Math.min(w, maxWidth);
                 int h = w >> 2;
                 int padding = Math.round((h * 15f) / 100f);
