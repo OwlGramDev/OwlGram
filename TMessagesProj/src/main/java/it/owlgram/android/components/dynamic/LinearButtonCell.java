@@ -2,8 +2,12 @@ package it.owlgram.android.components.dynamic;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -85,51 +89,6 @@ public class LinearButtonCell extends SimpleActionCell {
         addView(tv);
     }
 
-    public static LinearLayout getButtonPreview(Context context, int pos) {
-        int color = Theme.getColor(Theme.key_switchTrack);
-        LinearLayout mainLayout = new LinearLayout(context);
-        mainLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1.0f));
-        mainLayout.setOrientation(VERTICAL);
-        mainLayout.setGravity(Gravity.CENTER);
-
-        ImageView iv = new ImageView(context);
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(AndroidUtilities.dp(21), AndroidUtilities.dp(21));
-        layoutParams2.setMargins(0, 0,0,0);
-        layoutParams2.addRule(RelativeLayout.CENTER_IN_PARENT);
-        iv.setLayoutParams(layoutParams2);
-        int iconId;
-        switch (pos) {
-            case 1:
-                iconId = R.drawable.profile_video;
-                break;
-            case 2:
-                iconId = R.drawable.profile_phone;
-                break;
-            case 3:
-                iconId = R.drawable.msg_block;
-                break;
-            default:
-                iconId = R.drawable.profile_newmsg;
-                break;
-        }
-        Drawable d = ContextCompat.getDrawable(context, iconId);
-        Objects.requireNonNull(d).setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-        iv.setBackground(d);
-        iv.setAlpha(0.5f);
-
-        CardView cardView2 = new CardView(context);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, AndroidUtilities.dp(5));
-        layoutParams.setMargins(AndroidUtilities.dp(5), AndroidUtilities.dp(6), AndroidUtilities.dp(5), 0);
-        cardView2.setLayoutParams(layoutParams);
-        cardView2.setCardBackgroundColor(AndroidUtilities.getTransparentColor(color,0.5f));
-        cardView2.setRadius(AndroidUtilities.dp(2));
-        cardView2.setCardElevation(0);
-
-        mainLayout.addView(iv);
-        mainLayout.addView(cardView2);
-        return mainLayout;
-    }
-
     public static LinearLayout getShimmerButton(Context context, int pos) {
         LinearLayout mainLayout = new LinearLayout(context);
         mainLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f));
@@ -172,6 +131,57 @@ public class LinearButtonCell extends SimpleActionCell {
         mainLayout.addView(iv);
         mainLayout.addView(cardView2);
         return mainLayout;
+    }
+
+    public static void drawButtonPreview(Canvas canvas, int x, int y, int w, int pos, Context context) {
+        int color = Theme.getColor(Theme.key_switchTrack);
+
+        int topTextMargin = Math.round((w * 15F) / 100F);
+        int textWidth = Math.round((w * 100F) / 100F);
+        int textHeight = Math.round((w * 19F) / 100F);
+        int originalBHeight = w - textHeight - topTextMargin;
+        int buttonHeight = Math.round(((originalBHeight) * 80f) / 100f);
+        int marginDiff = originalBHeight - buttonHeight;
+        topTextMargin += marginDiff;
+        int xButton = x + (w >> 1) - (buttonHeight >> 1);
+
+        int totalHeight = buttonHeight + topTextMargin + textHeight;
+
+        int totalYMiddle = y + (w >> 1) - (totalHeight >> 1);
+
+        int xText = x + (w >> 1) - (textWidth >> 1);
+        int yText = totalYMiddle + buttonHeight + topTextMargin;
+
+
+        int iconId;
+        switch (pos) {
+            case 1:
+                iconId = R.drawable.msg_videocall;
+                break;
+            case 2:
+                iconId = R.drawable.payment_phone;
+                break;
+            case 3:
+                iconId = R.drawable.msg_block;
+                break;
+            default:
+                iconId = R.drawable.profile_newmsg;
+                break;
+        }
+        Drawable d = ContextCompat.getDrawable(context, iconId);
+        if (d != null) {
+            Rect rect = new Rect(xButton, totalYMiddle + (marginDiff >> 1), xButton + buttonHeight, totalYMiddle + (marginDiff >> 1) + buttonHeight);
+            d.setBounds(rect);
+            d.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+            d.setAlpha(Math.round(255 * 0.5f));
+            d.draw(canvas);
+            d.clearColorFilter();
+            d.setAlpha(255);
+        }
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setColor(AndroidUtilities.getTransparentColor(color,0.5f));
+        RectF rectText = new RectF(xText, yText, xText + textWidth, yText + textHeight);
+        canvas.drawRoundRect(rectText, textHeight >> 1, textHeight >> 1, p);
     }
 
     public ThemeInfo getTheme() {

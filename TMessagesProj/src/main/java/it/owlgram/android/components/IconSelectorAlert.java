@@ -138,7 +138,7 @@ public class IconSelectorAlert extends BottomSheet {
         scrollView.setWillNotDraw(false);
         scrollView.setClipToPadding(false);
         scrollView.setVerticalScrollBarEnabled(false);
-        container.addView(scrollView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
+        container.addView(scrollView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
 
         linearLayout = new LinearLayout(context);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
@@ -157,7 +157,7 @@ public class IconSelectorAlert extends BottomSheet {
         titleView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
         titleView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, dp(19));
-        header.addView(titleView, LayoutHelper.createFrame(
+        header.addView(titleView, LayoutHelper.createLinear(
                 LayoutHelper.MATCH_PARENT,
                 LayoutHelper.WRAP_CONTENT,
                 Gravity.FILL_HORIZONTAL | Gravity.TOP,

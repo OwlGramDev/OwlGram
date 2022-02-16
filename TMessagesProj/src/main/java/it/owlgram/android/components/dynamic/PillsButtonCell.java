@@ -2,8 +2,11 @@ package it.owlgram.android.components.dynamic;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -82,32 +85,6 @@ public class PillsButtonCell extends SimpleActionCell {
         addView(tv);
     }
 
-    public static LinearLayout getButtonPreview(Context context) {
-        int color = Theme.getColor(Theme.key_switchTrack);
-        LinearLayout mainLayout = new LinearLayout(context);
-        mainLayout.setLayoutParams(new LayoutParams(0, LayoutParams.MATCH_PARENT, 1.0f));
-        mainLayout.setOrientation(VERTICAL);
-        mainLayout.setGravity(Gravity.CENTER);
-
-        CardView cardView = new CardView(context);
-        cardView.setRadius(AndroidUtilities.dp(11));
-        cardView.setCardElevation(0);
-        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(color,0.5f));
-        cardView.setLayoutParams(new LayoutParams(AndroidUtilities.dp(30), AndroidUtilities.dp(25)));
-
-        CardView cardView2 = new CardView(context);
-        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, AndroidUtilities.dp(5));
-        layoutParams.setMargins(AndroidUtilities.dp(5), AndroidUtilities.dp(5), AndroidUtilities.dp(5), 0);
-        cardView2.setLayoutParams(layoutParams);
-        cardView2.setCardBackgroundColor(AndroidUtilities.getTransparentColor(color,0.5f));
-        cardView2.setRadius(AndroidUtilities.dp(2));
-        cardView2.setCardElevation(0);
-
-        mainLayout.addView(cardView);
-        mainLayout.addView(cardView2);
-        return mainLayout;
-    }
-
     public static LinearLayout getShimmerButton(Context context) {
         LinearLayout mainLayout = new LinearLayout(context);
         mainLayout.setLayoutParams(new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f));
@@ -132,6 +109,31 @@ public class PillsButtonCell extends SimpleActionCell {
         mainLayout.addView(cardView);
         mainLayout.addView(cardView2);
         return mainLayout;
+    }
+
+    public static void drawButtonPreview(Canvas canvas, int x, int y, int w) {
+        int color = Theme.getColor(Theme.key_switchTrack);
+
+        int topTextMargin = Math.round((w * 15F) / 100F);
+        int textWidth = Math.round((w * 100F) / 100F);
+        int textHeight = Math.round((w * 19F) / 100F);
+        int buttonHeight = w - textHeight - topTextMargin;
+
+        int totalHeight = buttonHeight + topTextMargin + textHeight;
+
+        int totalYMiddle = y + (w >> 1) - (totalHeight >> 1);
+
+        int xText = x + (w >> 1) - (textWidth >> 1);
+        int yText = totalYMiddle + buttonHeight + topTextMargin;
+
+        RectF rectF = new RectF(x, totalYMiddle, x + w, totalYMiddle + buttonHeight);
+        int rad1 = Math.round((w * 30F) / 100F);
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setColor(AndroidUtilities.getTransparentColor(color,0.5f));
+        canvas.drawRoundRect(rectF, rad1, rad1, p);
+
+        RectF rectText = new RectF(xText, yText, xText + textWidth, yText + textHeight);
+        canvas.drawRoundRect(rectText, textHeight >> 1, textHeight >> 1, p);
     }
 
     public ThemeInfo getTheme() {

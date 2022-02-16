@@ -15,16 +15,13 @@ import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.ui.ActionBar.Theme;
 
 public class MaterialButton extends CardView {
     final private TextView textView;
-    private boolean pressed = false;
     private View.OnClickListener listener;
-    private ImageView mt;
+    private final ImageView mt;
 
     @SuppressLint("ClickableViewAccessibility")
     public MaterialButton(Context context) {

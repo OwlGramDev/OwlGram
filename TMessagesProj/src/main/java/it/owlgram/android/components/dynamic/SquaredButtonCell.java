@@ -2,8 +2,11 @@ package it.owlgram.android.components.dynamic;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -104,35 +107,22 @@ public class SquaredButtonCell extends SimpleActionCell {
         return mainLayout;
     }
 
-    public static LinearLayout getButtonPreview(Context context) {
+    public static void drawButtonPreview(Canvas canvas, int x, int y, int w) {
         int color = Theme.getColor(Theme.key_switchTrack);
-        LinearLayout mainLayout = new LinearLayout(context);
-        mainLayout.setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.MATCH_PARENT, 1.0f));
-        mainLayout.setOrientation(VERTICAL);
-        mainLayout.setGravity(Gravity.CENTER);
+        RectF rectF = new RectF(x, y, x + w, y + w);
+        int rad1 = Math.round((w * 14.77F) / 100F);
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setColor(AndroidUtilities.getTransparentColor(color,0.5f));
+        canvas.drawRoundRect(rectF, rad1, rad1, p);
 
-        CardView cardView = new CardView(context);
-        cardView.setRadius(AndroidUtilities.dp(5));
-        cardView.setCardElevation(0);
-        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(color,0.5f));
-        cardView.setLayoutParams(new LinearLayout.LayoutParams(AndroidUtilities.dp(40), AndroidUtilities.dp(40)));
-
-        LinearLayout linearLayout = new LinearLayout(context);
-        linearLayout.setGravity(Gravity.BOTTOM);
-        linearLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-
-        CardView cardView2 = new CardView(context);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, AndroidUtilities.dp(5));
-        layoutParams.setMargins(AndroidUtilities.dp(5), 0, AndroidUtilities.dp(5), AndroidUtilities.dp(5));
-        cardView2.setLayoutParams(layoutParams);
-        cardView2.setCardBackgroundColor(AndroidUtilities.getTransparentColor(color,0.75f));
-        cardView2.setRadius(AndroidUtilities.dp(2));
-        cardView2.setCardElevation(0);
-
-        mainLayout.addView(cardView);
-        cardView.addView(linearLayout);
-        linearLayout.addView(cardView2);
-        return mainLayout;
+        int marginBottomText = Math.round((w * 12F) / 100F);
+        int textWidth = Math.round((w * 80F) / 100F);
+        int textHeight = Math.round((w * 19F) / 100F);
+        int xText = x + (w >> 1) - (textWidth >> 1);
+        int yText = y + w - marginBottomText - textHeight;
+        RectF rectText = new RectF(xText, yText, xText + textWidth, yText + textHeight);
+        p.setColor(AndroidUtilities.getTransparentColor(color,0.75f));
+        canvas.drawRoundRect(rectText, textHeight >> 1, textHeight >> 1, p);
     }
 
     public ThemeInfo getTheme() {

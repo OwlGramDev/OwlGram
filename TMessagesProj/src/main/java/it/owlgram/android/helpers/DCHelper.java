@@ -34,13 +34,13 @@ public class DCHelper {
             case 1:
                 return "149.154.175.50";
             case 2:
-                return "149.154.167.51";
+                return "149.154.167.50";
             case 3:
                 return "149.154.175.100";
             case 4:
                 return "149.154.167.91";
             case 5:
-                return "91.108.56.130";
+                return "91.108.56.100";
             default:
                 return "?.?.?.?";
         }

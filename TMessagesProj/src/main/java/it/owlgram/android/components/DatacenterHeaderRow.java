@@ -36,10 +36,10 @@ public class DatacenterHeaderRow extends LinearLayout {
         rLottieImageView.setAnimation(R.raw.duck_server, 120, 120);
         rLottieImageView.playAnimation();
         rLottieImageView.getAnimatedDrawable().setAutoRepeat(1);
-        addView(rLottieImageView, LayoutHelper.createFrame(120, 120, Gravity.CENTER_HORIZONTAL, 0, 20, 0, 0));
+        addView(rLottieImageView, LayoutHelper.createLinear(120, 120, Gravity.CENTER_HORIZONTAL, 0, 20, 0, 0));
 
         TextView textView = new TextView(context);
-        addView(textView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 36, 26, 36, 0));
+        addView(textView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 36, 26, 36, 0));
         textView.setGravity(Gravity.CENTER_HORIZONTAL);
         textView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
@@ -68,6 +68,6 @@ public class DatacenterHeaderRow extends LinearLayout {
 
         buttonTextView.setTextColor(Theme.getColor(Theme.key_featuredStickers_buttonText));
         buttonTextView.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(6), Theme.getColor(Theme.key_featuredStickers_addButton), Theme.getColor(Theme.key_featuredStickers_addButtonPressed)));
-        addView(buttonTextView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, Gravity.BOTTOM, 16, 15, 16, 16));
+        addView(buttonTextView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48, Gravity.BOTTOM, 16, 15, 16, 16));
     }
 }

@@ -4,8 +4,8 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.graphics.RectF;
 import android.util.AttributeSet;
+
 import androidx.annotation.ColorInt;
 import androidx.annotation.FloatRange;
 import androidx.annotation.IntDef;
@@ -50,7 +50,6 @@ public class Shimmer {
 
     final float[] positions = new float[COMPONENT_COUNT];
     final int[] colors = new int[COMPONENT_COUNT];
-    final RectF bounds = new RectF();
 
     @Direction int direction = Direction.LEFT_TO_RIGHT;
     @ColorInt int highlightColor = Color.WHITE;
@@ -119,14 +118,6 @@ public class Shimmer {
                 positions[3] = 1f;
                 break;
         }
-    }
-
-    void updateBounds(int viewWidth, int viewHeight) {
-        int magnitude = Math.max(viewWidth, viewHeight);
-        double rad = Math.PI / 2f - Math.toRadians(tilt % 90f);
-        double hyp = magnitude / Math.sin(rad);
-        int padding = 3 * Math.round((float) (hyp - magnitude) / 2f);
-        bounds.set(-padding, -padding, width(viewWidth) + padding, height(viewHeight) + padding);
     }
 
     public abstract static class Builder<T extends Builder<T>> {
@@ -346,14 +337,14 @@ public class Shimmer {
          * 1].
          */
         public T setBaseAlpha(@FloatRange(from = 0, to = 1) float alpha) {
-            int intAlpha = (int) (clamp(0f, 1f, alpha) * 255f);
+            int intAlpha = (int) (clamp(alpha) * 255f);
             mShimmer.baseColor = intAlpha << 24 | (mShimmer.baseColor & 0x00FFFFFF);
             return getThis();
         }
 
         /** Sets the shimmer alpha amount in the range [0, 1]. */
         public T setHighlightAlpha(@FloatRange(from = 0, to = 1) float alpha) {
-            int intAlpha = (int) (clamp(0f, 1f, alpha) * 255f);
+            int intAlpha = (int) (clamp(alpha) * 255f);
             mShimmer.highlightColor = intAlpha << 24 | (mShimmer.highlightColor & 0x00FFFFFF);
             return getThis();
         }
@@ -424,8 +415,8 @@ public class Shimmer {
             return mShimmer;
         }
 
-        private static float clamp(float min, float max, float value) {
-            return Math.min(max, Math.max(min, value));
+        private static float clamp(float value) {
+            return Math.min(1.0f, Math.max(0.0f, value));
         }
     }
 
