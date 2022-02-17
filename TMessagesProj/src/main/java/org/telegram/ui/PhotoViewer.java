@@ -249,6 +249,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.helpers.ForwardContext;
 
 @SuppressWarnings("unchecked")
 public class PhotoViewer implements NotificationCenter.NotificationCenterDelegate, GestureDetector2.OnGestureListener, GestureDetector2.OnDoubleTapListener {
@@ -304,7 +305,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private ActionBarMenuSubItem speedItem;
     private ActionBarMenuSubItem[] speedItems = new ActionBarMenuSubItem[5];
     private View speedGap;
-    private ActionBarMenuItem sendNoQuoteItem;
     private ActionBarMenuItem sendItem;
     private ActionBarMenuItem pipItem;
     private ActionBarMenuItem masksItem;
@@ -3934,14 +3934,17 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     final ArrayList<MessageObject> fmessages = new ArrayList<>();
                     fmessages.add(currentMessageObject);
                     final ChatActivity parentChatActivityFinal = parentChatActivity;
+                    fragment.forwardContext = () -> fmessages;
+                    ForwardContext.ForwardParams forwardParams = fragment.forwardContext.getForwardParams();
+                    forwardParams.noQuote = id == gallery_menu_send_noquote;
                     fragment.setDelegate((fragment1, dids, message, param) -> {
                         if (dids.size() > 1 || dids.get(0) == UserConfig.getInstance(currentAccount).getClientUserId() || message != null) {
                             for (int a = 0; a < dids.size(); a++) {
                                 long did = dids.get(a);
                                 if (message != null) {
-                                    SendMessagesHelper.getInstance(currentAccount).sendMessage(message.toString(), did, null, null, null, true, null, null, null, true, 0, null);
+                                    SendMessagesHelper.getInstance(currentAccount).sendMessage(message.toString(), did, null, null, null, true, null, null, null, forwardParams.notify, forwardParams.scheduleDate, null);
                                 }
-                                SendMessagesHelper.getInstance(currentAccount).sendMessage(fmessages, did, id == gallery_menu_send_noquote, false, true, 0);
+                                SendMessagesHelper.getInstance(currentAccount).sendMessage(fmessages, did, forwardParams.noQuote, forwardParams.noCaption, forwardParams.notify, forwardParams.scheduleDate);
                             }
                             fragment1.finishFragment();
                             if (parentChatActivityFinal != null) {
@@ -3954,9 +3957,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                         } else {
                             long did = dids.get(0);
                             Bundle args1 = new Bundle();
-                            if (id == gallery_menu_send_noquote) {
-                                args1.putBoolean("forward_noquote", true);
-                            }
+                            args1.putBoolean("forward_noquote", forwardParams.noQuote);
+                            args1.putBoolean("forward_nocaption", forwardParams.noCaption);
                             args1.putBoolean("scrollToTopOnResume", true);
                             if (DialogObject.isEncryptedDialog(did)) {
                                 args1.putInt("enc_id", DialogObject.getEncryptedChatId(did));
@@ -4402,8 +4404,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         masksItem = menu.addItem(gallery_menu_masks, R.drawable.msg_mask);
         masksItem.setContentDescription(LocaleController.getString("Masks", R.string.Masks));
         pipItem = menu.addItem(gallery_menu_pip, R.drawable.ic_goinline);
-        sendNoQuoteItem = menu.addItem(gallery_menu_send_noquote, R.drawable.msg_forward_noquote);
-        sendNoQuoteItem.setContentDescription(LocaleController.getString("NoQuoteForward", R.string.NoQuoteForward));
         pipItem.setContentDescription(LocaleController.getString("AccDescrPipMode", R.string.AccDescrPipMode));
         sendItem = menu.addItem(gallery_menu_send, R.drawable.msg_forward);
         sendItem.setContentDescription(LocaleController.getString("Forward", R.string.Forward));
@@ -4481,7 +4481,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         menuItem.addSubItem(gallery_menu_delete, R.drawable.msg_delete, LocaleController.getString("Delete", R.string.Delete)).setColors(0xfffafafa, 0xfffafafa);
         menuItem.addSubItem(gallery_menu_cancel_loading, R.drawable.msg_cancel, LocaleController.getString("StopDownload", R.string.StopDownload)).setColors(0xfffafafa, 0xfffafafa);
         menuItem.redrawPopup(0xf9222222);
-        sendNoQuoteItem.setContentDescription(LocaleController.getString("NoQuoteForward", R.string.NoQuoteForward));
         menuItemSpeed.redrawPopup(0xf9222222);
         setMenuItemIcon();
 
@@ -9788,8 +9787,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         isEvent = object != null && object.isEvent;
         sharedMediaType = MediaDataController.MEDIA_PHOTOVIDEO;
         allMediaItem.setText(LocaleController.getString("ShowAllMedia", R.string.ShowAllMedia));
-        sendNoQuoteItem.setVisibility(View.GONE);
-        setItemVisible(sendNoQuoteItem, false, false);
         setItemVisible(sendItem, false, false);
         setItemVisible(pipItem, false, true);
         cameraItem.setVisibility(View.GONE);
@@ -9949,9 +9946,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     needSearchImageInArr = false;
                 } else if (currentAnimation != null) {
                     needSearchImageInArr = false;
-                    sendNoQuoteItem.setVisibility(OwlConfig.showNoQuoteForward ? View.VISIBLE:View.GONE);
                     if (messageObject.canForwardMessage() && !noforwards) {
-                        setItemVisible(sendNoQuoteItem, OwlConfig.showNoQuoteForward, false);
                         setItemVisible(sendItem, true, false);
                     }
                 } else if (!messageObject.scheduled && !(messageObject.messageOwner.media instanceof TLRPC.TL_messageMediaInvoice) && !(messageObject.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage) && (messageObject.messageOwner.action == null || messageObject.messageOwner.action instanceof TLRPC.TL_messageActionEmpty)) {
@@ -9960,10 +9955,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     if (parentChatActivity == null || !parentChatActivity.isThreadChat()) {
                         menuItem.showSubItem(gallery_menu_showinchat);
                         menuItem.showSubItem(gallery_menu_showall);
-                        sendNoQuoteItem.setVisibility(OwlConfig.showNoQuoteForward ? View.VISIBLE:View.GONE);
                     }
                     setItemVisible(sendItem, !noforwards, false);
-                    setItemVisible(sendNoQuoteItem, !noforwards, false);
                 } else if (isEmbedVideo && messageObject.eventId == 0) {
                     setItemVisible(sendItem, true, false);
                 }
@@ -10015,9 +10008,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     startOffset = object.starOffset;
                 }
                 menuItem.showSubItem(gallery_menu_showinchat);
-                sendNoQuoteItem.setVisibility(OwlConfig.showNoQuoteForward ? View.VISIBLE:View.GONE);
                 if (openingObject.canForwardMessage() && !noforwards) {
-                    setItemVisible(sendNoQuoteItem, OwlConfig.showNoQuoteForward, false);
                     setItemVisible(sendItem, true, false);
                 }
                 if (openingObject.canPreviewDocument()) {
@@ -10390,7 +10381,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     actionBar.setTitle(LocaleController.getString("AttachDocument", R.string.AttachDocument));
                 }
                 if (DialogObject.isEncryptedDialog(currentDialogId) && !isEmbedVideo || noforwards) {
-                    setItemVisible(sendNoQuoteItem, false, false);
                     setItemVisible(sendItem, false, false);
                 }
                 if (isEmbedVideo || newMessageObject.messageOwner.ttl != 0 && newMessageObject.messageOwner.ttl < 60 * 60 || noforwards) {

@@ -279,13 +279,14 @@ import java.util.regex.Pattern;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.helpers.EntitiesHelper;
+import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.TranslateManager;
 import it.owlgram.android.helpers.TranslatorActionMessage;
 import it.owlgram.android.translator.Translator;
 import it.owlgram.android.ui.DetailsActivity;
 
 @SuppressWarnings("unchecked")
-public class ChatActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, LocationActivity.LocationActivityDelegate, ChatAttachAlertDocumentLayout.DocumentSelectActivityDelegate {
+public class ChatActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, LocationActivity.LocationActivityDelegate, ChatAttachAlertDocumentLayout.DocumentSelectActivityDelegate, ForwardContext {
 
     protected TLRPC.Chat currentChat;
     protected TLRPC.User currentUser;
@@ -698,9 +699,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private Runnable destroyTextureViewRunnable = () -> {
         destroyTextureView();
     };
-
-    public boolean noForwardQuote;
-    public boolean noForwardCaption;
 
     private Paint scrimPaint;
     private Paint actionBarBackgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -1539,8 +1537,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         int migrated_to = arguments.getInt("migrated_to", 0);
         scrollToTopOnResume = arguments.getBoolean("scrollToTopOnResume", false);
         needRemovePreviousSameChatActivity = arguments.getBoolean("need_remove_previous_same_chat_activity", true);
-        noForwardQuote = arguments.getBoolean("forward_noquote", false);
-        noForwardCaption = arguments.getBoolean("forward_nocaption", false);
+        setForwardParams(
+                arguments.getBoolean("forward_noQuote", false),
+                arguments.getBoolean("forward_noCaption", false)
+        );
         if (chatId != 0) {
             currentChat = getMessagesController().getChat(chatId);
             if (currentChat == null) {
@@ -2264,8 +2264,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     updateActionModeTitle();
                     updateVisibleRows();
                 } else if (id == forward || id == forward_noquote) {
-                    noForwardQuote = id == forward_noquote;
-                    noForwardCaption = false;
+                    setForwardParams(id == forward_noquote);
                     openForward(true);
                 } else if (id == save_to) {
                     ArrayList<MessageObject> messageObjects = new ArrayList<>();
@@ -8400,8 +8399,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         image.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_actionBarActionModeDefaultIcon), PorterDuff.Mode.MULTIPLY));
         forwardButton.setCompoundDrawablesWithIntrinsicBounds(image, null, null, null);
         forwardButton.setOnClickListener(v -> {
-            noForwardQuote = false;
-            noForwardCaption = false;
+            setForwardParams(false);
             openForward(false);
         });
         bottomMessagesActionContainer.addView(forwardButton, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.RIGHT | Gravity.TOP));
@@ -8810,8 +8808,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 super.selectAnotherChat();
                 dismiss(false);
                 if (forwardingMessages != null) {
-                    noForwardQuote = forwardingMessages.hideForwardSendersName;
-                    noForwardCaption = forwardingMessages.hideCaption;
+                    setForwardParams(
+                            forwardingMessages.hideForwardSendersName,
+                            forwardingMessages.hideCaption
+                    );
                     int hasPoll = 0;
                     boolean hasInvoice = false;
                     for (int a = 0, N = forwardingMessages.messages.size(); a < N; a++) {
@@ -11644,13 +11644,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (foundWebPage != null) {
                     return;
                 }
-                if (noForwardQuote) {
-                    noForwardQuote = false;
-                    forwardingMessages.hideForwardSendersName = true;
-                }
-                if (noForwardCaption) {
-                    noForwardCaption = false;
-                    forwardingMessages.hideCaption = true;
+                if (forwardParams.noQuote || forwardParams.noCaption) {
+                    forwardingMessages.hideForwardSendersName = forwardParams.noQuote;
+                    forwardingMessages.hideCaption = forwardParams.noCaption;
+                    setForwardParams(false, false);
                 }
                 chatActivityEnterView.setForceShowSendButton(true, false);
                 ArrayList<Long> uids = new ArrayList<>();
@@ -13564,7 +13561,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     forwardNoQuoteItem.setVisibility(OwlConfig.showNoQuoteForward ? View.VISIBLE:View.GONE);
                 }
                 if (forwardItem != null) {
-                    if (canSaveDocumentsCount == 1 && canEditMessagesCount == 1 && canForwardMessagesCount == 1) {
+                    if (canSaveDocumentsCount == 1 && canEditMessagesCount == 1 && canForwardMessagesCount == 1 && OwlConfig.showNoQuoteForward) {
                         forwardItem.setVisibility(View.GONE);
                     } else {
                         forwardItem.setVisibility(View.VISIBLE);
@@ -22669,9 +22666,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 createDeleteMessagesAlert(selectedObject, selectedObjectGroup);
                 break;
             }
-            case 2: {
-                noForwardQuote = false;
-                noForwardCaption = false;
+            case 2:
+            case 204: {
+                setForwardParams(option == 204);
                 forwardingMessage = selectedObject;
                 forwardingMessageGroup = selectedObjectGroup;
                 Bundle args = new Bundle();
@@ -23254,19 +23251,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 presentFragment(new DetailsActivity(selectedObject));
                 break;
             }
-            case 204: {
-                noForwardQuote = true;
-                noForwardCaption = false;
-                forwardingMessage = selectedObject;
-                forwardingMessageGroup = selectedObjectGroup;
-                Bundle args = new Bundle();
-                args.putBoolean("onlySelect", true);
-                args.putInt("dialogsType", 3);
-                DialogsActivity fragment = new DialogsActivity(args);
-                fragment.setDelegate(this);
-                presentFragment(fragment);
-                break;
-            }
             case 205: {
                 if (Build.VERSION.SDK_INT >= 23 && (Build.VERSION.SDK_INT <= 28 || BuildVars.NO_SCOPED_STORAGE) && getParentActivity().checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                     getParentActivity().requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 4);
@@ -23451,6 +23435,37 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     @Override
+    public ArrayList<MessageObject> getForwardingMessages() {
+        ArrayList<MessageObject> fMessages = new ArrayList<>();
+        if (forwardingMessage == null && selectedMessagesIds[0].size() == 0 && selectedMessagesIds[1].size() == 0) {
+            return fMessages;
+        }
+        if (forwardingMessage != null) {
+            if (forwardingMessageGroup != null) {
+                fMessages.addAll(forwardingMessageGroup.messages);
+            } else {
+                fMessages.add(forwardingMessage);
+            }
+        } else {
+            for (int a = 1; a >= 0; a--) {
+                ArrayList<Integer> ids = new ArrayList<>();
+                for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
+                    ids.add(selectedMessagesIds[a].keyAt(b));
+                }
+                Collections.sort(ids);
+                for (int b = 0; b < ids.size(); b++) {
+                    Integer id = ids.get(b);
+                    MessageObject messageObject = selectedMessagesIds[a].get(id);
+                    if (messageObject != null) {
+                        fMessages.add(messageObject);
+                    }
+                }
+            }
+        }
+        return fMessages;
+    }
+
+    @Override
     public void didSelectDialogs(DialogsActivity fragment, ArrayList<Long> dids, CharSequence message, boolean param) {
         if (forwardingMessage == null && selectedMessagesIds[0].size() == 0 && selectedMessagesIds[1].size() == 0) {
             return;
@@ -23493,9 +23508,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             for (int a = 0; a < dids.size(); a++) {
                 long did = dids.get(a);
                 if (message != null) {
-                    getSendMessagesHelper().sendMessage(message.toString(), did, null, null, null, true, null, null, null, true, 0, null);
+                    getSendMessagesHelper().sendMessage(message.toString(), did, null, null, null, true, null, null, null, forwardParams.notify, forwardParams.scheduleDate, null);
                 }
-                getSendMessagesHelper().sendMessage(fmessages, did, noForwardQuote, noForwardCaption,true, 0);
+                getSendMessagesHelper().sendMessage(fmessages, did, forwardParams.noQuote, forwardParams.noCaption, forwardParams.notify, forwardParams.scheduleDate);
             }
             fragment.finishFragment();
             if (dids.size() == 1) {
@@ -23507,12 +23522,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             long did = dids.get(0);
             if (did != dialog_id || chatMode == MODE_PINNED) {
                 Bundle args = new Bundle();
-                if (noForwardQuote) {
-                    args.putBoolean("forward_noquote", true);
-                }
-                if (noForwardCaption) {
-                    args.putBoolean("forward_nocaption", true);
-                }
+                args.putBoolean("forward_noQuote", forwardParams.noQuote);
+                args.putBoolean("forward_noCaption", forwardParams.noCaption);
                 args.putBoolean("scrollToTopOnResume", scrollToTopOnResume);
                 if (DialogObject.isEncryptedDialog(did)) {
                     args.putInt("enc_id", DialogObject.getEncryptedChatId(did));

@@ -4041,7 +4041,8 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
 
             }
         } else {
-            boolean notify = dialogsFragment == null || dialogsFragment.notify;
+            boolean notify = dialogsFragment == null || dialogsFragment.forwardContext.getForwardParams().notify;
+            int scheduleDate = dialogsFragment == null ? 0 : dialogsFragment.forwardContext.getForwardParams().scheduleDate;
             final ChatActivity fragment;
             if (dids.size() <= 1) {
                 final long did = dids.get(0);
@@ -4095,7 +4096,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
 
             if (contactsToSend != null && contactsToSend.size() == 1 && !mainFragmentsStack.isEmpty()) {
                 PhonebookShareAlert alert = new PhonebookShareAlert(mainFragmentsStack.get(mainFragmentsStack.size() - 1), null, null, contactsToSendUri, null, null, null);
-                alert.setDelegate((user, notify2, scheduleDate) -> {
+                alert.setDelegate((user, notify2, scheduleDate2) -> {
                     if (fragment != null) {
                         actionBarLayout.presentFragment(fragment, true, false, true, false);
                     }
@@ -4131,7 +4132,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                             }
                             ArrayList<String> arrayList = new ArrayList<>();
                             arrayList.add(videoPath);
-                            SendMessagesHelper.prepareSendingDocuments(accountInstance, arrayList, arrayList, null, captionToSend, null, did, null, null, null, null, notify, 0);
+                            SendMessagesHelper.prepareSendingDocuments(accountInstance, arrayList, arrayList, null, captionToSend, null, did, null, null, null, null, notify, scheduleDate);
                         }
                     }
                     if (photoPathsArray != null && !photosEditorOpened) {
@@ -4139,14 +4140,14 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                             photoPathsArray.get(0).caption = sendingText;
                             sendingText = null;
                         }
-                        SendMessagesHelper.prepareSendingMedia(accountInstance, photoPathsArray, did, null, null, null, false, false, null, notify, 0);
+                        SendMessagesHelper.prepareSendingMedia(accountInstance, photoPathsArray, did, null, null, null, false, false, null, notify, scheduleDate);
                     }
                     if (documentsPathsArray != null || documentsUrisArray != null) {
                         if (sendingText != null && sendingText.length() <= 1024 && ((documentsPathsArray != null ? documentsPathsArray.size() : 0) + (documentsUrisArray != null ? documentsUrisArray.size() : 0)) == 1) {
                             captionToSend = sendingText;
                             sendingText = null;
                         }
-                        SendMessagesHelper.prepareSendingDocuments(accountInstance, documentsPathsArray, documentsOriginalPathsArray, documentsUrisArray, captionToSend, documentsMimeType, did, null, null, null, null, notify, 0);
+                        SendMessagesHelper.prepareSendingDocuments(accountInstance, documentsPathsArray, documentsOriginalPathsArray, documentsUrisArray, captionToSend, documentsMimeType, did, null, null, null, null, notify, scheduleDate);
                     }
                     if (sendingText != null) {
                         SendMessagesHelper.prepareSendingText(accountInstance, sendingText, did, true, 0);
@@ -4154,11 +4155,11 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                     if (contactsToSend != null && !contactsToSend.isEmpty()) {
                         for (int a = 0; a < contactsToSend.size(); a++) {
                             TLRPC.User user = contactsToSend.get(a);
-                            SendMessagesHelper.getInstance(account).sendMessage(user, did, null, null, null, null, notify, 0);
+                            SendMessagesHelper.getInstance(account).sendMessage(user, did, null, null, null, null, notify, scheduleDate);
                         }
                     }
                     if (!TextUtils.isEmpty(message)) {
-                        SendMessagesHelper.prepareSendingText(accountInstance, message.toString(), did, notify, 0);
+                        SendMessagesHelper.prepareSendingText(accountInstance, message.toString(), did, notify, scheduleDate);
                     }
                 }
             }
