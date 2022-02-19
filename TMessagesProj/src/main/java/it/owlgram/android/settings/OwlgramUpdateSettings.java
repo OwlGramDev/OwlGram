@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildVars;
@@ -28,7 +30,7 @@ import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
-import it.owlgram.android.Copyright;
+import it.owlgram.android.PlayStoreUtils;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateCell;
 import it.owlgram.android.components.UpdateCheckCell;
@@ -62,7 +64,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
             if(data.length() > 0) {
                 JSONObject jsonObject = new JSONObject(data);
                 updateAvailable = UpdateManager.loadUpdate(jsonObject);
-                if(updateAvailable.version <= UpdateManager.currentVersion()) {
+                if(updateAvailable.version <= UpdateManager.currentVersion() && !BuildVars.IGNORE_VERSION_CHECK) {
                     updateAvailable = null;
                 }
             }
@@ -167,7 +169,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
 
         updateSectionHeader = rowCount++;
         updateCheckRow = rowCount++;
-        if(Copyright.isNoCopyrightFeaturesEnabled()){
+        if(!PlayStoreUtils.isDownloadedFromPlayStore()){
             betaUpdatesRow = rowCount++;
         }
         notifyWhenAvailableRow = rowCount++;
@@ -272,7 +274,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
                         @Override
                         protected void onConfirmUpdate() {
                             super.onConfirmUpdate();
-                            if(Copyright.isNoCopyrightFeaturesEnabled()){
+                            if(!PlayStoreUtils.isDownloadedFromPlayStore()){
                                 if(!ApkDownloader.isRunningDownload()) {
                                     ApkDownloader.downloadAPK(mContext, updateAvailable.link_file, updateAvailable.version);
                                     updateCell.setDownloadMode();

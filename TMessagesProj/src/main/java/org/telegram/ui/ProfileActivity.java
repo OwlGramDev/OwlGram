@@ -3753,13 +3753,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 presentFragment(new ChangeBioActivity());
             }
         } else if (position == channelInfoRow || position == userInfoRow || position == locationRow) {
-            boolean canShowTranslate = true;
-            if (view instanceof AboutLinkCell) {
-                AboutLinkCell aboutLinkCell = (AboutLinkCell) view;
-                canShowTranslate = aboutLinkCell.expandT >= 0.8f;
+            if (view instanceof AboutLinkCell && ((AboutLinkCell) view).onClick()) {
+                return false;
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-            builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy), canShowTranslate ? (originalBio != null ? LocaleController.getString("UndoTranslate",R.string.UndoTranslate):LocaleController.getString("TranslateMessage",R.string.TranslateMessage)):null}, (dialogInterface, i) -> {
+            builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy), originalBio != null ? LocaleController.getString("UndoTranslate",R.string.UndoTranslate):LocaleController.getString("TranslateMessage",R.string.TranslateMessage)}, (dialogInterface, i) -> {
                 try {
                     String about;
                     if(originalBio != null){

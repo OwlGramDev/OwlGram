@@ -9,7 +9,6 @@ import android.os.PowerManager;
 import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
-import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.NotificationCenter;
 
 import java.io.File;
@@ -62,7 +61,6 @@ public class ApkDownloader {
                 }
             }
         } catch (Exception ignored) {}
-        code -= BuildVars.IGNORE_VERSION_CHECK ? 1:0;
         boolean isAvailableFile = apkFile().exists() && downloadThread == null && !isCorrupted;
         if((code >= OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
             OwlConfig.setUpdateData("");
@@ -76,7 +74,7 @@ public class ApkDownloader {
     }
 
     public static void installUpdate(Activity activity) {
-        AndroidUtilities.openForView(ApkDownloader.apkFile(), "update.apk", "application/vnd.android.package-archive", activity, null);
+        ApkInstaller.installApk(activity);
     }
 
     public static void downloadAPK(Context context, String link, int version) {

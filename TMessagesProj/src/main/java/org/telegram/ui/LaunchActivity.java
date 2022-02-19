@@ -39,7 +39,6 @@ import android.os.StatFs;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.provider.Settings;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.util.Base64;
@@ -52,7 +51,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
@@ -73,13 +71,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.appindexing.Action;
 import com.google.firebase.appindexing.FirebaseUserActions;
 import com.google.firebase.appindexing.builders.AssistActionBuilder;
-import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONObject;
 import org.telegram.PhoneFormat.PhoneFormat;
@@ -113,7 +107,6 @@ import org.telegram.messenger.camera.CameraController;
 import org.telegram.messenger.voip.VideoCapturerDevice;
 import org.telegram.messenger.voip.VoIPPendingCall;
 import org.telegram.messenger.voip.VoIPService;
-import org.telegram.tgnet.AbstractSerializedData;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
@@ -123,7 +116,6 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.DrawerLayoutContainer;
 import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Adapters.DialogsAdapter;
 import org.telegram.ui.Adapters.DrawerLayoutAdapter;
 import org.telegram.ui.Cells.DrawerAddCell;
 import org.telegram.ui.Cells.DrawerProfileCell;
@@ -156,7 +148,6 @@ import org.telegram.ui.Components.StickersAlert;
 import org.telegram.ui.Components.TermsOfServiceView;
 import org.telegram.ui.Components.ThemeEditorView;
 import org.telegram.ui.Components.UndoView;
-import org.telegram.ui.Components.UpdateAppAlertDialog;
 import org.telegram.ui.Components.voip.VoIPHelper;
 import org.webrtc.voiceengine.WebRtcAudioTrack;
 
@@ -175,7 +166,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import it.owlgram.android.Copyright;
+import it.owlgram.android.PlayStoreUtils;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateAlertDialog;
 import it.owlgram.android.helpers.UpdateSignaling;
@@ -185,6 +176,7 @@ import it.owlgram.android.settings.OwlgramGeneralSettings;
 import it.owlgram.android.settings.OwlgramSettings;
 import it.owlgram.android.ui.DatacenterActivity;
 import it.owlgram.android.updates.ApkDownloader;
+import it.owlgram.android.updates.ApkInstaller;
 import it.owlgram.android.updates.UpdateManager;
 
 public class LaunchActivity extends Activity implements ActionBarLayout.ActionBarLayoutDelegate, NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate {
@@ -1242,6 +1234,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         });
     }
 
+    @SuppressLint("SetTextI18n")
     private boolean handleIntent(Intent intent, boolean isNew, boolean restore, boolean fromPassword) {
         if (AndroidUtilities.handleProxyIntent(this, intent)) {
             actionBarLayout.showLastFragment();
@@ -2033,6 +2026,17 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                                         ProfileActivity.startOwlSound();
                                     } else if (url.startsWith("tg:update") || url.startsWith("tg://update")) {
                                         checkAppUpdate(true);
+                                    } else if (url.startsWith("tg:stocwddo") || url.startsWith("tg://stocwddo")) {
+                                        BaseFragment fragment = mainFragmentsStack.get(mainFragmentsStack.size() - 1);
+                                        TLRPC.Document document = MediaDataController.getInstance(currentAccount).getEmojiAnimatedSticker("\uD83D\uDE02");
+                                        StickerSetBulletinLayout layout = new StickerSetBulletinLayout(fragment.getParentActivity(), null, StickerSetBulletinLayout.TYPE_EMPTY, document, fragment.getResourceProvider());
+                                        layout.subtitleTextView.setVisibility(View.GONE);
+                                        layout.titleTextView.setText("Sei stato Stocwddato \uD83D\uDE02\uD83D\uDE02\uD83D\uDE02\uD83D\uDE02");
+                                        layout.titleTextView.setTypeface(null);
+                                        layout.titleTextView.setMaxLines(3);
+                                        layout.titleTextView.setSingleLine(false);
+                                        Bulletin bulletin = Bulletin.make(fragment, layout, Bulletin.DURATION_LONG);
+                                        bulletin.show();
                                     } else if (url.startsWith("tg:experimental") || url.startsWith("tg://experimental")) {
                                         actionBarLayout.presentFragment(new OwlgramExperimentalSettings(), false, true, true, false);
                                         if (AndroidUtilities.isTablet()) {
@@ -3607,8 +3611,8 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         }
         updateLayout = new FrameLayout(this) {
 
-            private Paint paint = new Paint();
-            private Matrix matrix = new Matrix();
+            private final Paint paint = new Paint();
+            private final Matrix matrix = new Matrix();
             private LinearGradient updateGradient;
             private int lastGradientWidth;
 
@@ -3643,25 +3647,12 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
         }
         sideMenuContainer.addView(updateLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 44, Gravity.LEFT | Gravity.BOTTOM));
         updateLayout.setOnClickListener(v -> {
-            /*if (!SharedConfig()) {
-                return;
-            }
-            if (updateLayoutIcon.getIcon() == MediaActionDrawable.ICON_DOWNLOAD) {
-                FileLoader.getInstance(currentAccount).loadFile(SharedConfig.pendingAppUpdate.document, "update", 1, 1);
-                updateAppUpdateViews(true);
-            } else if (updateLayoutIcon.getIcon() == MediaActionDrawable.ICON_CANCEL) {
-                FileLoader.getInstance(currentAccount).cancelLoadFile(SharedConfig.pendingAppUpdate.document);
-                updateAppUpdateViews(true);
-            } else {
-                AndroidUtilities.openForView(SharedConfig.pendingAppUpdate.document, true, this);
-            }*/
-
-            if(ApkDownloader.isRunningDownload()) {
-                ApkDownloader.cancel();
-            } else if(ApkDownloader.updateDownloaded()) {
-                ApkDownloader.installUpdate(LaunchActivity.this);
-            } else {
-                if(Copyright.isNoCopyrightFeaturesEnabled()){
+            if (!PlayStoreUtils.isDownloadedFromPlayStore()) {
+                if(ApkDownloader.isRunningDownload()) {
+                    ApkDownloader.cancel();
+                } else if(ApkDownloader.updateDownloaded()) {
+                    ApkDownloader.installUpdate(LaunchActivity.this);
+                } else {
                     try {
                         String data = OwlConfig.updateData;
                         if(data.length() > 0) {
@@ -3670,9 +3661,9 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                             ApkDownloader.downloadAPK(LaunchActivity.this, update.link_file, update.version);
                         }
                     } catch (Exception ignored){}
-                } else {
-                    Browser.openUrl(getApplicationContext(), BuildVars.PLAYSTORE_APP_URL);
                 }
+            } else {
+                Browser.openUrl(LaunchActivity.this, BuildVars.PLAYSTORE_APP_URL);
             }
         });
         updateLayoutIcon = new RadialProgress2(updateLayout);
@@ -4507,6 +4498,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
     @Override
     protected void onResume() {
         super.onResume();
+        ApkInstaller.checkCanceledInstallation(LaunchActivity.this);
         if (Theme.selectedAutoNightType == Theme.AUTO_NIGHT_TYPE_SYSTEM) {
             Theme.checkAutoNightThemeConditions();
         }

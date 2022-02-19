@@ -501,7 +501,7 @@ public class AboutLinkCell extends FrameLayout {
         }
     }
 
-    public float expandT = 0f;
+    private float expandT = 0f;
     private float rawCollapseT = 0f;
     private ValueAnimator collapseAnimator;
     private boolean expanded = false;
@@ -708,6 +708,11 @@ public class AboutLinkCell extends FrameLayout {
         }
         return false;
     }
+
+    public boolean isExpanded() {
+        return !(shouldExpand && expandT <= 0);
+    }
+
     private float easeInOutCubic(float x) {
         return x < 0.5 ? 4 * x * x * x : 1 - (float) Math.pow(-2 * x + 2, 3) / 2;
     }

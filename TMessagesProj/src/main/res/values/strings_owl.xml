@@ -186,4 +186,12 @@
     <string name="DatacenterDesc">Here you can see the various status of <![CDATA[<a href="https://core.telegram.org/api/datacenter">Media Datacenter</a>]]> in realtime from the section below</string>
     <string name="WebVersion">Open Web Version</string>
     <string name="Repeat">Repeat</string>
+    <string name="InstallingUpdate">Installing update</string>
+    <string name="InstallationInProgress">Installation in progress…</string>
+    <string name="InstallationWarning">Keep OwlGram open until the installation is complete</string>
+    <string name="ErrorDuringInstallation">Error during installation</string>
+    <string name="UnknownInstallationError">An unknown error was raised by your device, report this problem to the Support!</string>
+    <string name="InstallationBlocked">Your phone have blocked this installation, report this problem to the Support!</string>
+    <string name="InstallationFailure">This version is currently corrupted, report this problem to the Support!</string>
+    <string name="InstallationNoMoreSpace">No more space available on your device, free up your device memory and try again</string>
 </resources>

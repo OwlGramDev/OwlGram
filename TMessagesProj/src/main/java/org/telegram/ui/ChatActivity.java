@@ -25732,7 +25732,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
                     @Override
                     public PinchToZoomHelper getPinchToZoomHelper() {
-                        return pinchToZoomHelper;
+                        return inPreviewMode ? null:pinchToZoomHelper;
                     }
 
                     @Override

@@ -4,6 +4,11 @@ import android.content.pm.PackageInfo;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.tasks.Task;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
@@ -14,12 +19,14 @@ import org.telegram.messenger.LocaleController;
 import java.net.URLEncoder;
 import java.util.Locale;
 
-import it.owlgram.android.Copyright;
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.PlayStoreUtils;
 import it.owlgram.android.helpers.EntitiesHelper;
 import it.owlgram.android.helpers.StandardHTTPRequest;
 
 public class UpdateManager {
+
+
 
     public static void isDownloadedUpdate(UpdateUICallback updateUICallback) {
         new Thread() {
@@ -58,8 +65,19 @@ public class UpdateManager {
     }
 
     public static void checkUpdates(UpdateCallback updateCallback) {
+        if (PlayStoreUtils.isDownloadedFromPlayStore()) {
+            AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(ApplicationLoader.applicationContext);
+            Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+            appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> checkInternal(updateCallback, appUpdateInfo.availableVersionCode() / 10));
+            appUpdateInfoTask.addOnFailureListener(e -> checkInternal(updateCallback, -1));
+        } else {
+            checkInternal(updateCallback, -1);
+        }
+    }
+
+    private static void checkInternal(UpdateCallback updateCallback, int psVersionCode) {
         Locale locale = LocaleController.getInstance().getCurrentLocale();
-        boolean betaMode = OwlConfig.betaUpdates && Copyright.isNoCopyrightFeaturesEnabled();
+        boolean betaMode = OwlConfig.betaUpdates && !PlayStoreUtils.isDownloadedFromPlayStore();
         new Thread() {
             @Override
             public void run() {
@@ -93,7 +111,7 @@ public class UpdateManager {
                             }
                             break;
                     }
-                    String url = String.format("https://app.owlgram.org/version?lang=%s&beta=%s&abi=%s", locale.getLanguage(), betaMode,  URLEncoder.encode(abi, "utf-8"));
+                    String url = String.format(locale,"https://app.owlgram.org/version?lang=%s&beta=%s&abi=%s&ps=%d", locale.getLanguage(), betaMode,  URLEncoder.encode(abi, "utf-8"), psVersionCode);
                     JSONObject obj = new JSONObject(new StandardHTTPRequest(url).request());
                     String update_status = obj.getString("status");
                     if (update_status.equals("no_updates")) {
@@ -161,7 +179,7 @@ public class UpdateManager {
     public static int currentVersion() {
         try {
             PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
-            return (pInfo.versionCode / 10) - (BuildVars.IGNORE_VERSION_CHECK ? 1:0);
+            return (pInfo.versionCode / 10) - (BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE:0);
         } catch (Exception e){
             return 0;
         }

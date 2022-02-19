@@ -520,6 +520,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         muteButton.setVisibility(GONE);
         addView(muteButton, LayoutHelper.createFrame(36, 36, Gravity.RIGHT | Gravity.TOP, 0, 0, 2, 0));
         muteButton.setOnClickListener(v -> {
+            if (fragment != null && fragment.getInPreviewMode()) return;
             VoIPService voIPService = VoIPService.getSharedInstance();
             if (voIPService == null) {
                 return;
@@ -651,6 +652,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                     fragment.showDialog(new SharingLocationsAlert(getContext(), this::openSharingLocation, resourcesProvider));
                 }
             } else if (currentStyle == 3) {
+                if (fragment != null && fragment.getInPreviewMode()) return;
                 if (VoIPService.getSharedInstance() != null && getContext() instanceof LaunchActivity) {
                     GroupCallActivity.create((LaunchActivity) getContext(), AccountInstance.getInstance(VoIPService.getSharedInstance().getAccount()), null, null, false, null);
                 }

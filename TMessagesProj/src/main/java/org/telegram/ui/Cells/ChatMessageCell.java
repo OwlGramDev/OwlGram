@@ -2289,14 +2289,13 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         int y = (int) event.getY();
 
         boolean result = false;
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-
+        if (event.getAction() == MotionEvent.ACTION_DOWN && this.baseFragment != null && !this.baseFragment.getInPreviewMode()) {
             final Handler handler = new Handler();
             Runnable longPressed = () -> {
                 if(pressedBotButton != -1) {
                     BotButton botButton = botButtons.get(pressedBotButton);
                     if(TextUtils.isEmpty(botButton.button.url)){
-                        if(this.baseFragment != null && (botButton.button.query != null || botButton.button.data != null)) {
+                        if(botButton.button.query != null || botButton.button.data != null) {
                             if(botButton.button.query == null){
                                 AndroidUtilities.addToClipboard(new String(botButton.button.data));
                             }else{
@@ -2343,6 +2342,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     pressedBotButton = a;
                     invalidate();
                     result = true;
+
                     handler.postDelayed(longPressed, ViewConfiguration.getLongPressTimeout());
                     break;
                 }

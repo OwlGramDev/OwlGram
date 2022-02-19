@@ -69,7 +69,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
-import it.owlgram.android.Copyright;
+import it.owlgram.android.PlayStoreUtils;
 import it.owlgram.android.OwlConfig;
 
 public class  MessagesController extends BaseController implements NotificationCenter.NotificationCenterDelegate {
@@ -14765,7 +14765,7 @@ public class  MessagesController extends BaseController implements NotificationC
         }
         for (int a = 0, N = reasons.size(); a < N; a++) {
             TLRPC.TL_restrictionReason reason = reasons.get(a);
-            if ("all".equals(reason.platform) || !BuildVars.isStandaloneApp() && !BuildVars.isBetaApp() && "android".equals(reason.platform) && !Copyright.isNoCopyrightFeaturesEnabled()) {
+            if ("all".equals(reason.platform) || !BuildVars.isStandaloneApp() && !BuildVars.isBetaApp() && "android".equals(reason.platform) && PlayStoreUtils.isDownloadedFromPlayStore()) {
                 return reason.text;
             }
         }
@@ -14810,7 +14810,7 @@ public class  MessagesController extends BaseController implements NotificationC
         } else {
             reason = getRestrictionReason(user.restriction_reason);
         }
-        if (reason != null && !Copyright.isNoCopyrightFeaturesEnabled()) {
+        if (reason != null && PlayStoreUtils.isDownloadedFromPlayStore()) {
             showCantOpenAlert(fragment, reason);
             return false;
         }

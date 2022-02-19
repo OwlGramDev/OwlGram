@@ -15,7 +15,7 @@ configurations.all {
 }
 
 dependencies {
-    implementation 'androidx.core:core:1.6.0'
+    implementation 'androidx.core:core:1.7.0'
     implementation 'androidx.palette:palette:1.0.0'
     implementation 'androidx.exifinterface:exifinterface:1.3.3'
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
@@ -49,6 +49,9 @@ dependencies {
     implementation "androidx.camera:camera-view:1.1.0-beta01"
     implementation "androidx.camera:camera-extensions:1.1.0-beta01"
     implementation 'androidx.interpolator:interpolator:1.0.0'
+
+    // GOOGLE PLAY UPDATE CHECKER
+    implementation 'com.google.android.play:core:1.10.3'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 }
@@ -309,7 +312,7 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 2567
+    defaultConfig.versionCode = 2569
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
