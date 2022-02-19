@@ -17,7 +17,6 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
-import org.telegram.messenger.XiaomiUtilities;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,7 +59,7 @@ public class ApkInstaller {
 
     public static void installApk(Activity context) {
         File apk = ApkDownloader.apkFile();
-        if (XiaomiUtilities.isMIUI() || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             AndroidUtilities.openForView(apk, "update.apk", "application/vnd.android.package-archive", context, null);
             return;
         }

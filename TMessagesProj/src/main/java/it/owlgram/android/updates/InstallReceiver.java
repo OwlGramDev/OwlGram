@@ -9,8 +9,6 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import com.google.android.exoplayer2.util.Log;
-
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -53,9 +51,6 @@ public class InstallReceiver extends BroadcastReceiver {
             case PackageInstaller.STATUS_FAILURE_INCOMPATIBLE:
             case PackageInstaller.STATUS_FAILURE_INVALID:
             case PackageInstaller.STATUS_FAILURE_STORAGE:
-                /*if (context instanceof LaunchActivity) {
-                    ((LaunchActivity) context).showBulletin(factory -> factory.createErrorBulletin(LocaleController.formatString("UpdateFailedToInstall", R.string.UpdateFailedToInstall, status)));
-                }*/
             case PackageInstaller.STATUS_FAILURE_ABORTED:
             case PackageInstaller.STATUS_SUCCESS:
             default:

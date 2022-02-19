@@ -111,13 +111,13 @@ public class UpdateManager {
                             }
                             break;
                     }
-                    String url = String.format(locale,"https://app.owlgram.org/version?lang=%s&beta=%s&abi=%s&ps=%d", locale.getLanguage(), betaMode,  URLEncoder.encode(abi, "utf-8"), psVersionCode);
+                    String url = String.format(locale,"https://app.owlgram.org/version?lang=%s&beta=%s&abi=%s", locale.getLanguage(), betaMode,  URLEncoder.encode(abi, "utf-8"));
                     JSONObject obj = new JSONObject(new StandardHTTPRequest(url).request());
                     String update_status = obj.getString("status");
                     if (update_status.equals("no_updates")) {
                         AndroidUtilities.runOnUIThread(() -> updateCallback.onSuccess(new UpdateNotAvailable()));
                     } else {
-                        int remoteVersion = obj.getInt("version");
+                        int remoteVersion = psVersionCode <= 0 ? obj.getInt("version"):psVersionCode;
                         if (remoteVersion > code || BuildVars.IGNORE_VERSION_CHECK) {
                             UpdateAvailable updateAvailable = loadUpdate(obj);
                             AndroidUtilities.runOnUIThread(() -> updateCallback.onSuccess(updateAvailable));
