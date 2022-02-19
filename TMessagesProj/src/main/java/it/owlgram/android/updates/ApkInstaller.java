@@ -98,7 +98,7 @@ public class ApkInstaller {
             case PackageInstaller.STATUS_FAILURE_CONFLICT:
                 return LocaleController.getString("InstallationFailure", R.string.InstallationFailure);
             case PackageInstaller.STATUS_FAILURE_STORAGE:
-                return LocaleController.getString("InstallationNoMoreSpace", R.string.InstallationNoMoreSpace);
+                return LocaleController.getString("NoMoreSpace", R.string.NoMoreSpace);
             case PackageInstaller.STATUS_FAILURE:
             default:
                 return LocaleController.getString("UnknownInstallationError", R.string.UnknownInstallationError);

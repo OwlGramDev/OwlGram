@@ -45,7 +45,7 @@ public class DatacenterHeaderRow extends LinearLayout {
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         textView.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
         textView.setHighlightColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkSelection));
-        String text = LocaleController.getString("DatacenterDesc", R.string.DatacenterDesc);
+        String text = LocaleController.getString("DatacenterStatusDesc", R.string.DatacenterStatusDesc);
         Spannable htmlParsed;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             htmlParsed = new SpannableString(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));

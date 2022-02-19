@@ -19,6 +19,8 @@
     <string name="SourceCode">Source Code</string>
     <string name="TranslateOwl">Translate OwlGram</string>
     <string name="TranslateOwlDesc">Help us translate OwlGram into your language</string>
+    <string name="Donate">Donate</string>
+    <string name="DonateDesc">Support the development</string>
     <string name="AvatarAsBackground">Profile Photo as Background</string>
     <string name="AvatarBlur">Blur Background</string>
     <string name="AvatarDarken">Darken Background</string>
@@ -29,6 +31,9 @@
     <string name="MenuItems">Menu Items</string>
     <string name="MenuItemsOrderDesc">Customize side menu items to suit your needs.</string>
     <string name="RecommendedItems">Recommended Menu Items</string>
+    <string name="DatacenterStatus">Datacenter Status</string>
+    <string name="DatacenterStatusDesc">Check the Telegram\'s <![CDATA[<a href="https://core.telegram.org/api/datacenter">Datacenter</a>]]> Status in realtime.</string>
+    <string name="WebVersion">Open Web Version</string>
     <string name="ButtonShape">Button Shape</string>
     <string name="ShapeSquared">Squared</string>
     <string name="ShapeRounded">Rounded</string>
@@ -73,6 +78,7 @@
     <string name="ClearFromCache">Clear from Cache</string>
     <string name="NoQuoteForward">NoQuote Forward</string>
     <string name="AddToSavedMessages">Save Message</string>
+    <string name="Repeat">Repeat</string>
     <string name="TranslatorType">Translator Type</string>
     <string name="TranslatorTypeOwl">In-Message</string>
     <string name="TranslatorTypeTG">Dialog Popup</string>
@@ -141,6 +147,14 @@
     <string name="InstallUpdate">Install</string>
     <string name="UpdateNote">Note:</string>
     <string name="RemindUpdate">Remind me later</string>
+    <string name="InstallingUpdate">Installing Update</string>
+    <string name="InstallationInProgress">Installation in progress…</string>
+    <string name="InstallationWarning">Please keep the app open until the installation in complete.</string>
+    <string name="ErrorDuringInstallation">Error during installation!</string>
+    <string name="InstallationBlocked">The installation was blocked by your device. Please report this issue to OwlGram support.</string>
+    <string name="InstallationFailure">The APK file is corrupted. Please report this issue to OwlGram support.</string>
+    <string name="UnknownInstallationError">Your device raised an unknown error. Please report this issue to OwlGram support.</string>
+    <string name="NoMoreSpace">Your phone has run out of available storage. Please free some space to download and install the update.</string>
     <string name="NoUpdateAvailable">OwlGram is up to date.</string>
     <string name="LastCheck">Last Check: %s</string>
     <string name="NeverChecked">Never Checked</string>
@@ -180,20 +194,6 @@
     <string name="UserRestrictionsSendGames">Send Animated Games</string>
     <string name="UserRestrictionsUseInlineBot">Use Inline Bots</string>
     <string name="RestrictionReason">Restriction Reason</string>
-    <string name="Donate">Donate</string>
-    <string name="DonateDesc">Support our development</string>
-    <string name="DatacenterStatus">Datacenter Status</string>
-    <string name="DatacenterDesc">Here you can see the various status of <![CDATA[<a href="https://core.telegram.org/api/datacenter">Media Datacenter</a>]]> in realtime from the section below</string>
-    <string name="WebVersion">Open Web Version</string>
-    <string name="Repeat">Repeat</string>
-    <string name="InstallingUpdate">Installing update</string>
-    <string name="InstallationInProgress">Installation in progress…</string>
-    <string name="InstallationWarning">Keep OwlGram open until the installation is complete</string>
-    <string name="ErrorDuringInstallation">Error during installation</string>
-    <string name="UnknownInstallationError">An unknown error was raised by your device, report this problem to the Support!</string>
-    <string name="InstallationBlocked">Your phone have blocked this installation, report this problem to the Support!</string>
-    <string name="InstallationFailure">This version is currently corrupted, report this problem to the Support!</string>
-    <string name="InstallationNoMoreSpace">No more space available on your device, free up your device memory and try again</string>
-    <string name="AppLinkNotVerifiedMessage">For Android 12 and newer, you need to manually add link to verified links in order to open t.me links in OwlGram.</string>
     <string name="AppLinkNotVerifiedTitle">App links not verified</string>
+    <string name="AppLinkNotVerifiedMessage">For Android 12 and newer, you need to manually add link to verified links in order to open t.me links in OwlGram.</string>
 </resources>

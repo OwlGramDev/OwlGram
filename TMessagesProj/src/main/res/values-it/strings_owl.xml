@@ -19,6 +19,8 @@
     <string name="SourceCode">Codice sorgente</string>
     <string name="TranslateOwl">Traduci OwlGram</string>
     <string name="TranslateOwlDesc">Aiutaci a tradurre OwlGram nella tua lingua</string>
+    <string name="Donate">Dona</string>
+    <string name="DonateDesc">Sostieni lo sviluppo</string>
     <string name="AvatarAsBackground">Foto del profilo come sfondo</string>
     <string name="AvatarBlur">Sfoca sfondo</string>
     <string name="AvatarDarken">Scurisci sfondo</string>
@@ -29,6 +31,9 @@
     <string name="MenuItems">Elementi del menu</string>
     <string name="MenuItemsOrderDesc">Personalizza gli elementi del menu laterale in base alle tue esigenze personali.</string>
     <string name="RecommendedItems">Elementi del menu consigliati</string>
+    <string name="DatacenterStatus">Stato dei datacenter</string>
+    <string name="DatacenterStatusDesc">Controlla lo stato dei <![CDATA[<a href="https://core.telegram.org/api/datacenter">datacenter</a>]]> di Telegram in tempo reale.</string>
+    <string name="WebVersion">Apri la versione web</string>
     <string name="ButtonShape">Forma dei bottoni</string>
     <string name="ShapeSquared">Quadrata</string>
     <string name="ShapeRounded">Arrotondata</string>
@@ -73,6 +78,7 @@
     <string name="ClearFromCache">Elimina dalla cache</string>
     <string name="NoQuoteForward">Inoltra senza citare</string>
     <string name="AddToSavedMessages">Salva messaggio</string>
+    <string name="Repeat">Ripeti</string>
     <string name="TranslatorType">Tipo di traduttore</string>
     <string name="TranslatorTypeOwl">Nel messaggio</string>
     <string name="TranslatorTypeTG">Popup a comparsa</string>
@@ -141,6 +147,14 @@
     <string name="InstallUpdate">Installa</string>
     <string name="UpdateNote">Note:</string>
     <string name="RemindUpdate">Ricordamelo più tardi</string>
+    <string name="InstallingUpdate">Installazione aggiornamento</string>
+    <string name="InstallationInProgress">Installazione in corso…</string>
+    <string name="InstallationWarning">Tieni aperta l\'app fino al termine dell\'installazione.</string>
+    <string name="ErrorDuringInstallation">Errore durante l\'installazione!</string>
+    <string name="InstallationBlocked">L\'installazione è stata bloccata dal tuo dispositivo. Per favore segnala questo problema al supporto di OwlGram.</string>
+    <string name="InstallationFailure">Il file APK è corrotto. Per favore segnala questo problema al supporto di OwlGram.</string>
+    <string name="UnknownInstallationError">Il tuo dispositivo ha sollevato un errore sconosciuto. Per favore segnala questo problema al supporto di OwlGram.</string>
+    <string name="NoMoreSpace">Il tuo telefono ha esaurito la memoria disponibile. Per favore libera un po\' di spazio per scaricare e installare l\'aggiornamento.</string>
     <string name="NoUpdateAvailable">OwlGram è aggiornato.</string>
     <string name="LastCheck">Ultimo controllo: %s</string>
     <string name="NeverChecked">Mai controllato</string>
@@ -180,4 +194,6 @@
     <string name="UserRestrictionsSendGames">Inviare giochi animati</string>
     <string name="UserRestrictionsUseInlineBot">Usare i bot inline</string>
     <string name="RestrictionReason">Motivo della restrizione</string>
+    <string name="AppLinkNotVerifiedTitle">Collegamenti all\'app non verificati</string>
+    <string name="AppLinkNotVerifiedMessage">Per Android 12 e versioni successive, è necessario aggiungere manualmente i collegamenti ai link verificati per aprire i link t.me in OwlGram.</string>
 </resources>
