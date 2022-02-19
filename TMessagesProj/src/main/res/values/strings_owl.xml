@@ -194,4 +194,6 @@
     <string name="InstallationBlocked">Your phone have blocked this installation, report this problem to the Support!</string>
     <string name="InstallationFailure">This version is currently corrupted, report this problem to the Support!</string>
     <string name="InstallationNoMoreSpace">No more space available on your device, free up your device memory and try again</string>
+    <string name="AppLinkNotVerifiedMessage">For Android 12 and newer, you need to manually add link to verified links in order to open t.me links in OwlGram.</string>
+    <string name="AppLinkNotVerifiedTitle">App links not verified</string>
 </resources>

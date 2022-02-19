@@ -67,9 +67,11 @@ public class OwlConfig {
     public static boolean unlimitedFavoriteStickers;
     public static boolean unlimitedPinnedDialogs;
     public static boolean devOptEnabled;
+    public static boolean verifyLinkTip;
     public static String translationTarget = "app";
     public static String updateData;
     public static String drawerItems;
+    public static String oldBuildVersion = null;
     public static int deepLFormality = DeepLTranslator.FORMALITY_DEFAULT;
     public static int translationProvider = Translator.PROVIDER_GOOGLE;
     public static int lastUpdateStatus = 0;
@@ -83,7 +85,6 @@ public class OwlConfig {
     public static int cameraType;
     public static int cameraXFps;
     public static int maxRecentStickers;
-    public static String oldBuildVersion = null;
     public static long lastUpdateCheck = 0;
     public static float stickerSize = 0.0f;
 
@@ -158,6 +159,7 @@ public class OwlConfig {
             useCameraXOptimizedMode = preferences.getBoolean("useCameraXOptimizedMode", SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_HIGH);
             disableProximityEvents = preferences.getBoolean("disableProximityEvents", false);
             swipeToPiP = preferences.getBoolean("swipeToPiP", false);
+            verifyLinkTip = preferences.getBoolean("verifyLinkTip", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -521,6 +523,14 @@ public class OwlConfig {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("unlimitedPinnedDialogs", unlimitedPinnedDialogs);
+        editor.apply();
+    }
+
+    public static void setVerifyLinkTip(boolean shown) {
+        verifyLinkTip = shown;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("verifyLinkTip", verifyLinkTip);
         editor.apply();
     }
 
