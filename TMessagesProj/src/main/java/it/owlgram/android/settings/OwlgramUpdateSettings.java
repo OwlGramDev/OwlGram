@@ -64,7 +64,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
             if(data.length() > 0) {
                 JSONObject jsonObject = new JSONObject(data);
                 updateAvailable = UpdateManager.loadUpdate(jsonObject);
-                if(updateAvailable.version <= UpdateManager.currentVersion() && !BuildVars.IGNORE_VERSION_CHECK) {
+                if(updateAvailable.version <= UpdateManager.currentVersion()) {
                     updateAvailable = null;
                 }
             }

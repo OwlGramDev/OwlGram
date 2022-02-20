@@ -117,8 +117,8 @@ public class UpdateManager {
                     if (update_status.equals("no_updates")) {
                         AndroidUtilities.runOnUIThread(() -> updateCallback.onSuccess(new UpdateNotAvailable()));
                     } else {
-                        int remoteVersion = psVersionCode <= 0 ? obj.getInt("version"):psVersionCode;
-                        if (remoteVersion > code || BuildVars.IGNORE_VERSION_CHECK) {
+                        int remoteVersion = BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE:(psVersionCode <= 0 ? obj.getInt("version"):psVersionCode);
+                        if (remoteVersion > code) {
                             UpdateAvailable updateAvailable = loadUpdate(obj);
                             AndroidUtilities.runOnUIThread(() -> updateCallback.onSuccess(updateAvailable));
                         } else {
@@ -162,7 +162,7 @@ public class UpdateManager {
                 obj.put("desc", desc);
                 obj.put("note", note);
                 obj.put("banner", banner);
-                obj.put("version", version);
+                obj.put("version", BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE:version);
                 obj.put("link_file", link_file);
                 obj.put("file_size", file_size);
             } catch (JSONException e) {
@@ -179,7 +179,7 @@ public class UpdateManager {
     public static int currentVersion() {
         try {
             PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
-            return (pInfo.versionCode / 10) - (BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE:0);
+            return (pInfo.versionCode / 10);
         } catch (Exception e){
             return 0;
         }

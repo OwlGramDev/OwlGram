@@ -25,7 +25,7 @@ public class UpdateSignaling {
                 }
             }
         }
-        if (oldBuildVersion != null && oldBuildVersion.equals(BuildVars.BUILD_VERSION_STRING)) {
+        if (oldBuildVersion != null && oldBuildVersion.equals(OwlConfig.currentNotificationVersion())) {
             return;
         }
         UpdateManager.getChangelogs(updateResult -> {

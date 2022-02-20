@@ -582,8 +582,12 @@ public class OwlConfig {
         editor.apply();
     }
 
+    public static String currentNotificationVersion() {
+        return BuildVars.BUILD_VERSION_STRING + "_" + BuildVars.BUILD_VERSION;
+    }
+
     public static void updateCurrentVersion() {
-        oldBuildVersion = BuildVars.BUILD_VERSION_STRING;
+        oldBuildVersion = currentNotificationVersion();
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("oldBuildVersion", oldBuildVersion);
