@@ -15,10 +15,12 @@
     <string name="OfficialChannel">Canal oficial</string>
     <string name="ChannelUsername">OwlGram</string>
     <string name="OfficialGroup">Grupo oficial</string>
-    <string name="GroupUsername">Chat de OwlGram</string>
+    <string name="GroupUsername">OwlGramChat</string>
     <string name="SourceCode">Código fuente</string>
     <string name="TranslateOwl">Traducir OwlGram</string>
     <string name="TranslateOwlDesc">Ayúdanos a traducir OwlGram a tu idioma</string>
+    <string name="Donate">Donar</string>
+    <string name="DonateDesc">Apoyar el desarrollo</string>
     <string name="AvatarAsBackground">Foto de perfil como fondo</string>
     <string name="AvatarBlur">Fondo desenfocado</string>
     <string name="AvatarDarken">Oscurecer el fondo</string>
@@ -29,6 +31,9 @@
     <string name="MenuItems">Elementos del menú</string>
     <string name="MenuItemsOrderDesc">Personalice elementos del menú lateral a sus necesidades.</string>
     <string name="RecommendedItems">Elementos de menú recomendados</string>
+    <string name="DatacenterStatus">Estado del centro de datos</string>
+    <string name="DatacenterStatusDesc">Compruebe el estado del <![CDATA[<a href="https://core.telegram.org/api/datacenter">centro de datos</a>]]> de Telegram en tiempo real.</string>
+    <string name="WebVersion">Abrir versión web</string>
     <string name="ButtonShape">Forma del botón</string>
     <string name="ShapeSquared">Cuadrado</string>
     <string name="ShapeRounded">Redondeado</string>
@@ -73,6 +78,7 @@
     <string name="ClearFromCache">Borrar de la caché</string>
     <string name="NoQuoteForward">Reenviar sin citar</string>
     <string name="AddToSavedMessages">Guardar mensaje</string>
+    <string name="Repeat">Repetir</string>
     <string name="TranslatorType">Tipo de traducción</string>
     <string name="TranslatorTypeOwl">En el mensaje</string>
     <string name="TranslatorTypeTG">Ventana de diálogo</string>
@@ -82,10 +88,10 @@
     <string name="TranslationProvider">Proveedor de traducción</string>
     <string name="TranslationProviderShort">Proveedor</string>
     <string name="ProviderGoogleTranslate">Traductor de Google</string>
-    <string name="ProviderYandex">Yandex Traductor</string>
+    <string name="ProviderYandex">Traductor de Yandex</string>
     <string name="ProviderDeepLTranslate">Traductor de DeepL</string>
     <string name="ProviderNiuTrans">Niu Trans</string>
-    <string name="ProviderDuckDuckGo">DuckDuckGo Translate</string>
+    <string name="ProviderDuckDuckGo">Traductor de DuckDuckGo</string>
     <string name="TranslationProviderInfo">%s puede tener acceso a los mensajes que traduzcas.</string>
     <string name="TranslationLanguage">Idioma de traducción</string>
     <string name="UseGoogleTranslate">Usar Google</string>
@@ -141,6 +147,14 @@
     <string name="InstallUpdate">Instalar</string>
     <string name="UpdateNote">Nota:</string>
     <string name="RemindUpdate">Recordarme más tarde</string>
+    <string name="InstallingUpdate">Instalando actualización</string>
+    <string name="InstallationInProgress">Instalación en progreso…</string>
+    <string name="InstallationWarning">Por favor, mantenga la aplicación abierta hasta que termine la instalación.</string>
+    <string name="ErrorDuringInstallation">¡Error durante la instalación!</string>
+    <string name="InstallationBlocked">La instalación fue bloqueada por su dispositivo. Por favor, informe de este problema al soporte de OwlGram.</string>
+    <string name="InstallationFailure">El archivo APK está dañado. Por favor reporte este problema al soporte de OwlGram.</string>
+    <string name="UnknownInstallationError">Tu dispositivo produjo un error desconocido. Por favor, reporta este problema al soporte de OwlGram.</string>
+    <string name="NoMoreSpace">Su teléfono se ha quedado sin almacenamiento disponible. Por favor, libere algo de espacio para descargar e instalar la actualización.</string>
     <string name="NoUpdateAvailable">OwlGram está actualizado.</string>
     <string name="LastCheck">Última comprobación: %s</string>
     <string name="NeverChecked">Nunca comprobado</string>
@@ -149,7 +163,7 @@
     <string name="InstallBetas">Instalar versiones beta</string>
     <string name="InstallBetasDesc">Probar nuevas actualizaciones de OwlGram antes de su lanzamiento oficial</string>
     <string name="AutoUpdate">Actualizar automáticamente</string>
-    <string name="AutoUpdatePrompt">Avisar cuando esté disponible</string>
+    <string name="AutoUpdatePrompt">Avísame cuando esté disponible</string>
     <string name="APKsChannel">Canal de APKs</string>
     <string name="MediaStreamVoip">Usar transmisión de medios en videochats</string>
     <string name="UnlimitedFavoriteStickers">Stickers favoritos ilimitados</string>
@@ -180,4 +194,6 @@
     <string name="UserRestrictionsSendGames">Enviar juegos animados</string>
     <string name="UserRestrictionsUseInlineBot">Usar bots inline</string>
     <string name="RestrictionReason">Motivo de la restricción</string>
+    <string name="AppLinkNotVerifiedTitle">Enlaces de aplicación no verificados</string>
+    <string name="AppLinkNotVerifiedMessage">Para Android 12 y posterior, tienes que añadir manualmente un enlace a los enlaces verificados para abrir los enlaces t.me en OwlGram.</string>
 </resources>
