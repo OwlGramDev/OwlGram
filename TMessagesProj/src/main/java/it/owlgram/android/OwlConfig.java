@@ -146,7 +146,7 @@ public class OwlConfig {
             oldDownloadedVersion = preferences.getInt("oldDownloadedVersion", 0);
             eventType = preferences.getInt("eventType", 0);
             buttonStyleType = preferences.getInt("buttonStyleType", 0);
-            tabMode = preferences.getInt("tabMode", 0);
+            tabMode = preferences.getInt("tabMode", 1);
             translatorStyle = preferences.getInt("translatorStyle", BaseTranslator.INLINE_STYLE);
             blurIntensity = preferences.getInt("blurIntensity", 75);
             oldBuildVersion = preferences.getString("oldBuildVersion", null);
