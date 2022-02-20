@@ -118,11 +118,15 @@ public class CameraXController {
         }
 
         public void start() {
-            lifecycleRegistry.setCurrentState(Lifecycle.State.RESUMED);
+            try {
+                lifecycleRegistry.setCurrentState(Lifecycle.State.RESUMED);
+            } catch (IllegalStateException ignored) {}
         }
 
         public void stop() {
-            lifecycleRegistry.setCurrentState(Lifecycle.State.DESTROYED);
+            try {
+                lifecycleRegistry.setCurrentState(Lifecycle.State.DESTROYED);
+            } catch (IllegalStateException ignored) {}
         }
 
         @NonNull
