@@ -57,7 +57,11 @@ public class ImportSettingsDialog extends BottomSheet {
         description.setGravity(Gravity.CENTER_HORIZONTAL);
         description.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         description.setTextColor(Theme.getColor(Theme.key_dialogTextGray3));
-        description.setText(AndroidUtilities.replaceTags(LocaleController.formatString("ImportingChanges", R.string.ImportingChanges, difference)));
+        if (difference == 1) {
+            description.setText(AndroidUtilities.replaceTags(LocaleController.getString("ImportingChangesOne", R.string.ImportingChangesOne)));
+        } else {
+            description.setText(AndroidUtilities.replaceTags(LocaleController.formatString("ImportingChangesOthers", R.string.ImportingChangesOthers, difference)));
+        }
         linearLayout.addView(description, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 21, 15, 21, 16));
 
         TextView buttonTextView = new TextView(activity);

@@ -78,9 +78,10 @@ public class ActionButtonManager {
             }
         } else if(chatId != 0 && chat != null){
             boolean hasAdminRights = ChatObject.hasAdminRights(chat);
+            boolean isCreator = chat.creator;
             boolean canLeave = !chat.creator && !chat.left && !chat.kicked;
             boolean discuss_available = chatInfo != null && chatInfo.linked_chat_id != 0;
-            boolean canShare = !TextUtils.isEmpty(chat.username);
+            boolean canShare = !TextUtils.isEmpty(chat.username) && chat.username != null;
             boolean isGroup = !ChatObject.isChannelAndNotMegaGroup(chat);
 
             if (chat.left && !chat.kicked) {
@@ -110,7 +111,7 @@ public class ActionButtonManager {
                 data.put("add_home");
             }
 
-            if ((data.length() + (discuss_available ? 1:0) + (canLeave ? 1:0)) < 4 - (canShare ? 1:0)) {
+            if ((data.length() + (discuss_available ? 1:0) + (canLeave ? 1:0)) < 4 - (canShare ? 1:0) && !isCreator) {
                 data.put("report");
             }
 

@@ -3179,8 +3179,8 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 } else {
                     long did = dids.get(0);
                     Bundle args1 = new Bundle();
-                    args1.putBoolean("forward_noquote", forwardParams.noQuote);
-                    args1.putBoolean("forward_nocaption", forwardParams.noCaption);
+                    args1.putBoolean("forward_noQuote", forwardParams.noQuote);
+                    args1.putBoolean("forward_noCaption", forwardParams.noCaption);
                     args1.putBoolean("scrollToTopOnResume", true);
                     if (DialogObject.isEncryptedDialog(did)) {
                         args1.putInt("enc_id", DialogObject.getEncryptedChatId(did));

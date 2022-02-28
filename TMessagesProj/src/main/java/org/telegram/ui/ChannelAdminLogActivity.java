@@ -55,6 +55,7 @@ import androidx.recyclerview.widget.LinearSmoothScrollerCustom;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
+import com.google.android.exoplayer2.util.Log;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildConfig;
@@ -117,6 +118,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import it.owlgram.android.OwlConfig;
+import it.owlgram.android.components.ImportSettingsDialog;
 
 public class ChannelAdminLogActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
@@ -1208,6 +1212,13 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
             options.add(10);
             items.add(LocaleController.getString("ShareFile", R.string.ShareFile));
             options.add(6);
+        } else if (type == 207) {
+            items.add(LocaleController.getString("ImportSettings", R.string.ImportSettings));
+            options.add(207);
+            items.add(LocaleController.getString("SaveToDownloads", R.string.SaveToDownloads));
+            options.add(10);
+            items.add(LocaleController.getString("ShareFile", R.string.ShareFile));
+            options.add(6);
         } else if (type == 7) {
             if (selectedObject.isMask()) {
                 items.add(LocaleController.getString("AddToMasks", R.string.AddToMasks));
@@ -1484,6 +1495,15 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
                 getParentActivity().startActivityForResult(Intent.createChooser(intent, LocaleController.getString("ShareFile", R.string.ShareFile)), 500);
                 break;
             }
+            case 207: {
+                int statusConf = OwlConfig.isValidFileSettings(selectedObject);
+                if (statusConf == OwlConfig.VALID_CONFIGURATION) {
+                    new ImportSettingsDialog(ChannelAdminLogActivity.this, selectedObject).checkCanShowDialog();
+                } else {
+                    BulletinFactory.of(ChannelAdminLogActivity.this).createSimpleBulletin(R.raw.gigagroup_convert, LocaleController.getString("UpdateToImport", R.string.UpdateToImport), true).show();
+                }
+                break;
+            }
             case 7: {
                 String path = selectedObject.messageOwner.attachPath;
                 if (path != null && path.length() > 0) {
@@ -1608,6 +1628,8 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
                                 return 10;
                             } else if (mime.endsWith("/xml")) {
                                 return 5;
+                            } else if (messageObject.getDocumentName().toLowerCase().endsWith("owl") && OwlConfig.isValidFileSettings(messageObject) >= OwlConfig.VALID_CONFIGURATION) {
+                                return 207;
                             } else if (mime.endsWith("/png") || mime.endsWith("/jpg") || mime.endsWith("/jpeg")) {
                                 return 6;
                             }
@@ -2310,10 +2332,19 @@ public class ChannelAdminLogActivity extends BaseFragment implements Notificatio
                                     scrollToPositionOnRecreate = -1;
                                 }
                             }
-                            try {
-                                AndroidUtilities.openForView(message, getParentActivity(), null);
-                            } catch (Exception e) {
-                                alertUserOpenError(message);
+                            int statusConf = OwlConfig.isValidFileSettings(message);
+                            if (message.getDocumentName().toLowerCase().endsWith("owl") && statusConf >= OwlConfig.VALID_CONFIGURATION) {
+                                if (statusConf == OwlConfig.VALID_CONFIGURATION) {
+                                    new ImportSettingsDialog(ChannelAdminLogActivity.this, message).checkCanShowDialog();
+                                } else {
+                                    BulletinFactory.of(ChannelAdminLogActivity.this).createSimpleBulletin(R.raw.gigagroup_convert, LocaleController.getString("UpdateToImport", R.string.UpdateToImport), true).show();
+                                }
+                            } else {
+                                try {
+                                    AndroidUtilities.openForView(message, getParentActivity(), null);
+                                } catch (Exception e) {
+                                    alertUserOpenError(message);
+                                }
                             }
                         }
                     }

@@ -23,7 +23,8 @@
     <string name="DonateDesc">Support the development</string>
     <string name="ImportSettings">Import Settings</string>
     <string name="ImportSettingsAlert">Are you sure you want to import these settings?</string>
-    <string name="ImportingChanges">%d changes will be applied to the current settings.</string>
+    <string name="ImportingChangesOne">1 change will be applied to the current settings.</string>
+    <string name="ImportingChangesOthers">%d changes will be applied to the current settings.</string>
     <string name="SettingsImported">Settings have been imported.</string>
     <string name="SameSettings">This backup contains the same changes as the current settings.</string>
     <string name="UpdateToImport">This backup contains settings that have been added in the latest OwlGram update.</string>

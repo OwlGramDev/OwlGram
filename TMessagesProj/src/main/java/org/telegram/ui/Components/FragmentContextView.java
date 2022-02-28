@@ -597,6 +597,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         });
 
         setOnClickListener(v -> {
+            if (isInPreviewMode()) return;
             if (currentStyle == 0) {
                 MessageObject messageObject = MediaController.getInstance().getPlayingMessageObject();
                 if (fragment != null && messageObject != null) {
@@ -677,6 +678,10 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 checkImport(false);
             }
         });
+    }
+
+    public boolean isInPreviewMode() {
+        return false;
     }
 
     public void setSupportsCalls(boolean value) {
