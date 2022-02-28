@@ -11,8 +11,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildVars;
@@ -30,8 +28,8 @@ import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
-import it.owlgram.android.PlayStoreUtils;
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.PlayStoreUtils;
 import it.owlgram.android.components.UpdateCell;
 import it.owlgram.android.components.UpdateCheckCell;
 import it.owlgram.android.updates.ApkDownloader;

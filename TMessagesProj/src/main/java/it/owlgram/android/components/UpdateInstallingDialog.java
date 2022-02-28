@@ -31,6 +31,7 @@ import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.LineProgressView;
 import org.telegram.ui.Components.RLottieImageView;
+import org.telegram.ui.Components.StickerImageView;
 
 import java.util.Locale;
 
@@ -43,7 +44,7 @@ public class UpdateInstallingDialog extends BottomSheet {
     private AnimatorSet shadowAnimation;
     private final LineProgressView lineProgressView;
     private final TextView percentTextView;
-    private final RLottieImageView imageView;
+    private final StickerImageView imageView;
     private final BottomSheetCell cell;
     private final TextView[] importCountTextView = new TextView[2];
     private final TextView[] infoTextView = new TextView[2];
@@ -157,10 +158,10 @@ public class UpdateInstallingDialog extends BottomSheet {
         textView.setText(LocaleController.getString("InstallingUpdate", R.string.InstallingUpdate));
         mainLayout.addView(textView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP | Gravity.LEFT, 17, 20, 17, 0));
 
-        imageView = new RLottieImageView(context);
-        imageView.setAutoRepeat(true);
-        imageView.setAnimation(R.raw.owl_walking, 120, 120);
-        imageView.playAnimation();
+        imageView = new StickerImageView(context, currentAccount);
+        imageView.setStickerPackName("Polar_Owl");
+        imageView.setStickerNum(12);
+        imageView.getImageReceiver().setAutoRepeat(1);
         mainLayout.addView(imageView, LayoutHelper.createFrame(160, 160, Gravity.CENTER_HORIZONTAL | Gravity.TOP, 17, 79, 17, 0));
 
         percentTextView = new TextView(context);
@@ -259,8 +260,8 @@ public class UpdateInstallingDialog extends BottomSheet {
     }
 
     public void setError(String errorMessage) {
-        imageView.setAnimation(R.raw.owl_sad, 120, 120);
-        imageView.playAnimation();
+        imageView.setStickerNum(14);
+        imageView.reloadSticker();
         cell.setVisibility(View.VISIBLE);
         AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.setDuration(250);

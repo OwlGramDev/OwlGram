@@ -14,7 +14,7 @@ public class MenuOrderManager {
 
     private static boolean configLoaded;
     private static JSONArray data;
-    private static final String[] list_items = new String[] {
+    public static final String[] list_items = new String[] {
             "new_group",
             "contacts",
             "calls",
@@ -31,6 +31,11 @@ public class MenuOrderManager {
     };
 
     static {
+        loadConfig();
+    }
+
+    public static void reloadConfig() {
+        configLoaded = false;
         loadConfig();
     }
 
@@ -52,15 +57,44 @@ public class MenuOrderManager {
         }
     }
 
+    private static String[] getDefaultItems() {
+        return new String[] {
+                list_items[0],
+                list_items[1],
+                list_items[2],
+                list_items[3],
+                list_items[4],
+                list_items[5],
+                list_items[9],
+                list_items[10],
+        };
+    }
+
+    public static void resetToDefaultPosition() {
+        data = new JSONArray();
+        loadDefaultItems();
+    }
+
+    public static boolean IsDefaultPosition() {
+        String[] defaultItems = getDefaultItems();
+        int sizeAvailable = sizeAvailable();
+        int foundSameItems = 0;
+        if (defaultItems.length == sizeAvailable) {
+            for (int i = 0; i < sizeAvailable; i++) {
+                EditableMenuItem editableMenuItem = MenuOrderManager.getSingleAvailableMenuItem(i);
+                if (editableMenuItem != null && defaultItems[i].equals(editableMenuItem.id)) {
+                    foundSameItems++;
+                }
+            }
+        }
+        return sizeAvailable == foundSameItems;
+    }
+
     private static void loadDefaultItems() {
-        data.put(list_items[0]);
-        data.put(list_items[1]);
-        data.put(list_items[2]);
-        data.put(list_items[3]);
-        data.put(list_items[4]);
-        data.put(list_items[5]);
-        data.put(list_items[9]);
-        data.put(list_items[10]);
+        String[] defaultItems = getDefaultItems();
+        for (String defaultItem : defaultItems) {
+            data.put(defaultItem);
+        }
         OwlConfig.setDrawerItems(data.toString());
     }
 

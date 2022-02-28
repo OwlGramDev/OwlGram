@@ -22,6 +22,7 @@ import android.view.View;
 import org.apache.commons.text.StringEscapeUtils;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.MediaDataController;
+import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.EditTextCaption;
@@ -37,7 +38,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EntitiesHelper {
-    final private static String[] list_params = new String[]{"b", "i", "u", "s", "tt", "a", "q"};
+    final private static String[] list_html_params = new String[]{"b", "i", "u", "s", "tt", "a", "q"};
+
     public static String entitiesToHtml(String text, ArrayList<TLRPC.MessageEntity> entities, boolean includeLink) {
         text = text.replace("\n", "\u2029");
         if (!includeLink) {
@@ -286,7 +288,7 @@ public class EntitiesHelper {
     }
 
     private static String fixDoubleSpace(String string) {
-        for (String list_param : list_params) {
+        for (String list_param : list_html_params) {
             string = string.replace(" <" + list_param + "> ", " <" + list_param + ">");
             string = string.replace(" </" + list_param + "> ", "</" + list_param + "> ");
         }
@@ -296,8 +298,8 @@ public class EntitiesHelper {
     }
 
     private static String fixDoubleHtmlElement(String string) {
-        for (String list_param : list_params) {
-            for (String list_param2 : list_params) {
+        for (String list_param : list_html_params) {
+            for (String list_param2 : list_html_params) {
                 string = string.replace("<" + list_param + "-" + list_param2 + ">", "<" + list_param + "><" + list_param2 + ">");
                 string = string.replace("</" + list_param + "-" + list_param2 + ">", "</" + list_param2 + "></" + list_param + ">");
             }
@@ -324,7 +326,7 @@ public class EntitiesHelper {
                         listUnclosedTags.remove(0);
                         listUnopenedTags.remove(0);
                     } else if (listUnclosedTags.size() > 0) {
-                        boolean isValidData = new ArrayList<>(Arrays.asList(list_params)).contains(tag);
+                        boolean isValidData = new ArrayList<>(Arrays.asList(list_html_params)).contains(tag);
                         String tagToReplace = isValidData ? listUnopenedTags.get(0):originalTag;
                         int start = string.indexOf(tagToReplace);
                         int end = start + tagToReplace.length();
@@ -346,7 +348,7 @@ public class EntitiesHelper {
     }
 
     private static String fixStrangeSpace(String string) {
-        for (String list_param : list_params) {
+        for (String list_param : list_html_params) {
             string = string.replace("< " + list_param + ">", "<" + list_param + ">");
             string = string.replace("<" + list_param + " >", "<" + list_param + ">");
             string = string.replace("</ " + list_param + ">", "</" + list_param + ">");
@@ -493,5 +495,11 @@ public class EntitiesHelper {
             spannable.setSpan(span, start, end, 0);
         }
         return spannable;
+    }
+
+    public static boolean containsMarkdown(CharSequence text) {
+        text = AndroidUtilities.getTrimmedString(text);
+        CharSequence[] message = new CharSequence[]{AndroidUtilities.getTrimmedString(text)};
+        return MediaDataController.getInstance(UserConfig.selectedAccount).getEntities(message, true, false).size() > 0;
     }
 }

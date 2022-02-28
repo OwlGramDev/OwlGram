@@ -107,6 +107,14 @@ public class SimpleTextView extends View implements Drawable.Callback {
         setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);
     }
 
+    public boolean haveSpoilers() {
+        return spoilers.size() > 0;
+    }
+
+    public void revealSpoilers() {
+        spoilers.clear();
+    }
+
     public void setTextColor(int color) {
         textPaint.setColor(color);
         invalidate();

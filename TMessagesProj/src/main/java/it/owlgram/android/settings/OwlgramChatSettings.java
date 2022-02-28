@@ -6,7 +6,6 @@ import android.os.Build;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.style.URLSpan;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,6 @@ import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
-import org.telegram.ui.Components.URLSpanNoUnderline;
 import org.telegram.ui.Components.UndoView;
 
 import java.util.ArrayList;
@@ -108,7 +106,7 @@ public class OwlgramChatSettings extends BaseFragment {
                 if (id == -1) {
                     finishFragment();
                 } else if (id == 1) {
-                    OwlConfig.setStickerSize(14.0f);
+                    OwlConfig.setStickerSize(14);
                     menuItem.setVisibility(View.GONE);
                     listAdapter.notifyItemChanged(stickerSizeRow, new Object());
                 }
@@ -119,7 +117,7 @@ public class OwlgramChatSettings extends BaseFragment {
         menuItem = menu.addItem(0, R.drawable.ic_ab_other);
         menuItem.setContentDescription(LocaleController.getString("AccDescrMoreOptions", R.string.AccDescrMoreOptions));
         menuItem.addSubItem(1, R.drawable.msg_reset, LocaleController.getString("ResetStickersSize", R.string.ResetStickersSize));
-        menuItem.setVisibility(OwlConfig.stickerSize != 14.0f ? View.VISIBLE : View.GONE);
+        menuItem.setVisibility(OwlConfig.stickerSizeStack != 14.0f ? View.VISIBLE : View.GONE);
 
         listAdapter = new ListAdapter(context);
         fragmentView = new FrameLayout(context);
@@ -457,7 +455,11 @@ public class OwlgramChatSettings extends BaseFragment {
                         @Override
                         protected void onSeek() {
                             super.onSeek();
-                            menuItem.setVisibility(VISIBLE);
+                            if (OwlConfig.stickerSizeStack != 14) {
+                                menuItem.setVisibility(VISIBLE);
+                            } else {
+                                menuItem.setVisibility(INVISIBLE);
+                            }
                         }
                     };
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));

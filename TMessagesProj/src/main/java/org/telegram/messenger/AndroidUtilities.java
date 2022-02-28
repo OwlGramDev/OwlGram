@@ -113,7 +113,9 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.TextDetailSettingsCell;
+import org.telegram.ui.ChannelAdminLogActivity;
 import org.telegram.ui.Components.BackgroundGradientDrawable;
+import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.ForegroundColorSpanThemable;
 import org.telegram.ui.Components.ForegroundDetector;
 import org.telegram.ui.Components.HideViewAfterAnimation;
@@ -156,6 +158,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import it.owlgram.android.OwlConfig;
+import it.owlgram.android.components.ImportSettingsDialog;
 
 public class AndroidUtilities {
 
@@ -2806,6 +2811,15 @@ public class AndroidUtilities {
             f = FileLoader.getPathToMessage(message.messageOwner);
         }
         if (f != null && f.exists()) {
+            int statusConf = OwlConfig.isValidFileSettings(message);
+            if (parentFragment != null && message.getDocumentName().toLowerCase().endsWith("owl") && statusConf >= OwlConfig.VALID_CONFIGURATION) {
+                if (statusConf == OwlConfig.VALID_CONFIGURATION) {
+                    new ImportSettingsDialog(parentFragment, message).checkCanShowDialog();
+                } else {
+                    BulletinFactory.of(parentFragment).createSimpleBulletin(R.raw.gigagroup_convert, LocaleController.getString("UpdateToImport", R.string.UpdateToImport), true).show();
+                }
+                return;
+            }
             if (parentFragment != null && f.getName().toLowerCase().endsWith("attheme")) {
                 Theme.ThemeInfo themeInfo = Theme.applyThemeFile(f, message.getDocumentName(), null, true);
                 if (themeInfo != null) {

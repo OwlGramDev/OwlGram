@@ -19,6 +19,8 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBar;
+import org.telegram.ui.ActionBar.ActionBarMenu;
+import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
@@ -36,6 +38,7 @@ public class DrawerOrderSettings extends BaseFragment {
     private ListAdapter listAdapter;
     private ItemTouchHelper itemTouchHelper;
     private RecyclerListView listView;
+    private ActionBarMenuItem menuItem;
 
     private int headerHintRow;
     private int headerSuggestedOptionsRow;
@@ -68,9 +71,20 @@ public class DrawerOrderSettings extends BaseFragment {
             public void onItemClick(int id) {
                 if (id == -1) {
                     finishFragment();
+                } else if (id == 1) {
+                    MenuOrderManager.resetToDefaultPosition();
+                    updateRowsId(true);
+                    menuItem.setVisibility(View.GONE);
+                    getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
                 }
             }
         });
+
+        ActionBarMenu menu = actionBar.createMenu();
+        menuItem = menu.addItem(0, R.drawable.ic_ab_other);
+        menuItem.setContentDescription(LocaleController.getString("AccDescrMoreOptions", R.string.AccDescrMoreOptions));
+        menuItem.addSubItem(1, R.drawable.msg_reset, LocaleController.getString("ResetItemsOrder", R.string.ResetItemsOrder));
+        menuItem.setVisibility(MenuOrderManager.IsDefaultPosition() ? View.GONE : View.VISIBLE);
 
         listAdapter = new ListAdapter(context);
         fragmentView = new FrameLayout(context);
@@ -87,9 +101,6 @@ public class DrawerOrderSettings extends BaseFragment {
             ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        listView.setOnItemClickListener((view, position, x, y) -> {
-
-        });
         return fragmentView;
     }
 
@@ -224,6 +235,7 @@ public class DrawerOrderSettings extends BaseFragment {
                             } else {
                                 updateRowsId(true);
                             }
+                            menuItem.setVisibility(MenuOrderManager.IsDefaultPosition() ? View.GONE : View.VISIBLE);
                             getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
                         }
                     });
@@ -250,6 +262,7 @@ public class DrawerOrderSettings extends BaseFragment {
                             } else {
                                 updateRowsId(true);
                             }
+                            menuItem.setVisibility(MenuOrderManager.IsDefaultPosition() ? View.GONE : View.VISIBLE);
                             getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
                         }
                     });
@@ -288,6 +301,7 @@ public class DrawerOrderSettings extends BaseFragment {
             }
             MenuOrderManager.changePosition(idx1, idx2);
             notifyItemMoved(fromIndex, toIndex);
+            menuItem.setVisibility(MenuOrderManager.IsDefaultPosition() ? View.GONE : View.VISIBLE);
             getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
         }
     }

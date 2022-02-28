@@ -1,9 +1,5 @@
 package it.owlgram.android.helpers;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.R;
@@ -20,7 +16,6 @@ import it.owlgram.android.translator.Translator;
 public class TranslatorActionMessage {
     private static final ArrayList<String> translatingMessage = new ArrayList<>();
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void translateMessage(long dialog_id, MessageObject messageObject, BaseFragment fragment, Theme.ResourcesProvider themeDelegate) {
         if (messageObject == null) {
             return;

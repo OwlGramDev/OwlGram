@@ -104,7 +104,6 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.util.Log;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
@@ -278,6 +277,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.components.ImportSettingsDialog;
 import it.owlgram.android.helpers.EntitiesHelper;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.TranslateManager;
@@ -13283,6 +13283,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                         return 10;
                                     } else if (mime.endsWith("/xml")) {
                                         return 5;
+                                    } else if (messageObject.getDocumentName().toLowerCase().endsWith("owl") && OwlConfig.isValidFileSettings(messageObject) >= OwlConfig.VALID_CONFIGURATION) {
+                                        return 207;
                                     } else if (!messageObject.isNewGif() && mime.endsWith("/mp4") || mime.endsWith("/png") || mime.endsWith("/jpg") || mime.endsWith("/jpeg")) {
                                         return 6;
                                     }
@@ -14111,7 +14113,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (entry.isCropped || entry.isPainted || entry.isFiltered || videoEditedInfo != null) {
                     sendMedia(entry, videoEditedInfo, notify, scheduleDate, forceDocument);
                 } else {
-                    chatActivityEnterView.doneEditingMessage();
+                    chatActivityEnterView.doneEditingMessage(true);
                 }
             }
 
@@ -21329,6 +21331,18 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 options.add(6);
                                 icons.add(R.drawable.msg_shareout);
                             }
+                        } else if (type == 207) {
+                            items.add(LocaleController.getString("ImportSettings", R.string.ImportSettings));
+                            options.add(207);
+                            icons.add(R.drawable.round_settings_backup_restore);
+                            if (!noforwards) {
+                                items.add(LocaleController.getString("SaveToDownloads", R.string.SaveToDownloads));
+                                options.add(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC);
+                                icons.add(R.drawable.msg_download);
+                                items.add(LocaleController.getString("ShareFile", R.string.ShareFile));
+                                options.add(6);
+                                icons.add(R.drawable.msg_shareout);
+                            }
                         } else if (type == 6 && !noforwards) {
                             items.add(LocaleController.getString("SaveToGallery", R.string.SaveToGallery));
                             options.add(7);
@@ -23231,7 +23245,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     if (messageObject.translated && messageObject.originalMessage != null) {
                         TranslatorActionMessage.resetTranslateMessage(dialog_id, ChatActivity.this, messageObject);
                     } else {
-                        TranslateManager.translateMessage(dialog_id, messageObject, getParentActivity(), ChatActivity.this, themeDelegate, onLinkPress2);
+                        TranslateManager.translateMessage(dialog_id, messageObject, getParentActivity(), ChatActivity.this, getMessagesController().isChatNoForwards(currentChat), themeDelegate, onLinkPress2);
                     }
                 }
                 break;
@@ -23300,6 +23314,15 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     return;
                 }
                 processRepeatMessage(false);
+                break;
+            }
+            case 207: {
+                int statusConf = OwlConfig.isValidFileSettings(selectedObject);
+                if (statusConf == OwlConfig.VALID_CONFIGURATION) {
+                    new ImportSettingsDialog(ChatActivity.this, selectedObject).checkCanShowDialog();
+                } else {
+                    BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.gigagroup_convert, LocaleController.getString("UpdateToImport", R.string.UpdateToImport), true).show();
+                }
                 break;
             }
             case 100: {
@@ -25601,18 +25624,27 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                     scrollToPositionOnRecreate = -1;
                                 }
                             }
-                            boolean handled = false;
-                            if (message.canPreviewDocument()) {
-                                PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate);
-                                PhotoViewer.getInstance().openPhoto(message, ChatActivity.this, message.type != 0 ? dialog_id : 0, message.type != 0 ? mergeDialogId : 0, photoViewerProvider);
-                                handled = true;
-                            }
-                            if (!handled) {
-                                try {
-                                    AndroidUtilities.openForView(message, getParentActivity(), themeDelegate);
-                                } catch (Exception e) {
-                                    FileLog.e(e);
-                                    alertUserOpenError(message);
+                            int statusConf = OwlConfig.isValidFileSettings(message);
+                            if (message.getDocumentName().toLowerCase().endsWith("owl") && statusConf >= OwlConfig.VALID_CONFIGURATION) {
+                                if (statusConf == OwlConfig.VALID_CONFIGURATION) {
+                                    new ImportSettingsDialog(ChatActivity.this, message).checkCanShowDialog();
+                                } else {
+                                    BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.gigagroup_convert, LocaleController.getString("UpdateToImport", R.string.UpdateToImport), true).show();
+                                }
+                            } else {
+                                boolean handled = false;
+                                if (message.canPreviewDocument()) {
+                                    PhotoViewer.getInstance().setParentActivity(getParentActivity(), themeDelegate);
+                                    PhotoViewer.getInstance().openPhoto(message, ChatActivity.this, message.type != 0 ? dialog_id : 0, message.type != 0 ? mergeDialogId : 0, photoViewerProvider);
+                                    handled = true;
+                                }
+                                if (!handled) {
+                                    try {
+                                        AndroidUtilities.openForView(message, getParentActivity(), themeDelegate);
+                                    } catch (Exception e) {
+                                        FileLog.e(e);
+                                        alertUserOpenError(message);
+                                    }
                                 }
                             }
                         }

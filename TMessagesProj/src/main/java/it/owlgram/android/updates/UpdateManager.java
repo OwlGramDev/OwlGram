@@ -148,7 +148,7 @@ public class UpdateManager {
             this.desc = desc;
             this.note = note;
             this.banner = banner;
-            this.version = version;
+            this.version = BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE:version;
             this.link_file = link_file;
             this.file_size = file_size;
         }
@@ -162,7 +162,7 @@ public class UpdateManager {
                 obj.put("desc", desc);
                 obj.put("note", note);
                 obj.put("banner", banner);
-                obj.put("version", BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE:version);
+                obj.put("version", version);
                 obj.put("link_file", link_file);
                 obj.put("file_size", file_size);
             } catch (JSONException e) {

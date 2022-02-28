@@ -19,7 +19,7 @@ import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.DeepLTranslator;
 import it.owlgram.android.translator.Translator;
 
-public class OwlConfig {
+public class OwlConfig extends SettingsManager{
     private static final Object sync = new Object();
     public static boolean hidePhoneNumber;
     public static boolean hideContactNumber;
@@ -72,6 +72,8 @@ public class OwlConfig {
     public static String updateData;
     public static String drawerItems;
     public static String oldBuildVersion = null;
+    public static String languagePackVersioning;
+    public static boolean xiaomiBlockedInstaller;
     public static int deepLFormality = DeepLTranslator.FORMALITY_DEFAULT;
     public static int translationProvider = Translator.PROVIDER_GOOGLE;
     public static int lastUpdateStatus = 0;
@@ -86,20 +88,37 @@ public class OwlConfig {
     public static int cameraXFps;
     public static int maxRecentStickers;
     public static long lastUpdateCheck = 0;
-    public static float stickerSize = 0.0f;
-
-    private static boolean configLoaded;
+    public static int stickerSizeStack = 0;
 
     static {
-        loadConfig();
+        loadConfig(true);
     }
 
-    public static void loadConfig() {
+    public static void loadConfig(boolean firstLoad) {
         synchronized (sync) {
             if (configLoaded) {
                 return;
             }
             SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+            //VERSION_CHECK
+            if (firstLoad) {
+                boolean backupFileExist = backupFile().exists();
+                DB_VERSION = preferences.getInt("DB_VERSION", 0);
+                if ((DB_VERSION < BuildVars.BUILD_VERSION || !backupFileExist) && preferences.getAll().size() > 0) {
+                    DB_VERSION = BuildVars.BUILD_VERSION;
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putInt("DB_VERSION", DB_VERSION);
+                    editor.apply();
+                    if (preferences.getAll().size() != 0 || backupFileExist) {
+                        if (!backupFileExist) {
+                            executeBackup();
+                        } else {
+                            restoreBackup(backupFile(), true);
+                        }
+                    }
+                }
+                preferences.registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> executeBackup());
+            }
             isChineseUser = ApplicationLoader.applicationContext.getResources().getBoolean(R.bool.isChineseUser);
             hidePhoneNumber = preferences.getBoolean("hidePhoneNumber", true);
             hideContactNumber = preferences.getBoolean("hideContactNumber", true);
@@ -150,7 +169,7 @@ public class OwlConfig {
             translatorStyle = preferences.getInt("translatorStyle", BaseTranslator.INLINE_STYLE);
             blurIntensity = preferences.getInt("blurIntensity", 75);
             oldBuildVersion = preferences.getString("oldBuildVersion", null);
-            stickerSize = preferences.getFloat("stickerSize", 14.0f);
+            stickerSizeStack = preferences.getInt("stickerSizeStack", 14);
             translationProvider = preferences.getInt("translationProvider", isChineseUser ? Translator.PROVIDER_NIU : Translator.PROVIDER_GOOGLE);
             showSantaHat = preferences.getBoolean("showSantaHat", true);
             showSnowFalling = preferences.getBoolean("showSnowFalling", true);
@@ -160,6 +179,8 @@ public class OwlConfig {
             disableProximityEvents = preferences.getBoolean("disableProximityEvents", false);
             swipeToPiP = preferences.getBoolean("swipeToPiP", false);
             verifyLinkTip = preferences.getBoolean("verifyLinkTip", false);
+            languagePackVersioning = preferences.getString("languagePackVersioning", "{}");
+            xiaomiBlockedInstaller = preferences.getBoolean("xiaomiBlockedInstaller", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -526,6 +547,14 @@ public class OwlConfig {
         editor.apply();
     }
 
+    public static void setXiaomiBlockedInstaller() {
+        xiaomiBlockedInstaller = true;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("xiaomiBlockedInstaller", xiaomiBlockedInstaller);
+        editor.apply();
+    }
+
     public static void setVerifyLinkTip(boolean shown) {
         verifyLinkTip = shown;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
@@ -574,11 +603,11 @@ public class OwlConfig {
         editor.apply();
     }
 
-    public static void setStickerSize(float size) {
-        stickerSize = size;
+    public static void setStickerSize(int size) {
+        stickerSizeStack = size;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putFloat("stickerSize", stickerSize);
+        editor.putInt("stickerSizeStack", stickerSizeStack);
         editor.apply();
     }
 
@@ -690,6 +719,14 @@ public class OwlConfig {
         editor.apply();
     }
 
+    public static void setLanguagePackVersioning(String data) {
+        languagePackVersioning = data;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("languagePackVersioning", languagePackVersioning);
+        editor.apply();
+    }
+
     public static int getNotificationColor() {
         if (accentAsNotificationColor) {
             int color = 0;
@@ -726,7 +763,7 @@ public class OwlConfig {
         editor.putBoolean("devOptEnabled", devOptEnabled);
         editor.apply();
         configLoaded = false;
-        loadConfig();
+        loadConfig(false);
     }
 
     public static boolean isDevOptEnabled() {

@@ -367,7 +367,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private TextView updateTextView;
 
     private DialogsActivityDelegate delegate;
-    public ForwardContext forwardContext = () -> null;
+    public ForwardContext forwardContext;
 
     private ArrayList<Long> selectedDialogs = new ArrayList<>();
 
@@ -7322,6 +7322,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             return false;
         }
         ForwardContext forwardContext = delegate instanceof ForwardContext ? (ForwardContext) delegate : this.forwardContext;
+        if (forwardContext == null) {
+            return false;
+        }
         boolean hasEncrypted = false;
         for (Long did : selectedDialogs) {
             if (DialogObject.isEncryptedDialog(did)) {
@@ -7329,7 +7332,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 break;
             }
         }
-        SendOptionsMenuLayout layout = new SendOptionsMenuLayout(parentActivity, forwardContext, selectedDialogs.size() > 1 && !hasEncrypted, selectedDialogs.size() > 1, () -> {
+        SendOptionsMenuLayout layout = new SendOptionsMenuLayout(parentActivity, forwardContext, (forwardContext.forceShowScheduleAndSound() || selectedDialogs.size() > 1) && !hasEncrypted, forwardContext.forceShowScheduleAndSound() || selectedDialogs.size() > 1, () -> {
             if (delegate == null || selectedDialogs.isEmpty()) {
                 return;
             }

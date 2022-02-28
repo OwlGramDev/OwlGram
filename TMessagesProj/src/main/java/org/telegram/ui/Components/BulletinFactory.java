@@ -121,11 +121,15 @@ public final class BulletinFactory {
     }
 
     public Bulletin createSimpleBulletin(int iconRawId, String text) {
+        return createSimpleBulletin(iconRawId, text, false);
+    }
+
+    public Bulletin createSimpleBulletin(int iconRawId, String text, boolean multiLine) {
         final Bulletin.LottieLayout layout = new Bulletin.LottieLayout(getContext(), resourcesProvider);
         layout.setAnimation(iconRawId, 36, 36);
         layout.textView.setText(text);
         layout.textView.setSingleLine(false);
-        layout.textView.setMaxLines(2);
+        layout.textView.setMaxLines(multiLine ? 4:2);
         return create(layout, Bulletin.DURATION_SHORT);
     }
 

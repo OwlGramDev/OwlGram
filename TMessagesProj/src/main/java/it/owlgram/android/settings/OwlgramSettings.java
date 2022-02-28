@@ -2,9 +2,11 @@ package it.owlgram.android.settings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -14,21 +16,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.browser.Browser;
 import org.telegram.ui.ActionBar.ActionBar;
+import org.telegram.ui.ActionBar.ActionBarLayout;
+import org.telegram.ui.ActionBar.ActionBarMenu;
+import org.telegram.ui.ActionBar.ActionBarMenuItem;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextDetailSettingsCell;
+import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
-import it.owlgram.android.ui.DatacenterActivity;
+import it.owlgram.android.OwlConfig;
 
-public class OwlgramSettings extends BaseFragment{
+public class OwlgramSettings extends BaseFragment {
     private int rowCount;
     private ListAdapter listAdapter;
 
@@ -65,9 +73,38 @@ public class OwlgramSettings extends BaseFragment{
             public void onItemClick(int id) {
                 if (id == -1) {
                     finishFragment();
+                } else if (id == 1) {
+                    OwlConfig.shareSettings(getParentActivity());
+                } else if (id == 2) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+                    builder.setTitle(LocaleController.getString("ThemeResetToDefaultsTitle", R.string.ThemeResetToDefaultsTitle));
+                    builder.setMessage(LocaleController.getString("ResetSettingsAlert", R.string.ResetSettingsAlert));
+                    builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+                    builder.setPositiveButton(LocaleController.getString("ColorPickerReset", R.string.ColorPickerReset), (dialogInterface, i) -> {
+                        int differenceUI = OwlConfig.getDifferenceUI();
+                        OwlConfig.resetSettings();
+                        Theme.lastHolidayCheckTime = 0;
+                        Theme.dialogs_holidayDrawable = null;
+                        getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
+                        getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                        OwlConfig.doRebuildUIWithDiff(differenceUI, parentLayout);
+                        BulletinFactory.of(OwlgramSettings.this).createSimpleBulletin(R.raw.forward, LocaleController.getString("ResetSettingsHint", R.string.ResetSettingsHint)).show();
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    showDialog(alertDialog);
+                    TextView button = (TextView) alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                    if (button != null) {
+                        button.setTextColor(Theme.getColor(Theme.key_dialogTextRed2));
+                    }
                 }
             }
         });
+
+        ActionBarMenu menu = actionBar.createMenu();
+        ActionBarMenuItem menuItem = menu.addItem(0, R.drawable.ic_ab_other);
+        menuItem.setContentDescription(LocaleController.getString("AccDescrMoreOptions", R.string.AccDescrMoreOptions));
+        menuItem.addSubItem(1, R.drawable.round_settings_backup_restore, LocaleController.getString("ExportSettings", R.string.ExportSettings));
+        menuItem.addSubItem(2, R.drawable.msg_reset, LocaleController.getString("ThemeResetToDefaultsTitle", R.string.ThemeResetToDefaultsTitle));
 
         listAdapter = new ListAdapter(context);
         fragmentView = new FrameLayout(context);

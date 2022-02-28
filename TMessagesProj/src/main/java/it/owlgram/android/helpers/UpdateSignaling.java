@@ -1,7 +1,6 @@
 package it.owlgram.android.helpers;
 
 import org.telegram.messenger.AccountInstance;
-import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.ConnectionsManager;

@@ -20,6 +20,8 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Xml;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.messenger.time.FastDateFormat;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
@@ -43,6 +45,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.helpers.LanguageHelper;
 
 public class LocaleController {
 
@@ -936,7 +939,7 @@ public class LocaleController {
             }
             currentLocale = newLocale;
             currentLocaleInfo = localeInfo;
-
+            LanguageHelper.loadRemoteLanguageFromCache(newLocale, true);
             if (!TextUtils.isEmpty(currentLocaleInfo.pluralLangCode)) {
                 currentPluralRules = allRules.get(currentLocaleInfo.pluralLangCode);
             }
@@ -1016,6 +1019,10 @@ public class LocaleController {
             }
         }
         return value;
+    }
+
+    public static void addLocaleValue(HashMap<String, String> vars) {
+        getInstance().localeValues.putAll(vars);
     }
 
     public static String getString(String key, int res) {
@@ -2102,6 +2109,7 @@ public class LocaleController {
                         localeValues = valuesToSet;
                         currentLocale = newLocale;
                         currentLocaleInfo = localeInfo;
+                        LanguageHelper.loadRemoteLanguageFromCache(newLocale,true);
                         if (!TextUtils.isEmpty(currentLocaleInfo.pluralLangCode)) {
                             currentPluralRules = allRules.get(currentLocaleInfo.pluralLangCode);
                         }

@@ -99,6 +99,8 @@ import androidx.recyclerview.widget.ChatListItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -3580,7 +3582,79 @@ public class ChatActivityEnterView extends ChatBlurredFrameLayout implements Not
         doneButtonContainer = new FrameLayout(context);
         doneButtonContainer.setVisibility(GONE);
         textFieldContainer.addView(doneButtonContainer, LayoutHelper.createFrame(48, 48, Gravity.BOTTOM | Gravity.RIGHT));
-        doneButtonContainer.setOnClickListener(view -> doneEditingMessage());
+        doneButtonContainer.setOnClickListener(view -> doneEditingMessage(true));
+        doneButtonContainer.setOnLongClickListener(view -> {
+            if (messageEditText.getText().length() == 0 || !EntitiesHelper.containsMarkdown(messageEditText.getText())) {
+                return false;
+            }
+            sendPopupLayout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(parentActivity, resourcesProvider);
+            sendPopupLayout.setAnimationEnabled(false);
+            sendPopupLayout.setOnTouchListener(new OnTouchListener() {
+                private final android.graphics.Rect popupRect = new android.graphics.Rect();
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+                        if (sendPopupWindow != null && sendPopupWindow.isShowing()) {
+                            v.getHitRect(popupRect);
+                            if (!popupRect.contains((int) event.getX(), (int) event.getY())) {
+                                sendPopupWindow.dismiss();
+                                sendPopupLayout = null;
+                            }
+                        }
+                    }
+                    return false;
+                }
+            });
+            sendPopupLayout.setDispatchKeyEventListener(keyEvent -> {
+                if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_BACK && keyEvent.getRepeatCount() == 0 && sendPopupWindow != null && sendPopupWindow.isShowing()) {
+                    sendPopupWindow.dismiss();
+                }
+            });
+            sendPopupLayout.setShownFromBotton(false);
+            ActionBarMenuSubItem sendWithoutMarkdownButton = new ActionBarMenuSubItem(getContext(), false, false, resourcesProvider);
+            sendWithoutMarkdownButton.setTextAndIcon(LocaleController.getString("SaveWithoutMarkdown", R.string.SaveWithoutMarkdown), R.drawable.round_code_off_white);
+            sendWithoutMarkdownButton.setMinimumWidth(AndroidUtilities.dp(196));
+            sendWithoutMarkdownButton.setOnClickListener(v -> {
+                if (sendPopupWindow != null && sendPopupWindow.isShowing()) {
+                    sendPopupWindow.dismiss();
+                }
+                doneEditingMessage(false);
+                sendPopupLayout = null;
+            });
+            sendPopupLayout.addView(sendWithoutMarkdownButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
+            sendPopupLayout.setupRadialSelectors(getThemedColor(Theme.key_dialogButtonSelector));
+            sendPopupWindow = new ActionBarPopupWindow(sendPopupLayout, LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT) {
+                @Override
+                public void dismiss() {
+                    super.dismiss();
+                    doneButtonContainer.invalidate();
+                    sendPopupLayout = null;
+                }
+            };
+            sendPopupWindow.setAnimationEnabled(false);
+            sendPopupWindow.setAnimationStyle(R.style.PopupContextAnimation2);
+            sendPopupWindow.setOutsideTouchable(true);
+            sendPopupWindow.setClippingEnabled(true);
+            sendPopupWindow.setInputMethodMode(ActionBarPopupWindow.INPUT_METHOD_NOT_NEEDED);
+            sendPopupWindow.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNSPECIFIED);
+            sendPopupWindow.getContentView().setFocusableInTouchMode(true);
+            sendPopupLayout.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(1000), MeasureSpec.AT_MOST), MeasureSpec.makeMeasureSpec(AndroidUtilities.dp(1000), MeasureSpec.AT_MOST));
+            sendPopupWindow.setFocusable(true);
+            view.getLocationInWindow(location);
+            int y;
+            if (keyboardVisible && ChatActivityEnterView.this.getMeasuredHeight() > AndroidUtilities.dp(topView != null && topView.getVisibility() == VISIBLE ? 48 + 58 : 58)) {
+                y = location[1] + view.getMeasuredHeight();
+            } else {
+                y = location[1] - sendPopupLayout.getMeasuredHeight() - AndroidUtilities.dp(2);
+            }
+            sendPopupWindow.showAtLocation(view, Gravity.LEFT | Gravity.TOP, location[0] + view.getMeasuredWidth() - sendPopupLayout.getMeasuredWidth() + AndroidUtilities.dp(8), y);
+            sendPopupWindow.dimBehind();
+            doneButtonContainer.invalidate();
+            try {
+                view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+            } catch (Exception ignore) {}
+            return false;
+        });
 
         Drawable doneCircleDrawable = Theme.createCircleDrawable(AndroidUtilities.dp(16), getThemedColor(Theme.key_chat_messagePanelSend));
         doneCheckDrawable = context.getResources().getDrawable(R.drawable.input_done).mutate();
@@ -3696,6 +3770,7 @@ public class ChatActivityEnterView extends ChatBlurredFrameLayout implements Not
         return false;
     }
 
+    private boolean oldMDCheck = false;
     @SuppressLint("ClickableViewAccessibility")
     private boolean onSendLongClick(View view) {
         if (isInScheduleMode()) {
@@ -3703,8 +3778,9 @@ public class ChatActivityEnterView extends ChatBlurredFrameLayout implements Not
         }
 
         boolean self = parentFragment != null && UserObject.isUserSelf(parentFragment.getCurrentUser());
-
-        if (sendPopupLayout == null) {
+        boolean checkMD = EntitiesHelper.containsMarkdown(messageEditText.getText());
+        if (sendPopupLayout == null || oldMDCheck != checkMD) {
+            oldMDCheck = checkMD;
             sendPopupLayout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(parentActivity, resourcesProvider);
             sendPopupLayout.setAnimationEnabled(false);
             sendPopupLayout.setOnTouchListener(new OnTouchListener() {
@@ -3762,6 +3838,19 @@ public class ChatActivityEnterView extends ChatBlurredFrameLayout implements Not
                 sendPopupLayout.addView(sendWithoutSoundButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
             }
             if (messageEditText.getText().length() > 0) {
+                if (EntitiesHelper.containsMarkdown(messageEditText.getText())) {
+                    ActionBarMenuSubItem sendWithoutMarkdownButton = new ActionBarMenuSubItem(getContext(), false, false, resourcesProvider);
+                    sendWithoutMarkdownButton.setTextAndIcon(LocaleController.getString("SendWithoutMarkdown", R.string.SendWithoutMarkdown), R.drawable.round_code_off_white);
+                    sendWithoutMarkdownButton.setMinimumWidth(AndroidUtilities.dp(196));
+                    sendWithoutMarkdownButton.setOnClickListener(v -> {
+                        if (sendPopupWindow != null && sendPopupWindow.isShowing()) {
+                            sendPopupWindow.dismiss();
+                        }
+                        sendMessageInternal(true, 0, false);
+                    });
+                    sendPopupLayout.addView(sendWithoutMarkdownButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
+                }
+
                 ActionBarMenuSubItem preSentTranslateButton = new ActionBarMenuSubItem(getContext(), false, false, resourcesProvider);
                 String languageText = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage();
                 preSentTranslateButton.setTextAndIcon(LocaleController.getString("TranslateMessage", R.string.TranslateMessage) + " (" + languageText + ")", R.drawable.round_translate_white_28);
@@ -4781,7 +4870,11 @@ public class ChatActivityEnterView extends ChatBlurredFrameLayout implements Not
         }
     }
 
+
     private void sendMessageInternal(boolean notify, int scheduleDate) {
+        sendMessageInternal(notify, scheduleDate, true);
+    }
+    private void sendMessageInternal(boolean notify, int scheduleDate, boolean withMarkdown) {
         if (slowModeTimer == Integer.MAX_VALUE && !isInScheduleMode()) {
             if (delegate != null) {
                 delegate.scrollToSendingMessage();
@@ -4833,7 +4926,7 @@ public class ChatActivityEnterView extends ChatBlurredFrameLayout implements Not
                 }
             }
         }
-        if (processSendingText(message, notify, scheduleDate)) {
+        if (processSendingText(message, notify, scheduleDate, withMarkdown)) {
             if (delegate.hasForwardingMessages() || (scheduleDate != 0 && !isInScheduleMode()) || isInScheduleMode()) {
                 messageEditText.setText("");
                 if (delegate != null) {
@@ -4859,7 +4952,7 @@ public class ChatActivityEnterView extends ChatBlurredFrameLayout implements Not
         }
     }
 
-    public void doneEditingMessage() {
+    public void doneEditingMessage(boolean withMarkdown) {
         if (editingMessageObject == null) {
             return;
         }
@@ -4888,15 +4981,15 @@ public class ChatActivityEnterView extends ChatBlurredFrameLayout implements Not
         CharSequence[] message = new CharSequence[]{AndroidUtilities.getTrimmedString(messageEditText.getText())};
         ArrayList<TLRPC.MessageEntity> entities = MediaDataController.getInstance(currentAccount).getEntities(message, supportsSendingNewEntities());
         if (!TextUtils.equals(message[0], editingMessageObject.messageText) || entities != null && !entities.isEmpty() || (entities == null || entities.isEmpty()) && !editingMessageObject.messageOwner.entities.isEmpty() || editingMessageObject.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage) {
-            editingMessageObject.editingMessage = message[0];
-            editingMessageObject.editingMessageEntities = entities;
+            editingMessageObject.editingMessage = withMarkdown ? message[0]:messageEditText.getText().toString();
+            editingMessageObject.editingMessageEntities = withMarkdown ? entities:new ArrayList<>();
             editingMessageObject.editingMessageSearchWebPage = messageWebPageSearch;
             SendMessagesHelper.getInstance(currentAccount).editMessage(editingMessageObject, null, null, null, null, null, false, null);
         }
         setEditingMessageObject(null, false);
     }
 
-    public boolean processSendingText(CharSequence text, boolean notify, int scheduleDate) {
+    public boolean processSendingText(CharSequence text, boolean notify, int scheduleDate, boolean withMarkdown) {
         text = AndroidUtilities.getTrimmedString(text);
         boolean supportsNewEntities = supportsSendingNewEntities();
         int maxLength = accountInstance.getMessagesController().maxMessageLength;
@@ -4952,7 +5045,10 @@ public class ChatActivityEnterView extends ChatBlurredFrameLayout implements Not
                     sendAnimationData.x = location[0] + AndroidUtilities.dp(11);
                     sendAnimationData.y = location[1] + AndroidUtilities.dp(8 + 11);
                 }
-
+                if (!withMarkdown) {
+                    message[0] = text.toString();
+                    entities = new ArrayList<>();
+                }
                 SendMessagesHelper.getInstance(currentAccount).sendMessage(message[0].toString(), dialog_id, replyingMessageObject, getThreadMessage(), messageWebPage, messageWebPageSearch, entities, null, null, notify, scheduleDate, sendAnimationData);
                 start = end + 1;
             } while (end != text.length());

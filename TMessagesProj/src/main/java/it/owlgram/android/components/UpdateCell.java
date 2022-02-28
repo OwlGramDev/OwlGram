@@ -22,7 +22,6 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.RadialProgressView;
 
-import java.util.Locale;
 import java.util.Objects;
 
 import it.owlgram.android.updates.ApkDownloader;

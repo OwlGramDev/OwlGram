@@ -3852,7 +3852,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 }
             });
         } else {
-            TranslateManager.translate(bio, getParentActivity(), ProfileActivity.this, urlSpan -> {
+            TranslateManager.translate(bio, getParentActivity(), ProfileActivity.this, false, urlSpan -> {
                 String url = urlSpan.toString();
                 if (url.startsWith("@")) {
                     getMessagesController().openByUserName(url.substring(1), ProfileActivity.this, 0);

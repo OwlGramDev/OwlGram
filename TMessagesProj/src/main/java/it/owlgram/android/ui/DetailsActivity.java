@@ -22,6 +22,7 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
@@ -169,6 +170,23 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
             ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+        listView.setOnItemClickListener((view, position) -> {
+            if (view instanceof TextDetailCellMultiline) {
+                TextDetailCellMultiline textDetailCell = (TextDetailCellMultiline) view;
+                if (textDetailCell.haveSpoilers()) {
+                    textDetailCell.revealSpoilers();
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+                    builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy)}, (dialogInterface, i) -> {
+                        if (i == 0) {
+                            AndroidUtilities.addToClipboard(textDetailCell.getText());
+                            BulletinFactory.of(DetailsActivity.this).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
+                        }
+                    });
+                    showDialog(builder.create());
+                }
+            }
+        });
         listView.setOnItemLongClickListener((view, position) -> {
             if (view instanceof TextDetailCellMultiline) {
                 if (getMessagesController().isChatNoForwards(fromChat)) {

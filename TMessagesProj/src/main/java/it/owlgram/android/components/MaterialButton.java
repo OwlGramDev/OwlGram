@@ -40,21 +40,6 @@ public class MaterialButton extends CardView {
         mt.setScaleType(ImageView.ScaleType.FIT_CENTER);
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, Color.argb(55, 0,0,0)));
         mt.setLayoutParams(new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-        /*mt.setOnTouchListener((view, motionEvent) -> {
-            switch (motionEvent.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    pressed = true;
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if (pressed && listener != null) {
-                        listener.onClick(MaterialButton.this);
-                    }
-                case MotionEvent.ACTION_CANCEL:
-                    pressed = false;
-                    break;
-            }
-            return false;
-        });*/
         mt.setClickable(true);
         mt.setOnTouchListener((View view, MotionEvent motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_UP && listener != null) {

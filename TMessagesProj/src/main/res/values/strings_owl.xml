@@ -21,6 +21,16 @@
     <string name="TranslateOwlDesc">Help us translate OwlGram into your language</string>
     <string name="Donate">Donate</string>
     <string name="DonateDesc">Support the development</string>
+    <string name="ImportSettings">Import Settings</string>
+    <string name="ImportSettingsAlert">Are you sure you want to import these settings?</string>
+    <string name="ImportingChanges">%d changes will be applied to the current settings.</string>
+    <string name="SettingsImported">Settings have been imported.</string>
+    <string name="SameSettings">This backup contains the same changes as the current settings.</string>
+    <string name="UpdateToImport">This backup contains settings that have been added in the latest OwlGram update.</string>
+    <string name="ExportSettings">Export Settings</string>
+    <string name="BackupName">Backup Name</string>
+    <string name="ResetSettingsAlert">Are you sure you want to reset OwlGram settings?</string>
+    <string name="ResetSettingsHint">Settings have been reset.</string>
     <string name="AvatarAsBackground">Profile Photo as Background</string>
     <string name="AvatarBlur">Blur Background</string>
     <string name="AvatarDarken">Darken Background</string>
@@ -31,6 +41,7 @@
     <string name="MenuItems">Menu Items</string>
     <string name="MenuItemsOrderDesc">Customize side menu items to suit your needs.</string>
     <string name="RecommendedItems">Recommended Menu Items</string>
+    <string name="ResetItemsOrder">Reset Items Order</string>
     <string name="DatacenterStatus">Datacenter Status</string>
     <string name="DatacenterStatusDesc">Check the Telegram\'s <![CDATA[<a href="https://core.telegram.org/api/datacenter">Datacenter</a>]]> Status in realtime.</string>
     <string name="WebVersion">Open Web Version</string>
@@ -196,4 +207,6 @@
     <string name="RestrictionReason">Restriction Reason</string>
     <string name="AppLinkNotVerifiedTitle">App links not verified</string>
     <string name="AppLinkNotVerifiedMessage">For Android 12 and newer, you need to manually add link to verified links in order to open t.me links in OwlGram.</string>
+    <string name="SendWithoutMarkdown">Send without markdown</string>
+    <string name="SaveWithoutMarkdown">Save without markdown</string>
 </resources>

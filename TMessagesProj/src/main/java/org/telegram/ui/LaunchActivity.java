@@ -69,7 +69,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.exoplayer2.util.Log;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.appindexing.Action;
 import com.google.firebase.appindexing.FirebaseUserActions;
@@ -169,6 +168,8 @@ import java.util.regex.Pattern;
 import it.owlgram.android.PlayStoreUtils;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateAlertDialog;
+import it.owlgram.android.helpers.ForwardContext;
+import it.owlgram.android.helpers.LanguageHelper;
 import it.owlgram.android.helpers.UpdateSignaling;
 import it.owlgram.android.settings.OwlgramChatSettings;
 import it.owlgram.android.settings.OwlgramExperimentalSettings;
@@ -2609,6 +2610,17 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                 return false;
             }
         };
+        fragment.forwardContext = new ForwardContext() {
+            @Override
+            public ArrayList<MessageObject> getForwardingMessages() {
+                return null;
+            }
+
+            @Override
+            public boolean forceShowScheduleAndSound() {
+                return true;
+            }
+        };
         fragment.setDelegate(this);
         boolean removeLast;
         if (AndroidUtilities.isTablet()) {
@@ -4050,6 +4062,9 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                 } else {
                     args.putLong("chat_id", -did);
                 }
+                if (scheduleDate != 0) {
+                    args.putInt("chatMode", ChatActivity.MODE_SCHEDULED);
+                }
                 if (!MessagesController.getInstance(account).checkCanOpenChat(args, dialogsFragment)) {
                     return;
                 }
@@ -4141,7 +4156,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
                         SendMessagesHelper.prepareSendingDocuments(accountInstance, documentsPathsArray, documentsOriginalPathsArray, documentsUrisArray, captionToSend, documentsMimeType, did, null, null, null, null, notify, scheduleDate);
                     }
                     if (sendingText != null) {
-                        SendMessagesHelper.prepareSendingText(accountInstance, sendingText, did, true, 0);
+                        SendMessagesHelper.prepareSendingText(accountInstance, sendingText, did, notify, scheduleDate);
                     }
                     if (contactsToSend != null && !contactsToSend.isEmpty()) {
                         for (int a = 0; a < contactsToSend.size(); a++) {
@@ -4547,6 +4562,7 @@ public class LaunchActivity extends Activity implements ActionBarLayout.ActionBa
             showUpdateActivity(UserConfig.selectedAccount, SharedConfig.pendingAppUpdate, true);
         }
         checkAppUpdate();
+        LanguageHelper.loadRemoteLanguageFromCache(LocaleController.getInstance().getCurrentLocale(), false);
         UpdateSignaling.checkWasUpdated();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

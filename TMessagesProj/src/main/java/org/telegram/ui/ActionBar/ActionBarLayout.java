@@ -204,7 +204,7 @@ public class ActionBarLayout extends FrameLayout {
                     boolean isValidTouch = ev.getX() >= AndroidUtilities.dp(8);
                     isValidTouch &= ev.getX() <= view.getRight() - AndroidUtilities.dp(8);
                     isValidTouch &= ev.getY() <= view.getBottom();
-                    isValidTouch &= ev.getY() >= y + AndroidUtilities.dp(65);
+                    isValidTouch &= ev.getY() >= y + AndroidUtilities.dp(70);
                     if (!isValidTouch) {
                         if (ev.getY() > view.getBottom() && ev.getAction() == MotionEvent.ACTION_DOWN) {
                             finishPreviewFragment();

@@ -17,6 +17,7 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
+import org.telegram.messenger.XiaomiUtilities;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
+import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateInstallingDialog;
 
 public class ApkInstaller {
@@ -59,7 +61,7 @@ public class ApkInstaller {
 
     public static void installApk(Activity context) {
         File apk = ApkDownloader.apkFile();
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP || OwlConfig.xiaomiBlockedInstaller && XiaomiUtilities.isMIUI()) {
             AndroidUtilities.openForView(apk, "update.apk", "application/vnd.android.package-archive", context, null);
             return;
         }
@@ -73,7 +75,13 @@ public class ApkInstaller {
             installReceiver = register(context, () -> {
                 if (installReceiver.resultValue != PackageInstaller.STATUS_PENDING_USER_ACTION) {
                     if (checkFailed(installReceiver.resultValue)) {
-                        updateInstallingDialog.setError(getErrorMessage(installReceiver.resultValue));
+                        if (checkFailedByXiaomi(installReceiver.resultValue)) {
+                            updateInstallingDialog.cancel();
+                            OwlConfig.setXiaomiBlockedInstaller();
+                            installApk(context);
+                        } else {
+                            updateInstallingDialog.setError(getErrorMessage(installReceiver.resultValue));
+                        }
                     } else {
                         updateInstallingDialog.cancel();
                     }
@@ -91,6 +99,7 @@ public class ApkInstaller {
     public static String getErrorMessage(int status) {
         switch (status) {
             case PackageInstaller.STATUS_FAILURE_BLOCKED:
+            case PackageInstaller.STATUS_FAILURE:
                 return LocaleController.getString("InstallationBlocked", R.string.InstallationBlocked);
             case PackageInstaller.STATUS_FAILURE_INVALID:
             case PackageInstaller.STATUS_FAILURE_INCOMPATIBLE:
@@ -98,10 +107,18 @@ public class ApkInstaller {
                 return LocaleController.getString("InstallationFailure", R.string.InstallationFailure);
             case PackageInstaller.STATUS_FAILURE_STORAGE:
                 return LocaleController.getString("NoMoreSpace", R.string.NoMoreSpace);
-            case PackageInstaller.STATUS_FAILURE:
             default:
                 return LocaleController.getString("UnknownInstallationError", R.string.UnknownInstallationError);
         }
+    }
+
+    private static boolean checkFailedByXiaomi(int status) {
+        switch (status) {
+            case PackageInstaller.STATUS_FAILURE:
+            case PackageInstaller.STATUS_FAILURE_BLOCKED:
+                return XiaomiUtilities.isMIUI();
+        }
+        return false;
     }
 
     private static boolean checkFailed(int status) {

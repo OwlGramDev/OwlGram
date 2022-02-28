@@ -43,7 +43,8 @@ public class StickerSizeCell extends FrameLayout {
         sizeBar.setDelegate(new SeekBarView.SeekBarViewDelegate() {
             @Override
             public void onSeekBarDrag(boolean stop, float progress) {
-                OwlConfig.setStickerSize(startStickerSize + (endStickerSize - startStickerSize) * progress);
+                int progressSave = Math.round(startStickerSize + (endStickerSize - startStickerSize) * progress);
+                OwlConfig.setStickerSize(progressSave);
                 onSeek();
                 StickerSizeCell.this.invalidate();
             }
@@ -68,8 +69,8 @@ public class StickerSizeCell extends FrameLayout {
     @Override
     protected void onDraw(Canvas canvas) {
         textPaint.setColor(Theme.getColor(Theme.key_windowBackgroundWhiteValueText));
-        canvas.drawText(String.valueOf(Math.round(OwlConfig.stickerSize)), getMeasuredWidth() - AndroidUtilities.dp(39), AndroidUtilities.dp(28), textPaint);
-        sizeBar.setProgress((OwlConfig.stickerSize - startStickerSize) / (float) (endStickerSize - startStickerSize));
+        canvas.drawText(String.valueOf(Math.round(OwlConfig.stickerSizeStack)), getMeasuredWidth() - AndroidUtilities.dp(39), AndroidUtilities.dp(28), textPaint);
+        sizeBar.setProgress((OwlConfig.stickerSizeStack - startStickerSize) / (float) (endStickerSize - startStickerSize));
     }
 
     @Override

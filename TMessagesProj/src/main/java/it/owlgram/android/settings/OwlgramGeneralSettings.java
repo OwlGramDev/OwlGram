@@ -467,7 +467,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     }else if (position == useSystemEmojiRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("UseSystemEmojis", R.string.UseSystemEmojis), OwlConfig.useSystemEmoji, true);
                     } else if (position == drawerAvatarAsBackgroundRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("AvatarAsBackground", R.string.AvatarAsBackground), OwlConfig.avatarAsDrawerBackground, !OwlConfig.avatarAsDrawerBackground);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("AvatarAsBackground", R.string.AvatarAsBackground), OwlConfig.avatarAsDrawerBackground, OwlConfig.avatarAsDrawerBackground);
                     } else if (position == drawerBlurBackgroundRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("AvatarBlur", R.string.AvatarBlur), OwlConfig.avatarBackgroundBlur, !OwlConfig.avatarBackgroundBlur);
                     } else if (position == drawerDarkenBackgroundRow) {

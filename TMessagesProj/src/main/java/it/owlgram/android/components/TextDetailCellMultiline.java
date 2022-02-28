@@ -51,6 +51,14 @@ public class TextDetailCellMultiline extends LinearLayout {
         addView(valueTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 23, 3, 23, 8));
     }
 
+    public boolean haveSpoilers() {
+        return textView.haveSpoilers();
+    }
+
+    public void revealSpoilers() {
+        textView.revealSpoilers();
+    }
+
     public void setTextAndValue(CharSequence text, String value, boolean divider) {
         charSequence = text;
         textView.setText(text, true);

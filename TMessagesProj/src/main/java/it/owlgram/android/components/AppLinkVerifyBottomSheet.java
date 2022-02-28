@@ -104,7 +104,7 @@ public class AppLinkVerifyBottomSheet extends BottomSheet {
         linearLayout.addView(imageView, LayoutHelper.createLinear(144, 144, Gravity.CENTER_HORIZONTAL, 0, 16, 0, 0));
 
         TextView title = new TextView(context);
-        title.setGravity(Gravity.START);
+        title.setGravity(Gravity.CENTER);
         title.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
         title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
         title.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
@@ -112,9 +112,9 @@ public class AppLinkVerifyBottomSheet extends BottomSheet {
         linearLayout.addView(title, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 21, 30, 21, 0));
 
         TextView description = new TextView(context);
-        description.setGravity(Gravity.START);
+        description.setGravity(Gravity.CENTER);
         description.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
-        description.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+        description.setTextColor(Theme.getColor(Theme.key_dialogTextGray3));
         description.setText(AndroidUtilities.replaceTags(LocaleController.getString("AppLinkNotVerifiedMessage", R.string.AppLinkNotVerifiedMessage)));
         linearLayout.addView(description, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 0, 21, 15, 21, 16));
 

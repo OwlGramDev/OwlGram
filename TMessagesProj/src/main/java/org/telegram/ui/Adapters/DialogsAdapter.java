@@ -27,6 +27,8 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ContactsController;
@@ -437,7 +439,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
                 break;
             }
             case 11: {
-                view = new TextInfoPrivacyCell(mContext) {
+                view = new TextInfoPrivacyCell(mContext)/* {
 
                     private int movement;
                     private float moveProgress;
@@ -484,7 +486,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
                             getTextView().invalidate();
                         }
                     }
-                };
+                }*/;
                 Drawable drawable = Theme.getThemedDrawable(mContext, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow);
                 CombinedDrawable combinedDrawable = new CombinedDrawable(new ColorDrawable(Theme.getColor(Theme.key_windowBackgroundGray)), drawable);
                 combinedDrawable.setFullsize(true);
@@ -571,7 +573,9 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
             }
             case 11: {
                 TextInfoPrivacyCell cell = (TextInfoPrivacyCell) holder.itemView;
-                cell.setText(LocaleController.getString("TapOnThePencil", R.string.TapOnThePencil));
+                boolean hasArchive = folderId == 0 && dialogsType == 0 && MessagesController.getInstance(currentAccount).dialogs_dict.get(DialogObject.makeFolderDialogId(1)) != null;
+                cell.setText(LocaleController.formatPluralStringComma("Chats", dialogsCount - (hasArchive ? 1:folderId == 1 ? 1:0)));
+                /*cell.setText(LocaleController.getString("TapOnThePencil", R.string.TapOnThePencil));
                 if (arrowDrawable == null) {
                     arrowDrawable = mContext.getResources().getDrawable(R.drawable.arrow_newchat);
                     arrowDrawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText4), PorterDuff.Mode.MULTIPLY));
@@ -579,7 +583,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
                 TextView textView = cell.getTextView();
                 textView.setCompoundDrawablePadding(AndroidUtilities.dp(4));
                 textView.setCompoundDrawablesWithIntrinsicBounds(null, null, arrowDrawable, null);
-                textView.getLayoutParams().width = LayoutHelper.WRAP_CONTENT;
+                textView.getLayoutParams().width = LayoutHelper.WRAP_CONTENT;*/
                 break;
             }
             case 12: {
@@ -651,7 +655,10 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
                 i -= 1;
             }
         }
-        if (folderId == 0 && dialogsCount > 10 && i == currentCount - 2 && dialogsType == 0) {
+        if (folderId != 1 && dialogsCount > 10 && i == currentCount - (dialogsType == 0 ? 2:1)) {
+            return 11;
+        }
+        if (folderId == 1 && dialogsCount > 10 && i == currentCount -1 && dialogsType == 0) {
             return 11;
         }
         int size = parentFragment.getDialogsArray(currentAccount, dialogsType, folderId, dialogsListFrozen).size();
