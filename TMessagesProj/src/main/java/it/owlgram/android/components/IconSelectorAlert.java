@@ -178,6 +178,8 @@ public class IconSelectorAlert extends BottomSheet {
         recyclerListView.setLayoutManager(new ExtendedGridLayoutManager(recyclerListView.getContext(), 6));
         recyclerListView.setPadding(AndroidUtilities.dp(10), AndroidUtilities.dp(10), AndroidUtilities.dp(10), AndroidUtilities.dp(10));
         recyclerListView.setAdapter(gridAdapter);
+        recyclerListView.setSelectorType(3);
+        recyclerListView.setSelectorDrawableColor(Theme.getColor(Theme.key_listSelector));
         recyclerListView.setOnItemClickListener((view, position) -> {
             this.onItemClick(position);
             dismiss();
