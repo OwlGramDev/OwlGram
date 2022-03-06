@@ -2,6 +2,8 @@ package it.owlgram.android.translator;
 
 import android.text.TextUtils;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,6 +11,7 @@ import org.telegram.messenger.FileLog;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,18 +44,52 @@ public class GoogleAppTranslator extends BaseTranslator {
 
     @Override
     protected Result translate(String query, String tl) throws IOException, JSONException {
-        String url = "https://translate.googleapis.com/translate_a/single?dj=1" +
-                "&q=" + URLEncoder.encode(query, "UTF-8") +
-                "&sl=auto" +
-                "&tl=" + tl +
-                "&ie=UTF-8&oe=UTF-8&client=at&dt=t&otf=2";
-        String response = new StandardHTTPRequest(url)
-                .header("User-Agent", "GoogleTranslate/6.25.0.02.404801591 (Linux; U; Android 11; Redmi K20 Pro)")
-                .request();
-        if (TextUtils.isEmpty(response)) {
-            return null;
+        ArrayList<String> blocks = new ArrayList<>();
+        while (query.length() > 2500) {
+            String maxBlockStr = query.substring(0, 2500);
+            int n;
+            n = maxBlockStr.lastIndexOf("\n\n");
+            if (n == -1) n = maxBlockStr.lastIndexOf("\n");
+            if (n == -1) n = maxBlockStr.lastIndexOf(". ");
+            blocks.add(query.substring(0, n + 1));
+            query = query.substring(n + 1);
         }
-        return getResult(response);
+        if (query.length() > 0) {
+            blocks.add(query);
+        }
+        StringBuilder resultString = new StringBuilder();
+        String resultLang = "";
+        for (int i = 0; i < blocks.size(); i++) {
+            String url = "https://translate.googleapis.com/translate_a/single?dj=1" +
+                    "&q=" + URLEncoder.encode(blocks.get(i), "UTF-8") +
+                    "&sl=auto" +
+                    "&tl=" + tl +
+                    "&ie=UTF-8&oe=UTF-8&client=at&dt=t&otf=2";
+            String response = new StandardHTTPRequest(url)
+                    .header("User-Agent", "GoogleTranslate/6.25.0.02.404801591 (Linux; U; Android 11; Redmi K20 Pro)")
+                    .request();
+            if (TextUtils.isEmpty(response)) {
+                return null;
+            }
+            Result result = getResult(response);
+            if (TextUtils.isEmpty(resultLang)) {
+                resultLang = result.sourceLanguage;
+            }
+            String stringToAdd = ((String) result.translation);
+            if (((String) result.translation).length() > 2) {
+                if (blocks.get(i).startsWith("\n\n") && !stringToAdd.startsWith("\n\n")) {
+                    stringToAdd = "\n\n" + stringToAdd;
+                }
+                if (blocks.get(i).endsWith("\n\n") && !stringToAdd.endsWith("\n\n")) {
+                    stringToAdd += "\n\n";
+                }
+            }
+            resultString.append(stringToAdd);
+        }
+        return new Result(
+            resultString.toString(),
+            resultLang
+        );
     }
 
     @Override

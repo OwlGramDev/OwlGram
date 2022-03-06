@@ -175,7 +175,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                 TextDetailCellMultiline textDetailCell = (TextDetailCellMultiline) view;
                 if (textDetailCell.haveSpoilers()) {
                     textDetailCell.revealSpoilers();
-                } else {
+                } else if (!getMessagesController().isChatNoForwards(fromChat)) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
                     builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy)}, (dialogInterface, i) -> {
                         if (i == 0) {

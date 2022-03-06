@@ -40,7 +40,6 @@ import android.graphics.drawable.RippleDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Layout;
 import android.text.Spannable;
@@ -59,7 +58,6 @@ import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.SoundEffectConstants;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewStructure;
 import android.view.accessibility.AccessibilityEvent;
@@ -103,7 +101,6 @@ import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.BaseFragment;
-import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.AnimatedFileDrawable;
@@ -112,7 +109,6 @@ import org.telegram.ui.Components.AnimationProperties;
 import org.telegram.ui.Components.AudioVisualizerDrawable;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.BackgroundGradientDrawable;
-import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.CheckBoxBase;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.EmptyStubSpan;
@@ -328,6 +324,10 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
 
         default void didPressBotButton(ChatMessageCell cell, TLRPC.KeyboardButton button) {
+        }
+
+        default boolean didLongPressBotButton(ChatMessageCell cell, TLRPC.KeyboardButton button) {
+            return false;
         }
 
         default void didPressReaction(ChatMessageCell cell, TLRPC.TL_reactionCount reaction, boolean longpress) {
@@ -2290,46 +2290,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         int y = (int) event.getY();
 
         boolean result = false;
-        if (event.getAction() == MotionEvent.ACTION_DOWN && this.baseFragment != null && !this.baseFragment.getInPreviewMode()) {
-            final Handler handler = new Handler();
-            Runnable longPressed = () -> {
-                if(pressedBotButton != -1) {
-                    BotButton botButton = botButtons.get(pressedBotButton);
-                    if(TextUtils.isEmpty(botButton.button.url)){
-                        if(botButton.button.query != null || botButton.button.data != null) {
-                            if(botButton.button.query == null){
-                                AndroidUtilities.addToClipboard(new String(botButton.button.data));
-                            }else{
-                                AndroidUtilities.addToClipboard(botButton.button.query);
-                            }
-                            BulletinFactory.of(this.baseFragment).createCopyBulletin(LocaleController.getString("CallbackCopiedHint", R.string.CallbackCopiedHint)).show();
-                        }
-                    } else {
-                        BottomSheet.Builder builder = new BottomSheet.Builder(getContext());
-                        final String urlFinal = botButton.button.url;
-                        builder.setTitle(urlFinal);
-                        builder.setItems(new CharSequence[]{LocaleController.getString("Open", R.string.Open), LocaleController.getString("Copy", R.string.Copy)}, (dialog, which) -> {
-                            if (which == 0) {
-                                Browser.openUrl(getContext(), urlFinal);
-                            } else if (which == 1) {
-                                String url = urlFinal;
-                                if (url.startsWith("mailto:")) {
-                                    url = url.substring(7);
-                                } else if (url.startsWith("tel:")) {
-                                    url = url.substring(4);
-                                }
-                                AndroidUtilities.addToClipboard(url);
-                            }
-                        });
-                        BottomSheet sheet = builder.create();
-                        sheet.setCanceledOnTouchOutside(true);
-                        sheet.show();
-                    }
-                    pressedBotButton = -1;
-                    invalidate();
-                }
-            };
-
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
             int addX;
             if (currentMessageObject.isOutOwner()) {
                 addX = getMeasuredWidth() - widthForButtons - AndroidUtilities.dp(10);
@@ -2343,8 +2304,6 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     pressedBotButton = a;
                     invalidate();
                     result = true;
-
-                    handler.postDelayed(longPressed, ViewConfiguration.getLongPressTimeout());
                     break;
                 }
             }
@@ -2473,7 +2432,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             resetPressedLink(-1);
         }
         updateRadialProgressBackground();
-        if (!disallowLongPress && pressedBotButton == -1 && result && event.getAction() == MotionEvent.ACTION_DOWN) {
+        if (!disallowLongPress && result && event.getAction() == MotionEvent.ACTION_DOWN) {
             startCheckLongPress();
         }
 
@@ -6845,6 +6804,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             return true;
         }
         resetPressedLink(-1);
+        if (pressedBotButton != -1) {
+            BotButton button = botButtons.get(pressedBotButton);
+            if (button.button != null && delegate.didLongPressBotButton(this, button.button)) {
+                return true;
+            }
+        }
         if (buttonPressed != 0 || miniButtonPressed != 0 || videoButtonPressed != 0 || pressedBotButton != -1) {
             buttonPressed = 0;
             miniButtonPressed = 0;

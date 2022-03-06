@@ -2242,7 +2242,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
         } else if (type == TYPE_ADMIN) {
             req.filter = new TLRPC.TL_channelParticipantsAdmins();
         } else if (type == TYPE_USERS) {
-            if (info != null && info.participants_count <= 200 && currentChat != null && currentChat.megagroup) {
+            if (info != null && info.participants_count <= 1 && currentChat != null && currentChat.megagroup) {
                 req.filter = new TLRPC.TL_channelParticipantsRecent();
             } else {
                 if (selectType == SELECT_TYPE_ADMIN) {

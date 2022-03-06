@@ -55,8 +55,10 @@ public class ActionButtonManager {
                 if (data.length() < 3) {
                     if (!isBot && !TextUtils.isEmpty(user.phone)) {
                         data.put("share_contact");
-                    } else {
+                    } else if (!TextUtils.isEmpty(user.username)){
                         data.put("share");
+                    } else if (!isTgUser) {
+                        data.put("add_home");
                     }
                 }
 
@@ -81,7 +83,7 @@ public class ActionButtonManager {
             boolean isCreator = chat.creator;
             boolean canLeave = !chat.creator && !chat.left && !chat.kicked;
             boolean discuss_available = chatInfo != null && chatInfo.linked_chat_id != 0;
-            boolean canShare = !TextUtils.isEmpty(chat.username) && chat.username != null;
+            boolean canShare = !TextUtils.isEmpty(chat.username);
             boolean isGroup = !ChatObject.isChannelAndNotMegaGroup(chat);
 
             if (chat.left && !chat.kicked) {
