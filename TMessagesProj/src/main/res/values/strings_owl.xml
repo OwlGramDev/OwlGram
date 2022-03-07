@@ -199,7 +199,13 @@
     <string name="SelectBetween">Select between two messages</string>
     <string name="JumpToBeginning">Jump to Beginning</string>
     <string name="CreateMention">Create Mention</string>
+    <string name="CopyTitle">Copy Title</string>
+    <string name="CopyCallback">Copy Callback</string>
+    <string name="CopyID">Copy ID</string>
+    <string name="CopyInlineQuery">Copy Inline Query</string>
     <string name="CallbackCopiedHint">Callback copied to clipboard.</string>
+    <string name="IDCopied">ID copied to clipboard.</string>
+    <string name="InlineQueryCopied">Inline Query copied to clipboard.</string>
     <string name="StickerSavedHint">Sticker saved to gallery.</string>
     <string name="UserRestrictionsSendStickers2">Send Stickers</string>
     <string name="UserRestrictionsSendGifs">Send GIFs</string>
@@ -210,9 +216,4 @@
     <string name="AppLinkNotVerifiedMessage">For Android 12 and newer, you need to manually add link to verified links in order to open t.me links in OwlGram.</string>
     <string name="SendWithoutMarkdown">Send without markdown</string>
     <string name="SaveWithoutMarkdown">Save without markdown</string>
-    <string name="CopyTitle">Copy title</string>
-    <string name="CopyCallback">Copy callback data</string>
-    <string name="CopyInlineQuery">Copy inline query</string>
-    <string name="CopyID">Copy ID</string>
-    <string name="CallbackData">Callback Data</string>
 </resources>

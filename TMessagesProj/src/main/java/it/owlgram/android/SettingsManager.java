@@ -9,12 +9,9 @@ import android.text.TextUtils;
 
 import androidx.core.content.FileProvider;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.FileLoader;
@@ -28,21 +25,15 @@ import org.telegram.ui.LaunchActivity;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 
-import it.owlgram.android.components.DynamicButtonSelector;
 import it.owlgram.android.components.FileSettingsNameDialog;
 import it.owlgram.android.helpers.MenuOrderManager;
 import it.owlgram.android.translator.Translator;
@@ -82,6 +73,7 @@ public class SettingsManager {
             case "INVALID_CONFIGURATION":
             case "VALID_CONFIGURATION":
             case "NEED_UPDATE_CONFIGURATION":
+            case "translationTarget":
                 return false;
             default:
                 return true;
