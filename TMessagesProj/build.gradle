@@ -43,11 +43,11 @@ dependencies {
     implementation 'org.apache.commons:commons-text:1.7'
 
     // CameraX Implementation
-    implementation "androidx.camera:camera-core:1.1.0-beta01"
-    implementation "androidx.camera:camera-camera2:1.1.0-beta01"
-    implementation "androidx.camera:camera-lifecycle:1.1.0-beta01"
-    implementation "androidx.camera:camera-view:1.1.0-beta01"
-    implementation "androidx.camera:camera-extensions:1.1.0-beta01"
+    implementation "androidx.camera:camera-core:1.1.0-beta02"
+    implementation "androidx.camera:camera-camera2:1.1.0-beta02"
+    implementation "androidx.camera:camera-lifecycle:1.1.0-beta02"
+    implementation "androidx.camera:camera-view:1.1.0-beta02"
+    implementation "androidx.camera:camera-extensions:1.1.0-beta02"
     implementation 'androidx.interpolator:interpolator:1.0.0'
 
     // GOOGLE PLAY UPDATE CHECKER
@@ -312,7 +312,7 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 2576
+    defaultConfig.versionCode = 2577
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->

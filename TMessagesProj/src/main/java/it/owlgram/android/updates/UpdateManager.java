@@ -69,7 +69,7 @@ public class UpdateManager {
             AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(ApplicationLoader.applicationContext);
             Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
             appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> checkInternal(updateCallback, appUpdateInfo.availableVersionCode() / 10));
-            appUpdateInfoTask.addOnFailureListener(e -> checkInternal(updateCallback, -1));
+            appUpdateInfoTask.addOnFailureListener(updateCallback::onError);
         } else {
             checkInternal(updateCallback, -1);
         }
