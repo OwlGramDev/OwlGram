@@ -324,7 +324,7 @@ public class  MessagesController extends BaseController implements NotificationC
     public Set<String> exportGroupUri;
     public Set<String> exportPrivateUri;
     public boolean autoarchiveAvailable;
-    public int groipCallVideoMaxParticipants;
+    public int groupCallVideoMaxParticipants;
     public boolean suggestStickersApiOnly;
     public ArrayList<String> gifSearchEmojies = new ArrayList<>();
     public HashSet<String> diceEmojies;
@@ -834,7 +834,7 @@ public class  MessagesController extends BaseController implements NotificationC
         filtersEnabled = mainPreferences.getBoolean("filtersEnabled", false);
         showFiltersTooltip = mainPreferences.getBoolean("showFiltersTooltip", false);
         autoarchiveAvailable = mainPreferences.getBoolean("autoarchiveAvailable", false);
-        groipCallVideoMaxParticipants = mainPreferences.getInt("groipCallVideoMaxParticipants", 30);
+        groupCallVideoMaxParticipants = mainPreferences.getInt("groipCallVideoMaxParticipants", 30);
         chatReadMarkSizeThreshold = mainPreferences.getInt("chatReadMarkSizeThreshold", 50);
         chatReadMarkExpirePeriod = mainPreferences.getInt("chatReadMarkExpirePeriod", 7 * 86400);
         suggestStickersApiOnly = mainPreferences.getBoolean("suggestStickersApiOnly", false);
@@ -1671,9 +1671,9 @@ public class  MessagesController extends BaseController implements NotificationC
                         case "groupcall_video_participants_max": {
                             if (value.value instanceof TLRPC.TL_jsonNumber) {
                                 TLRPC.TL_jsonNumber number = (TLRPC.TL_jsonNumber) value.value;
-                                if (number.value != groipCallVideoMaxParticipants) {
-                                    groipCallVideoMaxParticipants = (int) number.value;
-                                    editor.putInt("groipCallVideoMaxParticipants", groipCallVideoMaxParticipants);
+                                if (number.value != groupCallVideoMaxParticipants) {
+                                    groupCallVideoMaxParticipants = (int) number.value;
+                                    editor.putInt("groipCallVideoMaxParticipants", groupCallVideoMaxParticipants);
                                     changed = true;
                                 }
                             }
@@ -2784,9 +2784,11 @@ public class  MessagesController extends BaseController implements NotificationC
         }
 
         addSupportUser();
-        getNotificationCenter().postNotificationName(NotificationCenter.suggestedFiltersLoaded);
-        getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
-        getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
+        AndroidUtilities.runOnUIThread(()->{
+            getNotificationCenter().postNotificationName(NotificationCenter.suggestedFiltersLoaded);
+            getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
+            getNotificationCenter().postNotificationName(NotificationCenter.dialogsNeedReload);
+        });
     }
 
     public boolean isChatNoForwards(TLRPC.Chat chat) {
@@ -4826,6 +4828,11 @@ public class  MessagesController extends BaseController implements NotificationC
 
     public ArrayList<TLRPC.Dialog> getAllDialogs() {
         return allDialogs;
+    }
+
+    public void putDialogsEndReachedAfterRegistration() {
+        dialogsEndReached.put(0, true);
+        serverDialogsEndReached.put(0, true);
     }
 
     public boolean isDialogsEndReached(int folderId) {

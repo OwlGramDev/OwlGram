@@ -20,7 +20,7 @@ import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.util.Xml;
 
-import com.google.android.exoplayer2.util.Log;
+import androidx.annotation.StringRes;
 
 import org.telegram.messenger.time.FastDateFormat;
 import org.telegram.tgnet.ConnectionsManager;
@@ -75,6 +75,8 @@ public class LocaleController {
     public FastDateFormat formatterScheduleYear;
     public FastDateFormat formatterMonthYear;
     public FastDateFormat[] formatterScheduleSend = new FastDateFormat[15];
+
+    private static HashMap<Integer, String> resourcesCacheMap = new HashMap<>();
 
     private HashMap<String, PluralRules> allRules = new HashMap<>();
 
@@ -450,6 +452,26 @@ public class LocaleController {
         }
 
         AndroidUtilities.runOnUIThread(() -> currentSystemLocale = getSystemLocaleStringIso639());
+    }
+
+    public static String getLanguageFlag(String countryCode) {
+        if (countryCode.length() != 2 || countryCode.equals("YL")) return null;
+
+        if (countryCode.equals("XG")) {
+            return "\uD83D\uDEF0";
+        } else if (countryCode.equals("XV")){
+            return "\uD83C\uDF0D";
+        }
+
+        int base = 0x1F1A5;
+        char[] chars = countryCode.toCharArray();
+        char[] emoji = {
+                CharacterCompat.highSurrogate(base),
+                CharacterCompat.lowSurrogate(base + chars[0]),
+                CharacterCompat.highSurrogate(base),
+                CharacterCompat.lowSurrogate(base + chars[1])
+        };
+        return new String(emoji);
     }
 
     public LocaleInfo getLanguageFromDict(String key) {
@@ -1023,6 +1045,14 @@ public class LocaleController {
 
     public static void addLocaleValue(HashMap<String, String> vars) {
         getInstance().localeValues.putAll(vars);
+    }
+
+    public static String getString(@StringRes int res) {
+        String key = resourcesCacheMap.get(res);
+        if (key == null) {
+            resourcesCacheMap.put(res, key = ApplicationLoader.applicationContext.getResources().getResourceEntryName(res));
+        }
+        return getString(key, res);
     }
 
     public static String getString(String key, int res) {

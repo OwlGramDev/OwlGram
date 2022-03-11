@@ -37,7 +37,7 @@ public abstract class BaseCameraView extends FrameLayout {
         void onCameraInit();
     }
 
-    public abstract boolean isInitied();
+    public abstract boolean isInited();
     public abstract boolean isFrontface();
     public abstract void switchCamera();
     public abstract void setZoom(float value);

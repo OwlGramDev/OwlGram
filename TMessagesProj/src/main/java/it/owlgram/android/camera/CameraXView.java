@@ -143,9 +143,10 @@ public class CameraXView extends BaseCameraView {
     }
 
     @Override
-    public boolean isInitied() {
+    public boolean isInited() {
         return isStreaming;
     }
+
     @Override
     public boolean isFrontface() {
         return controller.isFrontface();
