@@ -22456,7 +22456,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             return;
         }
         if (messageObject.translated && messageObject.originalMessage != null) {
-            TranslatorActionMessage.resetTranslateMessage(dialog_id, ChatActivity.this, messageObject);
+            messageObject = TranslatorActionMessage.resetTranslateMessage(dialog_id, ChatActivity.this, messageObject);
         }
         if (searchItem != null && actionBar.isSearchFieldVisible()) {
             actionBar.closeSearchField();
@@ -23257,11 +23257,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 break;
             }
             case 202: {
-                ArrayList<MessageObject> messages =  new ArrayList<>();
+                ArrayList<MessageObject> messages = new ArrayList<>();
                 messages.add(selectedObject);
+                TLRPC.ReplyMarkup botButtons = selectedObject.messageOwner.reply_markup;
                 long my_user_id = UserConfig.getInstance(currentAccount).getClientUserId();
                 int result_send = getSendMessagesHelper().sendMessage(messages, my_user_id, false, true, false, 0);
                 AlertsCreator.showSendMediaAlert(result_send, this, themeDelegate);
+                selectedObject.messageOwner.reply_markup = botButtons;
                 if (result_send == 0) {
                     undoView.showWithAction(my_user_id, UndoView.ACTION_FWD_MESSAGES, messages.size());
                 }

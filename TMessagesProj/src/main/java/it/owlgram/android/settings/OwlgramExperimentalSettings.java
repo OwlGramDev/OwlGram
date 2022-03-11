@@ -40,6 +40,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
     private int headerImageRow;
     private int bottomHeaderRow;
     private int headerExperimental;
+    private int betterAudioMessagesRow;
     private int betterAudioCallRow;
     private int unlimitedStickersRow;
     private int unlimitedPinnedChatsRow;
@@ -129,6 +130,11 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                         listAdapter.notifyItemInserted(experimentalMessageAlert);
                     }
                 }
+            } else if (position == betterAudioMessagesRow) {
+                OwlConfig.toggleIncreaseAudioMessages();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.increaseAudioMessages);
+                }
             }
         });
         return fragmentView;
@@ -141,6 +147,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
         bottomHeaderRow = -1;
         headerExperimental = -1;
         betterAudioCallRow = -1;
+        betterAudioMessagesRow = -1;
         unlimitedStickersRow = -1;
         unlimitedPinnedChatsRow = -1;
         maxRecentStickersRow = -1;
@@ -152,6 +159,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
             bottomHeaderRow = rowCount++;
             headerExperimental = rowCount++;
             betterAudioCallRow = rowCount++;
+            betterAudioMessagesRow = rowCount++;
             unlimitedStickersRow = rowCount++;
             unlimitedPinnedChatsRow = rowCount++;
             maxRecentStickersRow = rowCount++;
@@ -204,6 +212,8 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                         textCheckCell.setColors(Theme.key_windowBackgroundCheckText, Theme.key_switchTrackBlue, Theme.key_switchTrackBlueChecked, Theme.key_switchTrackBlueThumb, Theme.key_switchTrackBlueThumbChecked);
                         textCheckCell.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
                         textCheckCell.setHeight(56);
+                    } else if (position == betterAudioMessagesRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("IncreaseVoiceMessageQuality", R.string.IncreaseVoiceMessageQuality), OwlConfig.increaseAudioMessages, true);
                     }
                     break;
                 case 4:
@@ -272,7 +282,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
         @Override
         public int getItemViewType(int position) {
             if (position == unlimitedStickersRow || position == unlimitedPinnedChatsRow || position == betterAudioCallRow ||
-                    position == checkBoxExperimentalRow) {
+                    position == checkBoxExperimentalRow || position == betterAudioMessagesRow) {
                 return 2;
             } else if (position == headerImageRow) {
                 return 3;

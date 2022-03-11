@@ -75,7 +75,7 @@ public class TranslatorActionMessage {
         return false;
     }
 
-    public static void resetTranslateMessage(long dialog_id, BaseFragment fragment, MessageObject messageObject) {
+    public static MessageObject resetTranslateMessage(long dialog_id, BaseFragment fragment, MessageObject messageObject) {
         if (messageObject.originalMessage instanceof String) {
             messageObject.messageOwner.message = (String) messageObject.originalMessage;
             messageObject.messageText = messageObject.messageOwner.message;
@@ -85,6 +85,6 @@ public class TranslatorActionMessage {
         } else if (messageObject.originalMessage instanceof TLRPC.TL_poll) {
             ((TLRPC.TL_messageMediaPoll) messageObject.messageOwner.media).poll = (TLRPC.TL_poll) messageObject.originalMessage;
         }
-        fragment.getMessageHelper().resetMessageContent(dialog_id, messageObject, false);
+        return fragment.getMessageHelper().resetMessageContent(dialog_id, messageObject, false);
     }
 }

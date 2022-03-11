@@ -124,7 +124,7 @@ public class MessageHelper extends BaseController {
         return messageObject;
     }
 
-    public void resetMessageContent(long dialogId, MessageObject messageObject, boolean translated) {
+    public MessageObject resetMessageContent(long dialogId, MessageObject messageObject, boolean translated) {
         TLRPC.Message message = messageObject.messageOwner;
         MessageObject obj = new MessageObject(currentAccount, message, true, true);
         obj.originalMessage = messageObject.originalMessage;
@@ -137,5 +137,6 @@ public class MessageHelper extends BaseController {
         ArrayList<MessageObject> arrayList = new ArrayList<>();
         arrayList.add(obj);
         getNotificationCenter().postNotificationName(NotificationCenter.replaceMessagesObjects, dialogId, arrayList, false);
+        return obj;
     }
 }

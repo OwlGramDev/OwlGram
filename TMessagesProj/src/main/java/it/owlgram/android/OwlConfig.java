@@ -68,6 +68,7 @@ public class OwlConfig extends SettingsManager{
     public static boolean unlimitedPinnedDialogs;
     public static boolean devOptEnabled;
     public static boolean verifyLinkTip;
+    public static boolean increaseAudioMessages;
     public static String translationTarget = "app";
     public static String updateData;
     public static String drawerItems;
@@ -190,6 +191,7 @@ public class OwlConfig extends SettingsManager{
             unlimitedPinnedDialogs = preferences.getBoolean("unlimitedPinnedDialogs"+dS, false);
             maxRecentStickers = preferences.getInt("maxRecentStickers"+dS, 20);
             betterAudioQuality = preferences.getBoolean("betterAudioQuality"+dS, false);
+            increaseAudioMessages = preferences.getBoolean("increaseAudioMessages"+dS, false);
 
             configLoaded = true;
         }
@@ -544,6 +546,14 @@ public class OwlConfig extends SettingsManager{
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("unlimitedPinnedDialogs", unlimitedPinnedDialogs);
+        editor.apply();
+    }
+
+    public static void toggleIncreaseAudioMessages() {
+        increaseAudioMessages = !increaseAudioMessages;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("increaseAudioMessages", increaseAudioMessages);
         editor.apply();
     }
 

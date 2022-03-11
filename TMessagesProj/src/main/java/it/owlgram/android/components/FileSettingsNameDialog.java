@@ -40,7 +40,6 @@ public class FileSettingsNameDialog {
         builder.setView(linearLayout);
 
         editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
-        editText.setTextColor(Theme.getColor(Theme.key_voipgroup_nameText));
         editText.setMaxLines(1);
         editText.setLines(1);
         editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
@@ -48,7 +47,7 @@ public class FileSettingsNameDialog {
         editText.setSingleLine(true);
         editText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         editText.setHint(LocaleController.getString("Settings", R.string.Settings));
-        editText.setHintTextColor(Theme.getColor(Theme.key_voipgroup_lastSeenText));
+        editText.setHintTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText));
         editText.setCursorColor(Theme.getColor(Theme.key_dialogTextBlue));
         editText.setCursorSize(AndroidUtilities.dp(20));
         editText.setCursorWidth(1.5f);
@@ -101,7 +100,6 @@ public class FileSettingsNameDialog {
         alertDialog.setOnShowListener(dialog -> makeFocusable(null, alertDialog, editText, true));
         alertDialog.setOnDismissListener(dialog -> AndroidUtilities.hideKeyboard(editText));
         alertDialog.show();
-        alertDialog.setTextColor(Theme.getColor(Theme.key_voipgroup_nameText));
         editText.requestFocus();
         TextView button = (TextView) alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
         if (button != null) {
