@@ -79,9 +79,13 @@ public class GoogleAppTranslator extends BaseTranslator {
             if (((String) result.translation).length() > 2) {
                 if (blocks.get(i).startsWith("\n\n") && !stringToAdd.startsWith("\n\n")) {
                     stringToAdd = "\n\n" + stringToAdd;
+                } else if (blocks.get(i).startsWith("\n") && !stringToAdd.startsWith("\n")) {
+                    stringToAdd = "\n" + stringToAdd;
                 }
                 if (blocks.get(i).endsWith("\n\n") && !stringToAdd.endsWith("\n\n")) {
                     stringToAdd += "\n\n";
+                } else if (blocks.get(i).endsWith("\n") && !stringToAdd.endsWith("\n")) {
+                    stringToAdd += "\n";
                 }
             }
             resultString.append(stringToAdd);
