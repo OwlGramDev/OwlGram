@@ -40,6 +40,7 @@ public class FileSettingsNameDialog {
         builder.setView(linearLayout);
 
         editText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+        editText.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
         editText.setMaxLines(1);
         editText.setLines(1);
         editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);

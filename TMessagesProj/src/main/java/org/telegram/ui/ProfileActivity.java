@@ -5761,10 +5761,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (UserObject.isUserSelf(user)) {
                 actionsSectionRow = rowCount++;
                 actionsSectionDivider = rowCount++;
-                if (avatarBig == null && (user.photo == null || !(user.photo.photo_big instanceof TLRPC.TL_fileLocation_layer97) && !(user.photo.photo_big instanceof TLRPC.TL_fileLocationToBeDeprecated)) && (avatarsViewPager == null || avatarsViewPager.getRealCount() == 0)) {
+                /*if (avatarBig == null && (user.photo == null || !(user.photo.photo_big instanceof TLRPC.TL_fileLocation_layer97) && !(user.photo.photo_big instanceof TLRPC.TL_fileLocationToBeDeprecated)) && (avatarsViewPager == null || avatarsViewPager.getRealCount() == 0)) {
                     setAvatarRow = rowCount++;
                     setAvatarSectionRow = rowCount++;
-                }
+                }*/
                 numberSectionRow = rowCount++;
                 datacenterRow = rowCount++;
                 datacenterDividerRow = rowCount++;
