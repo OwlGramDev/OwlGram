@@ -27,7 +27,7 @@
     <string name="ImportingChangesOthers">%d changes will be applied to the current settings.</string>
     <string name="SettingsImported">Settings have been imported.</string>
     <string name="SameSettings">This backup contains the same changes as the current settings.</string>
-    <string name="UpdateToImport">This backup contains settings that have been added in the latest OwlGram update.</string>
+    <string name="UpdateToImport">This backup is not supported by your version of OwlGram. Update the app to import it.</string>
     <string name="ExportSettings">Export Settings</string>
     <string name="BackupName">Backup Name</string>
     <string name="ResetSettingsAlert">Are you sure you want to reset OwlGram settings?</string>
@@ -217,4 +217,5 @@
     <string name="SendWithoutMarkdown">Send without markdown</string>
     <string name="SaveWithoutMarkdown">Save without markdown</string>
     <string name="IncreaseVoiceMessageQuality">Increase voice messages quality</string>
+    <string name="ClearRecentStickers">Clear recent stickers?</string>
 </resources>

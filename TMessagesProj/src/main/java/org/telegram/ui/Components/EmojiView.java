@@ -15,6 +15,7 @@ import android.animation.ObjectAnimator;
 import android.animation.StateListAnimator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
@@ -68,6 +69,8 @@ import androidx.recyclerview.widget.SimpleItemAnimator;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.DocumentObject;
@@ -93,6 +96,7 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.AlertDialog;
+import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.ContextLinkCell;
@@ -102,6 +106,7 @@ import org.telegram.ui.Cells.StickerEmojiCell;
 import org.telegram.ui.Cells.StickerSetGroupInfoCell;
 import org.telegram.ui.Cells.StickerSetNameCell;
 import org.telegram.ui.ContentPreviewViewer;
+import org.telegram.ui.LaunchActivity;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -4212,8 +4217,26 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                     break;
                 case 2:
                     view = new StickerSetNameCell(context, false, resourcesProvider);
+                    View finalView = view;
                     ((StickerSetNameCell) view).setOnIconClickListener(v -> {
-                        if (groupStickerSet != null) {
+                        if (finalView.getTag() != null && (Integer) finalView.getTag() == 201) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context, resourcesProvider);
+                            builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
+                            builder.setMessage(LocaleController.getString("ClearRecentStickers", R.string.ClearRecentStickers));
+                            builder.setPositiveButton(LocaleController.getString("ClearButton", R.string.ClearButton).toUpperCase(), (dialogInterface, i) -> {
+                                ArrayList<TLRPC.Document> stickersToRemove = new ArrayList<>(recentStickers);
+                                for (int i2 = 0; i2 < stickersToRemove.size(); i2++) {
+                                    MediaDataController.getInstance(currentAccount).addRecentSticker(MediaDataController.TYPE_IMAGE, null, stickersToRemove.get(i2), (int) (System.currentTimeMillis() / 1000), true, false);
+                                }
+                            });
+                            builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+                            Activity activity = AndroidUtilities.findActivity(context);
+                            BaseFragment fragment;
+                            if (activity instanceof LaunchActivity) {
+                                fragment = ((LaunchActivity) activity).getActionBarLayout().fragmentsStack.get(((LaunchActivity) activity).getActionBarLayout().fragmentsStack.size() - 1);
+                                fragment.showDialog(builder.create());
+                            }
+                        } else if (groupStickerSet != null) {
                             if (delegate != null) {
                                 delegate.onStickersGroupClick(info.id);
                             }
@@ -4354,7 +4377,8 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                                 cell.setText(set.set.title, 0);
                             }
                         } else if (object == recentStickers) {
-                            cell.setText(LocaleController.getString("RecentStickers", R.string.RecentStickers), 0);
+                            cell.setText(LocaleController.getString("RecentStickers", R.string.RecentStickers), R.drawable.stickerset_close);
+                            cell.setTag(201);
                         } else if (object == favouriteStickers) {
                             cell.setText(LocaleController.getString("FavoriteStickers", R.string.FavoriteStickers), 0);
                         }

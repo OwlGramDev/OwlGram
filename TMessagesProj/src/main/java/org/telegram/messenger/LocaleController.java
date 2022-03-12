@@ -1056,6 +1056,7 @@ public class LocaleController {
     }
 
     public static String getString(String key, int res) {
+        if (key.equals("AppName")) return ApplicationLoader.applicationContext.getString(res);
         return getInstance().getStringInternal(key, res);
     }
 
