@@ -1910,7 +1910,7 @@ public class AndroidUtilities {
 
     public static boolean isSmallScreen() {
         if (isSmallScreen == null) {
-            isSmallScreen = (Math.max(displaySize.x, displaySize.y) - statusBarHeight - navigationBarHeight) / density <= 610;
+            isSmallScreen = (Math.max(displaySize.x, displaySize.y) - statusBarHeight - navigationBarHeight) / density <= 650;
         }
         return isSmallScreen;
     }
@@ -4188,10 +4188,8 @@ public class AndroidUtilities {
         int red = Color.red(color);
         int green = Color.green(color);
         int blue = Color.blue(color);
-
         // Set alpha based on your logic, here I'm making it 25% of it's initial value.
         alpha *= opacity;
-
         return Color.argb(alpha, red, green, blue);
     }
 
@@ -4220,12 +4218,20 @@ public class AndroidUtilities {
     }
 
     public static boolean isLight(int color) {
-        int red   = Color.red(color);
+        int red = Color.red(color);
         int green = Color.green(color);
-        int blue  = Color.blue(color);
-
+        int blue = Color.blue(color);
         float[] hsl = new float[3];
         ColorUtils.RGBToHSL(red, green, blue, hsl);
         return hsl[2] >= 0.5f;
+    }
+
+    public static boolean isNumeric(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

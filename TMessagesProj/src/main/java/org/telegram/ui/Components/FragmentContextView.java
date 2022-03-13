@@ -667,7 +667,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 if (call == null) {
                     return;
                 }
-                VoIPHelper.startCall(chatActivity.getMessagesController().getChat(call.chatId), null, null, false, fragment.getParentActivity(), fragment, fragment.getAccountInstance());
+                VoIPHelper.startCall(chatActivity.getMessagesController().getChat(call.chatId), null, null, false, call.call != null && !call.call.rtmp_stream, fragment.getParentActivity(), fragment, fragment.getAccountInstance());
             } else if (currentStyle == 5) {
                 SendMessagesHelper.ImportingHistory importingHistory = parentFragment.getSendMessagesHelper().getImportingHistory(((ChatActivity) parentFragment).getDialogId());
                 if (importingHistory == null) {
@@ -921,7 +921,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             boolean isRtmpStream = false;
             if (fragment instanceof ChatActivity) {
                 ChatActivity chatActivity = (ChatActivity) fragment;
-                isRtmpStream = chatActivity.getGroupCall().call != null && chatActivity.getGroupCall().call.rtmp_stream;
+                isRtmpStream = chatActivity.getGroupCall() != null && chatActivity.getGroupCall().call != null && chatActivity.getGroupCall().call.rtmp_stream;
             }
 
             avatars.setVisibility(!isRtmpStream ? VISIBLE : GONE);
@@ -941,7 +941,13 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
             selector.setBackground(null);
             updateCallTitle();
 
-            avatars.setVisibility(!VoIPService.hasRtmpStream() ? VISIBLE : GONE);
+            boolean isRtmpStream = false;
+            if (fragment instanceof ChatActivity) {
+                ChatActivity chatActivity = (ChatActivity) fragment;
+                isRtmpStream = chatActivity.getGroupCall() != null && chatActivity.getGroupCall().call != null && chatActivity.getGroupCall().call.rtmp_stream;
+            }
+
+            avatars.setVisibility(!isRtmpStream ? VISIBLE : GONE);
             if (style == 3) {
                 if (VoIPService.getSharedInstance() != null) {
                     VoIPService.getSharedInstance().registerStateListener(this);
@@ -953,7 +959,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 titleTextView.setTranslationX(0);
                 subtitleTextView.setTranslationX(0);
             }
-            muteButton.setVisibility(!VoIPService.hasRtmpStream() ? VISIBLE : GONE);
+            muteButton.setVisibility(!isRtmpStream ? VISIBLE : GONE);
             isMuted = VoIPService.getSharedInstance() != null && VoIPService.getSharedInstance().isMicMute();
             muteDrawable.setCustomEndFrame(isMuted ? 15 : 29);
             muteDrawable.setCurrentFrame(muteDrawable.getCustomEndFrame() - 1, false, true);
