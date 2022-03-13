@@ -40,6 +40,7 @@ import it.owlgram.android.OwlConfig;
 import it.owlgram.android.camera.CameraXUtilities;
 import it.owlgram.android.components.CameraTypeSelector;
 import it.owlgram.android.components.StickerSizeCell;
+import it.owlgram.android.helpers.AudioEnhance;
 import it.owlgram.android.helpers.EntitiesHelper;
 import it.owlgram.android.helpers.PopupHelper;
 
@@ -82,6 +83,8 @@ public class OwlgramChatSettings extends BaseFragment {
     private int cameraAdviseRow;
     private int proximitySensorRow;
     private int swipePiPRow;
+    private int suppressionRow;
+    private int betterAudioMessagesRow;
 
     private UndoView restartTooltip;
 
@@ -133,7 +136,7 @@ public class OwlgramChatSettings extends BaseFragment {
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         listView.setOnItemClickListener((view, position, x, y) -> {
-            if (position == mediaSwipeByTapRow){
+            if (position == mediaSwipeByTapRow) {
                 OwlConfig.toggleMediaFlipByTap();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.mediaFlipByTap);
@@ -148,32 +151,32 @@ public class OwlgramChatSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showGreetings);
                 }
-            } else if (position == hideKeyboardRow){
+            } else if (position == hideKeyboardRow) {
                 OwlConfig.toggleHideKeyboard();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.hideKeyboard);
                 }
-            } else if (position == playGifAsVideoRow){
+            } else if (position == playGifAsVideoRow) {
                 OwlConfig.toggleGifAsVideo();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.gifAsVideo);
                 }
-            } else if (position == showFolderWhenForwardRow){
+            } else if (position == showFolderWhenForwardRow) {
                 OwlConfig.toggleShowFolderWhenForward();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showFolderWhenForward);
                 }
-            } else if (position == rearCameraStartingRow){
+            } else if (position == rearCameraStartingRow) {
                 OwlConfig.toggleUseRearCamera();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.useRearCamera);
                 }
-            } else if (position == confirmSendRow){
+            } else if (position == confirmSendRow) {
                 OwlConfig.toggleSendConfirm();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.sendConfirm);
                 }
-            } else if (position == showTranslateRow){
+            } else if (position == showTranslateRow) {
                 OwlConfig.toggleShowTranslate();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showTranslate);
@@ -188,38 +191,38 @@ public class OwlgramChatSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showRepeat);
                 }
-            } else if (position == showMessageDetails){
+            } else if (position == showMessageDetails) {
                 OwlConfig.toggleShowMessageDetails();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showMessageDetails);
                 }
-            } else if (position == showNoQuoteForwardRow){
+            } else if (position == showNoQuoteForwardRow) {
                 OwlConfig.toggleShowNoQuoteForwardRow();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showNoQuoteForward);
                 }
-            } else if (position == showReportRow){
+            } else if (position == showReportRow) {
                 OwlConfig.toggleShowReportMessage();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showReportMessage);
                 }
-            } else if (position == scrollableRow){
+            } else if (position == scrollableRow) {
                 OwlConfig.toggleScrollableChatPreview();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.scrollableChatPreview);
                 }
-            } else if (position == showDeleteRow){
+            } else if (position == showDeleteRow) {
                 OwlConfig.toggleShowDeleteDownloadedFile();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showDeleteDownloadedFile);
                 }
-            } else if (position == showHideAllTab){
+            } else if (position == showHideAllTab) {
                 OwlConfig.toggleHideAllTab();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.hideAllTab);
                 }
                 getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
-            } else if (position == cameraXOptimizeRow){
+            } else if (position == cameraXOptimizeRow) {
                 OwlConfig.toggleCameraXOptimizedMode();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.useCameraXOptimizedMode);
@@ -235,16 +238,26 @@ public class OwlgramChatSettings extends BaseFragment {
                     OwlConfig.saveCameraXFps(types.get(i));
                     listAdapter.notifyItemChanged(cameraXFpsRow);
                 });
-            } else if (position == proximitySensorRow){
+            } else if (position == proximitySensorRow) {
                 OwlConfig.toggleDisableProximityEvents();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.disableProximityEvents);
                 }
                 restartTooltip.showWithAction(0, UndoView.ACTION_CACHE_WAS_CLEARED, null, null);
-            } else if (position == swipePiPRow){
+            } else if (position == swipePiPRow) {
                 OwlConfig.toggleSwipeToPiP();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.swipeToPiP);
+                }
+            } else if (position == suppressionRow) {
+                OwlConfig.toggleVoicesAgc();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.voicesAgc);
+                }
+            } else if (position == betterAudioMessagesRow) {
+                OwlConfig.toggleIncreaseAudioMessages();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.increaseAudioMessages);
                 }
             }
         });
@@ -262,6 +275,7 @@ public class OwlgramChatSettings extends BaseFragment {
         cameraXOptimizeRow = -1;
         cameraXFpsRow = -1;
         cameraAdviseRow = -1;
+        suppressionRow = -1;
 
         stickerSizeHeaderRow = rowCount++;
         stickerSizeRow = rowCount++;
@@ -298,6 +312,10 @@ public class OwlgramChatSettings extends BaseFragment {
             cameraAdviseRow = rowCount++;
         }
         audioVideoHeaderRow = rowCount++;
+        if (AudioEnhance.isAvailable()) {
+            suppressionRow = rowCount++;
+        }
+        betterAudioMessagesRow = rowCount++;
         swipePiPRow = rowCount++;
         proximitySensorRow = rowCount++;
         rearCameraStartingRow = rowCount++;
@@ -354,7 +372,7 @@ public class OwlgramChatSettings extends BaseFragment {
                 case 3:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
                     textCheckCell.setEnabled(true, null);
-                    if (position == mediaSwipeByTapRow){
+                    if (position == mediaSwipeByTapRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("FlipMediaByTapping", R.string.FlipMediaByTapping), OwlConfig.mediaFlipByTap, true);
                     } else if (position == jumpChannelRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("JumpToNextChannel", R.string.JumpToNextChannel), OwlConfig.jumpChannel, true);
@@ -392,8 +410,12 @@ public class OwlgramChatSettings extends BaseFragment {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("PerformanceMode", R.string.PerformanceMode), LocaleController.getString("PerformanceModeDesc", R.string.PerformanceModeDesc), OwlConfig.useCameraXOptimizedMode, true, true);
                     } else if (position == proximitySensorRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("DisableProximityEvents", R.string.DisableProximityEvents), OwlConfig.disableProximityEvents, true);
-                    }else if (position == swipePiPRow) {
+                    } else if (position == swipePiPRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("SwipeToPiP", R.string.SwipeToPiP), OwlConfig.swipeToPiP, true);
+                    } else if (position == suppressionRow) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("VoiceEnhancements", R.string.VoiceEnhancements), LocaleController.getString("VoiceEnhancementsDesc", R.string.VoiceEnhancementsDesc), OwlConfig.voicesAgc, true, true);
+                    } else if (position == betterAudioMessagesRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("IncreaseVoiceMessageQuality", R.string.IncreaseVoiceMessageQuality), OwlConfig.increaseAudioMessages, true);
                     }
                     break;
                 case 6:
@@ -504,7 +526,7 @@ public class OwlgramChatSettings extends BaseFragment {
         @Override
         public int getItemViewType(int position) {
             if(position == chatDividerRow || position == foldersDividerRow || position == messageMenuDividerRow ||
-                    position == stickerSizeDividerRow){
+                    position == stickerSizeDividerRow) {
                 return 1;
             } else if (position == chatHeaderRow || position == foldersHeaderRow || position == audioVideoHeaderRow ||
                     position == messageMenuHeaderRow || position == stickerSizeHeaderRow || position == cameraTypeHeaderRow) {
@@ -515,7 +537,8 @@ public class OwlgramChatSettings extends BaseFragment {
                     position == showTranslateRow || position == showAddToSMRow || position == showMessageDetails ||
                     position == showNoQuoteForwardRow || position == showReportRow || position == scrollableRow ||
                     position == showDeleteRow || position == showHideAllTab || position == cameraXOptimizeRow ||
-                    position == proximitySensorRow || position == swipePiPRow || position == showRepeatRow) {
+                    position == proximitySensorRow || position == swipePiPRow || position == showRepeatRow ||
+                    position == suppressionRow || position == betterAudioMessagesRow) {
                 return 3;
             } else if (position == stickerSizeRow) {
                 return 4;

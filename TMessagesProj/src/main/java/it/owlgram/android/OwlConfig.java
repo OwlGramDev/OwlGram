@@ -69,6 +69,7 @@ public class OwlConfig extends SettingsManager{
     public static boolean devOptEnabled;
     public static boolean verifyLinkTip;
     public static boolean increaseAudioMessages;
+    public static boolean voicesAgc;
     public static String translationTarget = "app";
     public static String updateData;
     public static String drawerItems;
@@ -182,6 +183,8 @@ public class OwlConfig extends SettingsManager{
             verifyLinkTip = preferences.getBoolean("verifyLinkTip", false);
             languagePackVersioning = preferences.getString("languagePackVersioning", "{}");
             xiaomiBlockedInstaller = preferences.getBoolean("xiaomiBlockedInstaller", false);
+            increaseAudioMessages = preferences.getBoolean("increaseAudioMessages", false);
+            voicesAgc = preferences.getBoolean("voicesAgc", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -191,7 +194,6 @@ public class OwlConfig extends SettingsManager{
             unlimitedPinnedDialogs = preferences.getBoolean("unlimitedPinnedDialogs"+dS, false);
             maxRecentStickers = preferences.getInt("maxRecentStickers"+dS, 20);
             betterAudioQuality = preferences.getBoolean("betterAudioQuality"+dS, false);
-            increaseAudioMessages = preferences.getBoolean("increaseAudioMessages"+dS, false);
 
             configLoaded = true;
         }
@@ -554,6 +556,14 @@ public class OwlConfig extends SettingsManager{
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("increaseAudioMessages", increaseAudioMessages);
+        editor.apply();
+    }
+
+    public static void toggleVoicesAgc() {
+        voicesAgc = !voicesAgc;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("voicesAgc", voicesAgc);
         editor.apply();
     }
 

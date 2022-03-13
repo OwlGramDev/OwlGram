@@ -218,4 +218,6 @@
     <string name="SaveWithoutMarkdown">Save without markdown</string>
     <string name="IncreaseVoiceMessageQuality">Increase voice messages quality</string>
     <string name="ClearRecentStickers">Clear recent stickers?</string>
+    <string name="VoiceEnhancements">Voice Enhancements</string>
+    <string name="VoiceEnhancementsDesc">Noise Suppression and voice normalization</string>
 </resources>

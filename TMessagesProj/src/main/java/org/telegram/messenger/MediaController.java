@@ -61,7 +61,6 @@ import android.widget.FrameLayout;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.util.Log;
 
 import org.telegram.messenger.audioinfo.AudioInfo;
 import org.telegram.messenger.video.MediaCodecVideoConvertor;
@@ -83,7 +82,6 @@ import org.telegram.ui.PhotoViewer;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -101,6 +99,7 @@ import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.helpers.AudioEnhance;
 
 public class MediaController implements AudioManager.OnAudioFocusChangeListener, NotificationCenter.NotificationCenterDelegate, SensorEventListener {
 
@@ -3485,6 +3484,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                 recordReplyingMsg = replyToMsg;
                 recordReplyingTopMsg = replyToTopMsg;
                 fileBuffer.rewind();
+                AudioEnhance.initVoiceEnhancements(audioRecorder);
 
                 audioRecorder.startRecording();
             } catch (Exception e) {
@@ -3494,6 +3494,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                 recordingAudioFile.delete();
                 recordingAudioFile = null;
                 try {
+                    AudioEnhance.releaseVoiceEnhancements();
                     audioRecorder.release();
                     audioRecorder = null;
                 } catch (Exception e2) {
@@ -3586,6 +3587,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             requestAudioFocus(false);
         }
         try {
+            AudioEnhance.releaseVoiceEnhancements();
             if (audioRecorder != null) {
                 audioRecorder.release();
                 audioRecorder = null;
