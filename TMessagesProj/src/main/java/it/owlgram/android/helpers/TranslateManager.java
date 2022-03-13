@@ -130,12 +130,12 @@ public class TranslateManager extends Dialog {
         backButton.setClickable(t > .5f);
         headerShadowView.setAlpha(scrollView.getScrollY() > 0 ? 1f : t);
 
-        headerLayout.height = (int) lerp(dp(70), dp(56), t);
+        headerLayout.height = lerp(dp(70), dp(56), t);
         header.setLayoutParams(headerLayout);
 
         scrollViewLayout.setMargins(
                 scrollViewLayout.leftMargin,
-                (int) lerp(dp(70), dp(56), t),
+                lerp(dp(70), dp(56), t),
                 scrollViewLayout.rightMargin,
                 scrollViewLayout.bottomMargin
         );
@@ -1219,7 +1219,7 @@ public class TranslateManager extends Dialog {
             toTextView.measure(0, 0);
             super.onMeasure(
                     MeasureSpec.makeMeasureSpec(
-                            (int) AndroidUtilities.lerp(fromTextView.getMeasuredWidth(), toTextView.getMeasuredWidth(), loadingT) + getPaddingLeft() + getPaddingRight(),
+                            AndroidUtilities.lerp(fromTextView.getMeasuredWidth(), toTextView.getMeasuredWidth(), loadingT) + getPaddingLeft() + getPaddingRight(),
                             MeasureSpec.EXACTLY
                     ),
                     MeasureSpec.makeMeasureSpec(
@@ -1239,7 +1239,7 @@ public class TranslateManager extends Dialog {
         private void updateWidth() {
             boolean updated;
 
-            int newWidth = (int) AndroidUtilities.lerp(fromTextView.getMeasuredWidth(), toTextView.getMeasuredWidth(), loadingT) + getPaddingLeft() + getPaddingRight();
+            int newWidth = AndroidUtilities.lerp(fromTextView.getMeasuredWidth(), toTextView.getMeasuredWidth(), loadingT) + getPaddingLeft() + getPaddingRight();
             int newHeight = Math.max(fromTextView.getMeasuredHeight(), toTextView.getMeasuredHeight());
             LayoutParams lp = getLayoutParams();
             if (lp == null) {

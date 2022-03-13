@@ -2,8 +2,6 @@ package it.owlgram.android.translator;
 
 import android.text.TextUtils;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

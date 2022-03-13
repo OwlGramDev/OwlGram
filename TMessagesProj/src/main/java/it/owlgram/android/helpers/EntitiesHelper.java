@@ -90,6 +90,7 @@ public class EntitiesHelper {
         }
         String html_result = Html.toHtml(messSpan);
         html_result = html_result.replace("<p dir=\"ltr\">", "");
+        html_result = html_result.replace("<p dir=\"rtl\">", "");
         html_result = html_result.replace("</p>", "");
         html_result = html_result.replaceAll("<span style=\"text-decoration:line-through;\">(.*?)</span>", "<s>$1</s>");
         if (!includeLink) {
