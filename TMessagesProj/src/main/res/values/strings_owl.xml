@@ -143,6 +143,11 @@
     <string name="CameraTypeSystem">System</string>
     <string name="SystemCameraDesc">It allows you to directly access the system camera (not applicable for video messages).</string>
     <string name="MediaSettings">Media</string>
+    <string name="VoiceEnhancements">Voice Enhancements</string>
+    <string name="VoiceEnhancementsDesc">Noise Suppression and Voice Normalization</string>
+    <string name="IncreaseVoiceMessageQuality">HQ Voice Messages</string>
+    <string name="TurnSoundOnVDKey">Turn Sound On with Volume Down Key</string>
+    <string name="TurnSoundOnVDKeyDesc">If disabled, it will not unmute videos while pressing the volume down button</string>
     <string name="DisableProximityEvents">Disable Proximity Events</string>
     <string name="RestartAppToApplyChanges">Restart app to apply changes.</string>
     <string name="ConfirmAVMessages">Confirm sending Audio/Video Messages</string>
@@ -216,8 +221,6 @@
     <string name="AppLinkNotVerifiedMessage">For Android 12 and newer, you need to manually add link to verified links in order to open t.me links in OwlGram.</string>
     <string name="SendWithoutMarkdown">Send without markdown</string>
     <string name="SaveWithoutMarkdown">Save without markdown</string>
-    <string name="IncreaseVoiceMessageQuality">Increase voice messages quality</string>
     <string name="ClearRecentStickers">Clear recent stickers?</string>
-    <string name="VoiceEnhancements">Voice Enhancements</string>
-    <string name="VoiceEnhancementsDesc">Noise Suppression and voice normalization</string>
+    <string name="OpenArchiveOnPull">Open Archive by Pulling down</string>
 </resources>

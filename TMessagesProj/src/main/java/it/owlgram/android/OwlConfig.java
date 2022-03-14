@@ -70,6 +70,8 @@ public class OwlConfig extends SettingsManager{
     public static boolean verifyLinkTip;
     public static boolean increaseAudioMessages;
     public static boolean voicesAgc;
+    public static boolean turnSoundOnVDKey;
+    public static boolean openArchiveOnPull;
     public static String translationTarget = "app";
     public static String updateData;
     public static String drawerItems;
@@ -185,6 +187,8 @@ public class OwlConfig extends SettingsManager{
             xiaomiBlockedInstaller = preferences.getBoolean("xiaomiBlockedInstaller", false);
             increaseAudioMessages = preferences.getBoolean("increaseAudioMessages", false);
             voicesAgc = preferences.getBoolean("voicesAgc", false);
+            turnSoundOnVDKey = preferences.getBoolean("turnSoundOnVDKey", true);
+            openArchiveOnPull = preferences.getBoolean("openArchiveOnPull", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -564,6 +568,22 @@ public class OwlConfig extends SettingsManager{
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("voicesAgc", voicesAgc);
+        editor.apply();
+    }
+
+    public static void toggleturnSoundOnVDKey() {
+        turnSoundOnVDKey = !turnSoundOnVDKey;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("turnSoundOnVDKey", turnSoundOnVDKey);
+        editor.apply();
+    }
+
+    public static void toggleOpenArchiveOnPull() {
+        openArchiveOnPull = !openArchiveOnPull;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("openArchiveOnPull", openArchiveOnPull);
         editor.apply();
     }
 

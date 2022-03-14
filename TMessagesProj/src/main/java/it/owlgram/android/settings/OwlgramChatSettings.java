@@ -85,6 +85,8 @@ public class OwlgramChatSettings extends BaseFragment {
     private int swipePiPRow;
     private int suppressionRow;
     private int betterAudioMessagesRow;
+    private int turnSoundOnVDKeyRow;
+    private int openArchiveOnPullRow;
 
     private UndoView restartTooltip;
 
@@ -259,6 +261,16 @@ public class OwlgramChatSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.increaseAudioMessages);
                 }
+            } else if (position == turnSoundOnVDKeyRow) {
+                OwlConfig.toggleturnSoundOnVDKey();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.turnSoundOnVDKey);
+                }
+            } else if (position == openArchiveOnPullRow) {
+                OwlConfig.toggleOpenArchiveOnPull();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.openArchiveOnPull);
+                }
             }
         });
         restartTooltip = new UndoView(context);
@@ -280,6 +292,7 @@ public class OwlgramChatSettings extends BaseFragment {
         stickerSizeHeaderRow = rowCount++;
         stickerSizeRow = rowCount++;
         stickerSizeDividerRow = rowCount++;
+
         chatHeaderRow = rowCount++;
         mediaSwipeByTapRow = rowCount++;
         jumpChannelRow = rowCount++;
@@ -287,7 +300,9 @@ public class OwlgramChatSettings extends BaseFragment {
         playGifAsVideoRow = rowCount++;
         hideKeyboardRow = rowCount++;
         scrollableRow = rowCount++;
+        openArchiveOnPullRow = rowCount++;
         chatDividerRow = rowCount++;
+
         foldersHeaderRow = rowCount++;
         showHideAllTab = rowCount++;
         showFolderWhenForwardRow = rowCount++;
@@ -316,6 +331,7 @@ public class OwlgramChatSettings extends BaseFragment {
             suppressionRow = rowCount++;
         }
         betterAudioMessagesRow = rowCount++;
+        turnSoundOnVDKeyRow = rowCount++;
         swipePiPRow = rowCount++;
         proximitySensorRow = rowCount++;
         rearCameraStartingRow = rowCount++;
@@ -416,6 +432,10 @@ public class OwlgramChatSettings extends BaseFragment {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("VoiceEnhancements", R.string.VoiceEnhancements), LocaleController.getString("VoiceEnhancementsDesc", R.string.VoiceEnhancementsDesc), OwlConfig.voicesAgc, true, true);
                     } else if (position == betterAudioMessagesRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("IncreaseVoiceMessageQuality", R.string.IncreaseVoiceMessageQuality), OwlConfig.increaseAudioMessages, true);
+                    } else if (position == turnSoundOnVDKeyRow) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("TurnSoundOnVDKey", R.string.TurnSoundOnVDKey), LocaleController.getString("TurnSoundOnVDKeyDesc", R.string.TurnSoundOnVDKeyDesc), OwlConfig.turnSoundOnVDKey, true, true);
+                    } else if (position == openArchiveOnPullRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("OpenArchiveOnPull", R.string.OpenArchiveOnPull), OwlConfig.openArchiveOnPull, true);
                     }
                     break;
                 case 6:
@@ -538,7 +558,8 @@ public class OwlgramChatSettings extends BaseFragment {
                     position == showNoQuoteForwardRow || position == showReportRow || position == scrollableRow ||
                     position == showDeleteRow || position == showHideAllTab || position == cameraXOptimizeRow ||
                     position == proximitySensorRow || position == swipePiPRow || position == showRepeatRow ||
-                    position == suppressionRow || position == betterAudioMessagesRow) {
+                    position == suppressionRow || position == betterAudioMessagesRow || position == turnSoundOnVDKeyRow ||
+                    position == openArchiveOnPullRow) {
                 return 3;
             } else if (position == stickerSizeRow) {
                 return 4;

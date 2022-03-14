@@ -183,7 +183,7 @@ protected:
 class LottieParserImpl : protected LookaheadParserHandler {
 public:
     LottieParserImpl(char *str, const char *dir_path, std::map<int32_t, int32_t> *colorReplacement, rlottie::FitzModifier fitzModifier)
-            : LookaheadParserHandler(str), mDirPath(dir_path), colorMap(colorReplacement), mFitzModifier(fitzModifier)
+        : LookaheadParserHandler(str), mDirPath(dir_path), colorMap(colorReplacement), mFitzModifier(fitzModifier)
     {
     }
 
@@ -203,7 +203,7 @@ public:
     void   SkipValue();
     Value *PeekValue();
     int PeekType();  // returns a rapidjson::Type, or -1 for no value (at end of
-    // object/array)
+                     // object/array)
 
     bool IsValid() { return st_ != kError; }
 
@@ -278,13 +278,13 @@ public:
     LottieColor toColor(const char *str);
 
     void resolveLayerRefs();
-
+    
     bool hasParsingError();
 
 protected:
     const rlottie::FitzModifier                mFitzModifier;
     std::unordered_map<std::string, std::shared_ptr<VInterpolator>>
-            mInterpolatorCache;
+                                               mInterpolatorCache;
     std::shared_ptr<LOTCompositionData>        mComposition;
     LOTCompositionData *                       compRef{nullptr};
     LOTLayerData *                             curLayerRef{nullptr};
@@ -298,7 +298,7 @@ protected:
 };
 
 LookaheadParserHandler::LookaheadParserHandler(char *str)
-        : v_(), st_(kInit), r_(), ss_(str)
+    : v_(), st_(kInit), r_(), ss_(str)
 {
     r_.IterativeParseInit();
     ParseNext();
@@ -739,13 +739,13 @@ void LottieParserImpl::parseFitzColorReplacement()
 }
 
 static constexpr const unsigned char B64index[256] = {
-        0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-        0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-        0,  0,  0,  0,  0,  0,  0,  62, 63, 62, 62, 63, 52, 53, 54, 55, 56, 57,
-        58, 59, 60, 61, 0,  0,  0,  0,  0,  0,  0,  0,  1,  2,  3,  4,  5,  6,
-        7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
-        25, 0,  0,  0,  0,  63, 0,  26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
-        37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51};
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+    0,  0,  0,  0,  0,  0,  0,  62, 63, 62, 62, 63, 52, 53, 54, 55, 56, 57,
+    58, 59, 60, 61, 0,  0,  0,  0,  0,  0,  0,  0,  1,  2,  3,  4,  5,  6,
+    7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+    25, 0,  0,  0,  0,  63, 0,  26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
+    37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51};
 
 std::string b64decode(const void *data, const size_t len)
 {
@@ -1199,24 +1199,24 @@ std::shared_ptr<LOTMaskData> LottieParserImpl::parseMaskObject()
                 return sharedMask;
             }
             switch (str[0]) {
-                case 'n':
-                    obj->mMode = LOTMaskData::Mode::None;
-                    break;
-                case 'a':
-                    obj->mMode = LOTMaskData::Mode::Add;
-                    break;
-                case 's':
-                    obj->mMode = LOTMaskData::Mode::Substarct;
-                    break;
-                case 'i':
-                    obj->mMode = LOTMaskData::Mode::Intersect;
-                    break;
-                case 'f':
-                    obj->mMode = LOTMaskData::Mode::Difference;
-                    break;
-                default:
-                    obj->mMode = LOTMaskData::Mode::None;
-                    break;
+            case 'n':
+                obj->mMode = LOTMaskData::Mode::None;
+                break;
+            case 'a':
+                obj->mMode = LOTMaskData::Mode::Add;
+                break;
+            case 's':
+                obj->mMode = LOTMaskData::Mode::Substarct;
+                break;
+            case 'i':
+                obj->mMode = LOTMaskData::Mode::Intersect;
+                break;
+            case 'f':
+                obj->mMode = LOTMaskData::Mode::Difference;
+                break;
+            default:
+                obj->mMode = LOTMaskData::Mode::None;
+                break;
             }
         } else if (0 == strcmp(key, "pt")) {
             parseShapeProperty(obj->mShape);
@@ -1410,7 +1410,7 @@ std::shared_ptr<LOTData> LottieParserImpl::parseRectObject()
 std::shared_ptr<LOTData> LottieParserImpl::parseEllipseObject()
 {
     std::shared_ptr<LOTEllipseData> sharedEllipse =
-            std::make_shared<LOTEllipseData>();
+        std::make_shared<LOTEllipseData>();
     LOTEllipseData *obj = sharedEllipse.get();
 
     while (const char *key = NextObjectKey()) {
@@ -1442,7 +1442,7 @@ std::shared_ptr<LOTData> LottieParserImpl::parseEllipseObject()
 std::shared_ptr<LOTData> LottieParserImpl::parseShapeObject()
 {
     std::shared_ptr<LOTShapeData> sharedShape =
-            std::make_shared<LOTShapeData>();
+        std::make_shared<LOTShapeData>();
     LOTShapeData *obj = sharedShape.get();
 
     while (const char *key = NextObjectKey()) {
@@ -1476,7 +1476,7 @@ std::shared_ptr<LOTData> LottieParserImpl::parseShapeObject()
 std::shared_ptr<LOTData> LottieParserImpl::parsePolystarObject()
 {
     std::shared_ptr<LOTPolystarData> sharedPolystar =
-            std::make_shared<LOTPolystarData>();
+        std::make_shared<LOTPolystarData>();
     LOTPolystarData *obj = sharedPolystar.get();
 
     while (const char *key = NextObjectKey()) {
@@ -1516,10 +1516,10 @@ std::shared_ptr<LOTData> LottieParserImpl::parsePolystarObject()
         return sharedPolystar;
     }
     obj->setStatic(
-            obj->mPos.isStatic() && obj->mPointCount.isStatic() &&
-            obj->mInnerRadius.isStatic() && obj->mInnerRoundness.isStatic() &&
-            obj->mOuterRadius.isStatic() && obj->mOuterRoundness.isStatic() &&
-            obj->mRotation.isStatic());
+        obj->mPos.isStatic() && obj->mPointCount.isStatic() &&
+        obj->mInnerRadius.isStatic() && obj->mInnerRoundness.isStatic() &&
+        obj->mOuterRadius.isStatic() && obj->mOuterRoundness.isStatic() &&
+        obj->mRotation.isStatic());
 
     return sharedPolystar;
 }
@@ -1607,7 +1607,7 @@ void LottieParserImpl::getValue(LOTRepeaterTransform &obj)
 std::shared_ptr<LOTData> LottieParserImpl::parseReapeaterObject()
 {
     std::shared_ptr<LOTRepeaterData> sharedRepeater =
-            std::make_shared<LOTRepeaterData>();
+        std::make_shared<LOTRepeaterData>();
     LOTRepeaterData *obj = sharedRepeater.get();
 
     while (const char *key = NextObjectKey()) {
@@ -1654,10 +1654,10 @@ std::shared_ptr<LOTData> LottieParserImpl::parseReapeaterObject()
  * https://github.com/airbnb/lottie-web/blob/master/docs/json/shapes/transform.json
  */
 std::shared_ptr<LOTTransformData> LottieParserImpl::parseTransformObject(
-        bool ddd)
+    bool ddd)
 {
     std::shared_ptr<LOTTransformData> sharedTransform =
-            std::make_shared<LOTTransformData>();
+        std::make_shared<LOTTransformData>();
 
     auto obj = std::make_unique<TransformData>();
     if (ddd) obj->m3D = std::make_unique<LOT3DData>();
@@ -1936,7 +1936,7 @@ void LottieParserImpl::parseGradientProperty(LOTGradient *obj, const char *key) 
 std::shared_ptr<LOTData> LottieParserImpl::parseGFillObject()
 {
     std::shared_ptr<LOTGFillData> sharedGFill =
-            std::make_shared<LOTGFillData>();
+        std::make_shared<LOTGFillData>();
     LOTGFillData *obj = sharedGFill.get();
 
     while (const char *key = NextObjectKey()) {
@@ -2298,7 +2298,7 @@ bool LottieParserImpl::parseKeyFrameValue(const char *               key,
 }
 
 std::shared_ptr<VInterpolator> LottieParserImpl::interpolator(
-        VPointF inTangent, VPointF outTangent, std::string key)
+    VPointF inTangent, VPointF outTangent, std::string key)
 {
     if (key.empty()) {
         std::array<char, 20> temp;
@@ -2312,7 +2312,7 @@ std::shared_ptr<VInterpolator> LottieParserImpl::interpolator(
         return search->second;
     } else {
         auto obj = std::make_shared<VInterpolator>(
-                VInterpolator(outTangent, inTangent));
+            VInterpolator(outTangent, inTangent));
         mInterpolatorCache[std::move(key)] = obj;
         return obj;
     }
@@ -2734,7 +2734,7 @@ LottieParser::~LottieParser()
 }
 
 LottieParser::LottieParser(char *str, const char *dir_path, std::map<int32_t, int32_t> *colorReplacement, rlottie::FitzModifier fitzModifier)
-        : d(new LottieParserImpl(str, dir_path, colorReplacement, fitzModifier))
+    : d(new LottieParserImpl(str, dir_path, colorReplacement, fitzModifier))
 {
     d->parseComposition();
     if (d->hasParsingError()) {
