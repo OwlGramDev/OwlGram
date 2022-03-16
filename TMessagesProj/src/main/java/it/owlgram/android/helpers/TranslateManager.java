@@ -1651,6 +1651,7 @@ public class TranslateManager extends Dialog {
 
     public static void translate(CharSequence text, Context context, BaseFragment fragment, boolean noForwards, OnLinkPress onLinkPress) {
         LanguageDetector.detectLanguage(
+                context,
                 text.toString(),
                 str -> {
                     TranslateManager alert = new TranslateManager(fragment, context, str, text, noForwards, onLinkPress);

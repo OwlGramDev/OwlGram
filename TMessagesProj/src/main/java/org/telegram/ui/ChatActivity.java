@@ -22127,6 +22127,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         cell.setVisibility(View.GONE);
                         waitForLangDetection.set(true);
                         LanguageDetector.detectLanguage(
+                                this.getParentActivity(),
                                 finalMessageText.toString(),
                                 (String lang) -> {
                                     fromLang[0] = lang;

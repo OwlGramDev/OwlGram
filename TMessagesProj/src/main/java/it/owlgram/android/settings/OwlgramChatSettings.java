@@ -427,7 +427,7 @@ public class OwlgramChatSettings extends BaseFragment {
                     } else if (position == proximitySensorRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("DisableProximityEvents", R.string.DisableProximityEvents), OwlConfig.disableProximityEvents, true);
                     } else if (position == swipePiPRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("SwipeToPiP", R.string.SwipeToPiP), OwlConfig.swipeToPiP, true);
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("SwipeToPiP", R.string.SwipeToPiP), LocaleController.getString("SwipeToPiPDesc", R.string.SwipeToPiPDesc), OwlConfig.swipeToPiP, true, true);
                     } else if (position == suppressionRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("VoiceEnhancements", R.string.VoiceEnhancements), LocaleController.getString("VoiceEnhancementsDesc", R.string.VoiceEnhancementsDesc), OwlConfig.voicesAgc, true, true);
                     } else if (position == betterAudioMessagesRow) {

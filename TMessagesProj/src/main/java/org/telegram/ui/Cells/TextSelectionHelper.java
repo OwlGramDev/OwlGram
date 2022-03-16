@@ -1249,7 +1249,7 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
                     }
                 }
                 if (onTranslateListener != null && LanguageDetector.hasSupport() && getSelectedText() != null) {
-                    LanguageDetector.detectLanguage(getSelectedText().toString(), lng -> {
+                    LanguageDetector.detectLanguage(textSelectionOverlay.getContext(), getSelectedText().toString(), lng -> {
                         translateFromLanguage = lng;
                         updateTranslateButton(menu);
                     }, err -> {
