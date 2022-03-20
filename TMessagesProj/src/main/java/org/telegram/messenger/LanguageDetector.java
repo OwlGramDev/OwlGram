@@ -16,19 +16,19 @@ public class LanguageDetector {
         return true;
     }
 
-    public static void detectLanguage(Context context, String text, StringCallback onSuccess, ExceptionCallback onFail) {
+    public static void detectLanguage(String text, StringCallback onSuccess, ExceptionCallback onFail) {
         try {
             com.google.mlkit.nl.languageid.LanguageIdentification.getClient()
                     .identifyLanguage(text)
-                    .addOnSuccessListener(onSuccess::run)
-                    .addOnFailureListener(onFail::run);
-        } catch (IllegalStateException e) {
-            if (context != null) {
-                MlKit.initialize(context);
-                detectLanguage(null, text, onSuccess, onFail);
-            } else {
-                onFail.run(e);
-            }
+                    .addOnSuccessListener(str -> {
+                        onSuccess.run(str);
+                    })
+                    .addOnFailureListener(e -> {
+                        onFail.run(e);
+                    });
+        } catch (Exception e) {
+            FileLog.e(e);
+            onFail.run(e);
         }
     }
 }
