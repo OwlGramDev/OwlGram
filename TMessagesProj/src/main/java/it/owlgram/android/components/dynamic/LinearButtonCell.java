@@ -30,11 +30,20 @@ import java.util.Objects;
 
 @SuppressLint("ViewConstructor")
 public class LinearButtonCell extends SimpleActionCell {
+    private final String[] colors;
+    private final TextView tv;
+    private final ImageView iv;
+    private final ImageView mt;
+
 
     @SuppressLint("ClickableViewAccessibility")
-    public LinearButtonCell(Context context, String text, int iconId, int color, int myId) {
+    public LinearButtonCell(Context context, String text, int iconId, String color, int myId) {
         super(context);
-        int colorWhite = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText);
+        colors = new String[] {
+                color,
+                Theme.key_windowBackgroundWhiteBlackText,
+        };
+        int colorWhite = Theme.getColor(colors[1]);
 
         setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f));
         setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8));
@@ -50,7 +59,7 @@ public class LinearButtonCell extends SimpleActionCell {
         RelativeLayout rl = new RelativeLayout(context);
         rl.setLayoutParams(new CardView.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
-        ImageView mt = new ImageView(context);
+        mt = new ImageView(context);
         mt.setScaleType(ImageView.ScaleType.FIT_CENTER);
         mt.setClickable(true);
         mt.setOnTouchListener((View view, MotionEvent motionEvent) -> {
@@ -59,23 +68,23 @@ public class LinearButtonCell extends SimpleActionCell {
             }
             return false;
         });
-        mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(colorWhite, 0.2f)));
+        mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
         mt.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
-        ImageView iv = new ImageView(context);
+        iv = new ImageView(context);
         RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(AndroidUtilities.dp(27), AndroidUtilities.dp(27));
         layoutParams2.setMargins(0, 0,0,0);
         layoutParams2.addRule(RelativeLayout.CENTER_IN_PARENT);
         iv.setLayoutParams(layoutParams2);
         Drawable d = ContextCompat.getDrawable(context, iconId);
-        Objects.requireNonNull(d).setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        Objects.requireNonNull(d).setColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.SRC_ATOP);
         iv.setBackground(d);
 
-        TextView tv = new TextView(context);
+        tv = new TextView(context);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(0,AndroidUtilities.dp(5),0,0);
         tv.setLayoutParams(layoutParams);
-        tv.setTextColor(color);
+        tv.setTextColor(Theme.getColor(colors[0]));
         tv.setText(text);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
         tv.setGravity(Gravity.CENTER);
@@ -87,6 +96,13 @@ public class LinearButtonCell extends SimpleActionCell {
         rl.addView(mt);
         rl.addView(iv);
         addView(tv);
+    }
+
+    @Override
+    public void updateColors() {
+        tv.setTextColor(Theme.getColor(colors[0]));
+        iv.getBackground().setColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.SRC_ATOP);
+        mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
     }
 
     public static LinearLayout getShimmerButton(Context context, int pos) {
@@ -186,8 +202,7 @@ public class LinearButtonCell extends SimpleActionCell {
 
     public ThemeInfo getTheme() {
         return new ThemeInfo(
-                Theme.getColor(Theme.key_dialogTextBlue),
-                Color.TRANSPARENT,
+                false,
                 AndroidUtilities.dp(25)
         );
     }

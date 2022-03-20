@@ -11,11 +11,11 @@ import org.telegram.messenger.AndroidUtilities;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.dynamic.IceledButtonCell;
-import it.owlgram.android.components.dynamic.PillsButtonCell;
-import it.owlgram.android.components.dynamic.SquaredButtonCell;
-import it.owlgram.android.components.dynamic.SimpleActionCell;
-import it.owlgram.android.components.dynamic.RoundedButtonCell;
 import it.owlgram.android.components.dynamic.LinearButtonCell;
+import it.owlgram.android.components.dynamic.PillsButtonCell;
+import it.owlgram.android.components.dynamic.RoundedButtonCell;
+import it.owlgram.android.components.dynamic.SimpleActionCell;
+import it.owlgram.android.components.dynamic.SquaredButtonCell;
 
 @SuppressLint("ViewConstructor")
 public class ActionPanelCell extends LinearLayout {
@@ -27,7 +27,18 @@ public class ActionPanelCell extends LinearLayout {
         super(context);
         currId = -1;
         setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8), 0);
-        mainLayout = new LinearLayout(context);
+        mainLayout = new LinearLayout(context) {
+            @Override
+            public void invalidate() {
+                super.invalidate();
+                for (int i = 0; i < mainLayout.getChildCount(); i++) {
+                    if (mainLayout.getChildAt(i) instanceof SimpleActionCell) {
+                        SimpleActionCell contents = ((SimpleActionCell) mainLayout.getChildAt(i));
+                        contents.updateColors();
+                    }
+                }
+            }
+        };
         mainLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         mainLayout.setGravity(Gravity.CENTER_HORIZONTAL);
 
@@ -53,7 +64,7 @@ public class ActionPanelCell extends LinearLayout {
         mainLayout.setVisibility(VISIBLE);
         removeView(shimmerFrameLayout);
     }
-    public void addItem(String text, int icon, int color) {
+    public void addItem(String text, int icon, String color) {
         mainLayout.addView(getButton(getContext(), text, icon, color));
     }
 
@@ -79,7 +90,7 @@ public class ActionPanelCell extends LinearLayout {
         }
     }
 
-    public SimpleActionCell getButton(Context context, String text, int iconId, int color){
+    public SimpleActionCell getButton(Context context, String text, int iconId, String color){
         currId++;
         int myId = currId;
         switch (OwlConfig.buttonStyleType) {

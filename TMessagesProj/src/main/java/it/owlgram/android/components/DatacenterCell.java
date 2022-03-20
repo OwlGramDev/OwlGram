@@ -2,8 +2,7 @@ package it.owlgram.android.components;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -13,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
@@ -31,12 +29,12 @@ public class DatacenterCell extends LinearLayout {
     private final TextView tv;
     private final TextView tv2;
     private final ImageView iv;
-    private int color_icon;
     private int DC_CACHE = -1;
     private long ID_CACHE = -1;
     private final LinearLayout mainLayout;
     private final ShimmerFrameLayout shimmerFrameLayout;
     private final CardView mainCardView;
+    private boolean withBackground = false;
 
     @SuppressLint("SetTextI18n")
     public DatacenterCell(Context context) {
@@ -44,9 +42,9 @@ public class DatacenterCell extends LinearLayout {
         setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(8), AndroidUtilities.dp(16), AndroidUtilities.dp(8));
         setGravity(Gravity.CENTER_VERTICAL);
 
-        int colorIcon = Theme.getColor(Theme.key_windowBackgroundWhiteGrayText);
         int colorText = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText);
-        int blueColor = color_icon = Theme.getColor(Theme.key_dialogTextBlue);
+        int colorText2 = Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2);
+        String blueColor = Theme.key_dialogTextBlue;
 
         shimmerFrameLayout = new ShimmerFrameLayout(context);
         Shimmer.AlphaHighlightBuilder shimmer = new Shimmer.AlphaHighlightBuilder();
@@ -63,7 +61,17 @@ public class DatacenterCell extends LinearLayout {
 
         shimmerFrameLayout.addView(placeholderLayout);
 
-        mainLayout = new LinearLayout(context);
+        mainLayout = new LinearLayout(context) {
+            @Override
+            public void invalidate() {
+                super.invalidate();
+                if (withBackground) {
+                    mainCardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), 0.03f));
+                } else {
+                    mainCardView.setCardBackgroundColor(Color.TRANSPARENT);
+                }
+            }
+        };
         mainLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
         mainLayout.setGravity(Gravity.CENTER_VERTICAL);
 
@@ -71,13 +79,21 @@ public class DatacenterCell extends LinearLayout {
         mainCardView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         mainCardView.setCardElevation(0);
         mainCardView.setRadius(AndroidUtilities.dp(10.0f));
-        mainCardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(blueColor, 0.15f));
+        mainCardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), 0.03f));
 
         LinearLayout ll = new LinearLayout(context);
         ll.setLayoutParams(new CardView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         ll.setPadding(AndroidUtilities.dp(10), AndroidUtilities.dp(10), AndroidUtilities.dp(10), AndroidUtilities.dp(10));
 
-        iv = new ImageView(context);
+        iv = new ImageView(context) {
+            @Override
+            public void invalidate() {
+                super.invalidate();
+                if (iv.getBackground() != null) {
+                    iv.getBackground().setColorFilter(Theme.getColor(Theme.key_dialogTextBlue), PorterDuff.Mode.SRC_ATOP);
+                }
+            }
+        };
         LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(AndroidUtilities.dp(30), AndroidUtilities.dp(30));
         iv.setLayoutParams(layoutParams2);
         iv.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -100,7 +116,7 @@ public class DatacenterCell extends LinearLayout {
         tv.setEllipsize(TextUtils.TruncateAt.END);
 
         tv2 = new TextView(context);
-        tv2.setTextColor(colorIcon);
+        tv2.setTextColor(colorText2);
 
         tv2.setLines(1);
         tv2.setMaxLines(1);
@@ -160,9 +176,13 @@ public class DatacenterCell extends LinearLayout {
     }
 
     public void setTheme(SimpleActionCell.ThemeInfo themeInfo) {
-        mainCardView.setCardBackgroundColor(themeInfo.background);
+        if (themeInfo.withBackground) {
+            mainCardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), 0.03f));
+        } else {
+            mainCardView.setCardBackgroundColor(Color.TRANSPARENT);
+        }
+        this.withBackground = themeInfo.withBackground;
         mainCardView.setRadius(themeInfo.radius);
-        color_icon = themeInfo.colorIcon;
         if (ID_CACHE != -1) {
             setIdAndDC(ID_CACHE, DC_CACHE);
         }
@@ -181,14 +201,11 @@ public class DatacenterCell extends LinearLayout {
         tv.setText(DC_NAME);
         tv2.setText(String.valueOf(id));
         Drawable d = ContextCompat.getDrawable(getContext(), DCHelper.getDcIcon(DC));
-        Objects.requireNonNull(d).setColorFilter(color_icon, PorterDuff.Mode.SRC_ATOP);
-        iv.setImageBitmap(drawableToBitmap(d));
+        Objects.requireNonNull(d).setColorFilter(Theme.getColor(Theme.key_dialogTextBlue), PorterDuff.Mode.SRC_ATOP);
+        iv.setBackground(d);
     }
-    public static Bitmap drawableToBitmap (@NonNull Drawable drawable) {
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-        drawable.draw(canvas);
-        return bitmap;
+
+    public static int getBackColor() {
+        return AndroidUtilities.isLight(Theme.getColor(Theme.key_windowBackgroundWhite)) ? 0xFF000000:0xFFFFFFFF;
     }
 }

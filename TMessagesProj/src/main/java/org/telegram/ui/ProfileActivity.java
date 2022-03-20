@@ -8629,6 +8629,15 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             arrayList.add(new ThemeDescription(nameTextView[1], 0, null, null, new Drawable[]{verifiedDrawable}, null, Theme.key_profile_verifiedBackground));
         }
 
+        // CUSTOM ELEMENTS
+        arrayList.add(new ThemeDescription(listView, 0, new Class[]{DatacenterCell.class}, new String[]{"tv"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText));
+        arrayList.add(new ThemeDescription(listView, 0, new Class[]{DatacenterCell.class}, new String[]{"tv2"}, null, null, null, Theme.key_windowBackgroundWhiteGrayText2));
+        arrayList.add(new ThemeDescription(listView,0, new Class[]{DatacenterCell.class}, new String[]{"iv"}, null, null, null, Theme.key_dialogTextBlue));
+        arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_dialogTextBlue));
+        arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhiteRedText4));
+        arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_statisticChartLine_green));
+        arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhite));
+        arrayList.add(new ThemeDescription(listView,0, new Class[]{DatacenterCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhite));
         return arrayList;
     }
 

@@ -152,18 +152,18 @@ public class ActionButtonManager {
         return data.length();
     }
 
-    private int getColor(String id) {
+    private String getColor(String id) {
         switch (id) {
             case "leave":
             case "stop":
             case "block":
             case "logout":
-                return Theme.getColor(Theme.key_windowBackgroundWhiteRedText4);
+                return Theme.key_windowBackgroundWhiteRedText4;
             case "unblock":
             case "restart":
-                return Theme.getColor(Theme.key_statisticChartLine_green);
+                return Theme.key_statisticChartLine_green;
         }
-        return Theme.getColor(Theme.key_dialogTextBlue);
+        return Theme.key_dialogTextBlue;
     }
 
     public ActionButtonInfo getItemAt(int index){
@@ -174,7 +174,7 @@ public class ActionButtonManager {
         String text = null;
         int icon = -1;
         if (id != null) {
-            int color = getColor(id);
+            String color = getColor(id);
             switch (id) {
                 case "camera":
                     text = LocaleController.getString("AccDescrProfilePicture", R.string.AccDescrProfilePicture);
@@ -281,9 +281,9 @@ public class ActionButtonManager {
         public final String id;
         public final String text;
         public final int icon;
-        public final int color;
+        public final String color;
 
-        public ActionButtonInfo(String id, String text, int icon, int color) {
+        public ActionButtonInfo(String id, String text, int icon, String color) {
             this.id = id;
             this.text = text;
             this.icon = icon;

@@ -28,19 +28,30 @@ import java.util.Objects;
 
 @SuppressLint("ViewConstructor")
 public class SquaredButtonCell extends SimpleActionCell {
+    private final String[] colors;
+    private final TextView tv;
+    private final ImageView iv;
+    private final CardView cardView;
+    private final ImageView mt;
 
     @SuppressLint("ClickableViewAccessibility")
-    public SquaredButtonCell(Context context, String text, int iconId, int color, int myId) {
+    public SquaredButtonCell(Context context, String text, int iconId, String color, int myId) {
         super(context);
+        colors = new String[] {
+                color,
+                Theme.key_windowBackgroundWhiteBlackText,
+        };
+        int colorWhite = Theme.getColor(colors[1]);
+
         setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f));
         setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8));
         setGravity(Gravity.CENTER);
 
-        CardView cardView = new CardView(context);
+        cardView = new CardView(context);
         cardView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, AndroidUtilities.dp(80)));
         cardView.setCardElevation(0);
         cardView.setRadius(AndroidUtilities.dp(10.0f));
-        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(color, 0.15f));
+        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), 0.03f));
 
         RelativeLayout rl = new RelativeLayout(context);
         rl.setLayoutParams(new CardView.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
@@ -52,7 +63,7 @@ public class SquaredButtonCell extends SimpleActionCell {
         ll.setGravity(Gravity.CENTER);
         ll.setOrientation(LinearLayout.VERTICAL);
 
-        ImageView mt = new ImageView(context);
+        mt = new ImageView(context);
         mt.setScaleType(ImageView.ScaleType.FIT_CENTER);
         mt.setClickable(true);
         mt.setOnTouchListener((View view, MotionEvent motionEvent) -> {
@@ -61,19 +72,19 @@ public class SquaredButtonCell extends SimpleActionCell {
             }
             return false;
         });
-        mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(color, 0.5f)));
+        mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
         mt.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
-        ImageView iv = new ImageView(context);
-        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(AndroidUtilities.dp(30), AndroidUtilities.dp(30));
+        iv = new ImageView(context);
+        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(AndroidUtilities.dp(26), AndroidUtilities.dp(26));
         layoutParams2.setMargins(0,0,0,AndroidUtilities.dp(5));
         iv.setLayoutParams(layoutParams2);
         Drawable d = ContextCompat.getDrawable(context, iconId);
-        Objects.requireNonNull(d).setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        Objects.requireNonNull(d).setColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.SRC_ATOP);
         iv.setBackground(d);
 
-        TextView tv = new TextView(context);
-        tv.setTextColor(color);
+        tv = new TextView(context);
+        tv.setTextColor(Theme.getColor(colors[1]));
         tv.setText(text);
         tv.setLines(1);
         tv.setMaxLines(1);
@@ -89,6 +100,14 @@ public class SquaredButtonCell extends SimpleActionCell {
         rl.addView(ll);
         cardView.addView(rl);
         addView(cardView);
+    }
+
+    @Override
+    public void updateColors() {
+        tv.setTextColor(Theme.getColor(colors[1]));
+        iv.getBackground().setColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.SRC_ATOP);
+        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), 0.03f));
+        mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
     }
 
     public static LinearLayout getShimmerButton(Context context) {
@@ -127,8 +146,7 @@ public class SquaredButtonCell extends SimpleActionCell {
 
     public ThemeInfo getTheme() {
         return new ThemeInfo(
-                Theme.getColor(Theme.key_dialogTextBlue),
-                AndroidUtilities.getTransparentColor(Theme.getColor(Theme.key_dialogTextBlue), 0.15f),
+                true,
                 AndroidUtilities.dp(10)
         );
     }
