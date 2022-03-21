@@ -17,6 +17,7 @@ import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.browser.Browser;
 import org.telegram.ui.ActionBar.ActionBar;
@@ -143,12 +144,14 @@ public class OwlgramUpdateSettings extends BaseFragment {
 
             @Override
             public void onFinished() {
-                changeBetaMode.setEnabled(!ApkDownloader.updateDownloaded(), null);
-                updateCheckCell.setClickable(!ApkDownloader.updateDownloaded());
-                if(ApkDownloader.updateDownloaded()) {
-                    updateCell.setInstallMode();
-                } else {
-                    updateCell.setConfirmMode();
+                if(updateCell != null) {
+                    changeBetaMode.setEnabled(!ApkDownloader.updateDownloaded(), null);
+                    updateCheckCell.setClickable(!ApkDownloader.updateDownloaded());
+                    if(ApkDownloader.updateDownloaded()) {
+                        updateCell.setInstallMode();
+                    } else {
+                        updateCell.setConfirmMode();
+                    }
                 }
             }
         });
@@ -366,6 +369,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
                         listAdapter.notifyItemInserted(updateSectionAvailableRow);
                         listAdapter.notifyItemInserted(updateSectionDividerRow);
                         updateRowsId();
+                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                     }
                 } else {
                     updateCheckCell.setCheckTime();

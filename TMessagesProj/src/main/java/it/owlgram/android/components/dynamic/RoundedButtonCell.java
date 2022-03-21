@@ -158,7 +158,7 @@ public class RoundedButtonCell extends SimpleActionCell {
 
     public ThemeInfo getTheme() {
         return new ThemeInfo(
-                false,
+                true,
                 AndroidUtilities.dp(25)
         );
     }

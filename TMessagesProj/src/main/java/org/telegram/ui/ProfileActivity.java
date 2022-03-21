@@ -7726,7 +7726,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         dc.setTheme(theme);
                     }
                     if(userInfo != null){
-                        dc.setIdAndDC(userId, userInfo.profile_photo != null ? userInfo.profile_photo.dc_id:-1);
+                        if (UserObject.isUserSelf(userInfo.user)) {
+                            dc.setIdAndDC(userId, getConnectionsManager().getCurrentDatacenterId());
+                        } else {
+                            dc.setIdAndDC(userId, userInfo.profile_photo != null ? userInfo.profile_photo.dc_id:-1);
+                        }
                     }else if(chatInfo != null){
                         if(ChatObject.isChannel(currentChat)){
                             dc.setIdAndDC(Long.parseLong("-100"+chatId), chatInfo.chat_photo != null ? chatInfo.chat_photo.dc_id:-1);
