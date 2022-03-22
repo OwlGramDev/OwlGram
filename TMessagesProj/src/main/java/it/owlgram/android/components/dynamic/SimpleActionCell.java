@@ -43,17 +43,15 @@ public class SimpleActionCell extends LinearLayout {
         return iv;
     }
 
-    // TRYING TO KEEP 0.03f OF ALPHA WITH CONTRAST
     public static float getBackgroundAlpha() {
-        float NEEDED_CONTRAST = 1.12f;
         int colorBack = Theme.getColor(Theme.key_windowBackgroundWhite);
         float alphaColor = 0;
         for (int ratio = 20; ratio > 0; ratio -= 1) {
             try {
                 int blendedColor = ColorUtils.blendARGB(colorBack, getBackColor(), ratio / 100f);
-                double contrast = ColorUtils.calculateContrast(colorBack, blendedColor);
-                if (contrast <= NEEDED_CONTRAST) {
-                    alphaColor = ratio / 100f;
+                double contrast = ColorUtils.calculateContrast(colorBack, blendedColor) * 100.0;
+                alphaColor = ratio / 100f;
+                if (Math.round(contrast) <= 112) { // 112 IS CONTRAST OF 0.07f ALPHA
                     break;
                 }
             } catch (Exception ignored) {}

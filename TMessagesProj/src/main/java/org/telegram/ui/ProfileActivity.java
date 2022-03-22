@@ -6216,7 +6216,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                 }
 
-                if (lastSectionRow == -1 && currentChat.left && !currentChat.kicked) {
+                if (lastSectionRow == -1 && currentChat.left && !currentChat.kicked && OwlConfig.buttonStyleType == 5) {
                     joinRow = rowCount++;
                     lastSectionRow = rowCount++;
                 }
@@ -6669,7 +6669,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         }
                     }
                 }
-                if (!ActionButtonManager.canShowTopActions(editItemVisible)) {
+                if (!ActionButtonManager.canShowTopActions(editItemVisible) && OwlConfig.buttonStyleType == 5 && editItemVisible) {
                     if (ChatObject.canChangeChatInfo(chat)) {
                         if (!actionButtonManager.hasItem("edit")) {
                             otherItem.addSubItem(edit_channel, R.drawable.msg_edit, LocaleController.getString("Edit", R.string.Edit));
@@ -6733,7 +6733,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 //if (ChatObject.canChangeChatInfo(chat)) {
                 editItemVisible = true;
                 //}
-                if (!ActionButtonManager.canShowTopActions(editItemVisible)) {
+                if (!ActionButtonManager.canShowTopActions(true)) {
                     otherItem.addSubItem(edit_channel, R.drawable.msg_edit, LocaleController.getString("Edit", R.string.Edit));
                 }
                 if (!ChatObject.isKickedFromChat(chat) && !ChatObject.isLeftFromChat(chat)) {
