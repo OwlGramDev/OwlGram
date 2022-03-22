@@ -4,7 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.graphics.Region;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
 import android.widget.ImageView;
@@ -32,6 +36,7 @@ public class DynamicButtonSelector extends LinearLayout {
             "Iceled",
             LocaleController.getString("ShapePills", R.string.ShapePills),
             LocaleController.getString("ShapeLinear", R.string.ShapeLinear),
+            LocaleController.getString("ShapeStock", R.string.ShapeStock),
     };
     private final ImageView imageview;
 
@@ -69,14 +74,23 @@ public class DynamicButtonSelector extends LinearLayout {
                 canvas.drawRoundRect(rectF, radius, radius, p);
                 int sizeContainer = w - padding;
                 int xContainer = left + (w >> 1) - (sizeContainer >> 1);
-                int wItem = sizeContainer >> 2;
-                int yContainer = top + (h >> 1) - (wItem >> 1);
-                for (int i = 0; i < 4; i++) {
-                    int x = xContainer + (wItem * i);
+                int hItem = sizeContainer >> 2;
+                int yContainer = top + (h >> 1) - (hItem >> 1);
+                if (selectedStyle != 5) {
+                    for (int i = 0; i < 4; i++) {
+                        int x = xContainer + (hItem * i);
+                        int wSubItem = hItem - padding;
+                        int xMiddle = x + (hItem >> 1) - (wSubItem >> 1);
+                        int yMiddle = yContainer + (hItem >> 1) - (wSubItem >> 1);
+                        drawButtonPreview(canvas, xMiddle, yMiddle, wSubItem, selectedStyle, i);
+                    }
+                } else {
+                    int hSubItem = hItem - padding;
+                    int wItem = hItem * 4;
                     int wSubItem = wItem - padding;
-                    int xMiddle = x + (wItem >> 1) - (wSubItem >> 1);
-                    int yMiddle = yContainer + (wItem >> 1) - (wSubItem >> 1);
-                    drawButtonPreview(canvas, xMiddle, yMiddle, wSubItem, selectedStyle, i);
+                    int xMiddle = xContainer + (wItem >> 1) - (wSubItem >> 1);
+                    int yMiddle = yContainer + (hItem >> 1) - (hSubItem >> 1);
+                    drawStockPreview(canvas, xMiddle, yMiddle, wSubItem, hSubItem);
                 }
             }
         };
@@ -105,10 +119,36 @@ public class DynamicButtonSelector extends LinearLayout {
             OwlConfig.saveButtonStyle(newVal);
             invalidate();
             picker.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+            onSelectionChange();
         });
         int selectedButton = OwlConfig.buttonStyleType;
         picker1.setValue(selectedButton);
         addView(picker1, LayoutHelper.createLinear(132, LayoutHelper.MATCH_PARENT, Gravity.RIGHT, 21, 0, 21, 0));
+    }
+
+    private void drawStockPreview(Canvas canvas, int x, int y, int w, int h) {
+        int color = Theme.getColor(Theme.key_switchTrack);
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        int rad1 = Math.round((h * 14.77F) / 100F);
+        int dCircle = Math.round((h * 80f) / 100f);
+        int xCircle = (x + w) - dCircle - (rad1 * 2);
+        int yCircle = y + (h >> 1) - (dCircle >> 1);
+        RectF rectF = new RectF(xCircle, yCircle, xCircle + dCircle, yCircle + dCircle);
+        Path clipPath = new Path();
+        clipPath.addRoundRect(rectF, dCircle >> 1, dCircle >> 1, Path.Direction.CW);
+        p.setColor(AndroidUtilities.getTransparentColor(color,0.5f));
+        canvas.drawRoundRect(rectF, dCircle >> 1, dCircle >> 1, p);
+        p.setColor(AndroidUtilities.getTransparentColor(color,0.75f));
+        canvas.drawRoundRect(rectF, dCircle >> 1, dCircle >> 1, p);
+        canvas.clipPath(clipPath, Region.Op.DIFFERENCE);
+        int topBarH = Math.round((h * 50f) / 100f);
+        RectF rectF2 = new RectF(x, y, x + w, y + topBarH);
+        p.setColor(AndroidUtilities.getTransparentColor(color,0.5f));
+        canvas.drawRoundRect(rectF2, rad1, rad1, p);
+        int textH = Math.round(((h - topBarH) * 70f) / 100f);
+        int textY = (y + h) - textH;
+        RectF rectF3 = new RectF(x, textY, x + Math.round((w * 60f) / 100f), textY + textH);
+        canvas.drawRoundRect(rectF3, rad1, rad1, p);
     }
 
     private void drawButtonPreview(Canvas canvas, int x, int y, int w, int index, int pos) {
@@ -130,6 +170,8 @@ public class DynamicButtonSelector extends LinearLayout {
                 break;
         }
     }
+
+    protected void onSelectionChange() {}
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

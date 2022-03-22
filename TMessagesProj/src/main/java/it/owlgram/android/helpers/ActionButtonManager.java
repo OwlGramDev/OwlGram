@@ -10,10 +10,15 @@ import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
 
+import it.owlgram.android.OwlConfig;
+
 public class ActionButtonManager {
 
     private JSONArray data;
 
+    public void reset() {
+        data = new JSONArray();
+    }
     public void load(
             TLRPC.UserFull userInfo,
             TLRPC.User user,
@@ -24,13 +29,11 @@ public class ActionButtonManager {
             long chatId,
             TLRPC.Chat chat,
             TLRPC.ChatFull chatInfo,
-            boolean canAddUsers,
             boolean existGroupCall,
             boolean canEdit,
-            boolean canSearchMembers
-
+            boolean canSearchMembers,
+            int maxMegaGroupCount
     ) {
-        data = new JSONArray();
         if (userInfo != null){
             if (isSelf) {
                 data.put("camera");
@@ -43,7 +46,6 @@ public class ActionButtonManager {
                     if (isBot && !user.bot_nochats) {
                         data.put("add_bot");
                     }
-                    data.put("add_home");
                 } else {
                     data.put("call");
                 }
@@ -57,8 +59,6 @@ public class ActionButtonManager {
                         data.put("share_contact");
                     } else if (!TextUtils.isEmpty(user.username)){
                         data.put("share");
-                    } else if (!isTgUser) {
-                        data.put("add_home");
                     }
                 }
 
@@ -85,6 +85,18 @@ public class ActionButtonManager {
             boolean discuss_available = chatInfo != null && chatInfo.linked_chat_id != 0;
             boolean canShare = !TextUtils.isEmpty(chat.username);
             boolean isGroup = !ChatObject.isChannelAndNotMegaGroup(chat);
+            boolean canAddUsers = false;
+            if (chatInfo != null && chat.megagroup && chatInfo.participants != null && !chatInfo.participants.participants.isEmpty()) {
+                if (!ChatObject.isNotInChat(chat) && ChatObject.canAddUsers(chat) && chatInfo.participants_count < maxMegaGroupCount) {
+                    canAddUsers = true;
+                }
+            } else if (chatInfo != null) {
+                if (!(chatInfo.participants instanceof TLRPC.TL_chatParticipantsForbidden)) {
+                    if (ChatObject.canAddUsers(chat) || chat.default_banned_rights == null || !chat.default_banned_rights.invite_users) {
+                        canAddUsers = true;
+                    }
+                }
+            }
 
             if (chat.left && !chat.kicked) {
                 data.put("join");
@@ -107,10 +119,6 @@ public class ActionButtonManager {
 
             if (canEdit && hasAdminRights) {
                 data.put("edit");
-            }
-
-            if ((data.length() + (discuss_available ? 1:0) + (canLeave ? 1:0)) < 4 - (canShare ? 1:0)) {
-                data.put("add_home");
             }
 
             if ((data.length() + (discuss_available ? 1:0) + (canLeave ? 1:0)) < 4 - (canShare ? 1:0) && !isCreator) {
@@ -249,10 +257,6 @@ public class ActionButtonManager {
                     text = LocaleController.getString("Info", R.string.Info);
                     icon = R.drawable.profile_info;
                     break;
-                case "add_home":
-                    text = LocaleController.getString("Add", R.string.Add);
-                    icon = R.drawable.msg_home;
-                    break;
                 case "report":
                     text = LocaleController.getString("ReportChat", R.string.ReportChat);
                     icon = R.drawable.msg_report;
@@ -275,6 +279,10 @@ public class ActionButtonManager {
             }
         }
         return null;
+    }
+
+    public static boolean canShowTopActions(boolean editItemVisible) {
+        return (!OwlConfig.smartButtons && OwlConfig.buttonStyleType == 5) || !editItemVisible;
     }
 
     public static class ActionButtonInfo {

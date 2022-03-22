@@ -363,7 +363,7 @@ public class SharedConfig {
             saveStreamMedia = preferences.getBoolean("saveStreamMedia", true);
             smoothKeyboard = preferences.getBoolean("smoothKeyboard2", true);
             pauseMusicOnRecord = preferences.getBoolean("pauseMusicOnRecord", false);
-            chatBlur = preferences.getBoolean("chatBlur", false);
+            chatBlur = preferences.getBoolean("chatBlur", getDevicePerformanceClass() >= PERFORMANCE_CLASS_HIGH);
             streamAllVideo = preferences.getBoolean("streamAllVideo", BuildVars.DEBUG_VERSION);
             streamMkv = preferences.getBoolean("streamMkv", false);
             suggestStickers = preferences.getInt("suggestStickers", 0);

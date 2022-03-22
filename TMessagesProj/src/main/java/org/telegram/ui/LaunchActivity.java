@@ -2074,7 +2074,7 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                                             open_settings = 1;
                                         }
                                     } else if (url.startsWith("tg:owl") || url.startsWith("tg://owl")) {
-                                        ProfileActivity.startOwlSound();
+                                        //ProfileActivity.startOwlSound();
                                     } else if (url.startsWith("tg:update") || url.startsWith("tg://update")) {
                                         checkAppUpdate(true);
                                     } else if (url.startsWith("tg:stocwddo") || url.startsWith("tg://stocwddo")) {

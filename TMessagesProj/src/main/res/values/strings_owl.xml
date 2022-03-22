@@ -51,6 +51,7 @@
     <string name="ShapeRounded">Rounded</string>
     <string name="ShapePills">Pills</string>
     <string name="ShapeLinear">Linear</string>
+    <string name="ShapeStock">Stock</string>
     <string name="HidePhone">Hide my Phone Number</string>
     <string name="HidePhoneDesc">It allows you to hide your phone number from settings and side menu</string>
     <string name="HidePhoneOthers">Hide other people\'s Phone Number</string>

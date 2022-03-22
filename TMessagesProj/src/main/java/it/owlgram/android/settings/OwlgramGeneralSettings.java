@@ -656,7 +656,13 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
                 case 9:
-                    view = new DynamicButtonSelector(mContext);
+                    view = new DynamicButtonSelector(mContext) {
+                        @Override
+                        protected void onSelectionChange() {
+                            super.onSelectionChange();
+                            parentLayout.rebuildAllFragmentViews(false, false);
+                        }
+                    };
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
                 case 10:
