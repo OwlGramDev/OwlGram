@@ -9,6 +9,7 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.RLottieDrawable;
 
 import it.owlgram.android.OwlConfig;
 
@@ -186,7 +187,7 @@ public class ActionButtonManager {
             switch (id) {
                 case "camera":
                     text = LocaleController.getString("AccDescrProfilePicture", R.string.AccDescrProfilePicture);
-                    icon = R.drawable.menu_camera2;
+                    icon = R.raw.camera_outline;
                     break;
                 case "edit_name":
                     text = LocaleController.getString("VoipEditName", R.string.VoipEditName);
@@ -282,7 +283,7 @@ public class ActionButtonManager {
     }
 
     public static boolean canShowTopActions(boolean editItemVisible) {
-        return (!OwlConfig.smartButtons && OwlConfig.buttonStyleType == 5) || !editItemVisible;
+        return (!OwlConfig.smartButtons || !editItemVisible) && OwlConfig.buttonStyleType == 5;
     }
 
     public static class ActionButtonInfo {

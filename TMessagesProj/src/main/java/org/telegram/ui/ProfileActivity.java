@@ -3723,6 +3723,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         cameraDrawable.setCustomEndFrame(86);
                         cellCameraDrawable.setCustomEndFrame(86);
                         writeButton.playAnimation();
+                        if (actionPanelCell != null && actionPanelCell.getPhotoImageView() != null) {
+                            actionPanelCell.getPhotoImageView().playAnimation();
+                        }
                         if (setAvatarCell != null) {
                             setAvatarCell.getImageView().playAnimation();
                         }
@@ -3736,6 +3739,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 cellCameraDrawable.setCurrentFrame(0);
                 cellCameraDrawable.setCustomEndFrame(43);
                 writeButton.playAnimation();
+                if (actionPanelCell != null && actionPanelCell.getPhotoImageView() != null) {
+                    actionPanelCell.getPhotoImageView().playAnimation();
+                }
                 if (setAvatarCell != null) {
                     setAvatarCell.getImageView().playAnimation();
                 }
@@ -6665,9 +6671,13 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 }
                 if (!ActionButtonManager.canShowTopActions(editItemVisible)) {
                     if (ChatObject.canChangeChatInfo(chat)) {
-                        otherItem.addSubItem(edit_channel, R.drawable.msg_edit, LocaleController.getString("Edit", R.string.Edit));
+                        if (!actionButtonManager.hasItem("edit")) {
+                            otherItem.addSubItem(edit_channel, R.drawable.msg_edit, LocaleController.getString("Edit", R.string.Edit));
+                        }
                     } else {
-                        otherItem.addSubItem(edit_channel, R.drawable.menu_info, LocaleController.getString("Info", R.string.Info));
+                        if (!actionButtonManager.hasItem("info")) {
+                            otherItem.addSubItem(edit_channel, R.drawable.menu_info, LocaleController.getString("Info", R.string.Info));
+                        }
                     }
                 }
                 if (chat.megagroup) {
@@ -8284,6 +8294,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }else if(chatId != 0 && currentChat != null) {
             actionPanelCell.setLoaded();
         }
+        RLottieDrawable photoAnimationDrawable = actionPanelCell.getPhotoAnimationDrawable();
+        if (photoAnimationDrawable != null) {
+            cameraDrawable = photoAnimationDrawable;
+        }
         if (updateActionBar) {
             createActionBarMenu(false);
         }
@@ -8975,9 +8989,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         arrayList.add(new ThemeDescription(avatarImage, 0, null, null, Theme.avatarDrawables, null, Theme.key_avatar_text));
         arrayList.add(new ThemeDescription(avatarImage, 0, null, null, new Drawable[]{avatarDrawable}, null, Theme.key_avatar_backgroundInProfileBlue));
 
-        arrayList.add(new ThemeDescription(writeButton, ThemeDescription.FLAG_IMAGECOLOR, null, null, null, null, Theme.key_profile_actionIcon));
-        arrayList.add(new ThemeDescription(writeButton, ThemeDescription.FLAG_BACKGROUNDFILTER, null, null, null, null, Theme.key_profile_actionBackground));
-        arrayList.add(new ThemeDescription(writeButton, ThemeDescription.FLAG_BACKGROUNDFILTER | ThemeDescription.FLAG_DRAWABLESELECTEDSTATE, null, null, null, null, Theme.key_profile_actionPressedBackground));
+        if (OwlConfig.buttonStyleType == 5) {
+            arrayList.add(new ThemeDescription(writeButton, ThemeDescription.FLAG_IMAGECOLOR, null, null, null, null, Theme.key_profile_actionIcon));
+            arrayList.add(new ThemeDescription(writeButton, ThemeDescription.FLAG_BACKGROUNDFILTER, null, null, null, null, Theme.key_profile_actionBackground));
+            arrayList.add(new ThemeDescription(writeButton, ThemeDescription.FLAG_BACKGROUNDFILTER | ThemeDescription.FLAG_DRAWABLESELECTEDSTATE, null, null, null, null, Theme.key_profile_actionPressedBackground));
+        }
 
         arrayList.add(new ThemeDescription(listView, ThemeDescription.FLAG_CHECKTAG, new Class[]{TextCell.class}, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText));
         arrayList.add(new ThemeDescription(listView, ThemeDescription.FLAG_CHECKTAG, new Class[]{TextCell.class}, new String[]{"textView"}, null, null, null, Theme.key_windowBackgroundWhiteGreenText2));
@@ -9060,11 +9076,13 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         arrayList.add(new ThemeDescription(listView, 0, new Class[]{DatacenterCell.class}, new String[]{"tv"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText));
         arrayList.add(new ThemeDescription(listView, 0, new Class[]{DatacenterCell.class}, new String[]{"tv2"}, null, null, null, Theme.key_windowBackgroundWhiteGrayText2));
         arrayList.add(new ThemeDescription(listView,0, new Class[]{DatacenterCell.class}, new String[]{"iv"}, null, null, null, Theme.key_dialogTextBlue));
-        arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_dialogTextBlue));
-        arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhiteRedText4));
-        arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_statisticChartLine_green));
-        arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhite));
         arrayList.add(new ThemeDescription(listView,0, new Class[]{DatacenterCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhite));
+        if (OwlConfig.buttonStyleType != 5) {
+            arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_dialogTextBlue));
+            arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhiteRedText4));
+            arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_statisticChartLine_green));
+            arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhite));
+        }
         return arrayList;
     }
 

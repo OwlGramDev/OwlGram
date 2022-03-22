@@ -4280,4 +4280,20 @@ public class AndroidUtilities {
             return false;
         }
     }
+
+    public static float getLightIntensity(int color) {
+        int red = Color.red(color);
+        int green = Color.green(color);
+        int blue = Color.blue(color);
+        float[] hsl = new float[3];
+        ColorUtils.RGBToHSL(red, green, blue, hsl);
+        return hsl[2];
+    }
+
+    public static int getComplementaryColor(int color) {
+        int red = 255 - Color.red(color);
+        int green = 255 - Color.green(color);
+        int blue = 255 - Color.blue(color);
+        return Color.rgb(red, green, blue);
+    }
 }

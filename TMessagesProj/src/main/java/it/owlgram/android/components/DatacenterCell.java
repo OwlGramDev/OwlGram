@@ -21,6 +21,7 @@ import org.telegram.ui.ActionBar.Theme;
 import java.util.Locale;
 import java.util.Objects;
 
+import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.dynamic.SimpleActionCell;
 import it.owlgram.android.helpers.DCHelper;
 
@@ -39,12 +40,11 @@ public class DatacenterCell extends LinearLayout {
     @SuppressLint("SetTextI18n")
     public DatacenterCell(Context context) {
         super(context);
-        setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(8), AndroidUtilities.dp(16), AndroidUtilities.dp(8));
+        setPadding(AndroidUtilities.dp(23), AndroidUtilities.dp(8), AndroidUtilities.dp(23), AndroidUtilities.dp(8));
         setGravity(Gravity.CENTER_VERTICAL);
 
         int colorText = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText);
         int colorText2 = Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2);
-        String blueColor = Theme.key_dialogTextBlue;
 
         shimmerFrameLayout = new ShimmerFrameLayout(context);
         Shimmer.AlphaHighlightBuilder shimmer = new Shimmer.AlphaHighlightBuilder();
@@ -66,7 +66,7 @@ public class DatacenterCell extends LinearLayout {
             public void invalidate() {
                 super.invalidate();
                 if (withBackground) {
-                    mainCardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), 0.03f));
+                    mainCardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(SimpleActionCell.getBackColor(), SimpleActionCell.getBackgroundAlpha()));
                 } else {
                     mainCardView.setCardBackgroundColor(Color.TRANSPARENT);
                 }
@@ -79,7 +79,8 @@ public class DatacenterCell extends LinearLayout {
         mainCardView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
         mainCardView.setCardElevation(0);
         mainCardView.setRadius(AndroidUtilities.dp(10.0f));
-        mainCardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), 0.03f));
+        mainCardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(SimpleActionCell.getBackColor(), SimpleActionCell.getBackgroundAlpha()));
+        mainCardView.setVisibility(OwlConfig.buttonStyleType == 5 ? GONE:VISIBLE);
 
         LinearLayout ll = new LinearLayout(context);
         ll.setLayoutParams(new CardView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -100,7 +101,7 @@ public class DatacenterCell extends LinearLayout {
 
         LinearLayout textLayout = new LinearLayout(context);
         textLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        textLayout.setPadding(AndroidUtilities.dp(16), 0, AndroidUtilities.dp(16), 0);
+        textLayout.setPadding(AndroidUtilities.dp(OwlConfig.buttonStyleType == 5 ? 0:16), 0, 0, 0);
         textLayout.setOrientation(LinearLayout.VERTICAL);
         textLayout.setGravity(Gravity.LEFT);
 
@@ -147,6 +148,7 @@ public class DatacenterCell extends LinearLayout {
         cardView.setCardElevation(0);
         cardView.setRadius(AndroidUtilities.dp(10));
         cardView.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        cardView.setVisibility(OwlConfig.buttonStyleType == 5 ? GONE:VISIBLE);
 
         LinearLayout textLayout = new LinearLayout(context);
         textLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -177,7 +179,7 @@ public class DatacenterCell extends LinearLayout {
 
     public void setTheme(SimpleActionCell.ThemeInfo themeInfo) {
         if (themeInfo.withBackground) {
-            mainCardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), 0.03f));
+            mainCardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(SimpleActionCell.getBackColor(), SimpleActionCell.getBackgroundAlpha()));
         } else {
             mainCardView.setCardBackgroundColor(Color.TRANSPARENT);
         }
@@ -203,9 +205,5 @@ public class DatacenterCell extends LinearLayout {
         Drawable d = ContextCompat.getDrawable(getContext(), DCHelper.getDcIcon(DC));
         Objects.requireNonNull(d).setColorFilter(Theme.getColor(Theme.key_dialogTextBlue), PorterDuff.Mode.SRC_ATOP);
         iv.setBackground(d);
-    }
-
-    public static int getBackColor() {
-        return AndroidUtilities.isLight(Theme.getColor(Theme.key_windowBackgroundWhite)) ? 0xFF000000:0xFFFFFFFF;
     }
 }

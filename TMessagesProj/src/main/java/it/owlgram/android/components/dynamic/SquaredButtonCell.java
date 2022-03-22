@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -22,7 +23,10 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.RLottieDrawable;
+import org.telegram.ui.Components.RLottieImageView;
 
 import java.util.Objects;
 
@@ -30,7 +34,6 @@ import java.util.Objects;
 public class SquaredButtonCell extends SimpleActionCell {
     private final String[] colors;
     private final TextView tv;
-    private final ImageView iv;
     private final CardView cardView;
     private final ImageView mt;
 
@@ -41,7 +44,6 @@ public class SquaredButtonCell extends SimpleActionCell {
                 color,
                 Theme.key_windowBackgroundWhiteBlackText,
         };
-        int colorWhite = Theme.getColor(colors[1]);
 
         setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f));
         setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8));
@@ -51,7 +53,7 @@ public class SquaredButtonCell extends SimpleActionCell {
         cardView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, AndroidUtilities.dp(80)));
         cardView.setCardElevation(0);
         cardView.setRadius(AndroidUtilities.dp(10.0f));
-        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), 0.03f));
+        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), getBackgroundAlpha()));
 
         RelativeLayout rl = new RelativeLayout(context);
         rl.setLayoutParams(new CardView.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
@@ -75,13 +77,19 @@ public class SquaredButtonCell extends SimpleActionCell {
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
         mt.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
-        iv = new ImageView(context);
+        iv = new RLottieImageView(context);
         LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(AndroidUtilities.dp(26), AndroidUtilities.dp(26));
         layoutParams2.setMargins(0,0,0,AndroidUtilities.dp(5));
         iv.setLayoutParams(layoutParams2);
-        Drawable d = ContextCompat.getDrawable(context, iconId);
-        Objects.requireNonNull(d).setColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.SRC_ATOP);
-        iv.setBackground(d);
+        if (iconId == R.raw.camera_outline) {
+            cameraDrawable = new RLottieDrawable(R.raw.camera_outline, String.valueOf(R.raw.camera_outline), AndroidUtilities.dp(26 * 2), AndroidUtilities.dp(26 * 2), false, null);
+            iv.setAnimation(cameraDrawable);
+            iv.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.setScaleType(ImageView.ScaleType.CENTER);
+        } else {
+            iv.setBackground(ContextCompat.getDrawable(context, iconId));
+            iv.getBackground().setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+        }
 
         tv = new TextView(context);
         tv.setTextColor(Theme.getColor(colors[1]));
@@ -105,8 +113,12 @@ public class SquaredButtonCell extends SimpleActionCell {
     @Override
     public void updateColors() {
         tv.setTextColor(Theme.getColor(colors[1]));
-        iv.getBackground().setColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.SRC_ATOP);
-        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), 0.03f));
+        if (iv.getBackground() != null) {
+            iv.getBackground().setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+        } else {
+            iv.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+        }
+        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), getBackgroundAlpha()));
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
     }
 

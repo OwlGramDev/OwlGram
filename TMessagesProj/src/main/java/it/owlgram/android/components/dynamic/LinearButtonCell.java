@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
@@ -25,6 +26,8 @@ import androidx.core.content.ContextCompat;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.RLottieDrawable;
+import org.telegram.ui.Components.RLottieImageView;
 
 import java.util.Objects;
 
@@ -32,7 +35,6 @@ import java.util.Objects;
 public class LinearButtonCell extends SimpleActionCell {
     private final String[] colors;
     private final TextView tv;
-    private final ImageView iv;
     private final ImageView mt;
 
 
@@ -43,7 +45,6 @@ public class LinearButtonCell extends SimpleActionCell {
                 color,
                 Theme.key_windowBackgroundWhiteBlackText,
         };
-        int colorWhite = Theme.getColor(colors[1]);
 
         setLayoutParams(new LinearLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f));
         setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8));
@@ -71,14 +72,20 @@ public class LinearButtonCell extends SimpleActionCell {
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
         mt.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
-        iv = new ImageView(context);
+        iv = new RLottieImageView(context);
         RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(AndroidUtilities.dp(27), AndroidUtilities.dp(27));
         layoutParams2.setMargins(0, 0,0,0);
         layoutParams2.addRule(RelativeLayout.CENTER_IN_PARENT);
         iv.setLayoutParams(layoutParams2);
-        Drawable d = ContextCompat.getDrawable(context, iconId);
-        Objects.requireNonNull(d).setColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.SRC_ATOP);
-        iv.setBackground(d);
+        if (iconId == R.raw.camera_outline) {
+            cameraDrawable = new RLottieDrawable(R.raw.camera_outline, String.valueOf(R.raw.camera_outline), AndroidUtilities.dp(27 * 2), AndroidUtilities.dp(27 * 2), false, null);
+            iv.setAnimation(cameraDrawable);
+            iv.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.setScaleType(ImageView.ScaleType.CENTER);
+        } else {
+            iv.setBackground(ContextCompat.getDrawable(context, iconId));
+            iv.getBackground().setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+        }
 
         tv = new TextView(context);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -101,7 +108,11 @@ public class LinearButtonCell extends SimpleActionCell {
     @Override
     public void updateColors() {
         tv.setTextColor(Theme.getColor(colors[0]));
-        iv.getBackground().setColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.SRC_ATOP);
+        if (iv.getBackground() != null) {
+            iv.getBackground().setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+        } else {
+            iv.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+        }
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
     }
 

@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
@@ -22,7 +23,10 @@ import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.RLottieDrawable;
+import org.telegram.ui.Components.RLottieImageView;
 
 import java.util.Objects;
 
@@ -30,7 +34,6 @@ import java.util.Objects;
 public class PillsButtonCell extends SimpleActionCell {
     private final String[] colors;
     private final TextView tv;
-    private final ImageView iv;
     private final CardView cardView;
     private final ImageView mt;
 
@@ -52,7 +55,7 @@ public class PillsButtonCell extends SimpleActionCell {
         cardView.setLayoutParams(new LayoutParams(AndroidUtilities.dp(70), AndroidUtilities.dp(55)));
         cardView.setCardElevation(0);
         cardView.setRadius(AndroidUtilities.dp(25));
-        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), 0.03f));
+        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), getBackgroundAlpha()));
 
         RelativeLayout rl = new RelativeLayout(context);
         rl.setLayoutParams(new CardView.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
@@ -69,14 +72,20 @@ public class PillsButtonCell extends SimpleActionCell {
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
         mt.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
-        iv = new ImageView(context);
+        iv = new RLottieImageView(context);
         RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(AndroidUtilities.dp(25), AndroidUtilities.dp(25));
         layoutParams2.setMargins(0, AndroidUtilities.dp(5),0,0);
         layoutParams2.addRule(RelativeLayout.CENTER_IN_PARENT);
         iv.setLayoutParams(layoutParams2);
-        Drawable d = ContextCompat.getDrawable(context, iconId);
-        Objects.requireNonNull(d).setColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.SRC_ATOP);
-        iv.setBackground(d);
+        if (iconId == R.raw.camera_outline) {
+            cameraDrawable = new RLottieDrawable(R.raw.camera_outline, String.valueOf(R.raw.camera_outline), AndroidUtilities.dp(25 * 2), AndroidUtilities.dp(25 * 2), false, null);
+            iv.setAnimation(cameraDrawable);
+            iv.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.setScaleType(ImageView.ScaleType.CENTER);
+        } else {
+            iv.setBackground(ContextCompat.getDrawable(context, iconId));
+            iv.getBackground().setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+        }
 
         tv = new TextView(context);
         LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -99,8 +108,12 @@ public class PillsButtonCell extends SimpleActionCell {
     @Override
     public void updateColors() {
         tv.setTextColor(Theme.getColor(colors[1]));
-        iv.getBackground().setColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.SRC_ATOP);
-        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), 0.03f));
+        if (iv.getBackground() != null) {
+            iv.getBackground().setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+        } else {
+            iv.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+        }
+        cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), getBackgroundAlpha()));
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
     }
 

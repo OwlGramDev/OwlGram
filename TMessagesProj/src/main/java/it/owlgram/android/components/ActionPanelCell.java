@@ -8,6 +8,8 @@ import android.widget.LinearLayout;
 import androidx.cardview.widget.CardView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.ui.Components.RLottieDrawable;
+import org.telegram.ui.Components.RLottieImageView;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.dynamic.IceledButtonCell;
@@ -135,6 +137,26 @@ public class ActionPanelCell extends LinearLayout {
                     }
                 };
         }
+    }
+
+    public RLottieDrawable getPhotoAnimationDrawable() {
+        try {
+            SimpleActionCell simpleActionCell = (SimpleActionCell) mainLayout.getChildAt(0);
+            if(simpleActionCell != null) {
+                return simpleActionCell.getAnimatedDrawable();
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
+
+    public RLottieImageView getPhotoImageView() {
+        try {
+            SimpleActionCell simpleActionCell = (SimpleActionCell) mainLayout.getChildAt(0);
+            if(simpleActionCell != null) {
+                return simpleActionCell.getLottieImageView();
+            }
+        } catch (Exception ignored) {}
+        return null;
     }
 
     public SimpleActionCell.ThemeInfo getTheme() {
