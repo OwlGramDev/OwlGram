@@ -6648,7 +6648,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 /*if (ChatObject.hasAdminRights(chat) || chat.megagroup && ChatObject.canChangeChatInfo(chat)) {
                     editItemVisible = true;
                 }*/
-                editItemVisible = !ChatObject.isChannelAndNotMegaGroup(chat);
+                editItemVisible = !ChatObject.isChannelAndNotMegaGroup(chat) || ChatObject.canChangeChatInfo(chat);
                 if (chatInfo != null) {
                     if (ChatObject.canManageCalls(chat) && chatInfo.call == null) {
                         if (!actionButtonManager.hasItem("join_call")) {
