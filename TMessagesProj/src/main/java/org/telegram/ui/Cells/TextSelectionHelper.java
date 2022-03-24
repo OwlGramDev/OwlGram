@@ -48,6 +48,7 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
@@ -63,6 +64,7 @@ import org.telegram.ui.RestrictedLanguagesSelectActivity;
 import java.util.ArrayList;
 
 import it.owlgram.android.helpers.EntitiesHelper;
+import it.owlgram.android.helpers.TranslateManager;
 
 public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.SelectableView> {
 
@@ -1266,7 +1268,7 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
                         translateFromLanguage = null;
                         updateTranslateButton(menu);
                     });
-                } else {
+                } else if (!TranslateManager.canShowPopupTranslation()){
                     translateFromLanguage = null;
                     updateTranslateButton(menu);
                 }
@@ -1311,6 +1313,8 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
                         if (onTranslateListener != null) {
                             String translateToLanguage = LocaleController.getInstance().getCurrentLocale().getLanguage();
                             onTranslateListener.run(getSelectedText(), translateFromLanguage, translateToLanguage, () -> showActions());
+                        } else if (TranslateManager.canShowPopupTranslation()) {
+                            TextSelectionHelper.this.callback.startTranslate(getSelectedText(), () -> showActions());
                         }
                         hideActions();
                         return true;
@@ -1531,6 +1535,7 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
     public static class Callback {
         public void onStateChanged(boolean isSelected){};
         public void onTextCopied(){};
+        public void startTranslate(CharSequence text, Runnable onAlertDismiss){};
     }
 
     protected void fillLayoutForOffset(int offset, LayoutBlock layoutBlock) {

@@ -58,6 +58,7 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
@@ -224,8 +225,9 @@ public class TranslateManager extends Dialog {
     private final BaseFragment fragment;
     private final boolean noForwards;
     private final OnLinkPress onLinkPress;
+    private final Runnable onDismiss;
 
-    public TranslateManager(BaseFragment fragment, Context context, String fromLanguage, CharSequence text, boolean noForwards, OnLinkPress onLinkPress) {
+    public TranslateManager(BaseFragment fragment, Context context, String fromLanguage, CharSequence text, boolean noForwards, OnLinkPress onLinkPress, Runnable onDismiss) {
         super(context, R.style.TransparentDialog);
 
         this.onLinkPress = onLinkPress;
@@ -233,6 +235,7 @@ public class TranslateManager extends Dialog {
         this.fragment = fragment;
         this.fromLanguage = fromLanguage != null && fromLanguage.equals("und") ? "auto" : fromLanguage;
         this.textBlocks = cutInBlocks(text);
+        this.onDismiss = onDismiss;
         String toLanguage = Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0];
 
         if (Build.VERSION.SDK_INT >= 30) {
@@ -802,6 +805,11 @@ public class TranslateManager extends Dialog {
             backDrawable.setAlpha((int) (openingT * 51));
             bulletinContainer.setTranslationY((1f - openingT) * Math.min(minHeight(), displayMetrics.heightPixels * heightMaxPercent));
         });
+        if (T <= 0f) {
+            if (onDismiss != null) {
+                onDismiss.run();
+            }
+        }
         openingAnimator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animator) {
@@ -1009,8 +1017,8 @@ public class TranslateManager extends Dialog {
         void run(boolean rateLimit);
     }
 
-    public static TranslateManager showAlert(Context context, BaseFragment fragment, String fromLanguage, CharSequence text, boolean noForwards, OnLinkPress onLinkPress) {
-        TranslateManager alert = new TranslateManager(fragment, context, fromLanguage, text, noForwards, onLinkPress);
+    public static TranslateManager showAlert(Context context, BaseFragment fragment, String fromLanguage, CharSequence text, boolean noForwards, OnLinkPress onLinkPress, Runnable onDismiss) {
+        TranslateManager alert = new TranslateManager(fragment, context, fromLanguage, text, noForwards, onLinkPress, onDismiss);
         if (fragment != null) {
             if (fragment.getParentActivity() != null) {
                 fragment.showDialog(alert);
@@ -1650,10 +1658,13 @@ public class TranslateManager extends Dialog {
     }
 
     public static void translate(CharSequence text, Context context, BaseFragment fragment, boolean noForwards, OnLinkPress onLinkPress) {
+        translate(text, context, fragment, noForwards, onLinkPress, null);
+    }
+    public static void translate(CharSequence text, Context context, BaseFragment fragment, boolean noForwards, OnLinkPress onLinkPress, Runnable onDismiss) {
         LanguageDetector.detectLanguage(
                 text.toString(),
                 str -> {
-                    TranslateManager alert = new TranslateManager(fragment, context, str, text, noForwards, onLinkPress);
+                    TranslateManager alert = new TranslateManager(fragment, context, str, text, noForwards, onLinkPress, onDismiss);
                     if (fragment != null) {
                         if (fragment.getParentActivity() != null) {
                             fragment.showDialog(alert);
@@ -1669,9 +1680,13 @@ public class TranslateManager extends Dialog {
     public static void translateMessage(long dialog, MessageObject object, Context context, BaseFragment fragment, boolean noForwards, Theme.ResourcesProvider themeDelegate, OnLinkPress onLinkPress) {
         if ((OwlConfig.translatorStyle == 1 || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) && object.type != MessageObject.TYPE_POLL) {
             CharSequence text = object.messageOwner.message;
-            translate(text, context, fragment, noForwards, onLinkPress);
+            translate(text, context, fragment, noForwards, onLinkPress, null);
         } else {
             TranslatorActionMessage.translateMessage(dialog, object, fragment, themeDelegate);
         }
+    }
+
+    public static boolean canShowPopupTranslation() {
+        return !MessagesController.getGlobalMainSettings().getBoolean("translate_button", false);
     }
 }

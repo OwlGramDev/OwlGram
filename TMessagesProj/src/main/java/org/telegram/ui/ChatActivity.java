@@ -8526,6 +8526,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
                 undoView.showWithAction(0, UndoView.ACTION_TEXT_COPIED, null);
             }
+
+            @Override
+            public void startTranslate(CharSequence text, Runnable onAlertDismiss) {
+                super.startTranslate(text, onAlertDismiss);
+                TranslateManager.translate(text, context, ChatActivity.this, false, onLinkPress2, onAlertDismiss);
+            }
         });
 
         contentView.addView(textSelectionHelper.getOverlayView(context));
