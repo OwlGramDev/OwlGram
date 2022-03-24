@@ -9720,6 +9720,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         for (int a = 0; a < 2; a++) {
             for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
                 MessageObject messageObject = selectedMessagesIds[a].valueAt(b);
+                if (messageObject.translated && messageObject.originalMessage != null) {
+                    messageObject = TranslatorActionMessage.resetTranslateMessage(dialog_id, ChatActivity.this, messageObject);
+                }
                 if (messageObject.isPoll()) {
                     hasPoll = messageObject.isPublicPoll() ? 2 : 1;
                     if (hasPoll == 2) {

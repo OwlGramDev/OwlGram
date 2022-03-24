@@ -343,6 +343,7 @@ public class SettingsManager {
         int returnStatus = 0;
         for (int i = 0; i < differences.size(); i++) {
             switch (differences.get(i)) {
+                case "buttonStyleType":
                 case "hidePhoneNumber":
                     returnStatus = addWithCheck(returnStatus, NEED_FRAGMENT_REBASE);
                     break;
