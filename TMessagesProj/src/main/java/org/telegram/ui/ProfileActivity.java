@@ -1259,7 +1259,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             }
                         }
                     }
-                    if (callItemVisible && !ActionButtonManager.canShowCall(currentChat)) {
+                    if (callItemVisible && !ActionButtonManager.canShowCall(currentChat) && OwlConfig.buttonStyleType == 5) {
                         callItem.setVisibility(VISIBLE);
                     }
                     if (videoCallItemVisible && canShowTopAction) {
@@ -1392,7 +1392,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
         private ActionBarMenuItem getSecondaryMenuItem() {
             boolean canShowTopAction = ActionButtonManager.canShowTopActions(editItemVisible);
-            if (callItemVisible && ActionButtonManager.canShowCall(currentChat)) {
+            if (callItemVisible && ActionButtonManager.canShowCall(currentChat) && OwlConfig.buttonStyleType == 5) {
                 return callItem;
             } else if (editItemVisible && canShowTopAction) {
                 return editItem;
@@ -2401,7 +2401,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 avatarContainer2.setPivotX(avatarContainer2.getMeasuredWidth() / 2f);
                 AndroidUtilities.updateViewVisibilityAnimated(avatarContainer2, !expanded, 0.95f, true);
                 boolean canShowTopAction = ActionButtonManager.canShowTopActions(editItemVisible);
-                callItem.setVisibility(expanded || !callItemVisible ? GONE : INVISIBLE);
+                callItem.setVisibility(expanded || !(callItemVisible && OwlConfig.buttonStyleType == 5) ? GONE : INVISIBLE);
                 videoCallItem.setVisibility(expanded ||!(videoCallItemVisible && canShowTopAction) ? GONE : INVISIBLE);
                 editItem.setVisibility(expanded || !(editItemVisible && canShowTopAction) ? GONE : INVISIBLE);
                 otherItem.setVisibility(expanded ? GONE : INVISIBLE);
@@ -4359,7 +4359,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 verifiedCheckDrawable.setColorFilter(AndroidUtilities.getOffsetColor(color1, color2, value, 1.0f), PorterDuff.Mode.MULTIPLY);
             }
 
-            if (avatarsViewPagerIndicatorView.getSecondaryMenuItem() != null && ((videoCallItemVisible && ActionButtonManager.canShowTopActions(editItemVisible)) || editItemVisible || (callItemVisible && !ActionButtonManager.canShowCall(currentChat)))) {
+            if (avatarsViewPagerIndicatorView.getSecondaryMenuItem() != null && ((videoCallItemVisible && ActionButtonManager.canShowTopActions(editItemVisible)) || editItemVisible || (callItemVisible && !ActionButtonManager.canShowCall(currentChat) && OwlConfig.buttonStyleType == 5))) {
                 needLayoutText(Math.min(1f, extraHeight / AndroidUtilities.dp(88f)));
             }
         }
@@ -4384,7 +4384,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         ActionBarMenuItem mediaSearchItem = sharedMediaLayout.getSearchItem();
         if (!mediaHeaderVisible) {
             boolean canShowTopAction = ActionButtonManager.canShowTopActions(editItemVisible);
-            if (callItemVisible && !ActionButtonManager.canShowCall(currentChat)) {
+            if (callItemVisible && !ActionButtonManager.canShowCall(currentChat) && OwlConfig.buttonStyleType == 5) {
                 callItem.setVisibility(View.VISIBLE);
             }
             if (videoCallItemVisible && canShowTopAction) {
@@ -4452,7 +4452,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (headerAnimatorSet != null) {
                     if (mediaHeaderVisible) {
                         boolean canShowTopAction = ActionButtonManager.canShowTopActions(editItemVisible);
-                        if (callItemVisible && !ActionButtonManager.canShowCall(currentChat)) {
+                        if (callItemVisible && !ActionButtonManager.canShowCall(currentChat) && OwlConfig.buttonStyleType == 5) {
                             callItem.setVisibility(View.INVISIBLE);
                         }
                         if (videoCallItemVisible && canShowTopAction) {
@@ -4709,7 +4709,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             writeButton.setAlpha(setVisible ? 1.0f : 0.0f);
                         }
                     }
-                    if (callItem != null && callItemVisible) {
+                    if (callItem != null && callItemVisible && OwlConfig.buttonStyleType == 5) {
                         if (ActionButtonManager.canShowCall(currentChat)) {
                             boolean setCallVisible = diff > 0.5f;
                             if (setCallVisible != isCallItemVisible) {
@@ -5088,7 +5088,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 }
             }
         }
-        if (callItemVisible && !ActionButtonManager.canShowCall(currentChat)) {
+        if (callItemVisible && !ActionButtonManager.canShowCall(currentChat) && OwlConfig.buttonStyleType == 5) {
             extra += 48;
         }
         if (videoCallItemVisible && canShowTopAction) {
@@ -6838,7 +6838,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
         if (!mediaHeaderVisible) {
             boolean canShowTopAction = ActionButtonManager.canShowTopActions(editItemVisible);
-            if (callItemVisible) {
+            if (callItemVisible && OwlConfig.buttonStyleType == 5) {
                 if (callItem.getVisibility() != View.VISIBLE) {
                     callItem.setVisibility(View.VISIBLE);
                     if (animated) {
