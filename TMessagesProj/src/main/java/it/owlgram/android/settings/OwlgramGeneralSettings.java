@@ -156,6 +156,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showIDAndDC);
                 }
+                parentLayout.rebuildAllFragmentViews(false, false);
             }else if (position == messageTimeSwitchRow) {
                 OwlConfig.toggleFullTime();
                 if (view instanceof TextCheckCell) {

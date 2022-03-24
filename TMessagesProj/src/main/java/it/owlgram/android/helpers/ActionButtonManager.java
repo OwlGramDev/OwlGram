@@ -284,18 +284,22 @@ public class ActionButtonManager {
         return null;
     }
 
-    public static boolean canShowTopActions(boolean editItemVisible) {
-        return (!OwlConfig.smartButtons || !editItemVisible) && OwlConfig.buttonStyleType == 5;
+    public static boolean canShowTopActions(TLRPC.Chat currentChat, boolean editItemVisible) {
+        return (!canShowShortcuts(currentChat) || !editItemVisible) && OwlConfig.buttonStyleType == 5;
     }
 
     public static boolean canShowCall(TLRPC.Chat currentChat) {
         boolean canEdit;
         if (ChatObject.isChannel(currentChat)) {
-            canEdit = !ChatObject.isChannelAndNotMegaGroup(currentChat) || ChatObject.canChangeChatInfo(currentChat);
+            canEdit = !ChatObject.isChannelAndNotMegaGroup(currentChat) || ChatObject.hasAdminRights(currentChat);
         } else {
             canEdit = true;
         }
-        return OwlConfig.smartButtons && canEdit;
+        return canShowShortcuts(currentChat) && canEdit;
+    }
+
+    public static boolean canShowShortcuts(TLRPC.Chat currentChat) {
+        return OwlConfig.smartButtons && ChatObject.canChangeChatInfo(currentChat);
     }
 
     public static class ActionButtonInfo {

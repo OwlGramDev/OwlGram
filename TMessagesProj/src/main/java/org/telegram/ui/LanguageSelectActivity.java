@@ -42,6 +42,7 @@ import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.LanguageCell;
 import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Cells.TextCheckCell;
+import org.telegram.ui.Cells.TextDetailCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextRadioCell;
 import org.telegram.ui.Cells.TextSettingsCell;
@@ -55,6 +56,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Timer;
+
+import it.owlgram.android.settings.OwlgramGeneralSettings;
+import it.owlgram.android.settings.OwlgramSettings;
 
 public class LanguageSelectActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
@@ -421,13 +425,23 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             header.setText(LocaleController.getString("TranslateMessages", R.string.TranslateMessages));
             addView(header, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
-            boolean value = getValue();
+            TextSettingsCell cell = new TextSettingsCell(context);
+            cell.setText(LocaleController.getString("OwlSetting", R.string.OwlSetting), false);
+            cell.setBackground(Theme.createSelectorWithBackgroundDrawable(Theme.getColor(Theme.key_windowBackgroundWhite), Theme.getColor(Theme.key_listSelector)));
+            cell.setOnClickListener(e -> {
+                presentFragment(new OwlgramGeneralSettings());
+            });
+            addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+            addView(new ShadowSectionCell(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+            /*boolean value = getValue();
             showButtonCheck = new TextCheckCell(context);
             showButtonCheck.setBackground(Theme.createSelectorWithBackgroundDrawable(Theme.getColor(Theme.key_windowBackgroundWhite), Theme.getColor(Theme.key_listSelector)));
             showButtonCheck.setTextAndCheck(
-                    LocaleController.getString("ShowTranslateButton", R.string.ShowTranslateButton),
-                    value,
-                    value
+                LocaleController.getString("ShowTranslateButton", R.string.ShowTranslateButton),
+                value,
+                value
             );
             showButtonCheck.setOnClickListener(e -> {
                 preferences.edit().putBoolean("translate_button", !getValue()).apply();
@@ -463,13 +477,13 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
 //            header2.setTranslationY(-Math.max(doNotTranslateCell.getHeight(), info2.getHeight()));
 //            addView(header2, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM));
 
-//            setLayoutParams(new RecyclerView.LayoutParams(LayoutHelper.MATCH_PARENT, height()));
+//            setLayoutParams(new RecyclerView.LayoutParams(LayoutHelper.MATCH_PARENT, height()));*/
             updateHeight();
-            update();
+            //update();
         }
 
         private boolean getValue() {
-            return preferences.getBoolean("translate_button", false);
+            return preferences.getBoolean("translate_button2", false);
         }
         private ArrayList<String> getRestrictedLanguages() {
             String currentLang = LocaleController.getInstance().getCurrentLocaleInfo().pluralLangCode;
@@ -539,11 +553,11 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
         }
 
         void updateHeight() {
-            header.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
+            /*header.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
             showButtonCheck.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
             doNotTranslateCell.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
             info.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
-            info2.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
+            info2.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);*/
 
             int newHeight = searching ? 0 : height();
             if (getLayoutParams() == null) {
@@ -555,10 +569,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             }
         }
         int height() {
-            return Math.max(AndroidUtilities.dp(40), header.getMeasuredHeight()) +
-                    Math.max(AndroidUtilities.dp(50), showButtonCheck.getMeasuredHeight()) +
-                    Math.max(Math.max(AndroidUtilities.dp(50), doNotTranslateCell.getMeasuredHeight()), (info2.getMeasuredHeight() <= 0 ? AndroidUtilities.dp(51) : info2.getMeasuredHeight())) +
-                    (info.getMeasuredHeight() <= 0 ? AndroidUtilities.dp(62) : info.getMeasuredHeight());/* + header2.getHeight()*/
+            return LayoutHelper.WRAP_CONTENT;
         }
 
         @Override
@@ -566,7 +577,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             updateHeight();
         }
-
+/*
         @Override
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
@@ -580,12 +591,12 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             });
             updateHeight();
         }
-
         @Override
         protected void onDetachedFromWindow() {
             super.onDetachedFromWindow();
             preferences.unregisterOnSharedPreferenceChangeListener(listener);
         }
+*/
     }
 
     private class ListAdapter extends RecyclerListView.SelectionAdapter {

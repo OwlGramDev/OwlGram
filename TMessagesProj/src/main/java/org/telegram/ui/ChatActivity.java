@@ -21169,7 +21169,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             options.add(OPTION_PIN);
                             icons.add(R.drawable.msg_pin);
                         }
-                        if (selectedObject != null && selectedObject.contentType == 0 && (messageText != null && messageText.length() > 0 && !selectedObject.isAnimatedEmoji() && !selectedObject.isDice()) && MessagesController.getGlobalMainSettings().getBoolean("translate_button", false)) {
+                        if (selectedObject != null && selectedObject.contentType == 0 && (messageText != null && messageText.length() > 0 && !selectedObject.isAnimatedEmoji() && !selectedObject.isDice()) && MessagesController.getGlobalMainSettings().getBoolean("translate_button2", false)) {
                             items.add(LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
                             options.add(29);
                             icons.add(R.drawable.msg_translate);
@@ -21492,7 +21492,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 }
                             }
 
-                            if (messageObject != null && !(editingMessageObject != null && editingMessageObject.getId() == messageObject.getId()) && OwlConfig.showTranslate && !MessagesController.getGlobalMainSettings().getBoolean("translate_button", false)) {
+                            if (messageObject != null && !(editingMessageObject != null && editingMessageObject.getId() == messageObject.getId()) && OwlConfig.showTranslate && !MessagesController.getGlobalMainSettings().getBoolean("translate_button2", false)) {
                                 String currentID = messageObject.getChatId()+"_"+messageObject.getId();
                                 if (!TranslatorActionMessage.checkAlreadyTranslating(currentID)) {
                                     items.add(messageObject.translated ? LocaleController.getString("UndoTranslate", R.string.UndoTranslate) : LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
@@ -21515,7 +21515,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             options.add(13);
                             icons.add(R.drawable.msg_pin);
                         }
-                        if (selectedObject != null && selectedObject.contentType == 0 && (messageText != null && messageText.length() > 0 && !selectedObject.isAnimatedEmoji() && !selectedObject.isDice()) && MessagesController.getGlobalMainSettings().getBoolean("translate_button", false)) {
+                        if (selectedObject != null && selectedObject.contentType == 0 && (messageText != null && messageText.length() > 0 && !selectedObject.isAnimatedEmoji() && !selectedObject.isDice()) && MessagesController.getGlobalMainSettings().getBoolean("translate_button2", false)) {
                             items.add(LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
                             options.add(29);
                             icons.add(R.drawable.msg_translate);
