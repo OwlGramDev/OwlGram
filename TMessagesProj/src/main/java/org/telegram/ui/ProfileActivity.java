@@ -4704,7 +4704,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             writeButton.setAlpha(setVisible ? 1.0f : 0.0f);
                         }
                     }
-                    if (callItem != null) {
+                    if (callItem != null && callItemVisible) {
                         if (ActionButtonManager.canShowCall(currentChat)) {
                             boolean setCallVisible = diff > 0.5f;
                             if (setCallVisible != isCallItemVisible) {
