@@ -6104,7 +6104,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 numberSectionRow = rowCount++;
                 numberRow = rowCount++;
                 setUsernameRow = rowCount++;
-                datacenterRow = rowCount++;
+                if (OwlConfig.showIDAndDC) {
+                    datacenterRow = rowCount++;
+                }
                 bioRow = rowCount++;
 
                 settingsSectionRow = rowCount++;
@@ -6164,7 +6166,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (userInfo != null && !TextUtils.isEmpty(userInfo.about)) {
                     userInfoRow = rowCount++;
                 }
-                datacenterRow = rowCount++;
+                if (OwlConfig.showIDAndDC) {
+                    datacenterRow = rowCount++;
+                }
                 if (user != null && !TextUtils.isEmpty(user.username)) {
                     usernameRow = rowCount++;
                 }
@@ -6206,13 +6210,17 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 actionsSectionRow = rowCount++;
                 actionsSectionDivider = rowCount++;
             }
-            infoHeaderRow = rowCount++;
+            if (OwlConfig.showIDAndDC) {
+                infoHeaderRow = rowCount++;
+            }
 
             if (chatInfo != null && (!TextUtils.isEmpty(chatInfo.about) || chatInfo.location instanceof TLRPC.TL_channelLocation) || !TextUtils.isEmpty(currentChat.username)) {
                 if (LocaleController.isRTL && ChatObject.isChannel(currentChat) && chatInfo != null && !currentChat.megagroup && chatInfo.linked_chat_id != 0) {
                     emptyRow = rowCount++;
                 }
-                //infoHeaderRow = rowCount++;
+                if (!OwlConfig.showIDAndDC) {
+                    infoHeaderRow = rowCount++;
+                }
                 if (chatInfo != null) {
                     if (!TextUtils.isEmpty(chatInfo.about)) {
                         channelInfoRow = rowCount++;
@@ -6221,7 +6229,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         locationRow = rowCount++;
                     }
                 }
-                datacenterRow = rowCount++;
+                if (OwlConfig.showIDAndDC) {
+                    datacenterRow = rowCount++;
+                }
                 if (!TextUtils.isEmpty(currentChat.username)) {
                     usernameRow = rowCount++;
                 }
@@ -6229,7 +6239,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     restrictionReasonRow = rowCount++;
                 }
             } else {
-                datacenterRow = rowCount++;
+                if (OwlConfig.showIDAndDC) {
+                    datacenterRow = rowCount++;
+                }
             }
             if (infoHeaderRow != -1) {
                 notificationsDividerRow = rowCount++;

@@ -87,6 +87,7 @@ public class OwlgramChatSettings extends BaseFragment {
     private int betterAudioMessagesRow;
     private int turnSoundOnVDKeyRow;
     private int openArchiveOnPullRow;
+    private int confirmStickersGIFsRow;
 
     private UndoView restartTooltip;
 
@@ -271,6 +272,11 @@ public class OwlgramChatSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.openArchiveOnPull);
                 }
+            } else if (position == confirmStickersGIFsRow) {
+                OwlConfig.toggleConfirmStickersGIFs();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.confirmStickersGIFs);
+                }
             }
         });
         restartTooltip = new UndoView(context);
@@ -336,6 +342,7 @@ public class OwlgramChatSettings extends BaseFragment {
         proximitySensorRow = rowCount++;
         rearCameraStartingRow = rowCount++;
         confirmSendRow = rowCount++;
+        confirmStickersGIFsRow = rowCount++;
 
         if (listAdapter != null && notify) {
             listAdapter.notifyDataSetChanged();
@@ -436,6 +443,8 @@ public class OwlgramChatSettings extends BaseFragment {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("TurnSoundOnVDKey", R.string.TurnSoundOnVDKey), LocaleController.getString("TurnSoundOnVDKeyDesc", R.string.TurnSoundOnVDKeyDesc), OwlConfig.turnSoundOnVDKey, true, true);
                     } else if (position == openArchiveOnPullRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("OpenArchiveOnPull", R.string.OpenArchiveOnPull), OwlConfig.openArchiveOnPull, true);
+                    } else if (position == confirmStickersGIFsRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("ConfirmStickersGIFs", R.string.ConfirmStickersGIFs), OwlConfig.confirmStickersGIFs, true);
                     }
                     break;
                 case 6:
@@ -559,7 +568,7 @@ public class OwlgramChatSettings extends BaseFragment {
                     position == showDeleteRow || position == showHideAllTab || position == cameraXOptimizeRow ||
                     position == proximitySensorRow || position == swipePiPRow || position == showRepeatRow ||
                     position == suppressionRow || position == betterAudioMessagesRow || position == turnSoundOnVDKeyRow ||
-                    position == openArchiveOnPullRow) {
+                    position == openArchiveOnPullRow || position == confirmStickersGIFsRow) {
                 return 3;
             } else if (position == stickerSizeRow) {
                 return 4;

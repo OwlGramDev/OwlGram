@@ -59,7 +59,6 @@
     <string name="UseSystemFonts">Use System Fonts</string>
     <string name="UseSystemEmojis">Use System Emojis</string>
     <string name="PacManAnimation">Force Pac-Man Animation when Archive</string>
-    <string name="TransparentStatusBar">Transparent Status Bar</string>
     <string name="ChristmasHat">Christmas Hat</string>
     <string name="FallingSnow">Falling Snow</string>
     <string name="Fireworks">Fireworks</string>
@@ -227,4 +226,6 @@
     <string name="OpenArchiveOnPull">Open Archive by Pulling down</string>
     <string name="SlidingTitle">Sliding Title</string>
     <string name="SlidingTitleDesc">If the chat title is long, it will scroll on the screen</string>
+    <string name="ConfirmStickersGIFs">Confirm Sending Stickers and GIFs</string>
+    <string name="ShowID_DC">Show ID and DC in Profiles</string>
 </resources>

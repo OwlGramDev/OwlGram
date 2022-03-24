@@ -73,6 +73,8 @@ public class OwlConfig extends SettingsManager{
     public static boolean turnSoundOnVDKey;
     public static boolean openArchiveOnPull;
     public static boolean slidingChatTitle;
+    public static boolean confirmStickersGIFs;
+    public static boolean showIDAndDC;
     public static String translationTarget = "app";
     public static String updateData;
     public static String drawerItems;
@@ -191,6 +193,8 @@ public class OwlConfig extends SettingsManager{
             turnSoundOnVDKey = preferences.getBoolean("turnSoundOnVDKey", true);
             openArchiveOnPull = preferences.getBoolean("openArchiveOnPull", false);
             slidingChatTitle = preferences.getBoolean("slidingChatTitle", false);
+            confirmStickersGIFs = preferences.getBoolean("confirmStickersGIFs", false);
+            showIDAndDC = preferences.getBoolean("showIDAndDC", true);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -594,6 +598,22 @@ public class OwlConfig extends SettingsManager{
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("slidingChatTitle", slidingChatTitle);
+        editor.apply();
+    }
+
+    public static void toggleConfirmStickersGIFs() {
+        confirmStickersGIFs = !confirmStickersGIFs;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("confirmStickersGIFs", confirmStickersGIFs);
+        editor.apply();
+    }
+
+    public static void toggleShowIDAndDC() {
+        showIDAndDC = !showIDAndDC;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showIDAndDC", showIDAndDC);
         editor.apply();
     }
 

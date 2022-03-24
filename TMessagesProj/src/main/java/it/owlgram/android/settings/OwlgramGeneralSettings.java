@@ -65,7 +65,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
     private int useSystemFontRow;
     private int useSystemEmojiRow;
     private int forcePacmanRow;
-    private int statusBarSwitchRow;
+    private int dcIdRow;
     private int messageTimeSwitchRow;
     private int roundedNumberSwitchRow;
     private int divisorAppearanceRow;
@@ -151,17 +151,10 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.hideContactNumber);
                 }
-            }else if (position == statusBarSwitchRow) {
-                SharedConfig.toggleNoStatusBar();
+            }else if (position == dcIdRow) {
+                OwlConfig.toggleShowIDAndDC();
                 if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(SharedConfig.noStatusBar);
-                }
-                if (getParentActivity() != null && Build.VERSION.SDK_INT >= 21) {
-                    if (SharedConfig.noStatusBar) {
-                        getParentActivity().getWindow().setStatusBarColor(0);
-                    } else {
-                        getParentActivity().getWindow().setStatusBarColor(0x33000000);
-                    }
+                    ((TextCheckCell) view).setChecked(OwlConfig.showIDAndDC);
                 }
             }else if (position == messageTimeSwitchRow) {
                 OwlConfig.toggleFullTime();
@@ -382,7 +375,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
         useSystemFontRow = rowCount++;
         useSystemEmojiRow = rowCount++;
         forcePacmanRow = rowCount++;
-        statusBarSwitchRow = rowCount++;
+        dcIdRow = rowCount++;
         if (((Theme.getEventType() == 0 && OwlConfig.eventType == 0) || OwlConfig.eventType == 1)) {
             showSantaHatRow = rowCount++;
             showFallingSnowRow = rowCount++;
@@ -461,8 +454,8 @@ public class OwlgramGeneralSettings extends BaseFragment {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("HidePhone", R.string.HidePhone), LocaleController.getString("HidePhoneDesc", R.string.HidePhoneDesc), OwlConfig.hidePhoneNumber,true, true);
                     } else if (position == phoneContactsSwitchRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("HidePhoneOthers", R.string.HidePhoneOthers), LocaleController.getString("HidePhoneOthersDesc", R.string.HidePhoneOthersDesc), OwlConfig.hideContactNumber, true, true);
-                    } else if (position == statusBarSwitchRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("TransparentStatusBar", R.string.TransparentStatusBar), SharedConfig.noStatusBar, true);
+                    } else if (position == dcIdRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("ShowID_DC", R.string.ShowID_DC), OwlConfig.showIDAndDC, true);
                     }else if (position == messageTimeSwitchRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("FormatTimeSeconds", R.string.FormatTimeSeconds), LocaleController.getString("FormatTimeSecondsDesc", R.string.FormatTimeSecondsDesc), OwlConfig.fullTime, true, true);
                     }else if (position == roundedNumberSwitchRow) {
@@ -650,11 +643,11 @@ public class OwlgramGeneralSettings extends BaseFragment {
                             //TODO
                             //NEEDED TO ADD THE DYNAMIC DISABLE ITEMS
                             if (((Theme.getEventType() == 0 && eventSelected == 0 && oldEvent != 1) || eventSelected == 1 && oldEvent != 0)) {
-                                listAdapter.notifyItemChanged(statusBarSwitchRow, new Object());
-                                listAdapter.notifyItemRangeInserted(statusBarSwitchRow + 1, 2);
+                                listAdapter.notifyItemChanged(dcIdRow, new Object());
+                                listAdapter.notifyItemRangeInserted(dcIdRow + 1, 2);
                             } else if (((Theme.getEventType() == 0 && oldEvent == 0 && eventSelected != 1) || oldEvent == 1 && eventSelected != 0)) {
-                                listAdapter.notifyItemChanged(statusBarSwitchRow, new Object());
-                                listAdapter.notifyItemRangeRemoved(statusBarSwitchRow + 1, 2);
+                                listAdapter.notifyItemChanged(dcIdRow, new Object());
+                                listAdapter.notifyItemRangeRemoved(dcIdRow + 1, 2);
                             }
                         }
                     };
@@ -696,7 +689,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     position == callHeaderRow || position == editBlurHeaderRow || position == themeDrawerHeader ||
                     position == dynamicButtonHeaderRow){
                 return 2;
-            } else if (position == phoneNumberSwitchRow || position == phoneContactsSwitchRow || position == statusBarSwitchRow ||
+            } else if (position == phoneNumberSwitchRow || position == phoneContactsSwitchRow || position == dcIdRow ||
                     position == roundedNumberSwitchRow || position == messageTimeSwitchRow || position == confirmCallSwitchRow ||
                     position == useSystemFontRow || position == useSystemEmojiRow || position == drawerAvatarAsBackgroundRow ||
                     position == drawerDarkenBackgroundRow || position == drawerBlurBackgroundRow || position == showGradientRow ||

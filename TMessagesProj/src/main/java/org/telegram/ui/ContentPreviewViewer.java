@@ -33,6 +33,8 @@ import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ImageLoader;
 import org.telegram.messenger.MediaDataController;
@@ -63,6 +65,7 @@ import org.telegram.ui.Components.RecyclerListView;
 
 import java.util.ArrayList;
 
+import it.owlgram.android.OwlConfig;
 import it.owlgram.android.helpers.MessageHelper;
 
 public class ContentPreviewViewer {
@@ -150,6 +153,8 @@ public class ContentPreviewViewer {
     private FrameLayoutDrawer containerView;
     private ImageReceiver centerImage = new ImageReceiver();
     private boolean isVisible = false;
+    private boolean isShowedRunnable = false;
+    private boolean withVibration = true;
     private float showProgress;
     private StaticLayout stickerEmojiLayout;
     private long lastUpdateTime;
@@ -162,6 +167,7 @@ public class ContentPreviewViewer {
             if (parentActivity == null) {
                 return;
             }
+            isShowedRunnable = true;
             if (currentContentType == CONTENT_TYPE_STICKER) {
                 final boolean inFavs = MediaDataController.getInstance(currentAccount).isStickerInFavorites(currentDocument);
                 BottomSheet.Builder builder = new BottomSheet.Builder(parentActivity, true, resourcesProvider);
@@ -252,7 +258,9 @@ public class ContentPreviewViewer {
                     close();
                 });
                 visibleDialog.show();
-                containerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                if (withVibration) {
+                    containerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                }
                 if (delegate != null && delegate.needRemove()) {
                     BottomSheet.BottomSheetCell cell = visibleDialog.getItemViews().get(0);
                     cell.setTextColor(getThemedColor(Theme.key_dialogTextRed));
@@ -344,7 +352,9 @@ public class ContentPreviewViewer {
                     close();
                 });
                 visibleDialog.show();
-                containerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                if (withVibration) {
+                    containerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                }
                 if (canDelete) {
                     visibleDialog.setItemColor(items.size() - 1, getThemedColor(Theme.key_dialogTextRed2), getThemedColor(Theme.key_dialogRedIcon));
                 }
@@ -397,19 +407,46 @@ public class ContentPreviewViewer {
         }
     }
 
+    // Hi Neko! What are you doing here??
+    public void confirmSending() {
+        withVibration = false;
+        AndroidUtilities.runOnUIThread(() -> {
+            if (isVisible()) {
+                if (showSheetRunnable != null && !isShowedRunnable) {
+                    AndroidUtilities.cancelRunOnUIThread(showSheetRunnable);
+                    showSheetRunnable.run();
+                    if (openPreviewRunnable != null) {
+                        AndroidUtilities.cancelRunOnUIThread(openPreviewRunnable);
+                        openPreviewRunnable.run();
+                    }
+                }
+            } else {
+                confirmSending();
+            }
+        }, 150);
+    }
+
     public boolean onTouch(MotionEvent event, final RecyclerListView listView, final int height, final Object listener, ContentPreviewViewerDelegate contentPreviewViewerDelegate, Theme.ResourcesProvider resourcesProvider) {
         delegate = contentPreviewViewerDelegate;
         this.resourcesProvider = resourcesProvider;
         if (openPreviewRunnable != null || isVisible()) {
             if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_POINTER_UP) {
-                AndroidUtilities.runOnUIThread(() -> {
-                    if (listView instanceof RecyclerListView) {
-                        listView.setOnItemClickListener((RecyclerListView.OnItemClickListener) listener);
-                    }
-                }, 150);
-                if (openPreviewRunnable != null) {
+                if (!OwlConfig.confirmStickersGIFs) {
+                    AndroidUtilities.runOnUIThread(() -> {
+                        if (!OwlConfig.confirmStickersGIFs) {
+                            if (listView instanceof RecyclerListView) {
+                                listView.setOnItemClickListener((RecyclerListView.OnItemClickListener) listener);
+                            }
+                        }
+                    }, 150);
+                } else {
+                    confirmSending();
+                }
+                if (openPreviewRunnable != null && !OwlConfig.confirmStickersGIFs) {
                     AndroidUtilities.cancelRunOnUIThread(openPreviewRunnable);
                     openPreviewRunnable = null;
+                } else if (openPreviewRunnable != null) {
+                    return true;
                 } else if (isVisible()) {
                     close();
                     if (currentPreviewCell != null) {
@@ -516,7 +553,9 @@ public class ContentPreviewViewer {
                                     contextLinkCell.setScaled(true);
                                 }
                             }
-                            runSmoothHaptic();
+                            if (withVibration) {
+                                runSmoothHaptic();
+                            }
 
                             return true;
                         }
@@ -630,7 +669,9 @@ public class ContentPreviewViewer {
                             contextLinkCell.setScaled(true);
                         }
                     }
-                    currentPreviewCell.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+                    if (withVibration) {
+                        currentPreviewCell.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+                    }
                 };
                 AndroidUtilities.runOnUIThread(openPreviewRunnable, 200);
                 return true;
@@ -867,11 +908,15 @@ public class ContentPreviewViewer {
         currentQuery = null;
         delegate = null;
         isVisible = false;
+        isShowedRunnable = false;
+        withVibration = true;
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.startAllHeavyOperations, 8);
     }
 
     public void destroy() {
         isVisible = false;
+        isShowedRunnable = false;
+        withVibration = true;
         delegate = null;
         currentDocument = null;
         currentQuery = null;
