@@ -262,7 +262,7 @@ public class OwlgramChatSettings extends BaseFragment {
                     ((TextCheckCell) view).setChecked(OwlConfig.increaseAudioMessages);
                 }
             } else if (position == turnSoundOnVDKeyRow) {
-                OwlConfig.toggleturnSoundOnVDKey();
+                OwlConfig.toggleTurnSoundOnVDKey();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.turnSoundOnVDKey);
                 }

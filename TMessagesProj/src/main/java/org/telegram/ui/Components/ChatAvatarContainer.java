@@ -356,8 +356,17 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
         setTitle(value, false, false);
     }
 
+    public void setTitle(CharSequence value, boolean scrollable) {
+        setTitle(value, false, false, scrollable);
+    }
+
     public void setTitle(CharSequence value, boolean scam, boolean fake) {
+        setTitle(value, scam, fake, false);
+    }
+
+    public void setTitle(CharSequence value, boolean scam, boolean fake, boolean scrollable) {
         titleTextView.setText(value);
+        titleTextView.setScrollNonFitText(scrollable);
         if (scam || fake) {
             if (!(titleTextView.getRightDrawable() instanceof ScamDrawable)) {
                 ScamDrawable drawable = new ScamDrawable(11, scam ? 0 : 1);

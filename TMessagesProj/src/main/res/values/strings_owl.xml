@@ -225,4 +225,6 @@
     <string name="SaveWithoutMarkdown">Save without markdown</string>
     <string name="ClearRecentStickers">Clear recent stickers?</string>
     <string name="OpenArchiveOnPull">Open Archive by Pulling down</string>
+    <string name="SlidingTitle">Sliding Title</string>
+    <string name="SlidingTitleDesc">If the chat title is long, it will scroll on the screen</string>
 </resources>

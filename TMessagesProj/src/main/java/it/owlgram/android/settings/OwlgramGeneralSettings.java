@@ -96,6 +96,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
     private int notificationAccentRow;
     private int showSantaHatRow;
     private int showFallingSnowRow;
+    private int slidingTitleRow;
 
     private DrawerProfilePreviewCell profilePreviewCell;
 
@@ -327,6 +328,11 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 Theme.lastHolidayCheckTime = 0;
                 Theme.dialogs_holidayDrawable = null;
                 getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            } else if (position == slidingTitleRow) {
+                OwlConfig.toggleSlidingChatTitle();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.slidingChatTitle);
+                }
             }
         });
         return fragmentView;
@@ -386,6 +392,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
         smartButtonsRow = rowCount++;
         appBarShadowRow = rowCount++;
         notificationAccentRow = rowCount++;
+        slidingTitleRow = rowCount++;
         divisorAppearanceRow = rowCount++;
         translationHeaderRow = rowCount++;
         translationStyle = rowCount++;
@@ -488,6 +495,8 @@ public class OwlgramGeneralSettings extends BaseFragment {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ChristmasHat", R.string.ChristmasHat), OwlConfig.showSantaHat, true);
                     } else if (position == showFallingSnowRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("FallingSnow", R.string.FallingSnow), OwlConfig.showSnowFalling, true);
+                    } else if (position == slidingTitleRow) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("SlidingTitle", R.string.SlidingTitle), LocaleController.getString("SlidingTitleDesc", R.string.SlidingTitleDesc), OwlConfig.slidingChatTitle, true, true);
                     }
                     break;
                 case 4:
@@ -693,7 +702,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     position == drawerDarkenBackgroundRow || position == drawerBlurBackgroundRow || position == showGradientRow ||
                     position == showAvatarRow || position == forcePacmanRow || position == smartButtonsRow ||
                     position == appBarShadowRow || position == notificationAccentRow || position == showSantaHatRow ||
-                    position == showFallingSnowRow
+                    position == showFallingSnowRow || position == slidingTitleRow
             ){
                 return 3;
             } else if ( position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow ||
