@@ -87,9 +87,11 @@ public class ActionButtonManager {
             boolean canShare = !TextUtils.isEmpty(chat.username);
             boolean isGroup = !ChatObject.isChannelAndNotMegaGroup(chat);
             boolean canAddUsers = false;
-            if (chatInfo != null && chat.megagroup && chatInfo.participants != null && !chatInfo.participants.participants.isEmpty()) {
-                if (!ChatObject.isNotInChat(chat) && ChatObject.canAddUsers(chat) && chatInfo.participants_count < maxMegaGroupCount) {
-                    canAddUsers = true;
+            if (ChatObject.isChannel(chat)) {
+                if (chatInfo != null && chat.megagroup && chatInfo.participants != null && !chatInfo.participants.participants.isEmpty()) {
+                    if (!ChatObject.isNotInChat(chat) && ChatObject.canAddUsers(chat) && chatInfo.participants_count < maxMegaGroupCount) {
+                        canAddUsers = true;
+                    }
                 }
             } else if (chatInfo != null) {
                 if (!(chatInfo.participants instanceof TLRPC.TL_chatParticipantsForbidden)) {
@@ -172,7 +174,7 @@ public class ActionButtonManager {
             case "restart":
                 return Theme.key_statisticChartLine_green;
         }
-        return Theme.key_dialogTextBlue;
+        return Theme.key_switch2TrackChecked;
     }
 
     public ActionButtonInfo getItemAt(int index){
@@ -284,6 +286,16 @@ public class ActionButtonManager {
 
     public static boolean canShowTopActions(boolean editItemVisible) {
         return (!OwlConfig.smartButtons || !editItemVisible) && OwlConfig.buttonStyleType == 5;
+    }
+
+    public static boolean canShowCall(TLRPC.Chat currentChat) {
+        boolean canEdit;
+        if (ChatObject.isChannel(currentChat)) {
+            canEdit = !ChatObject.isChannelAndNotMegaGroup(currentChat) || ChatObject.canChangeChatInfo(currentChat);
+        } else {
+            canEdit = true;
+        }
+        return OwlConfig.smartButtons && canEdit;
     }
 
     public static class ActionButtonInfo {

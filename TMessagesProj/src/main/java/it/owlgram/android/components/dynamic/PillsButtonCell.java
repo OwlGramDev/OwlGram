@@ -168,12 +168,5 @@ public class PillsButtonCell extends SimpleActionCell {
         canvas.drawRoundRect(rectText, textHeight >> 1, textHeight >> 1, p);
     }
 
-    public ThemeInfo getTheme() {
-        return new ThemeInfo(
-                true,
-                AndroidUtilities.dp(20)
-        );
-    }
-
     protected void onItemClick(int id) {}
 }

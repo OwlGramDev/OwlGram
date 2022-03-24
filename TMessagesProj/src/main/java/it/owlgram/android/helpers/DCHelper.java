@@ -6,12 +6,47 @@ import android.os.SystemClock;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
+import org.telegram.messenger.UserObject;
+import org.telegram.tgnet.TLRPC;
 
 import java.util.ArrayList;
 
 public class DCHelper {
+    public static TInfo getTInfo(TLRPC.UserFull userInfo, TLRPC.ChatFull chatInfo, TLRPC.Chat currentChat, int myDC) {
+        int DC = 0;
+        String id = "0";
+        if(userInfo != null){
+            if (UserObject.isUserSelf(userInfo.user)) {
+                DC = myDC;
+            } else {
+                DC = userInfo.profile_photo != null ? userInfo.profile_photo.dc_id:-1;
+            }
+            id = String.valueOf(userInfo.id);
+        }else if(chatInfo != null){
+            DC = chatInfo.chat_photo != null ? chatInfo.chat_photo.dc_id:-1;
+            if(ChatObject.isChannel(currentChat)){
+                id = "-100"+chatInfo.id;
+            }else{
+                id = "-"+chatInfo.id;
+            }
+        }
+        DC = DC != 0 ? DC:-1;
+        return new TInfo(DC, Long.parseLong(id));
+    }
+
+    public static class TInfo {
+        public final int dcID;
+        public final long userID;
+
+        TInfo(int dcID, long userID) {
+            this.dcID = dcID;
+            this.userID = userID;
+        }
+    }
+
     public static int getDCColor(int dc_id) {
         switch (dc_id){
             case 1:
@@ -73,6 +108,23 @@ public class DCHelper {
                 return R.drawable.ic_vesta_datacenter;
             case 5:
                 return R.drawable.ic_flora_datacenter;
+            default:
+                return R.drawable.menu_secret_hw;
+        }
+    }
+
+    public static int getDcIconLittle(int dc_id) {
+        switch (dc_id){
+            case 1:
+                return R.drawable.ic_pluto_datacenter_little;
+            case 2:
+                return R.drawable.ic_venus_datacenter_little;
+            case 3:
+                return R.drawable.ic_aurora_datacenter_little;
+            case 4:
+                return R.drawable.ic_vesta_datacenter_little;
+            case 5:
+                return R.drawable.ic_flora_datacenter_little;
             default:
                 return R.drawable.menu_secret_hw;
         }

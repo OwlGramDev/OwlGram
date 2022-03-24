@@ -159,16 +159,6 @@ public class ActionPanelCell extends LinearLayout {
         return null;
     }
 
-    public SimpleActionCell.ThemeInfo getTheme() {
-        try {
-            SimpleActionCell simpleActionCell = (SimpleActionCell) mainLayout.getChildAt(0);
-            if(simpleActionCell != null) {
-                return simpleActionCell.getTheme();
-            }
-        } catch (Exception ignored) {}
-        return null;
-    }
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY), heightMeasureSpec);
