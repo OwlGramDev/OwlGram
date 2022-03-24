@@ -9,6 +9,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StrikethroughSpan;
@@ -273,7 +274,12 @@ public class EntitiesHelper {
                 TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
                 run.flags |= TextStyleSpan.FLAG_STYLE_STRIKE;
                 result = new TextStyleSpan(run);
-            } else if (mSpan instanceof ForegroundColorSpan) {
+            } else if (mSpan instanceof ForegroundColorSpan || mSpan instanceof BackgroundColorSpan) {
+                if (mSpan instanceof BackgroundColorSpan) {
+                    ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Theme.getColor(Theme.key_chat_messagePanelText));
+                    editTextCaption.getText().removeSpan(mSpan);
+                    editTextCaption.getText().setSpan(foregroundColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                }
                 TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
                 run.flags |= TextStyleSpan.FLAG_STYLE_SPOILER;
                 result = new TextStyleSpan(run);
