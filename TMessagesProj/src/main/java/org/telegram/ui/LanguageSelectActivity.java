@@ -57,6 +57,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Timer;
 
+import it.owlgram.android.OwlConfig;
 import it.owlgram.android.settings.OwlgramGeneralSettings;
 import it.owlgram.android.settings.OwlgramSettings;
 
@@ -204,6 +205,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                     }
                     preferences.edit().putStringSet("translate_button_restricted_languages", newSelectedLanguages).apply();
 
+                    OwlConfig.fixLanguageSelected();
                     finishFragment();
                 }
             } catch (Exception e) {
