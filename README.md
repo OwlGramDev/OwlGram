@@ -42,9 +42,10 @@ OwlGram is an **unofficial** messaging app that uses **Telegram's API**.
 • Test Backend  
 • Playback Speed for audio files shorter than 20 minutes  
 • Side Menu Customization  
-• And more...
+• [And more...](<https://telegra.ph/OwlGram---List-of-Features-03-04>)
 
 ## ✏️ Credits
 • **[Nekogram](<https://gitlab.com/Nekogram/Nekogram>)**  
+• **[CatoGramX](<https://github.com/CatogramX/CatogramX>)**  
 *[Licensed under GNU GPL-2.0](<https://github.com/OwlGramDev/OwlGram/blob/master/LICENSE>)*
 

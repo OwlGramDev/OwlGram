@@ -83,9 +83,11 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
 
     private Context mContext;
     private ArchiveHintCell archiveHintCell;
+    private TextInfoPrivacyCell textInfoPrivacyCell;
     private ArrayList<TLRPC.TL_contact> onlineContacts;
     private boolean forceUpdatingContacts;
     private int dialogsCount;
+    private int MIN_SHOW_COUNTER = 10;
     private int prevContactsCount;
     private int prevDialogsCount;
     private int dialogsType;
@@ -255,7 +257,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
         }
         if (folderId == 0 && dialogsCount != 0) {
             count++;
-            if (dialogsCount > 10 && dialogsType == 0) {
+            if (dialogsCount > MIN_SHOW_COUNTER) {
                 count++;
             }
         }
@@ -481,7 +483,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
                 break;
             }
             case VIEW_TYPE_NEW_CHAT_HINT: {
-                view = new TextInfoPrivacyCell(mContext) {
+                view = textInfoPrivacyCell =new TextInfoPrivacyCell(mContext) {
 
                     private int movement;
                     private float moveProgress;
@@ -648,6 +650,18 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
                 textView.getLayoutParams().width = LayoutHelper.WRAP_CONTENT;*/
                 break;
             }
+            case VIEW_TYPE_LAST_EMPTY: {
+                LastEmptyView cell = (LastEmptyView) holder.itemView;
+                if (dialogsCount > MIN_SHOW_COUNTER) {
+                    Drawable drawable = Theme.getThemedDrawable(mContext, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow);
+                    CombinedDrawable combinedDrawable = new CombinedDrawable(new ColorDrawable(Theme.getColor(Theme.key_windowBackgroundGray)), drawable);
+                    combinedDrawable.setFullsize(true);
+                    cell.setBackground(combinedDrawable);
+                } else {
+                    cell.setBackground(null);
+                }
+                break;
+            }
             case VIEW_TYPE_TEXT: {
                 TextCell cell = (TextCell) holder.itemView;
                 cell.setColors(Theme.key_windowBackgroundWhiteBlueText4, Theme.key_windowBackgroundWhiteBlueText4);
@@ -735,10 +749,10 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
                 i -= 1;
             }
         }
-        if (folderId != 1 && dialogsCount > 10 && i == currentCount - (dialogsType == 0 ? 2:1)) {
+        if (folderId != 1 && dialogsCount > MIN_SHOW_COUNTER && i == currentCount - (dialogsType == 0 ? 2:2)) {
             return VIEW_TYPE_NEW_CHAT_HINT;
         }
-        if (folderId == 1 && dialogsCount > 10 && i == currentCount -1 && dialogsType == 0) {
+        if (folderId == 1 && dialogsCount > MIN_SHOW_COUNTER && i == currentCount -1 && dialogsType == 0) {
             return VIEW_TYPE_NEW_CHAT_HINT;
         }
         int size = parentFragment.getDialogsArray(currentAccount, dialogsType, folderId, dialogsListFrozen).size();
@@ -971,6 +985,12 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
                     }
                 } else {
                     height = 0;
+                }
+            }
+            if (textInfoPrivacyCell != null && dialogsCount > MIN_SHOW_COUNTER) {
+                int hM = textInfoPrivacyCell.getMeasuredHeight();
+                if (height >= hM) {
+                    height -= hM;
                 }
             }
             setMeasuredDimension(MeasureSpec.getSize(widthMeasureSpec), height);
