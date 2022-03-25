@@ -4182,7 +4182,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         if (view instanceof AboutLinkCell) {
                             AboutLinkCell aboutLinkCell = (AboutLinkCell) view;
                             if(originalBio != null){
-                                aboutLinkCell.setTextAndValue(originalBio, LocaleController.getString("UserBio", R.string.UserBio), true);
+                                aboutLinkCell.setTextAndValue(originalBio, channelInfoRow != -1 ? null:LocaleController.getString("UserBio", R.string.UserBio), true);
                                 currentBio = originalBio;
                                 originalBio = null;
                             } else {
@@ -4242,7 +4242,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     translatingBio = false;
                     currentBio = (String) result.translation;
                     originalBio = bio;
-                    aboutLinkCell.setTextAndValue(currentBio, LocaleController.getString("UserBio", R.string.UserBio), true);
+                    aboutLinkCell.setTextAndValue(currentBio, channelInfoRow != -1 ? null:LocaleController.getString("UserBio", R.string.UserBio), true);
                 }
 
                 @Override
@@ -7960,7 +7960,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             if(originalBio != null){
                                 value = currentBio;
                             }
-                            aboutLinkCell.setTextAndValue(value, LocaleController.getString("UserBio", R.string.UserBio), false);
+                            aboutLinkCell.setTextAndValue(value, LocaleController.getString("UserBio", R.string.UserBio), true);
                             currentBio = userInfo != null ? userInfo.about : null;
                         } else {
                             aboutLinkCell.setTextAndValue( LocaleController.getString("UserBioDetail", R.string.UserBioDetail), LocaleController.getString("UserBio", R.string.UserBio), false);
@@ -7980,7 +7980,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         if(originalBio != null){
                             text = currentBio;
                         }
-                        aboutLinkCell.setText(text, ChatObject.isChannel(currentChat) && !currentChat.megagroup);
+                        aboutLinkCell.setText(text, true /*ChatObject.isChannel(currentChat) && !currentChat.megagroup*/);
                     }
                     aboutLinkCell.setOnClickListener(e -> processOnClickOrPress(position, aboutLinkCell));
                     aboutLinkCell.setOnLongClickListener(e -> {
