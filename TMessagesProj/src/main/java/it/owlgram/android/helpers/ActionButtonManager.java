@@ -299,7 +299,7 @@ public class ActionButtonManager {
     }
 
     public static boolean canShowShortcuts(TLRPC.Chat currentChat) {
-        return OwlConfig.smartButtons && ChatObject.canChangeChatInfo(currentChat);
+        return OwlConfig.smartButtons && (ChatObject.hasAdminRights(currentChat) || currentChat != null && currentChat.megagroup && ChatObject.canChangeChatInfo(currentChat));
     }
 
     public static class ActionButtonInfo {
