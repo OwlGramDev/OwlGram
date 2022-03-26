@@ -3,16 +3,16 @@ OwlGram is an **unofficial** messaging app that uses **Telegram's API**.
 
 ## 🔗 Redirect
 🇮🇹 **Italian**  
-├ [Italian Channel](<http://t.me/OwlGramIT>)  
-└ [Italian Group](<http://t.me/OwlGramChatIT>)
+├ [Italian Channel](<https://tx.me/OwlGramIT>)  
+└ [Italian Group](<https://tx.me/OwlGramChatIT>)
 
 🇬🇧 **English**  
-├ [English Channel](<http://t.me/OwlGram>)  
-└ [English Group](<http://t.me/OwlGramChat>)
+├ [English Channel](<https://tx.me/OwlGram>)  
+└ [English Group](<http://tx.me/OwlGramChat>)
 
 🔗 **Download**  
-├ [Stable Releases](<http://t.me/OwlGramAPKs>)  
-└ [Beta Releases](<http://t.me/OwlGramBeta>)
+├ [Stable Releases](<https://tx.me/OwlGramAPKs>)  
+└ [Beta Releases](<https://tx.me/OwlGramBeta>)
 
 ## 🆕 Features
 • New UI for profiles  
