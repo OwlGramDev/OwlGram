@@ -9,6 +9,8 @@ import android.text.TextUtils;
 
 import androidx.core.content.FileProvider;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -192,9 +194,8 @@ public class SettingsManager {
                 case "blurIntensity":
                     return integerValue >= 0 && integerValue <= 100;
                 case "eventType":
-                    return integerValue >= 0 && integerValue <= 5;
                 case "buttonStyleType":
-                    return integerValue >= 0 && integerValue <= 4;
+                    return integerValue >= 0 && integerValue <= 5;
                 case "translatorStyle":
                     return integerValue >= 0 && integerValue <= 1;
                 case "cameraXFps":

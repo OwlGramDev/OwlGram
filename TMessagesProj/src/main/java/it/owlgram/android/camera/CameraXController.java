@@ -43,6 +43,7 @@ import androidx.camera.core.MeteringPoint;
 import androidx.camera.core.MeteringPointFactory;
 import androidx.camera.core.Preview;
 import androidx.camera.core.VideoCapture;
+import androidx.camera.core.ZoomState;
 import androidx.camera.core.impl.utils.Exif;
 import androidx.camera.core.internal.compat.workaround.ExifRotationAvailability;
 import androidx.camera.extensions.ExtensionMode;
@@ -295,7 +296,9 @@ public class CameraXController {
 
     public boolean isAvailableWideMode() {
         if (provider != null) {
-            return CameraXUtilities.isWideAngleAvailable(provider);
+            ZoomState zoomStateLiveData = camera.getCameraInfo().getZoomState().getValue();
+            boolean wideModeByZoom = zoomStateLiveData != null && zoomStateLiveData.getMinZoomRatio() < 1.0f;
+            return CameraXUtilities.isWideAngleAvailable(provider) && !wideModeByZoom;
         } else {
             return false;
         }
@@ -403,6 +406,18 @@ public class CameraXController {
     public void setZoom(float value) {
         oldZoomSelection = value;
         camera.getCameraControl().setLinearZoom(value);
+    }
+
+    public float resetZoom() {
+        if (camera != null) {
+            camera.getCameraControl().setZoomRatio(1.0f);
+            ZoomState zoomStateLiveData = camera.getCameraInfo().getZoomState().getValue();
+            if (zoomStateLiveData != null) {
+                oldZoomSelection = zoomStateLiveData.getLinearZoom();
+                return oldZoomSelection;
+            }
+        }
+        return 0.0f;
     }
 
     @SuppressLint("UnsafeExperimentalUsageError")

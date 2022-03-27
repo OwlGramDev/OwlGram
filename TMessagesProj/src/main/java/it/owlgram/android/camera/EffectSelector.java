@@ -79,13 +79,15 @@ public class EffectSelector extends LinearLayout {
                 ButtonEffect buttonEffect = new ButtonEffect(getContext(), effect) {
                     @Override
                     protected void onItemClick(ButtonEffect buttonEffect, int camera_type) {
-                        super.onItemClick(buttonEffect, camera_type);
-                        if (oldSelection != null) {
-                            oldSelection.toggleButton(false, true);
+                        if (EffectSelector.this.isClickable()) {
+                            super.onItemClick(buttonEffect, camera_type);
+                            if (oldSelection != null) {
+                                oldSelection.toggleButton(false, true);
+                            }
+                            buttonEffect.toggleButton(true, true);
+                            oldSelection = buttonEffect;
+                            onEffectSelected(camera_type);
                         }
-                        buttonEffect.toggleButton(true, true);
-                        oldSelection = buttonEffect;
-                        onEffectSelected(camera_type);
                     }
                 };
                 buttonEffect.toggleButton(effect == CameraXController.CAMERA_NONE, false);

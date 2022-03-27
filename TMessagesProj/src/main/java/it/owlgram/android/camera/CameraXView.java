@@ -355,6 +355,11 @@ public class CameraXView extends BaseCameraView {
         controller.setZoom(value);
     }
 
+    @Override
+    public float resetZoom() {
+        return controller.resetZoom();
+    }
+
     public boolean isHdrModeSupported() {
         return controller.isAvailableHdrMode();
     }

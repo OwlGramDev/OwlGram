@@ -41,6 +41,10 @@ public abstract class BaseCameraView extends FrameLayout {
     public abstract boolean isFrontface();
     public abstract void switchCamera();
     public abstract void setZoom(float value);
+    public float resetZoom() {
+        setZoom(0.0f);
+        return 0.0f;
+    }
     public abstract void focusToPoint(int x, int y);
     public abstract void runHaptic();
     public abstract void setRecordFile(File generateVideoPath);
