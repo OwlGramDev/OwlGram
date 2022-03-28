@@ -98,6 +98,10 @@ abstract public class BaseTranslator {
         return getTargetLanguage(OwlConfig.translationTarget);
     }
 
+    public String getCurrentTargetKeyboardLanguage() {
+        return getTargetLanguage(OwlConfig.translationKeyboardTarget);
+    }
+
     public static class Result {
         public Object translation;
         @Nullable

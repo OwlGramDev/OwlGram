@@ -3642,7 +3642,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 }
 
                 ActionBarMenuSubItem preSentTranslateButton = new ActionBarMenuSubItem(getContext(), false, false, resourcesProvider);
-                String languageText = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage();
+                String languageText = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetKeyboardLanguage();
                 preSentTranslateButton.setTextAndIcon(LocaleController.getString("TranslateMessage", R.string.TranslateMessage) + " (" + languageText + ")", R.drawable.round_translate_white_28);
                 preSentTranslateButton.setMinimumWidth(AndroidUtilities.dp(196));
                 preSentTranslateButton.setOnClickListener(v -> {
@@ -3655,8 +3655,8 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                     if (sendPopupWindow != null && sendPopupWindow.isShowing()) {
                         sendPopupWindow.dismiss();
                     }
-                    Translator.showTranslationTargetSelector(getContext(), () -> {
-                        String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage();
+                    Translator.showTranslationTargetSelector(getContext(), true, () -> {
+                        String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetKeyboardLanguage();
                         preSentTranslateButton.setTextAndIcon(LocaleController.getString("TranslateMessage", R.string.TranslateMessage) + " (" + language + ")", R.drawable.round_translate_white_28);
                         translatePreSend();
                     }, resourcesProvider);
@@ -3707,7 +3707,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
     }
 
     public void translatePreSend() {
-        Translator.translate(messageEditText.getText().toString(), new Translator.TranslateCallBack() {
+        Translator.translate(messageEditText.getText().toString(), true, new Translator.TranslateCallBack() {
             @Override
             public void onSuccess(BaseTranslator.Result result) {
                 messageEditText.setText((String) result.translation);

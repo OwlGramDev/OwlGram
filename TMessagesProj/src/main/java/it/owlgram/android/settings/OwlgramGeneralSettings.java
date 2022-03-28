@@ -20,7 +20,6 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
-import org.telegram.messenger.SharedConfig;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarLayout;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -35,6 +34,7 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
@@ -73,6 +73,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
     private int translationStyle;
     private int translationProviderSelectRow;
     private int destinationLanguageSelectRow;
+    private int doNotTranslateSelectRow;
     private int divisorTranslationRow;
     private int hintTranslation1;
     private int hintTranslation2;
@@ -198,10 +199,13 @@ public class OwlgramGeneralSettings extends BaseFragment {
                             listAdapter.notifyItemChanged(destinationLanguageSelectRow);
                             listAdapter.notifyItemInserted(deepLFormalityRow);
                         }
+                        listAdapter.notifyItemChanged(doNotTranslateSelectRow);
                     }
                 });
             } else if (position == destinationLanguageSelectRow) {
                 presentFragment(new SelectLanguageSettings());
+            } else if (position == doNotTranslateSelectRow) {
+                presentFragment(new DoNotTranslateSettings());
             } else if (position == deepLFormalityRow) {
                 ArrayList<String> arrayList = new ArrayList<>();
                 ArrayList<Integer> types = new ArrayList<>();
@@ -392,6 +396,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
         translationStyle = rowCount++;
         translationProviderSelectRow = rowCount++;
         destinationLanguageSelectRow = rowCount++;
+        doNotTranslateSelectRow = rowCount++;
         deepLFormalityRow = OwlConfig.translationProvider == Translator.PROVIDER_DEEPL ? rowCount++:-1;
         divisorTranslationRow = rowCount++;
         hintTranslation1 = rowCount++;
@@ -524,6 +529,25 @@ public class OwlgramGeneralSettings extends BaseFragment {
                             }
                         }
                         textSettingsCell.setTextAndValue(LocaleController.getString("TranslationLanguage", R.string.TranslationLanguage), value, true);
+                    } else if (position == doNotTranslateSelectRow) {
+                        String doNotTranslateCellValue = null;
+                        HashSet<String> langCodes = DoNotTranslateSettings.getRestrictedLanguages();
+                        if (langCodes.size() == 1) {
+                            try {
+                                String language = langCodes.iterator().next();
+                                Locale locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? Locale.forLanguageTag(language) : new Locale(language);
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !TextUtils.isEmpty(locale.getScript())) {
+                                    doNotTranslateCellValue = HtmlCompat.fromHtml(AndroidUtilities.capitalize(locale.getDisplayScript()), HtmlCompat.FROM_HTML_MODE_LEGACY).toString();
+                                } else {
+                                    doNotTranslateCellValue = AndroidUtilities.capitalize(locale.getDisplayName());
+                                }
+                            } catch (Exception ignored) {}
+                        } else if (langCodes.size() == 0) {
+                            doNotTranslateCellValue = LocaleController.getString("EmptyExceptions", R.string.EmptyExceptions);
+                        }
+                        if (doNotTranslateCellValue == null)
+                            doNotTranslateCellValue = String.format(LocaleController.getPluralString("Languages", langCodes.size()), langCodes.size());
+                        textSettingsCell.setTextAndValue(LocaleController.getString("DoNotTranslate", R.string.DoNotTranslate), doNotTranslateCellValue, true);
                     } else if (position == deepLFormalityRow) {
                         String value;
                         switch (OwlConfig.deepLFormality) {
@@ -700,7 +724,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
             ){
                 return 3;
             } else if ( position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow ||
-                    position == translationStyle){
+                    position == translationStyle || position == doNotTranslateSelectRow){
                 return 4;
             } else if (position == drawerRow) {
                 return 5;

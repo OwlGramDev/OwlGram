@@ -13,6 +13,8 @@ import org.telegram.ui.ActionBar.Theme;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import it.owlgram.android.camera.CameraXUtilities;
 import it.owlgram.android.translator.BaseTranslator;
@@ -75,12 +77,14 @@ public class OwlConfig extends SettingsManager{
     public static boolean slidingChatTitle;
     public static boolean confirmStickersGIFs;
     public static boolean showIDAndDC;
+    public static boolean xiaomiBlockedInstaller;
     public static String translationTarget = "app";
+    public static String translationKeyboardTarget = "app";
     public static String updateData;
     public static String drawerItems;
     public static String oldBuildVersion = null;
     public static String languagePackVersioning;
-    public static boolean xiaomiBlockedInstaller;
+    public static Set<String> doNotTranslateLanguages;
     public static int deepLFormality = DeepLTranslator.FORMALITY_DEFAULT;
     public static int translationProvider = Translator.PROVIDER_GOOGLE;
     public static int lastUpdateStatus = 0;
@@ -94,8 +98,8 @@ public class OwlConfig extends SettingsManager{
     public static int cameraType;
     public static int cameraXFps;
     public static int maxRecentStickers;
-    public static long lastUpdateCheck = 0;
     public static int stickerSizeStack = 0;
+    public static long lastUpdateCheck = 0;
 
     static {
         loadConfig(true);
@@ -167,6 +171,7 @@ public class OwlConfig extends SettingsManager{
             lastUpdateStatus = preferences.getInt("lastUpdateStatus", 0);
             remindedUpdate = preferences.getInt("remindedUpdate", 0);
             translationTarget = preferences.getString("translationTarget", "app");
+            translationKeyboardTarget = preferences.getString("translationKeyboardTarget", "app");
             updateData = preferences.getString("updateData", "");
             drawerItems = preferences.getString("drawerItems", "[]");
             oldDownloadedVersion = preferences.getInt("oldDownloadedVersion", 0);
@@ -195,6 +200,7 @@ public class OwlConfig extends SettingsManager{
             slidingChatTitle = preferences.getBoolean("slidingChatTitle", false);
             confirmStickersGIFs = preferences.getBoolean("confirmStickersGIFs", false);
             showIDAndDC = preferences.getBoolean("showIDAndDC", true);
+            doNotTranslateLanguages = preferences.getStringSet("doNotTranslateLanguages", new HashSet<>());
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -650,6 +656,14 @@ public class OwlConfig extends SettingsManager{
         editor.apply();
     }
 
+    public static void setTranslationKeyboardTarget(String target) {
+        translationKeyboardTarget = target;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("translationKeyboardTarget", translationKeyboardTarget);
+        editor.apply();
+    }
+
     public static void setDeepLFormality(int formality) {
         deepLFormality = formality;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
@@ -795,6 +809,14 @@ public class OwlConfig extends SettingsManager{
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("languagePackVersioning", languagePackVersioning);
+        editor.apply();
+    }
+
+    public static void setDoNotTranslateLanguages(HashSet<String> data) {
+        doNotTranslateLanguages = data;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putStringSet("doNotTranslateLanguages", doNotTranslateLanguages);
         editor.apply();
     }
 

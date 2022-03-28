@@ -19,10 +19,13 @@ import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.helpers.PopupHelper;
+import it.owlgram.android.settings.DoNotTranslateSettings;
 
 public class Translator {
 
@@ -130,6 +133,20 @@ public class Translator {
     }
 
     public static void showTranslationTargetSelector(Context context, Runnable callback, Theme.ResourcesProvider resourcesProvider) {
+        showTranslationTargetSelector(context, false,  callback, resourcesProvider);
+    }
+
+    public static void fixDoNotTranslateLanguages(BaseTranslator translator) {
+        HashSet<String> languages = DoNotTranslateSettings.getRestrictedLanguages();
+        for (String targetLanguage : languages) {
+            if (!translator.supportLanguage(targetLanguage)) {
+                languages.remove(targetLanguage);
+            }
+        }
+        OwlConfig.setDoNotTranslateLanguages(languages);
+    }
+
+    public static void showTranslationTargetSelector(Context context, boolean isKeyboard, Runnable callback, Theme.ResourcesProvider resourcesProvider) {
         BaseTranslator translator = Translator.getCurrentTranslator();
         ArrayList<String> targetLanguages = new ArrayList<>(translator.getTargetLanguages());
         ArrayList<CharSequence> names = new ArrayList<>();
@@ -146,8 +163,12 @@ public class Translator {
         targetLanguages.add(0, "app");
         names.add(0, LocaleController.getString("Default", R.string.Default));
 
-        PopupHelper.show(names, LocaleController.getString("TranslationLanguage", R.string.TranslationLanguage), targetLanguages.indexOf(OwlConfig.translationTarget), context, i -> {
-            OwlConfig.setTranslationTarget(targetLanguages.get(i));
+        PopupHelper.show(names, LocaleController.getString("TranslationLanguage", R.string.TranslationLanguage), targetLanguages.indexOf(isKeyboard ? OwlConfig.translationKeyboardTarget:OwlConfig.translationTarget), context, i -> {
+            if (isKeyboard) {
+                OwlConfig.setTranslationKeyboardTarget(targetLanguages.get(i));
+            } else {
+                OwlConfig.setTranslationTarget(targetLanguages.get(i));
+            }
             callback.run();
         }, resourcesProvider);
     }
@@ -169,6 +190,7 @@ public class Translator {
 
             if (translator.supportLanguage(targetLanguage)) {
                 OwlConfig.setTranslationProvider(types.get(i));
+                fixDoNotTranslateLanguages(translator);
                 if (callback != null) callback.run(true);
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context, resourcesProvider)
@@ -176,12 +198,14 @@ public class Translator {
                 if ("app".equals(OwlConfig.translationTarget)) {
                     builder.setPositiveButton(LocaleController.getString("UseGoogleTranslate", R.string.UseGoogleTranslate), (dialog, which) -> {
                         OwlConfig.setTranslationProvider(Translator.PROVIDER_GOOGLE);
+                        fixDoNotTranslateLanguages(translator);
                         if (callback != null) callback.run(false);
                     });
                     builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
                 } else if (translator.supportLanguage(translator.getCurrentAppLanguage())) {
                     builder.setPositiveButton(LocaleController.getString("ResetLanguage", R.string.ResetLanguage), (dialog, which) -> {
                         OwlConfig.setTranslationProvider(types.get(i));
+                        fixDoNotTranslateLanguages(translator);
                         OwlConfig.setTranslationTarget("app");
                         if (callback != null) callback.run(false);
                     });
@@ -215,10 +239,12 @@ public class Translator {
     }
 
     public static void translate(Object query, TranslateCallBack translateCallBack) {
+        translate(query, false, translateCallBack);
+    }
+
+    public static void translate(Object query, boolean isKeyboard, TranslateCallBack translateCallBack) {
         BaseTranslator translator = getCurrentTranslator();
-
-        String language = translator.getCurrentTargetLanguage();
-
+        String language = isKeyboard ? translator.getCurrentTargetKeyboardLanguage():translator.getCurrentTargetLanguage();
         if (!translator.supportLanguage(language)) {
             translateCallBack.onError(new UnsupportedTargetLanguageException());
         } else {

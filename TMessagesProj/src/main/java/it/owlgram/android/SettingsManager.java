@@ -68,6 +68,8 @@ public class SettingsManager {
             case "oldDownloadedVersion":
             case "lastUpdateCheck":
             case "translationTarget":
+            case "doNotTranslateLanguages":
+            case "translationKeyboardTarget":
             case "DB_VERSION":
             case "NEED_RECREATE_FORMATTERS":
             case "NEED_RECREATE_SHADOW":

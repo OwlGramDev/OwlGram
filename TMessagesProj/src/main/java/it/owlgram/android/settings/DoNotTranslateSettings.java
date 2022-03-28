@@ -24,20 +24,20 @@ import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
-import org.telegram.ui.Cells.TextRadioCell;
+import org.telegram.ui.Cells.TextCheckbox2Cell;
 import org.telegram.ui.Components.EmptyTextProgressView;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
 
-public class SelectLanguageSettings extends BaseFragment {
-
+public class DoNotTranslateSettings extends BaseFragment {
     private int rowCount;
     private int languageHeaderRow;
     private int languagesStartRow;
@@ -45,11 +45,13 @@ public class SelectLanguageSettings extends BaseFragment {
     private ArrayList<String> targetLanguages;
     private ListAdapter listAdapter;
     private EmptyTextProgressView emptyView;
+    private HashSet<String> selectedLanguages = null;
     private boolean searchWas;
 
     @Override
     public boolean onFragmentCreate() {
         super.onFragmentCreate();
+        selectedLanguages = getRestrictedLanguages();
         fixMostImportantLanguages(loadLanguages().getCurrentAppLanguage());
         updateRowsId();
         return true;
@@ -58,7 +60,7 @@ public class SelectLanguageSettings extends BaseFragment {
     @Override
     public View createView(Context context) {
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setTitle(LocaleController.getString("TranslationLanguage", R.string.TranslationLanguage));
+        actionBar.setTitle(LocaleController.getString("DoNotTranslate", R.string.DoNotTranslate));
         actionBar.setAllowOverlayTitle(false);
         if (AndroidUtilities.isTablet()) {
             actionBar.setOccupyStatusBar(false);
@@ -71,7 +73,6 @@ public class SelectLanguageSettings extends BaseFragment {
                 }
             }
         });
-
         listAdapter = new ListAdapter(context);
         fragmentView = new FrameLayout(context);
         fragmentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
@@ -87,13 +88,19 @@ public class SelectLanguageSettings extends BaseFragment {
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         listView.setOnItemClickListener((view, position, x, y) -> {
             if (position != languageHeaderRow) {
-                String selectedLanguage = targetLanguages.get(position - languagesStartRow);
-                OwlConfig.setTranslationTarget(selectedLanguage);
-                finishFragment();
+                TextCheckbox2Cell cell = (TextCheckbox2Cell) view;
+                cell.setChecked(!cell.isChecked());
+                if (cell.isChecked()) {
+                    selectedLanguages.add(targetLanguages.get(position - languagesStartRow));
+                } else {
+                    selectedLanguages.remove(targetLanguages.get(position - languagesStartRow));
+                }
+                OwlConfig.setDoNotTranslateLanguages(selectedLanguages);
             }
         });
 
         ActionBarMenu menu = actionBar.createMenu();
+
         ActionBarMenuItem item = menu.addItem(0, R.drawable.ic_ab_search).setIsSearchField(true).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener() {
 
             @Override
@@ -137,6 +144,19 @@ public class SelectLanguageSettings extends BaseFragment {
         return fragmentView;
     }
 
+    public static HashSet<String> getRestrictedLanguages() {
+        return new HashSet<>(OwlConfig.doNotTranslateLanguages);
+    }
+
+    private static String getLanguage(String language) {
+        Locale locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? Locale.forLanguageTag(language) : new Locale(language);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !TextUtils.isEmpty(locale.getScript())) {
+            return HtmlCompat.fromHtml(String.format("%s - %s", AndroidUtilities.capitalize(locale.getDisplayScript()), AndroidUtilities.capitalize(locale.getDisplayScript(locale))), HtmlCompat.FROM_HTML_MODE_LEGACY).toString();
+        } else {
+            return String.format("%s - %s", AndroidUtilities.capitalize(locale.getDisplayName()), AndroidUtilities.capitalize(locale.getDisplayName(locale)));
+        }
+    }
+
     private BaseTranslator loadLanguages() {
         BaseTranslator translator = Translator.getCurrentTranslator();
         targetLanguages = new ArrayList<>(translator.getTargetLanguages());
@@ -154,27 +174,11 @@ public class SelectLanguageSettings extends BaseFragment {
         targetLanguages.add(0, targetLanguages.get(indexLangEn));
         names.remove(indexLangEn + 1);
         targetLanguages.remove(indexLangEn + 1);
-        targetLanguages.add(0, "app");
-        names.add(0, LocaleController.getString("Default", R.string.Default) + " - " + getLanguage(appLanguage));
         int indexLangApp = targetLanguages.indexOf(appLanguage);
         names.remove(indexLangApp);
         targetLanguages.remove(indexLangApp);
-        if (!OwlConfig.translationTarget.equals("app")) {
-            int indexLangSelected = targetLanguages.indexOf(OwlConfig.translationTarget);
-            names.add(0, names.get(indexLangSelected));
-            targetLanguages.add(0, targetLanguages.get(indexLangSelected));
-            names.remove(indexLangSelected + 1);
-            targetLanguages.remove(indexLangSelected + 1);
-        }
-    }
-
-    private static String getLanguage(String language) {
-        Locale locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? Locale.forLanguageTag(language) : new Locale(language);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !TextUtils.isEmpty(locale.getScript())) {
-            return HtmlCompat.fromHtml(String.format("%s - %s", AndroidUtilities.capitalize(locale.getDisplayScript()), AndroidUtilities.capitalize(locale.getDisplayScript(locale))), HtmlCompat.FROM_HTML_MODE_LEGACY).toString();
-        } else {
-            return String.format("%s - %s", AndroidUtilities.capitalize(locale.getDisplayName()), AndroidUtilities.capitalize(locale.getDisplayName(locale)));
-        }
+        names.add(0, getLanguage(appLanguage));
+        targetLanguages.add(0, appLanguage);
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -223,15 +227,15 @@ public class SelectLanguageSettings extends BaseFragment {
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             switch (holder.getItemViewType()) {
                 case 1:
-                    TextRadioCell textRadioCell = (TextRadioCell) holder.itemView;
+                    TextCheckbox2Cell textRadioCell = (TextCheckbox2Cell) holder.itemView;
                     String[] languages = names.get(position - languagesStartRow).toString().split(" - ");
-                    boolean isSelectedLanguage = OwlConfig.translationTarget.equals(targetLanguages.get(position - languagesStartRow));
+                    boolean isSelectedLanguage = selectedLanguages.contains(targetLanguages.get(position - languagesStartRow));
                     textRadioCell.setTextAndValueAndCheck(languages[1], languages[0], isSelectedLanguage, false, true);
                     break;
                 case 2:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == languageHeaderRow) {
-                        headerCell.setText(LocaleController.getString("Language", R.string.Language));
+                        headerCell.setText(LocaleController.getString("ChooseLanguages", R.string.ChooseLanguages));
                     }
                     break;
             }
@@ -250,7 +254,7 @@ public class SelectLanguageSettings extends BaseFragment {
             if (viewType == 2) {
                 view = new HeaderCell(mContext);
             } else {
-                view = new TextRadioCell(mContext);
+                view = new TextCheckbox2Cell(mContext);
             }
             view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
             return new RecyclerListView.Holder(view);
