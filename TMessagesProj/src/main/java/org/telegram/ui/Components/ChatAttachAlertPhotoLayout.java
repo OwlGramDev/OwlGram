@@ -1543,7 +1543,6 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                                         ObjectAnimator.ofFloat(zoomControlView, View.ALPHA, 1.0f),
                                         ObjectAnimator.ofFloat(evControlView, View.ALPHA, 1.0f),
                                         ObjectAnimator.ofFloat(effectSelector, View.ALPHA, 1.0f),
-                                        ObjectAnimator.ofFloat(lockAnimationView, View.ALPHA, 1.0f),
                                         ObjectAnimator.ofFloat(flashModeButton[0], View.ALPHA, 1.0f),
                                         ObjectAnimator.ofFloat(flashModeButton[1], View.ALPHA, 1.0f),
                                         ObjectAnimator.ofFloat(cameraPhotoRecyclerView, View.ALPHA, 1.0f)
@@ -3388,6 +3387,10 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
 
     @Override
     public boolean onDismiss() {
+        if (shutterButton.getState() != ShutterButton.State.DEFAULT) {
+            shutterButton.getDelegate().shutterCancel(false);
+            shutterButton.setState(ShutterButton.State.DEFAULT, false);
+        }
         if (cameraAnimationInProgress) {
             return true;
         }

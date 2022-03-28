@@ -6731,7 +6731,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 /*if (ChatObject.hasAdminRights(chat) || chat.megagroup && ChatObject.canChangeChatInfo(chat)) {
                     editItemVisible = true;
                 }*/
-                editItemVisible = !ChatObject.isChannelAndNotMegaGroup(chat) || ChatObject.canChangeChatInfo(chat);
+                editItemVisible = !ChatObject.isChannelAndNotMegaGroup(chat) || ChatObject.canChangeChatInfo(chat) || ChatObject.hasAdminRights(chat);
                 if (chatInfo != null) {
                     if (ChatObject.canManageCalls(chat) && chatInfo.call == null) {
                         if (!actionButtonManager.hasItem("join_call")) {
@@ -6753,7 +6753,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                 }
                 if (!ActionButtonManager.canShowTopActions(currentChat, editItemVisible) && OwlConfig.buttonStyleType == 5 && editItemVisible) {
-                    if (ChatObject.canChangeChatInfo(chat)) {
+                    if (ChatObject.hasAdminRights(currentChat) || currentChat.megagroup && ChatObject.canChangeChatInfo(currentChat)) {
                         if (!actionButtonManager.hasItem("edit")) {
                             otherItem.addSubItem(edit_channel, R.drawable.msg_edit, LocaleController.getString("Edit", R.string.Edit));
                         }
