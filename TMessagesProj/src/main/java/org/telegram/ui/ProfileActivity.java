@@ -4213,14 +4213,14 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
             builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy)}, (dialogInterface, i) -> {
                 try {
-                    String id = "";
-                    if(chatId != 0){
+                    String id;
+                    if (chatId != 0) {
                         if(ChatObject.isChannel(currentChat)){
                             id = "-100"+chatId;
                         }else{
                             id = "-"+chatId;
                         }
-                    }else{
+                    } else {
                         id = String.valueOf(userId);
                     }
                     AndroidUtilities.addToClipboard(id);

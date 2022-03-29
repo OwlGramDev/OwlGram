@@ -923,6 +923,7 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
         container.addView(effectSelector, new FrameLayout.LayoutParams(LayoutHelper.MATCH_PARENT, AndroidUtilities.dp(60) + effectSelector.getSpaceNotch()));
         effectSelector.setVisibility(GONE);
         effectSelector.setAlpha(0.0f);
+        effectSelector.setClickable(true);
 
         evControlView = new SlideControlView(context, SlideControlView.SLIDER_MODE_EV);
         evControlView.setVisibility(View.GONE);
@@ -2106,7 +2107,6 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                     } else {
                         effectSelector.loadEffects((CameraXView) cameraView);
                         effectSelector.setVisibility(cameraView.isFrontface() ? GONE:VISIBLE);
-                        effectSelector.setAlpha(0.0f);
                         lockAnimationView.setVisibility(VISIBLE);
                         lockAnimationView.setAlpha(0.0f);
                         if (((CameraXView) cameraView).isFlashAvailable()) {
