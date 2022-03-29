@@ -101,6 +101,7 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageLoader;
 import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.ImageReceiver;
+import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MediaDataController;
@@ -195,6 +196,7 @@ import it.owlgram.android.components.ActionPanelCell;
 import it.owlgram.android.helpers.ActionButtonManager;
 import it.owlgram.android.helpers.DCHelper;
 import it.owlgram.android.helpers.TranslateManager;
+import it.owlgram.android.settings.DoNotTranslateSettings;
 import it.owlgram.android.settings.OwlgramSettings;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
@@ -4155,19 +4157,18 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (view instanceof AboutLinkCell && ((AboutLinkCell) view).onClick()) {
                 return false;
             }
-            AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-            builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy), originalBio != null ? LocaleController.getString("UndoTranslate",R.string.UndoTranslate):LocaleController.getString("TranslateMessage",R.string.TranslateMessage)}, (dialogInterface, i) -> {
+            String about;
+            if(originalBio != null){
+                about = originalBio;
+            } else if (position == locationRow) {
+                about = chatInfo != null && chatInfo.location instanceof TLRPC.TL_channelLocation ? ((TLRPC.TL_channelLocation) chatInfo.location).address : null;
+            } else if (position == channelInfoRow) {
+                about = chatInfo != null ? chatInfo.about : null;
+            } else {
+                about = userInfo != null ? userInfo.about : null;
+            }
+            DialogInterface.OnClickListener onClickListener = (dialogInterface, i) -> {
                 try {
-                    String about;
-                    if(originalBio != null){
-                        about = originalBio;
-                    } else if (position == locationRow) {
-                        about = chatInfo != null && chatInfo.location instanceof TLRPC.TL_channelLocation ? ((TLRPC.TL_channelLocation) chatInfo.location).address : null;
-                    } else if (position == channelInfoRow) {
-                        about = chatInfo != null ? chatInfo.about : null;
-                    } else {
-                        about = userInfo != null ? userInfo.about : null;
-                    }
                     if (TextUtils.isEmpty(about)) {
                         return;
                     }
@@ -4193,8 +4194,20 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 } catch (Exception e) {
                     FileLog.e(e);
                 }
+            };
+            LanguageDetector.detectLanguage(about, lng -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+                String translateButton = null;
+                if (lng == null || originalBio != null || !DoNotTranslateSettings.getRestrictedLanguages().contains(lng)) {
+                    translateButton = originalBio != null ? LocaleController.getString("UndoTranslate",R.string.UndoTranslate):LocaleController.getString("TranslateMessage",R.string.TranslateMessage);
+                }
+                builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy), translateButton}, onClickListener);
+                showDialog(builder.create());
+            }, err -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+                builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy), null}, onClickListener);
+                showDialog(builder.create());
             });
-            showDialog(builder.create());
             return true;
         } else if (position == datacenterRow && (userInfo != null || chatInfo != null)){
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());

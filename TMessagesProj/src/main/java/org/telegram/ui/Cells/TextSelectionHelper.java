@@ -65,6 +65,7 @@ import java.util.ArrayList;
 
 import it.owlgram.android.helpers.EntitiesHelper;
 import it.owlgram.android.helpers.TranslateManager;
+import it.owlgram.android.settings.DoNotTranslateSettings;
 
 public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.SelectableView> {
 
@@ -1258,7 +1259,7 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
                         menu.getItem(1).setVisible(true);
                     }
                 }
-                if (onTranslateListener != null && LanguageDetector.hasSupport() && getSelectedText() != null) {
+                /*if (onTranslateListener != null && LanguageDetector.hasSupport() && getSelectedText() != null) {
                     LanguageDetector.detectLanguage(getSelectedText().toString(), lng -> {
                         translateFromLanguage = lng;
                         updateTranslateButton(menu);
@@ -1271,22 +1272,36 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
                 } else if (!TranslateManager.canShowPopupTranslation()){
                     translateFromLanguage = null;
                     updateTranslateButton(menu);
+                }*/
+                if (LanguageDetector.hasSupport() && getSelectedText() != null){
+                    LanguageDetector.detectLanguage(getSelectedText().toString(), lng -> {
+                        translateFromLanguage = lng;
+                        updateTranslateButton(menu);
+                    }, err -> {
+                        FileLog.e("mlkit: failed to detect language in selection");
+                        FileLog.e(err);
+                        translateFromLanguage = null;
+                        updateTranslateButton(menu);
+                    });
                 }
                 return true;
             }
 
             private String translateFromLanguage = null;
             private void updateTranslateButton(Menu menu) {
-                String translateToLanguage = LocaleController.getInstance().getCurrentLocale().getLanguage();
+                //String translateToLanguage = LocaleController.getInstance().getCurrentLocale().getLanguage();
                 menu.getItem(2).setVisible(
-                        onTranslateListener != null && (
+                       translateFromLanguage == null || !DoNotTranslateSettings.getRestrictedLanguages().contains(translateFromLanguage)
+                );
+                /*
+                 onTranslateListener != null && (
                                 (
                                         translateFromLanguage != null &&
                                                 (!translateFromLanguage.equals(translateToLanguage) || translateFromLanguage.equals("und")) &&
-                                                !RestrictedLanguagesSelectActivity.getRestrictedLanguages().contains(translateFromLanguage)
+                                                !DoNotTranslateSettings.getRestrictedLanguages().contains(translateFromLanguage)
                                 ) || !LanguageDetector.hasSupport()
                         )
-                );
+                * */
             }
 
             @Override
@@ -1310,12 +1325,11 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
                         showActions();
                         return true;
                     case TRANSLATE:
-                        if (onTranslateListener != null) {
+                        /*if (onTranslateListener != null) {
                             String translateToLanguage = LocaleController.getInstance().getCurrentLocale().getLanguage();
                             onTranslateListener.run(getSelectedText(), translateFromLanguage, translateToLanguage, () -> showActions());
-                        } else if (TranslateManager.canShowPopupTranslation()) {
-                            TextSelectionHelper.this.callback.startTranslate(getSelectedText(), () -> showActions());
-                        }
+                        }*/
+                        TextSelectionHelper.this.callback.startTranslate(getSelectedText(), () -> showActions());
                         hideActions();
                         return true;
                     default:

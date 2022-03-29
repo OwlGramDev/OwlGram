@@ -1685,8 +1685,4 @@ public class TranslateManager extends Dialog {
             TranslatorActionMessage.translateMessage(dialog, object, fragment, themeDelegate);
         }
     }
-
-    public static boolean canShowPopupTranslation() {
-        return !MessagesController.getGlobalMainSettings().getBoolean("translate_button2", false);
-    }
 }
