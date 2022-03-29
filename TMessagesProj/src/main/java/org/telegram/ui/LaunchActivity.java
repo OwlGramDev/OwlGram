@@ -2070,6 +2070,10 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                                             open_settings = 4;
                                         } else if (url.contains("change_number")) {
                                             open_settings = 5;
+                                        } else if (url.contains("privacy")) {
+                                            open_settings = 201;
+                                        } else if (url.contains("language")) {
+                                            open_settings = 202;
                                         } else {
                                             open_settings = 1;
                                         }
@@ -2432,6 +2436,10 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                     closePrevious = true;
                 } else if (open_settings == 6) {
                     fragment = new EditWidgetActivity(open_widget_edit_type, open_widget_edit);
+                } else if (open_settings == 201) {
+                    fragment = new PrivacySettingsActivity();
+                } else if (open_settings == 202) {
+                    fragment = new LanguageSelectActivity();
                 } else {
                     fragment = null;
                 }
