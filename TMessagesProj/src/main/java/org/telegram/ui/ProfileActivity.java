@@ -8253,16 +8253,16 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     break;
                 case 18:
                     DatacenterCell dc = (DatacenterCell) holder.itemView;
-                    if (actionPanelCell != null) {
+                    if (OwlConfig.buttonStyleType == 5) {
+                        dc.setTheme(new SimpleActionCell.ThemeInfo(
+                                false,
+                                0
+                        ));
+                    } else if (actionPanelCell != null) {
                         SimpleActionCell.ThemeInfo theme = actionPanelCell.getTheme();
                         if (theme != null) {
                             dc.setTheme(theme);
                         }
-                    } else if (OwlConfig.buttonStyleType == 5) {
-                        dc.setTheme(new SimpleActionCell.ThemeInfo(
-                                false,
-                               0
-                        ));
                     }
                     tInfo = DCHelper.getTInfo(currentUser, currentChat);
                     dc.setIdAndDC(tInfo);
