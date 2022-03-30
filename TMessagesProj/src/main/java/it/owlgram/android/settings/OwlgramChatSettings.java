@@ -500,7 +500,7 @@ public class OwlgramChatSettings extends BaseFragment  implements NotificationCe
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int type = holder.getItemViewType();
-            return type == 3 || type == 7;
+            return type == 3 || type == 7 || type == 8;
         }
 
         @NonNull
@@ -557,6 +557,10 @@ public class OwlgramChatSettings extends BaseFragment  implements NotificationCe
                     break;
                 case 7:
                     view = new TextSettingsCell(mContext);
+                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    break;
+                case 8:
+                    view = new TextCheckbox2Cell(mContext);
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
                 default:
