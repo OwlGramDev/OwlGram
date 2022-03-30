@@ -143,7 +143,7 @@ public class Translator {
                 languages.remove(targetLanguage);
             }
         }
-        OwlConfig.setDoNotTranslateLanguages(languages);
+        DoNotTranslateSettings.saveRestrictedLanguages(languages);
     }
 
     public static void showTranslationTargetSelector(Context context, boolean isKeyboard, Runnable callback, Theme.ResourcesProvider resourcesProvider) {

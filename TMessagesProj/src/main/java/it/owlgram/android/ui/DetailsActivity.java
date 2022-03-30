@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.LocaleController;
@@ -108,22 +107,31 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
     private TLRPC.User fromForwardedUser;
     private TLRPC.User fromRepliedUser;
 
+    private DCHelper.TInfo fromForwardedUserInfo;
+    private DCHelper.TInfo fromRepliedUserInfo;
+    private DCHelper.TInfo fromUserInfo;
+    private DCHelper.TInfo fromChatInfo;
+
     public DetailsActivity(MessageObject messageObject) {
         this.messageObject = messageObject;
         if (messageObject.getChatId() != 0) {
             fromChat = getMessagesController().getChat(messageObject.getChatId());
+            fromChatInfo = DCHelper.getTInfo(fromChat);
         }
         if (messageObject.messageOwner.from_id instanceof TLRPC.TL_peerUser) {
             fromUser = getMessagesController().getUser(messageObject.messageOwner.from_id.user_id);
+            fromUserInfo = DCHelper.getTInfo(fromUser);
         }
         if (messageObject.messageOwner.fwd_from != null && messageObject.messageOwner.fwd_from.from_id instanceof TLRPC.TL_peerUser){
             fromForwardedUser = getMessagesController().getUser(messageObject.messageOwner.fwd_from.from_id.user_id);
+            fromForwardedUserInfo = DCHelper.getTInfo(fromForwardedUser);
         } else if (messageObject.messageOwner.fwd_from != null && !TextUtils.isEmpty(messageObject.messageOwner.fwd_from.from_name)) {
             fromForwardedUser = new TLRPC.User() {};
             fromForwardedUser.first_name = messageObject.messageOwner.fwd_from.from_name;
         }
         if (messageObject.messageOwner.replyMessage != null && messageObject.messageOwner.replyMessage.from_id instanceof TLRPC.TL_peerUser){
             fromRepliedUser = getMessagesController().getUser(messageObject.messageOwner.replyMessage.from_id.user_id);
+            fromRepliedUserInfo = DCHelper.getTInfo(fromRepliedUser);
         }
     }
 
@@ -469,7 +477,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                 case 3:
                     TextDetailCellMultiline textDetailCell = (TextDetailCellMultiline) holder.itemView;
                     if (position == idUserHeaderRow) {
-                        textDetailCell.setTextAndValue(String.valueOf(fromUser.id), "ID",false);
+                        textDetailCell.setTextAndValue(String.valueOf(fromUserInfo.tID), "ID",false);
                     } else if (position == nameUserHeaderRow) {
                         String full_name = fromUser.first_name;
                         if (fromUser.last_name != null){
@@ -501,7 +509,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == forwardUserUsernameRow) {
                         textDetailCell.setTextAndValue("@" + fromForwardedUser.username, LocaleController.getString("Username", R.string.Username),true);
                     } else if (position == forwardUserIdRow) {
-                        textDetailCell.setTextAndValue(String.valueOf(fromForwardedUser.id), "ID", false);
+                        textDetailCell.setTextAndValue(String.valueOf(fromForwardedUserInfo.tID), "ID", false);
                     } else if (position == repliedMessageTextRow) {
                         CharSequence message = messageObject.messageOwner.replyMessage.message;
                         message = EntitiesHelper.getSpannableString(message.toString(), messageObject.messageOwner.replyMessage.entities, true);
@@ -513,7 +521,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                         String title = messageObject.scheduled ?  LocaleController.getString("MessageScheduledDate", R.string.MessageScheduledDate) : LocaleController.getString("MessageDate", R.string.MessageDate);
                         textDetailCell.setTextAndValue(messageObject.messageOwner.replyMessage.date == 0x7ffffffe ? LocaleController.getString("MessageScheduledWhenOnline", R.string.MessageScheduledWhenOnline) : LocaleController.formatString("formatDateAtTime", R.string.formatDateAtTime, LocaleController.getInstance().formatterYear.format(new Date(date)), LocaleController.getInstance().formatterDayWithSeconds.format(new Date(date))), title, false);
                     } else if (position == repliedUserIdRow) {
-                        textDetailCell.setTextAndValue(String.valueOf(fromRepliedUser.id), "ID",false);
+                        textDetailCell.setTextAndValue(String.valueOf(fromRepliedUserInfo.tID), "ID",false);
                     } else if (position == repliedUserNameRow) {
                         String full_name = fromRepliedUser.first_name;
                         if (fromRepliedUser.last_name != null){
@@ -527,11 +535,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == groupUsernameRow) {
                         textDetailCell.setTextAndValue("@" + fromChat.username, LocaleController.getString("Username", R.string.Username),true);
                     } else if (position == groupIdRow) {
-                        if (ChatObject.isChannel(fromChat)){
-                            textDetailCell.setTextAndValue("-100"+fromChat.id, "ID",false);
-                        }else{
-                            textDetailCell.setTextAndValue("-"+fromChat.id, "ID",false);
-                        }
+                        textDetailCell.setTextAndValue(String.valueOf(fromChatInfo.tID), "ID",false);
                     } else if (position == fileNameRow) {
                         textDetailCell.setTextAndValue(fileName, LocaleController.getString("FileName", R.string.FileName),true);
                     } else if (position == filePathRow) {
@@ -562,33 +566,13 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == fileMimeType) {
                         textDetailCell.setTextAndValue(messageObject.messageOwner.media.document.mime_type, LocaleController.getString("MimeType", R.string.MimeType), true);
                     } else if (position == groupDatacenterRow) {
-                        int DC = fromChat.photo.dc_id;
-                        String DC_NAME = DCHelper.getDcName(DC);
-                        if (DC != -1){
-                            DC_NAME = String.format(Locale.ENGLISH, "%s - DC%d", DC_NAME, DC);
-                        }
-                        textDetailCell.setTextAndValue(DC_NAME, LocaleController.getString("Datacenter", R.string.FileDC), true);
+                        textDetailCell.setTextAndValue(fromChatInfo.longDcName, LocaleController.getString("Datacenter", R.string.FileDC), true);
                     } else if (position == repliedUserDatacenterRow) {
-                        int DC = fromRepliedUser.photo.dc_id;
-                        String DC_NAME = DCHelper.getDcName(DC);
-                        if (DC != -1){
-                            DC_NAME = String.format(Locale.ENGLISH, "%s - DC%d", DC_NAME, DC);
-                        }
-                        textDetailCell.setTextAndValue(DC_NAME, LocaleController.getString("Datacenter", R.string.FileDC), true);
+                        textDetailCell.setTextAndValue(fromRepliedUserInfo.longDcName, LocaleController.getString("Datacenter", R.string.FileDC), true);
                     } else if (position == forwardUserDatacenterRow) {
-                        int DC = fromForwardedUser.photo.dc_id;
-                        String DC_NAME = DCHelper.getDcName(DC);
-                        if (DC != -1){
-                            DC_NAME = String.format(Locale.ENGLISH, "%s - DC%d", DC_NAME, DC);
-                        }
-                        textDetailCell.setTextAndValue(DC_NAME, LocaleController.getString("Datacenter", R.string.FileDC), true);
+                        textDetailCell.setTextAndValue(fromForwardedUserInfo.longDcName, LocaleController.getString("Datacenter", R.string.FileDC), true);
                     } else if (position == dcRow) {
-                        int DC = fromUser.photo.dc_id;
-                        String DC_NAME = DCHelper.getDcName(DC);
-                        if (DC != -1){
-                            DC_NAME = String.format(Locale.ENGLISH, "%s - DC%d", DC_NAME, DC);
-                        }
-                        textDetailCell.setTextAndValue(DC_NAME, LocaleController.getString("Datacenter", R.string.FileDC), true);
+                        textDetailCell.setTextAndValue(fromUserInfo.longDcName, LocaleController.getString("Datacenter", R.string.FileDC), true);
                     }
                     break;
             }

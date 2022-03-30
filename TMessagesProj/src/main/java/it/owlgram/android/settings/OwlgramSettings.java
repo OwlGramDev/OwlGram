@@ -42,6 +42,7 @@ public class OwlgramSettings extends BaseFragment {
     private int divisorInfoRow;
     private int categoryHeaderRow;
     private int generalSettingsRow;
+    private int appearanceSettingsRow;
     private int chatSettingsRow;
     private int updateSettingsRow;
     private int experimentalSettingsRow;
@@ -126,7 +127,7 @@ public class OwlgramSettings extends BaseFragment {
             } else if (position == sourceCodeRow) {
                 Browser.openUrl(getParentActivity(), "https://github.com/OwlGramDev/OwlGram");
             } else if (position == supportTranslationRow) {
-                Browser.openUrl(getParentActivity(), "https://crowdin.com/project/owlgram");
+                Browser.openUrl(getParentActivity(), "https://translations.owlgram.org/");
             } else if (position == generalSettingsRow) {
                 presentFragment(new OwlgramGeneralSettings());
             } else if (position == chatSettingsRow) {
@@ -137,6 +138,8 @@ public class OwlgramSettings extends BaseFragment {
                 presentFragment(new OwlgramExperimentalSettings());
             } else if (position == supportDonationRow) {
                 Browser.openUrl(getParentActivity(), "https://www.buymeacoffee.com/OwlGram");
+            } else if (position == appearanceSettingsRow) {
+                presentFragment(new OwlgramAppearanceSettings());
             }
         });
         return fragmentView;
@@ -147,6 +150,7 @@ public class OwlgramSettings extends BaseFragment {
         rowCount = 0;
         categoryHeaderRow = rowCount++;
         generalSettingsRow = rowCount++;
+        appearanceSettingsRow = rowCount++;
         chatSettingsRow = rowCount++;
         experimentalSettingsRow = rowCount++;
         updateSettingsRow = rowCount++;
@@ -206,6 +210,8 @@ public class OwlgramSettings extends BaseFragment {
                         textCell.setTextAndIcon(LocaleController.getString("SourceCode", R.string.SourceCode), R.drawable.outline_source_white_28, true);
                     } else if (position == experimentalSettingsRow) {
                         textCell.setTextAndIcon(LocaleController.getString("Experimental", R.string.Experimental), R.drawable.outline_science_white, true);
+                    } else if (position == appearanceSettingsRow) {
+                        textCell.setTextAndIcon(LocaleController.getString("Appearance", R.string.Appearance), R.drawable.settings_appearance, true);
                     }
                     break;
                 case 3:
@@ -264,7 +270,7 @@ public class OwlgramSettings extends BaseFragment {
                 return 1;
             } else if (position == generalSettingsRow || position == chatSettingsRow || position == updateSettingsRow ||
                     position == channelUpdatesRow || position == sourceCodeRow || position == groupUpdatesRow ||
-                    position == experimentalSettingsRow){
+                    position == experimentalSettingsRow || position == appearanceSettingsRow){
                 return 2;
             } else if (position == categoryHeaderRow || position == infoHeaderRow) {
                 return 3;

@@ -228,4 +228,9 @@
     <string name="SlidingTitleDesc">If the chat title is long, it will scroll on the screen</string>
     <string name="ConfirmStickersGIFs">Confirm Sending Stickers and GIFs</string>
     <string name="ShowID_DC">Show ID and DC in Profiles</string>
+    <string name="FontsAndEmojis">Fonts and Emojis</string>
+    <string name="DC_IDSettings">Datacenter and user ID</string>
+    <string name="Automatic">Automatic</string>
+    <string name="IDType">ID Type</string>
+    <string name="IDTypeAbout">Telegram API uses IDs as-is, but Bot API adds minus in the beginning for groups, and -100 for channels and supergroups to fit it in one field.</string>
 </resources>

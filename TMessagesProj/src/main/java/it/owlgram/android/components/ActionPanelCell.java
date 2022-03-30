@@ -62,10 +62,12 @@ public class ActionPanelCell extends LinearLayout {
         shimmerFrameLayout.addView(placeholderLayout);
         addView(shimmerFrameLayout);
     }
+
     public void setLoaded(){
         mainLayout.setVisibility(VISIBLE);
         removeView(shimmerFrameLayout);
     }
+
     public void addItem(String text, int icon, String color) {
         mainLayout.addView(getButton(getContext(), text, icon, color));
     }
@@ -154,6 +156,16 @@ public class ActionPanelCell extends LinearLayout {
             SimpleActionCell simpleActionCell = (SimpleActionCell) mainLayout.getChildAt(0);
             if(simpleActionCell != null) {
                 return simpleActionCell.getLottieImageView();
+            }
+        } catch (Exception ignored) {}
+        return null;
+    }
+
+    public SimpleActionCell.ThemeInfo getTheme() {
+        try {
+            SimpleActionCell simpleActionCell = (SimpleActionCell) mainLayout.getChildAt(0);
+            if(simpleActionCell != null) {
+                return simpleActionCell.getTheme();
             }
         } catch (Exception ignored) {}
         return null;

@@ -5,45 +5,70 @@ import android.os.SystemClock;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
+import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.tgnet.TLRPC;
 
 import java.util.ArrayList;
+import java.util.Locale;
+
+import it.owlgram.android.OwlConfig;
 
 public class DCHelper {
-    public static TInfo getTInfo(TLRPC.UserFull userInfo, TLRPC.ChatFull chatInfo, TLRPC.Chat currentChat, int myDC) {
+    public static TInfo getTInfo(TLRPC.User userInfo) {
+        return getTInfo(userInfo, null);
+    }
+
+    public static TInfo getTInfo(TLRPC.Chat currentChat) {
+        return getTInfo(null, currentChat);
+    }
+
+    public static TInfo getTInfo(TLRPC.User user, TLRPC.Chat chat) {
         int DC = 0;
-        String id = "0";
-        if(userInfo != null){
-            if (UserObject.isUserSelf(userInfo.user)) {
+        int currentAccount = UserConfig.selectedAccount;
+        int myDC = AccountInstance.getInstance(currentAccount).getConnectionsManager().getCurrentDatacenterId();
+        long id = 0;
+        if(user != null){
+            if (UserObject.isUserSelf(user) && myDC != -1) {
                 DC = myDC;
             } else {
-                DC = userInfo.profile_photo != null ? userInfo.profile_photo.dc_id:-1;
+                DC = user.photo != null ? user.photo.dc_id:-1;
             }
-            id = String.valueOf(userInfo.id);
-        }else if(chatInfo != null){
-            DC = chatInfo.chat_photo != null ? chatInfo.chat_photo.dc_id:-1;
-            if(ChatObject.isChannel(currentChat)){
-                id = "-100"+chatInfo.id;
-            }else{
-                id = "-"+chatInfo.id;
+            id = user.id;
+        }else if(chat != null){
+            DC = chat.photo != null ? chat.photo.dc_id:-1;
+            if (OwlConfig.idType == 0) {
+                if(ChatObject.isChannel(chat)){
+                    id = -1000000000000L - chat.id;
+                }else{
+                    id = -chat.id;
+                }
+            } else {
+                id = chat.id;
             }
         }
         DC = DC != 0 ? DC:-1;
-        return new TInfo(DC, Long.parseLong(id));
+        String DC_NAME = DCHelper.getDcName(DC);
+        if (DC != -1){
+            DC_NAME = String.format(Locale.ENGLISH, "%s - DC%d", DC_NAME, DC);
+        }
+        return new TInfo(DC, id, DC_NAME);
     }
 
     public static class TInfo {
         public final int dcID;
-        public final long userID;
+        public final String longDcName;
+        public final long tID;
 
-        TInfo(int dcID, long userID) {
+        TInfo(int dcID, long tID, String longDcName) {
             this.dcID = dcID;
-            this.userID = userID;
+            this.tID = tID;
+            this.longDcName = longDcName;
         }
     }
 

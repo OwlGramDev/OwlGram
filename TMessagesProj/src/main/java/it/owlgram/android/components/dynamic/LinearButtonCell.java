@@ -211,5 +211,12 @@ public class LinearButtonCell extends SimpleActionCell {
         canvas.drawRoundRect(rectText, textHeight >> 1, textHeight >> 1, p);
     }
 
+    public ThemeInfo getTheme() {
+        return new ThemeInfo(
+                false,
+                AndroidUtilities.dp(25)
+        );
+    }
+
     protected void onItemClick(int id) {}
 }

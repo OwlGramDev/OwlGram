@@ -15,7 +15,11 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBar;
@@ -95,7 +99,7 @@ public class DoNotTranslateSettings extends BaseFragment {
                 } else {
                     selectedLanguages.remove(targetLanguages.get(position - languagesStartRow));
                 }
-                OwlConfig.setDoNotTranslateLanguages(selectedLanguages);
+                saveRestrictedLanguages(selectedLanguages);
             }
         });
 
@@ -145,7 +149,25 @@ public class DoNotTranslateSettings extends BaseFragment {
     }
 
     public static HashSet<String> getRestrictedLanguages() {
-        return new HashSet<>(OwlConfig.doNotTranslateLanguages);
+        try {
+            JSONArray array = new JSONArray(OwlConfig.doNotTranslateLanguages);
+            HashSet<String> result = new HashSet<>();
+            for (int a = 0; a < array.length(); a++) {
+                result.add(array.getString(a));
+            }
+            return result;
+        } catch (JSONException e) {
+            FileLog.e(e);
+        }
+        return new HashSet<>();
+    }
+
+    public static void saveRestrictedLanguages(HashSet<String> languages) {
+        JSONArray jsonArray = new JSONArray();
+        for (String language : languages) {
+            jsonArray.put(language);
+        }
+        OwlConfig.setDoNotTranslateLanguages(jsonArray.toString());
     }
 
     private static String getLanguage(String language) {

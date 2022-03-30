@@ -76,7 +76,7 @@ public class CameraXUtilities {
                     if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) == LENS_FACING_BACK) {
                         availableBackCamera++;
                         ZoomState zoomState = cameraInfo.getZoomState().getValue();
-                        if (zoomState != null && zoomState.getMinZoomRatio() <= 0.5F && zoomState.getMinZoomRatio() > 0) {
+                        if (zoomState != null && zoomState.getMinZoomRatio() < 1.0F && zoomState.getMinZoomRatio() > 0) {
                             foundWideAngleOnPrimaryCamera = true;
                         }
                         float[] listLensAngle = cameraCharacteristics.get(LENS_INFO_AVAILABLE_FOCAL_LENGTHS);

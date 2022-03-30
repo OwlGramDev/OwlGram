@@ -21,7 +21,7 @@ import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.DeepLTranslator;
 import it.owlgram.android.translator.Translator;
 
-public class OwlConfig extends SettingsManager{
+public class OwlConfig extends SettingsManager {
     private static final Object sync = new Object();
     public static boolean hidePhoneNumber;
     public static boolean hideContactNumber;
@@ -84,7 +84,7 @@ public class OwlConfig extends SettingsManager{
     public static String drawerItems;
     public static String oldBuildVersion = null;
     public static String languagePackVersioning;
-    public static Set<String> doNotTranslateLanguages;
+    public static String doNotTranslateLanguages;
     public static int deepLFormality = DeepLTranslator.FORMALITY_DEFAULT;
     public static int translationProvider = Translator.PROVIDER_GOOGLE;
     public static int lastUpdateStatus = 0;
@@ -100,6 +100,8 @@ public class OwlConfig extends SettingsManager{
     public static int maxRecentStickers;
     public static int stickerSizeStack = 0;
     public static long lastUpdateCheck = 0;
+    public static int dcStyleType;
+    public static int idType;
 
     static {
         loadConfig(true);
@@ -200,7 +202,9 @@ public class OwlConfig extends SettingsManager{
             slidingChatTitle = preferences.getBoolean("slidingChatTitle", false);
             confirmStickersGIFs = preferences.getBoolean("confirmStickersGIFs", false);
             showIDAndDC = preferences.getBoolean("showIDAndDC", true);
-            doNotTranslateLanguages = preferences.getStringSet("doNotTranslateLanguages", new HashSet<>());
+            doNotTranslateLanguages = preferences.getString("doNotTranslateLanguages", "[]");
+            dcStyleType = preferences.getInt("dcStyleType", 0);
+            idType = preferences.getInt("idType", 0);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -696,6 +700,22 @@ public class OwlConfig extends SettingsManager{
         editor.apply();
     }
 
+    public static void setDcStyleType(int type) {
+        dcStyleType = type;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("dcStyleType", dcStyleType);
+        editor.apply();
+    }
+
+    public static void setIdType(int type) {
+        idType = type;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("idType", idType);
+        editor.apply();
+    }
+
     public static String currentNotificationVersion() {
         return BuildVars.BUILD_VERSION_STRING + "_" + BuildVars.BUILD_VERSION;
     }
@@ -812,11 +832,11 @@ public class OwlConfig extends SettingsManager{
         editor.apply();
     }
 
-    public static void setDoNotTranslateLanguages(HashSet<String> data) {
+    public static void setDoNotTranslateLanguages(String data) {
         doNotTranslateLanguages = data;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putStringSet("doNotTranslateLanguages", doNotTranslateLanguages);
+        editor.putString("doNotTranslateLanguages", doNotTranslateLanguages);
         editor.apply();
     }
 

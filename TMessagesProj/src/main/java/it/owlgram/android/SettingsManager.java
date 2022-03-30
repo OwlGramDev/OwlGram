@@ -186,6 +186,7 @@ public class SettingsManager {
                 case "deepLFormality":
                 case "tabMode":
                 case "cameraType":
+                case "dcStyleType":
                     return integerValue >= 0 && integerValue <= 2;
                 case "translationProvider":
                     return integerValue == Translator.PROVIDER_GOOGLE ||
@@ -198,6 +199,7 @@ public class SettingsManager {
                 case "eventType":
                 case "buttonStyleType":
                     return integerValue >= 0 && integerValue <= 5;
+                case "idType":
                 case "translatorStyle":
                     return integerValue >= 0 && integerValue <= 1;
                 case "cameraXFps":

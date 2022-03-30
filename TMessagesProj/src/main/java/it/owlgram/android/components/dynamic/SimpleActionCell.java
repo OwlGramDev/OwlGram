@@ -22,6 +22,8 @@ public class SimpleActionCell extends LinearLayout {
         super(context);
     }
 
+    public ThemeInfo getTheme() {return null;}
+
     public void updateColors() {}
 
     public static class ThemeInfo {

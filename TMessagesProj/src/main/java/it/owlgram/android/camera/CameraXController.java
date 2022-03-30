@@ -296,9 +296,7 @@ public class CameraXController {
 
     public boolean isAvailableWideMode() {
         if (provider != null) {
-            ZoomState zoomStateLiveData = camera.getCameraInfo().getZoomState().getValue();
-            boolean wideModeByZoom = zoomStateLiveData != null && zoomStateLiveData.getMinZoomRatio() < 1.0f;
-            return CameraXUtilities.isWideAngleAvailable(provider) && !wideModeByZoom;
+            return CameraXUtilities.isWideAngleAvailable(provider);
         } else {
             return false;
         }
