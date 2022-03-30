@@ -1439,7 +1439,8 @@ public class AndroidUtilities {
         synchronized (typefaceCache) {
             if (!typefaceCache.containsKey(assetPath)) {
                 try {
-                    if (OwlConfig.useSystemFont) {
+                    SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+                    if (preferences.getBoolean("useSystemFont", false)) {
                         Typeface t = null;
                         switch (assetPath) {
                             case "fonts/rmedium.ttf":
