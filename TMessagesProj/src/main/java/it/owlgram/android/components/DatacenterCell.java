@@ -19,10 +19,8 @@ import androidx.core.content.ContextCompat;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.ui.ActionBar.Theme;
 
-import java.util.Locale;
 import java.util.Objects;
 
-import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.dynamic.SimpleActionCell;
 import it.owlgram.android.helpers.DCHelper;
 
@@ -81,7 +79,6 @@ public class DatacenterCell extends LinearLayout {
         mainCardView.setCardElevation(0);
         mainCardView.setRadius(AndroidUtilities.dp(10.0f));
         mainCardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(SimpleActionCell.getBackColor(), SimpleActionCell.getBackgroundAlpha()));
-        mainCardView.setVisibility(OwlConfig.buttonStyleType == 5 ? GONE:VISIBLE);
 
         LinearLayout ll = new LinearLayout(context);
         ll.setLayoutParams(new CardView.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -102,7 +99,7 @@ public class DatacenterCell extends LinearLayout {
 
         LinearLayout textLayout = new LinearLayout(context);
         textLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        textLayout.setPadding(AndroidUtilities.dp(OwlConfig.buttonStyleType == 5 ? 0:16), 0, 0, 0);
+        textLayout.setPadding(AndroidUtilities.dp(16), 0, 0, 0);
         textLayout.setOrientation(LinearLayout.VERTICAL);
         textLayout.setGravity(Gravity.LEFT);
 
@@ -149,7 +146,6 @@ public class DatacenterCell extends LinearLayout {
         cardView.setCardElevation(0);
         cardView.setRadius(AndroidUtilities.dp(10));
         cardView.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-        cardView.setVisibility(OwlConfig.buttonStyleType == 5 ? GONE:VISIBLE);
 
         LinearLayout textLayout = new LinearLayout(context);
         textLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));

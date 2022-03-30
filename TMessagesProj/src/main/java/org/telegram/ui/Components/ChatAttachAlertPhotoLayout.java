@@ -65,6 +65,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.checkerframework.checker.units.qual.A;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -923,7 +925,7 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
         container.addView(effectSelector, new FrameLayout.LayoutParams(LayoutHelper.MATCH_PARENT, AndroidUtilities.dp(60) + effectSelector.getSpaceNotch()));
         effectSelector.setVisibility(GONE);
         effectSelector.setAlpha(0.0f);
-        effectSelector.setClickable(true);
+        effectSelector.setEnabledButtons(true);
 
         evControlView = new SlideControlView(context, SlideControlView.SLIDER_MODE_EV);
         evControlView.setVisibility(View.GONE);
@@ -1004,7 +1006,7 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                     lockAnimationView.animate().alpha(1f).setDuration(200);
                     lockAnimationView.setCurrentMove(0);
                     lockAnimationView.setLocked(false);
-                    effectSelector.setClickable(false);
+                    effectSelector.setEnabledButtons(false);
                     ((CameraXView) cameraView).recordVideo(outputFile, cameraView.isFrontface(), (thumbPath, duration) -> {
                         if (outputFile == null || parentAlert.baseFragment == null || cameraView == null) {
                             return;
@@ -1052,7 +1054,7 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                         lockAnimationView.animate().alpha(0f).setDuration(200);
                     }
                     ((CameraXView) cameraView).stopVideoRecording(true);
-                    effectSelector.setClickable(true);
+                    effectSelector.setEnabledButtons(true);
                 }
                 initialEVState = 0.5f;
             }
@@ -1067,7 +1069,7 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                     if (takingPhoto || cameraView == null || ((CameraXView) cameraView).isFlooding()) {
                         return;
                     }
-                    effectSelector.setClickable(true);
+                    effectSelector.setEnabledButtons(true);
                 }
                 if (shutterButton.getState() != ShutterButton.State.DEFAULT) {
                     resetRecordState();
@@ -2106,9 +2108,11 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                         }
                     } else {
                         effectSelector.loadEffects((CameraXView) cameraView);
-                        effectSelector.setVisibility(cameraView.isFrontface() ? GONE:VISIBLE);
-                        lockAnimationView.setVisibility(VISIBLE);
-                        lockAnimationView.setAlpha(0.0f);
+                        if (cameraOpened) {
+                            effectSelector.setVisibility(cameraView.isFrontface() ? GONE:VISIBLE);
+                            lockAnimationView.setVisibility(VISIBLE);
+                            lockAnimationView.setAlpha(0.0f);
+                        }
                         if (((CameraXView) cameraView).isFlashAvailable()) {
                             setCameraFlashModeIcon(flashModeButton[0], ((CameraXView) cameraView).getCurrentFlashMode());
                             for (int a = 0; a < 2; a++) {

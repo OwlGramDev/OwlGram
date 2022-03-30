@@ -195,6 +195,7 @@ import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.ActionPanelCell;
 import it.owlgram.android.components.DatacenterCell;
 import it.owlgram.android.components.DcStyleSelector;
+import it.owlgram.android.components.dynamic.LinearButtonCell;
 import it.owlgram.android.components.dynamic.SimpleActionCell;
 import it.owlgram.android.helpers.ActionButtonManager;
 import it.owlgram.android.helpers.DCHelper;
@@ -8252,9 +8253,16 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     break;
                 case 18:
                     DatacenterCell dc = (DatacenterCell) holder.itemView;
-                    SimpleActionCell.ThemeInfo theme = actionPanelCell.getTheme();
-                    if (theme != null) {
-                        dc.setTheme(theme);
+                    if (actionPanelCell != null) {
+                        SimpleActionCell.ThemeInfo theme = actionPanelCell.getTheme();
+                        if (theme != null) {
+                            dc.setTheme(theme);
+                        }
+                    } else if (OwlConfig.buttonStyleType == 5) {
+                        dc.setTheme(new SimpleActionCell.ThemeInfo(
+                                false,
+                               0
+                        ));
                     }
                     tInfo = DCHelper.getTInfo(currentUser, currentChat);
                     dc.setIdAndDC(tInfo);

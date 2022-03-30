@@ -3,6 +3,7 @@ package it.owlgram.android.settings;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
+import android.os.Parcelable;
 import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.exoplayer2.util.Log;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
@@ -163,10 +166,13 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                 presentFragment(new DrawerOrderSettings());
             } else if (position == useSystemFontRow) {
                 OwlConfig.toggleUseSystemFont();
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.useSystemFont);
+                AndroidUtilities.clearTypefaceCache();
+                Parcelable recyclerViewState = null;
+                if (listView.getLayoutManager() != null) {
+                    recyclerViewState = listView.getLayoutManager().onSaveInstanceState();
                 }
                 parentLayout.rebuildAllFragmentViews(true, true);
+                listView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
             } else if (position == useSystemEmojiRow) {
                 OwlConfig.toggleUseSystemEmoji();
                 if (view instanceof TextCheckCell) {
@@ -184,11 +190,13 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                 }
             } else if (position == appBarShadowRow) {
                 OwlConfig.toggleAppBarShadow();
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.disableAppBarShadow);
-                }
                 ActionBarLayout.headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : parentLayout.getResources().getDrawable(R.drawable.header_shadow).mutate();
+                Parcelable recyclerViewState = null;
+                if (listView.getLayoutManager() != null) {
+                    recyclerViewState = listView.getLayoutManager().onSaveInstanceState();
+                }
                 parentLayout.rebuildAllFragmentViews(true, true);
+                listView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
             } else if (position == showSantaHatRow) {
                 OwlConfig.toggleShowSantaHat();
                 if (view instanceof TextCheckCell) {

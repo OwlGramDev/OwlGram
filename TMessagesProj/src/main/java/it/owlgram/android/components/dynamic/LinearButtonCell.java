@@ -214,7 +214,7 @@ public class LinearButtonCell extends SimpleActionCell {
     public ThemeInfo getTheme() {
         return new ThemeInfo(
                 false,
-                AndroidUtilities.dp(25)
+                0
         );
     }
 

@@ -174,6 +174,7 @@ import it.owlgram.android.components.UpdateAlertDialog;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.LanguageHelper;
 import it.owlgram.android.helpers.UpdateSignaling;
+import it.owlgram.android.settings.OwlgramAppearanceSettings;
 import it.owlgram.android.settings.OwlgramChatSettings;
 import it.owlgram.android.settings.OwlgramExperimentalSettings;
 import it.owlgram.android.settings.OwlgramGeneralSettings;
@@ -2112,6 +2113,15 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                                         }
                                     } else if (url.startsWith("tg:general") || url.startsWith("tg://general")) {
                                         actionBarLayout.presentFragment(new OwlgramGeneralSettings(), false, true, true, false);
+                                        if (AndroidUtilities.isTablet()) {
+                                            actionBarLayout.showLastFragment();
+                                            rightActionBarLayout.showLastFragment();
+                                            drawerLayoutContainer.setAllowOpenDrawer(false, false);
+                                        } else {
+                                            drawerLayoutContainer.setAllowOpenDrawer(true, false);
+                                        }
+                                    } else if (url.startsWith("tg:appearance") || url.startsWith("tg://appearance")) {
+                                        actionBarLayout.presentFragment(new OwlgramAppearanceSettings(), false, true, true, false);
                                         if (AndroidUtilities.isTablet()) {
                                             actionBarLayout.showLastFragment();
                                             rightActionBarLayout.showLastFragment();

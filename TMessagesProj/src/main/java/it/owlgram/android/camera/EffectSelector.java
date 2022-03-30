@@ -26,6 +26,7 @@ import java.util.List;
 public class EffectSelector extends LinearLayout {
 
     private ButtonEffect oldSelection;
+    private boolean isEnabledButtons = true;
 
     public EffectSelector(Context context) {
         super(context);
@@ -79,7 +80,7 @@ public class EffectSelector extends LinearLayout {
                 ButtonEffect buttonEffect = new ButtonEffect(getContext(), effect) {
                     @Override
                     protected void onItemClick(ButtonEffect buttonEffect, int camera_type) {
-                        if (EffectSelector.this.isClickable()) {
+                        if (isEnabledButtons) {
                             super.onItemClick(buttonEffect, camera_type);
                             if (oldSelection != null) {
                                 oldSelection.toggleButton(false, true);
@@ -101,6 +102,10 @@ public class EffectSelector extends LinearLayout {
     }
 
     protected void onEffectSelected(int cameraEffect) {}
+
+    public void setEnabledButtons(boolean clickable) {
+        isEnabledButtons = clickable;
+    }
 
     public void setScreenOrientation(int screenOrientation) {
         setOrientation(screenOrientation);

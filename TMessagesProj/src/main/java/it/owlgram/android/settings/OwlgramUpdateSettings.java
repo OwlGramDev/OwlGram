@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildVars;
@@ -207,6 +209,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
                     break;
                 case 2:
                     UpdateCell updateCell = (UpdateCell) holder.itemView;
+                    OwlgramUpdateSettings.this.updateCell = updateCell;
                     updateCell.setUpdate(
                             updateAvailable.title,
                             updateAvailable.desc,
@@ -279,6 +282,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
                             if(!PlayStoreUtils.isDownloadedFromPlayStore()){
                                 if(!ApkDownloader.isRunningDownload()) {
                                     ApkDownloader.downloadAPK(mContext, updateAvailable.link_file, updateAvailable.version);
+                                    Log.e("TEST", "Downloading APK");
                                     updateCell.setDownloadMode();
                                 }
                             } else {
@@ -301,7 +305,6 @@ public class OwlgramUpdateSettings extends BaseFragment {
                             }
                         }
                     };
-                    updateCell = (UpdateCell) view;
                     break;
                 case 3:
                     view = new HeaderCell(mContext);

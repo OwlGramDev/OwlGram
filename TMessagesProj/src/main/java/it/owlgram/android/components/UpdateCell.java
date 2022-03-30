@@ -8,6 +8,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.text.Html;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -26,7 +27,7 @@ import java.util.Objects;
 
 import it.owlgram.android.updates.ApkDownloader;
 
-public class UpdateCell extends LinearLayout {
+public class UpdateCell extends FrameLayout {
     private final BackupImageView backupImageView;
     private final TextView updateTitle;
     private final TextView descMessage;
@@ -45,11 +46,16 @@ public class UpdateCell extends LinearLayout {
 
         setBackgroundColor(colorBackground);
         RelativeLayout relativeLayout = new RelativeLayout(context);
-        relativeLayout.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT,AndroidUtilities.dp(330)));
+        relativeLayout.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        relativeLayout.setMinimumHeight(AndroidUtilities.dp(330));
+
+        RelativeLayout relativeLayoutBackground = new RelativeLayout(context);
+        relativeLayoutBackground.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
         backupImageView = new BackupImageView(getContext());
-        backupImageView.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        relativeLayout.addView(backupImageView);
+        backupImageView.setLayoutParams(new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        relativeLayoutBackground.addView(backupImageView);
+
         ImageView iv1 = new ImageView(context);
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.BOTTOM_TOP,
@@ -58,7 +64,7 @@ public class UpdateCell extends LinearLayout {
         layoutParams.setMargins(0, AndroidUtilities.dp(20),0,0);
         iv1.setLayoutParams(layoutParams);
         iv1.setBackground(gd);
-        relativeLayout.addView(iv1);
+        relativeLayoutBackground.addView(iv1);
         ImageView iv2 = new ImageView(context);
         GradientDrawable gd2 = new GradientDrawable(
                 GradientDrawable.Orientation.LEFT_RIGHT,
@@ -67,17 +73,17 @@ public class UpdateCell extends LinearLayout {
         layoutParams2.setMargins(0, 0, AndroidUtilities.dp(20),0);
         iv2.setLayoutParams(layoutParams2);
         iv2.setBackground(gd2);
-        relativeLayout.addView(iv2);
+        relativeLayoutBackground.addView(iv2);
         ImageView iv3 = new ImageView(context);
         iv3.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         iv3.setBackgroundColor(AndroidUtilities.getTransparentColor(colorBackground, 0.3F));
-        relativeLayout.addView(iv3);
+        relativeLayoutBackground.addView(iv3);
 
         LinearLayout linearLayout = new LinearLayout(context);
         RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         layoutParams3.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75),0);
         linearLayout.setLayoutParams(layoutParams3);
-        linearLayout.setOrientation(VERTICAL);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
 
         updateTitle = new TextView(context);
         LinearLayout.LayoutParams layoutParams4 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -99,7 +105,7 @@ public class UpdateCell extends LinearLayout {
 
         note = new TextView(context);
         LinearLayout.LayoutParams layoutParams6 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        layoutParams6.setMargins(0, AndroidUtilities.dp(20), 0,0);
+        layoutParams6.setMargins(0, AndroidUtilities.dp(20), 0, AndroidUtilities.dp(80));
         note.setLayoutParams(layoutParams6);
         note.setTextColor(colorText);
         note.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
@@ -114,9 +120,10 @@ public class UpdateCell extends LinearLayout {
 
         downloadUpdate = new LinearLayout(context);
         RelativeLayout.LayoutParams layoutParams7 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        layoutParams7.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(25),AndroidUtilities.dp(20));
+        layoutParams7.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(25),0);
         layoutParams7.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         downloadUpdate.setLayoutParams(layoutParams7);
+        downloadUpdate.setPadding(0,0, 0, AndroidUtilities.dp(20));
 
         MaterialButton materialButton = new MaterialButton(context);
         LinearLayout.LayoutParams layoutParams10 = new LinearLayout.LayoutParams(0, AndroidUtilities.dp(40), 1.0f);
@@ -136,11 +143,12 @@ public class UpdateCell extends LinearLayout {
 
         downloadingUpdate = new LinearLayout(context);
         RelativeLayout.LayoutParams layoutParams8 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        layoutParams8.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75),AndroidUtilities.dp(20));
+        layoutParams8.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75),0);
         layoutParams8.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         downloadingUpdate.setLayoutParams(layoutParams8);
         downloadingUpdate.setGravity(Gravity.CENTER_VERTICAL);
         downloadingUpdate.setVisibility(GONE);
+        downloadingUpdate.setPadding(0,0,0, AndroidUtilities.dp(20));
 
         RelativeLayout relativeLayout2 = new RelativeLayout(context);
         relativeLayout2.setLayoutParams(new LinearLayout.LayoutParams(AndroidUtilities.dp(52), AndroidUtilities.dp(52)));
@@ -163,7 +171,7 @@ public class UpdateCell extends LinearLayout {
 
         LinearLayout linearLayout4 = new LinearLayout(context);
         linearLayout4.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        linearLayout4.setOrientation(VERTICAL);
+        linearLayout4.setOrientation(LinearLayout.VERTICAL);
 
         TextView title_download = new TextView(context);
         LinearLayout.LayoutParams layoutParams12 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -187,10 +195,11 @@ public class UpdateCell extends LinearLayout {
 
         installUpdate = new LinearLayout(context);
         RelativeLayout.LayoutParams layoutParams15 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        layoutParams15.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(25),AndroidUtilities.dp(20));
+        layoutParams15.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(25),0);
         layoutParams15.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         installUpdate.setLayoutParams(layoutParams15);
         installUpdate.setVisibility(GONE);
+        installUpdate.setPadding(0,0,0, AndroidUtilities.dp(15));
 
         MaterialButton materialButton3 = new MaterialButton(context);
         LinearLayout.LayoutParams layoutParams14 = new LinearLayout.LayoutParams(0, AndroidUtilities.dp(50), 1.0f);
@@ -211,6 +220,7 @@ public class UpdateCell extends LinearLayout {
         relativeLayout.addView(downloadingUpdate);
         relativeLayout.addView(installUpdate);
         relativeLayout.addView(linearLayout);
+        addView(relativeLayoutBackground);
         addView(relativeLayout);
     }
 

@@ -137,7 +137,7 @@ public class OwlgramSettings extends BaseFragment {
             } else if (position == experimentalSettingsRow) {
                 presentFragment(new OwlgramExperimentalSettings());
             } else if (position == supportDonationRow) {
-                Browser.openUrl(getParentActivity(), "https://www.buymeacoffee.com/OwlGram");
+                Browser.openUrl(getParentActivity(), "https://donations.owlgram.org/");
             } else if (position == appearanceSettingsRow) {
                 presentFragment(new OwlgramAppearanceSettings());
             }
