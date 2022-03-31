@@ -29,6 +29,8 @@ import androidx.collection.LongSparseArray;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.util.Consumer;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.SQLite.SQLiteCursor;
 import org.telegram.SQLite.SQLiteException;
 import org.telegram.SQLite.SQLitePreparedStatement;
@@ -69,7 +71,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
-import it.owlgram.android.PlayStoreUtils;
+import it.owlgram.android.StoreUtils;
 import it.owlgram.android.OwlConfig;
 
 public class  MessagesController extends BaseController implements NotificationCenter.NotificationCenterDelegate {
@@ -814,8 +816,8 @@ public class  MessagesController extends BaseController implements NotificationC
         canRevokePmInbox = mainPreferences.getBoolean("canRevokePmInbox", canRevokePmInbox);
         preloadFeaturedStickers = mainPreferences.getBoolean("preloadFeaturedStickers", false);
         youtubePipType = mainPreferences.getString("youtubePipType", "disabled");
-        keepAliveService = mainPreferences.getBoolean("keepAliveService", false);
-        backgroundConnection = mainPreferences.getBoolean("keepAliveService", false);
+        keepAliveService = mainPreferences.getBoolean("keepAliveService", !ApplicationLoader.hasPlayServices);
+        backgroundConnection = mainPreferences.getBoolean("keepAliveService", !ApplicationLoader.hasPlayServices);
         promoDialogId = mainPreferences.getLong("proxy_dialog", 0);
         nextPromoInfoCheckTime = mainPreferences.getInt("nextPromoInfoCheckTime", 0);
         promoDialogType = mainPreferences.getInt("promo_dialog_type", 0);
@@ -14790,7 +14792,7 @@ public class  MessagesController extends BaseController implements NotificationC
         }
         for (int a = 0, N = reasons.size(); a < N; a++) {
             TLRPC.TL_restrictionReason reason = reasons.get(a);
-            if ("all".equals(reason.platform) || !BuildVars.isStandaloneApp() && !BuildVars.isBetaApp() && "android".equals(reason.platform) && PlayStoreUtils.isDownloadedFromPlayStore()) {
+            if ("all".equals(reason.platform) || !BuildVars.isStandaloneApp() && !BuildVars.isBetaApp() && "android".equals(reason.platform) && StoreUtils.isDownloadedFromAnyStore()) {
                 return reason.text;
             }
         }
@@ -14835,7 +14837,7 @@ public class  MessagesController extends BaseController implements NotificationC
         } else {
             reason = getRestrictionReason(user.restriction_reason);
         }
-        if (reason != null && PlayStoreUtils.isDownloadedFromPlayStore()) {
+        if (reason != null && StoreUtils.isDownloadedFromAnyStore()) {
             showCantOpenAlert(fragment, reason);
             return false;
         }

@@ -51,6 +51,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.widget.NestedScrollView;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.Emoji;
@@ -1678,6 +1680,7 @@ public class TranslateManager extends Dialog {
     }
 
     public static void translateMessage(long dialog, MessageObject object, Context context, BaseFragment fragment, boolean noForwards, Theme.ResourcesProvider themeDelegate, OnLinkPress onLinkPress) {
+        Log.e("TranslateManager", object.messageOwner.message);
         if ((OwlConfig.translatorStyle == 1 || Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) && object.type != MessageObject.TYPE_POLL) {
             CharSequence text = object.messageOwner.message;
             translate(text, context, fragment, noForwards, onLinkPress, null);

@@ -33,7 +33,7 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.PlayStoreUtils;
+import it.owlgram.android.StoreUtils;
 import it.owlgram.android.components.UpdateCell;
 import it.owlgram.android.components.UpdateCheckCell;
 import it.owlgram.android.updates.ApkDownloader;
@@ -173,7 +173,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
 
         updateSectionHeader = rowCount++;
         updateCheckRow = rowCount++;
-        if(!PlayStoreUtils.isDownloadedFromPlayStore()){
+        if(!StoreUtils.isDownloadedFromAnyStore()){
             betaUpdatesRow = rowCount++;
         }
         notifyWhenAvailableRow = rowCount++;
@@ -279,7 +279,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
                         @Override
                         protected void onConfirmUpdate() {
                             super.onConfirmUpdate();
-                            if(!PlayStoreUtils.isDownloadedFromPlayStore()){
+                            if(!StoreUtils.isDownloadedFromAnyStore()){
                                 if(!ApkDownloader.isRunningDownload()) {
                                     ApkDownloader.downloadAPK(mContext, updateAvailable.link_file, updateAvailable.version);
                                     Log.e("TEST", "Downloading APK");

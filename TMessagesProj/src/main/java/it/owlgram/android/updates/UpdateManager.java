@@ -20,7 +20,7 @@ import java.net.URLEncoder;
 import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.PlayStoreUtils;
+import it.owlgram.android.StoreUtils;
 import it.owlgram.android.helpers.EntitiesHelper;
 import it.owlgram.android.helpers.StandardHTTPRequest;
 
@@ -65,7 +65,7 @@ public class UpdateManager {
     }
 
     public static void checkUpdates(UpdateCallback updateCallback) {
-        if (PlayStoreUtils.isDownloadedFromPlayStore()) {
+        if (StoreUtils.isDownloadedFromAnyStore()) {
             AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(ApplicationLoader.applicationContext);
             Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
             appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> checkInternal(updateCallback, appUpdateInfo.availableVersionCode() / 10));
@@ -77,7 +77,7 @@ public class UpdateManager {
 
     private static void checkInternal(UpdateCallback updateCallback, int psVersionCode) {
         Locale locale = LocaleController.getInstance().getCurrentLocale();
-        boolean betaMode = OwlConfig.betaUpdates && !PlayStoreUtils.isDownloadedFromPlayStore();
+        boolean betaMode = OwlConfig.betaUpdates && !StoreUtils.isDownloadedFromAnyStore();
         new Thread() {
             @Override
             public void run() {
@@ -104,11 +104,7 @@ public class UpdateManager {
                             break;
                         case 0:
                         case 9:
-                            if (BuildVars.isStandaloneApp()) {
-                                abi = "direct";
-                            } else {
-                                abi = "universal";
-                            }
+                            abi = "universal";
                             break;
                     }
                     String url = String.format(locale,"https://app.owlgram.org/version?lang=%s&beta=%s&abi=%s", locale.getLanguage(), betaMode,  URLEncoder.encode(abi, "utf-8"));

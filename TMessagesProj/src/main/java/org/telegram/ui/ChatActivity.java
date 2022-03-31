@@ -21115,6 +21115,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             if (type >= 0 || type == -1 && single && (message.isSending() || message.isEditing()) && currentEncryptedChat == null) {
                 selectedObject = message;
                 selectedObjectGroup = groupedMessages;
+                MessageObject messageObject = getMessageHelper().getMessageForTranslate(selectedObject, selectedObjectGroup);
 
                 messageText = getMessageCaption(selectedObject, selectedObjectGroup); // used only in translations
                 if (messageText == null && selectedObject.isPoll()) {
@@ -21175,10 +21176,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             options.add(29);
                             icons.add(R.drawable.msg_translate);
                         }*/
-                        if (selectedObject != null && selectedObject.contentType == 0 && !(editingMessageObject != null && editingMessageObject.getId() == selectedObject.getId()) && (messageText != null && messageText.length() > 0 && !selectedObject.isAnimatedEmoji() && !selectedObject.isDice()) && OwlConfig.showTranslate) {
-                            String currentID = selectedObject.getChatId()+"_"+selectedObject.getId();
+                        if (messageObject != null && messageObject.contentType == 0 && !(editingMessageObject != null && editingMessageObject.getId() == messageObject.getId()) && (messageText != null && messageText.length() > 0 && !messageObject.isAnimatedEmoji() && !messageObject.isDice()) && OwlConfig.showTranslate) {
+                            String currentID = messageObject.getChatId()+"_"+messageObject.getId();
                             if (!TranslatorActionMessage.checkAlreadyTranslating(currentID)) {
-                                items.add(selectedObject.translated ? LocaleController.getString("UndoTranslate", R.string.UndoTranslate) : LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
+                                items.add(messageObject.translated ? LocaleController.getString("UndoTranslate", R.string.UndoTranslate) : LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
                                 options.add(201);
                                 icons.add(R.drawable.msg_translate);
                             }
@@ -21475,13 +21476,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             options.add(2);
                             icons.add(R.drawable.msg_forward);
                         }
-                        if (OwlConfig.showNoQuoteForward && !selectedObject.isSponsored() && chatMode != MODE_SCHEDULED && !selectedObject.needDrawBluredPreview() && !selectedObject.isLiveLocation() && selectedObject.type != 16 && !getMessagesController().isChatNoForwards(currentChat)) {
+                        if (OwlConfig.showNoQuoteForward && !selectedObject.isSponsored() && chatMode != MODE_SCHEDULED && !selectedObject.needDrawBluredPreview() && !selectedObject.isLiveLocation() && selectedObject.type != 16 && !noforwards) {
                             items.add(LocaleController.getString("NoQuoteForward", R.string.NoQuoteForward));
                             options.add(204);
                             icons.add(R.drawable.msg_forward_noquote);
                         }
                         if (chatMode != MODE_SCHEDULED && !getMessagesController().isChatNoForwards(currentChat)) {
-                            MessageObject messageObject = getMessageForTranslate();
                             long my_user_id = UserConfig.getInstance(currentAccount).getClientUserId();
                             long user_id = selectedObject.messageOwner.from_id.user_id;
                             long chat_id = selectedObject.getChatId();
@@ -21520,10 +21520,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             options.add(29);
                             icons.add(R.drawable.msg_translate);
                         }*/
-                        if (selectedObject != null && selectedObject.contentType == 0 && !(editingMessageObject != null && editingMessageObject.getId() == selectedObject.getId()) && (messageText != null && messageText.length() > 0 && !selectedObject.isAnimatedEmoji() && !selectedObject.isDice()) && OwlConfig.showTranslate) {
-                            String currentID = selectedObject.getChatId()+"_"+selectedObject.getId();
+                        if (messageObject != null && messageObject.contentType == 0 && !(editingMessageObject != null && editingMessageObject.getId() == messageObject.getId()) && (messageText != null && messageText.length() > 0 && !messageObject.isAnimatedEmoji() && !messageObject.isDice()) && OwlConfig.showTranslate) {
+                            String currentID = messageObject.getChatId()+"_"+messageObject.getId();
                             if (!TranslatorActionMessage.checkAlreadyTranslating(currentID)) {
-                                items.add(selectedObject.translated ? LocaleController.getString("UndoTranslate", R.string.UndoTranslate) : LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
+                                items.add(messageObject.translated ? LocaleController.getString("UndoTranslate", R.string.UndoTranslate) : LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
                                 options.add(201);
                                 icons.add(R.drawable.msg_translate);
                             }
@@ -22069,7 +22069,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     return false;
                 });
                 if (option == 201) { // OwlGram Translate Button
-                    String toLang = LocaleController.getInstance().getCurrentLocale().getLanguage();
+                    MessageObject messageObject = getMessageHelper().getMessageForTranslate(selectedObject, selectedObjectGroup);
+                    onLinkPress2 = (link) -> didPressMessageUrl(link, false, messageObject, v instanceof ChatMessageCell ? (ChatMessageCell) v : null);
                     if (LanguageDetector.hasSupport()) {
                         final String[] fromLang = { null };
                         cell.setVisibility(View.GONE);
@@ -22079,7 +22080,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 (String lang) -> {
                                     fromLang[0] = lang;
                                     if (fromLang[0] != null) {
-                                        if (!DoNotTranslateSettings.getRestrictedLanguages().contains(fromLang[0])) {
+                                        if (!DoNotTranslateSettings.getRestrictedLanguages().contains(fromLang[0]) || message.translated) {
                                             cell.setVisibility(View.VISIBLE);
                                         }
                                     } else {
@@ -22100,35 +22101,34 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                     }
                                 }
                         );
-                        cell.setOnClickListener(v1 -> {
-                            if (message.translated && message.originalMessage != null) {
-                                TranslatorActionMessage.resetTranslateMessage(dialog_id, ChatActivity.this, message);
-                            } else {
-                                TranslateManager.translateMessage(dialog_id, message, getParentActivity(), ChatActivity.this, getMessagesController().isChatNoForwards(currentChat), themeDelegate, onLinkPress2);
-                            }
-                            if (scrimPopupWindow != null) {
-                                scrimPopupWindow.dismiss();
-                            }
-                        });
-                        cell.setOnLongClickListener(v1 -> {
-                            if (message.translated && message.originalMessage != null) return false;
-                            Translator.showTranslationTargetSelector(getParentActivity(), cell::performClick, themeDelegate);
-                            if (scrimPopupWindow != null) {
-                                scrimPopupWindow.dismiss();
-                            }
-                            return true;
-                        });
                         cell.postDelayed(() -> {
                             if (onLangDetectionDone.get() != null) {
                                 onLangDetectionDone.getAndSet(null).run();
                             }
                         }, 250);
                     }
+                    cell.setOnClickListener(v1 -> {
+                        if (messageObject.translated && messageObject.originalMessage != null) {
+                            TranslatorActionMessage.resetTranslateMessage(dialog_id, ChatActivity.this, messageObject);
+                        } else {
+                            TranslateManager.translateMessage(dialog_id, messageObject, getParentActivity(), ChatActivity.this, getMessagesController().isChatNoForwards(currentChat), themeDelegate, onLinkPress2);
+                        }
+                        if (scrimPopupWindow != null) {
+                            scrimPopupWindow.dismiss();
+                        }
+                    });
+                    cell.setOnLongClickListener(v1 -> {
+                        if (messageObject.translated && messageObject.originalMessage != null) return false;
+                        Translator.showTranslationTargetSelector(getParentActivity(), cell::performClick, themeDelegate);
+                        if (scrimPopupWindow != null) {
+                            scrimPopupWindow.dismiss();
+                        }
+                        return true;
+                    });
                 }
                 if (option == 29) { // "Translate" button
                     String toLang = LocaleController.getInstance().getCurrentLocale().getLanguage();
                     final CharSequence finalMessageText = messageText;
-                    onLinkPress2 = (link) -> didPressMessageUrl(link, false, selectedObject, v instanceof ChatMessageCell ? (ChatMessageCell) v : null);
                     TranslateAlert.OnLinkPress onLinkPress = (link) -> {
                         didPressMessageUrl(link, false, selectedObject, v instanceof ChatMessageCell ? (ChatMessageCell) v : null);
                     };
@@ -22742,25 +22742,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             path = FileLoader.getPathToMessage(messageObject.messageOwner).toString();
         }
         MediaController.saveFile(path, getParentActivity(), messageObject.isVideo() ? 1 : 0, null, null);
-    }
-
-    private MessageObject getMessageForTranslate() {
-        MessageObject messageObject = null;
-        if (selectedObjectGroup != null && !selectedObjectGroup.isDocuments) {
-            for (MessageObject object : selectedObjectGroup.messages) {
-                if (!TextUtils.isEmpty(object.messageOwner.message)) {
-                    if (messageObject != null) {
-                        messageObject = null;
-                        break;
-                    } else {
-                        messageObject = object;
-                    }
-                }
-            }
-        } else if (!TextUtils.isEmpty(selectedObject.messageOwner.message) || selectedObject.type == MessageObject.TYPE_POLL) {
-            messageObject = selectedObject;
-        }
-        return messageObject;
     }
 
     private void processSelectedOption(int option) {

@@ -40,6 +40,19 @@ public class MessageHelper extends BaseController {
         saveStickerToGallery(activity, path, MessageObject.isVideoSticker(document), callback);
     }
 
+    public MessageObject getMessageForTranslate(MessageObject selectedObject, MessageObject.GroupedMessages selectedObjectGroup) {
+        MessageObject messageObject = null;
+        if (selectedObjectGroup != null && !selectedObjectGroup.isDocuments) {
+            messageObject = getTargetMessageObjectFromGroup(selectedObjectGroup);
+        } else if (selectedObject.isPoll()) {
+            messageObject = selectedObject;
+        } else if (!TextUtils.isEmpty(selectedObject.messageOwner.message)) {
+            messageObject = selectedObject;
+        }
+        return messageObject;
+    }
+
+
     private static void saveStickerToGallery(Activity activity, String path, boolean video, Runnable callback) {
         Utilities.globalQueue.postRunnable(() -> {
             try {

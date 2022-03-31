@@ -84,8 +84,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -192,10 +190,10 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.StoreUtils;
 import it.owlgram.android.components.ActionPanelCell;
 import it.owlgram.android.components.DatacenterCell;
 import it.owlgram.android.components.DcStyleSelector;
-import it.owlgram.android.components.dynamic.LinearButtonCell;
 import it.owlgram.android.components.dynamic.SimpleActionCell;
 import it.owlgram.android.helpers.ActionButtonManager;
 import it.owlgram.android.helpers.DCHelper;
@@ -7687,31 +7685,33 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     cell.getTextView().setMovementMethod(null);
                     try {
                         PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
-                        int code = pInfo.versionCode / 10;
                         String abi = "";
+                        if (!StoreUtils.isDownloadedFromAnyStore()) {
+                            abi = "direct";
+                        }
                         switch (pInfo.versionCode % 10) {
                             case 1:
                             case 3:
-                                abi = "arm-v7a";
+                                abi += " arm-v7a";
                                 break;
                             case 2:
                             case 4:
-                                abi = "x86";
+                                abi += " x86";
                                 break;
                             case 5:
                             case 7:
-                                abi = "arm64-v8a";
+                                abi += " arm64-v8a";
                                 break;
                             case 6:
                             case 8:
-                                abi = "x86_64";
+                                abi += " x86_64";
                                 break;
                             case 0:
                             case 9:
-                                if (BuildVars.isStandaloneApp()) {
-                                    abi = "direct " + Build.CPU_ABI + " " + Build.CPU_ABI2;
-                                } else {
+                                if (StoreUtils.isDownloadedFromAnyStore()) {
                                     abi = "universal " + Build.CPU_ABI + " " + Build.CPU_ABI2;
+                                } else {
+                                    abi += "-universal " + Build.CPU_ABI + " " + Build.CPU_ABI2;
                                 }
                                 break;
                         }

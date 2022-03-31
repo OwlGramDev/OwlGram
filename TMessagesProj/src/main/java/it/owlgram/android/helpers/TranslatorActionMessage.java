@@ -33,7 +33,6 @@ public class TranslatorActionMessage {
             }
         }
         final MessageObject finalMessageObject = messageObject;
-        Object finalOriginal = original;
         translatingMessage.add(currentID);
         Translator.translate(original, new Translator.TranslateCallBack() {
             @Override
@@ -48,8 +47,6 @@ public class TranslatorActionMessage {
                         EntitiesHelper.TextWithMention entitiesResult = EntitiesHelper.getEntities(result_translation, finalMessageObject.originalEntities, !supportHTMLMode);
                         finalMessageObject.messageOwner.message = entitiesResult.text;
                         finalMessageObject.messageOwner.entities = entitiesResult.entities;
-                    } else if(finalOriginal instanceof String) {
-                        finalMessageObject.messageOwner.message = finalOriginal + "\n--------\n" + result.translation;
                     }
                 } else if (result.translation instanceof TLRPC.TL_poll) {
                     ((TLRPC.TL_messageMediaPoll) finalMessageObject.messageOwner.media).poll = (TLRPC.TL_poll) result.translation;

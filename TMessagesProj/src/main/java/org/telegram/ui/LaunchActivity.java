@@ -23,7 +23,6 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
@@ -168,7 +167,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import it.owlgram.android.PlayStoreUtils;
+import it.owlgram.android.StoreUtils;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateAlertDialog;
 import it.owlgram.android.helpers.ForwardContext;
@@ -3774,7 +3773,7 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
         }
         sideMenuContainer.addView(updateLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 44, Gravity.LEFT | Gravity.BOTTOM));
         updateLayout.setOnClickListener(v -> {
-            if (!PlayStoreUtils.isDownloadedFromPlayStore()) {
+            if (!StoreUtils.isDownloadedFromAnyStore()) {
                 if(ApkDownloader.isRunningDownload()) {
                     ApkDownloader.cancel();
                 } else if(ApkDownloader.updateDownloaded()) {

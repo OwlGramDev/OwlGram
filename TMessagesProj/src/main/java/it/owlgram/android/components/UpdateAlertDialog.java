@@ -36,7 +36,7 @@ import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.LayoutHelper;
 
-import it.owlgram.android.PlayStoreUtils;
+import it.owlgram.android.StoreUtils;
 import it.owlgram.android.updates.ApkDownloader;
 import it.owlgram.android.updates.UpdateManager;
 
@@ -314,7 +314,7 @@ public class UpdateAlertDialog extends BottomSheet {
         BottomSheetCell doneButton = new BottomSheetCell(context, false);
         doneButton.setText(LocaleController.formatString("AppUpdateDownloadNow", R.string.AppUpdateDownloadNow), false);
         doneButton.background.setOnClickListener(v -> {
-            if(!PlayStoreUtils.isDownloadedFromPlayStore()){
+            if(!StoreUtils.isDownloadedFromAnyStore()){
                 ApkDownloader.downloadAPK(context, updateAvailable.link_file, updateAvailable.version);
             } else {
                 Browser.openUrl(getContext(), BuildVars.PLAYSTORE_APP_URL);
