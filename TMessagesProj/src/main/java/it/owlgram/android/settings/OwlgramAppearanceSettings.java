@@ -73,6 +73,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
     private int smartButtonsRow;
     private int appBarShadowRow;
     private int slidingTitleRow;
+    private int searchIconInActionBarRow;
     private int appearanceDividerRow;
 
     @Override
@@ -229,6 +230,11 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.roundedNumbers);
                 }
+            } else if (position == searchIconInActionBarRow) {
+                OwlConfig.toggleSearchIconInActionBar();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.searchIconInActionBar);
+                }
             }
         });
         return fragmentView;
@@ -287,6 +293,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
         smartButtonsRow = rowCount++;
         appBarShadowRow = rowCount++;
         slidingTitleRow = rowCount++;
+        searchIconInActionBarRow = rowCount++;
         appearanceDividerRow = rowCount++;
 
         if (listAdapter != null && notify) {
@@ -367,6 +374,8 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                         textCheckCell.setTextAndCheck(LocaleController.getString("FallingSnow", R.string.FallingSnow), OwlConfig.showSnowFalling, true);
                     } else if (position == slidingTitleRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("SlidingTitle", R.string.SlidingTitle), LocaleController.getString("SlidingTitleDesc", R.string.SlidingTitleDesc), OwlConfig.slidingChatTitle, true, true);
+                    } else if (position == searchIconInActionBarRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("SearchIconTitleBar", R.string.SearchIconTitleBar), OwlConfig.searchIconInActionBar, true);
                     }
                     break;
                 case 4:
@@ -477,7 +486,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                     position == drawerDarkenBackgroundRow || position == drawerBlurBackgroundRow || position == showGradientRow ||
                     position == showAvatarRow || position == forcePacmanRow || position == smartButtonsRow ||
                     position == appBarShadowRow|| position == showSantaHatRow || position == showFallingSnowRow ||
-                    position == slidingTitleRow) {
+                    position == slidingTitleRow || position == searchIconInActionBarRow) {
                 return 3;
             } else if (position == drawerRow) {
                 return 4;

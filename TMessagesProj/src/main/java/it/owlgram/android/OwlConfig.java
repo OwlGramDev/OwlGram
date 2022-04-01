@@ -102,6 +102,7 @@ public class OwlConfig extends SettingsManager {
     public static long lastUpdateCheck = 0;
     public static int dcStyleType;
     public static int idType;
+    public static boolean searchIconInActionBar;
 
     static {
         loadConfig(true);
@@ -205,6 +206,7 @@ public class OwlConfig extends SettingsManager {
             doNotTranslateLanguages = preferences.getString("doNotTranslateLanguages", "[]");
             dcStyleType = preferences.getInt("dcStyleType", 0);
             idType = preferences.getInt("idType", 0);
+            searchIconInActionBar = preferences.getBoolean("searchIconInActionBar", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -625,6 +627,14 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showIDAndDC", showIDAndDC);
+        editor.apply();
+    }
+
+    public static void toggleSearchIconInActionBar() {
+        searchIconInActionBar = !searchIconInActionBar;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("searchIconInActionBar", searchIconInActionBar);
         editor.apply();
     }
 

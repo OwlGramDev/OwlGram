@@ -7687,31 +7687,31 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
                         String abi = "";
                         if (!StoreUtils.isDownloadedFromAnyStore()) {
-                            abi = "direct";
+                            abi = "direct ";
                         }
                         switch (pInfo.versionCode % 10) {
                             case 1:
                             case 3:
-                                abi += " arm-v7a";
+                                abi += "arm-v7a";
                                 break;
                             case 2:
                             case 4:
-                                abi += " x86";
+                                abi += "x86";
                                 break;
                             case 5:
                             case 7:
-                                abi += " arm64-v8a";
+                                abi += "arm64-v8a";
                                 break;
                             case 6:
                             case 8:
-                                abi += " x86_64";
+                                abi += "x86_64";
                                 break;
                             case 0:
                             case 9:
                                 if (StoreUtils.isDownloadedFromAnyStore()) {
-                                    abi = "universal " + Build.CPU_ABI + " " + Build.CPU_ABI2;
+                                    abi = "universal/" + Build.CPU_ABI + " " + Build.CPU_ABI2;
                                 } else {
-                                    abi += "-universal " + Build.CPU_ABI + " " + Build.CPU_ABI2;
+                                    abi += "universal/" + Build.CPU_ABI + " " + Build.CPU_ABI2;
                                 }
                                 break;
                         }

@@ -45,7 +45,7 @@ import it.owlgram.android.helpers.AudioEnhance;
 import it.owlgram.android.helpers.EntitiesHelper;
 import it.owlgram.android.helpers.PopupHelper;
 
-public class OwlgramChatSettings extends BaseFragment  implements NotificationCenter.NotificationCenterDelegate {
+public class OwlgramChatSettings extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
     private ActionBarMenuItem menuItem;
 
     private int rowCount;
