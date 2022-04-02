@@ -6041,8 +6041,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             int start = mentionsAdapter.getResultStartPosition();
             int len = mentionsAdapter.getResultLength();
             if (object instanceof String) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(parentActivity);
+                AlertDialog.Builder builder = new AlertDialog.Builder(parentActivity, resourcesProvider);
                 builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
+                builder.setMessage(LocaleController.getString("ClearSearch", R.string.ClearSearch));
+                builder.setPositiveButton(LocaleController.getString("ClearButton", R.string.ClearButton).toUpperCase(), (dialogInterface, i) -> mentionsAdapter.clearRecentHashtags());
                 builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
                 showAlertDialog(builder);
                 return true;
