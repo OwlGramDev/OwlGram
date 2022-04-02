@@ -3627,7 +3627,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     } else {
                         showSearchAsIcon = false;
                     }
-                    showSearchAsIcon |= OwlConfig.searchIconInActionBar;
+                    showSearchAsIcon |= OwlConfig.searchIconInActionBar && !inPreviewMode;
                     if (showSearchAsIcon || showAudioCallAsIcon) {
                         if (avatarContainer != null && avatarContainer.getLayoutParams() != null) {
                             ((MarginLayoutParams) avatarContainer.getLayoutParams()).rightMargin = AndroidUtilities.dp(96);
@@ -3657,7 +3657,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     }
                     if (headerItem != null) {
                         TLRPC.UserFull userInfo = getCurrentUserInfo();
-                        if (showAudioCallAsIcon) {
+                        if (showAudioCallAsIcon && !OwlConfig.searchIconInActionBar) {
                             headerItem.hideSubItem(call);
                         } else if (userInfo != null && userInfo.phone_calls_available) {
                             headerItem.showSubItem(call);

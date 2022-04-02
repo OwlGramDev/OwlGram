@@ -136,16 +136,6 @@ public class Translator {
         showTranslationTargetSelector(context, false,  callback, resourcesProvider);
     }
 
-    public static void fixDoNotTranslateLanguages(BaseTranslator translator) {
-        HashSet<String> languages = DoNotTranslateSettings.getRestrictedLanguages();
-        for (String targetLanguage : languages) {
-            if (!translator.supportLanguage(targetLanguage)) {
-                languages.remove(targetLanguage);
-            }
-        }
-        DoNotTranslateSettings.saveRestrictedLanguages(languages);
-    }
-
     public static void showTranslationTargetSelector(Context context, boolean isKeyboard, Runnable callback, Theme.ResourcesProvider resourcesProvider) {
         BaseTranslator translator = Translator.getCurrentTranslator();
         ArrayList<String> targetLanguages = new ArrayList<>(translator.getTargetLanguages());
@@ -190,7 +180,6 @@ public class Translator {
 
             if (translator.supportLanguage(targetLanguage)) {
                 OwlConfig.setTranslationProvider(types.get(i));
-                fixDoNotTranslateLanguages(translator);
                 if (callback != null) callback.run(true);
             } else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context, resourcesProvider)
@@ -198,14 +187,12 @@ public class Translator {
                 if ("app".equals(OwlConfig.translationTarget)) {
                     builder.setPositiveButton(LocaleController.getString("UseGoogleTranslate", R.string.UseGoogleTranslate), (dialog, which) -> {
                         OwlConfig.setTranslationProvider(Translator.PROVIDER_GOOGLE);
-                        fixDoNotTranslateLanguages(translator);
                         if (callback != null) callback.run(false);
                     });
                     builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
                 } else if (translator.supportLanguage(translator.getCurrentAppLanguage())) {
                     builder.setPositiveButton(LocaleController.getString("ResetLanguage", R.string.ResetLanguage), (dialog, which) -> {
                         OwlConfig.setTranslationProvider(types.get(i));
-                        fixDoNotTranslateLanguages(translator);
                         OwlConfig.setTranslationTarget("app");
                         if (callback != null) callback.run(false);
                     });
