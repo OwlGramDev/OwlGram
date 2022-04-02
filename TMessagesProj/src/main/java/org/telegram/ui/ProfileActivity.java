@@ -4203,7 +4203,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             LanguageDetector.detectLanguage(about, lng -> {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
                 String translateButton = null;
-                if (lng == null || originalBio != null || !DoNotTranslateSettings.getRestrictedLanguages().contains(lng)) {
+                if (lng == null || originalBio != null || !DoNotTranslateSettings.getRestrictedLanguages().contains(lng.split("-")[0])) {
                     translateButton = originalBio != null ? LocaleController.getString("UndoTranslate",R.string.UndoTranslate):LocaleController.getString("TranslateMessage",R.string.TranslateMessage);
                 }
                 builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy), translateButton}, onClickListener);

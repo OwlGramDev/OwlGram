@@ -1291,7 +1291,7 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
             private void updateTranslateButton(Menu menu) {
                 //String translateToLanguage = LocaleController.getInstance().getCurrentLocale().getLanguage();
                 menu.getItem(2).setVisible(
-                       translateFromLanguage == null || !DoNotTranslateSettings.getRestrictedLanguages().contains(translateFromLanguage)
+                       translateFromLanguage == null || !DoNotTranslateSettings.getRestrictedLanguages().contains(translateFromLanguage.split("-")[0])
                 );
                 /*
                  onTranslateListener != null && (

@@ -22083,7 +22083,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 (String lang) -> {
                                     fromLang[0] = lang;
                                     if (fromLang[0] != null) {
-                                        if (!DoNotTranslateSettings.getRestrictedLanguages().contains(fromLang[0]) || message.translated) {
+                                        if (!DoNotTranslateSettings.getRestrictedLanguages().contains(fromLang[0].split("-")[0]) || message.translated) {
                                             cell.setVisibility(View.VISIBLE);
                                         }
                                     } else {

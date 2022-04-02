@@ -20,6 +20,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
+import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBar;
@@ -181,7 +182,7 @@ public class DoNotTranslateSettings extends BaseFragment {
 
     private BaseTranslator loadLanguages() {
         BaseTranslator translator = Translator.getCurrentTranslator();
-        targetLanguages = new ArrayList<>(translator.getTargetLanguages());
+        targetLanguages = new ArrayList<>(LanguageDetector.SUPPORTED_LANGUAGES);
         names = new ArrayList<>();
         for (String language : targetLanguages) {
             names.add(getLanguage(language));
@@ -196,7 +197,7 @@ public class DoNotTranslateSettings extends BaseFragment {
         targetLanguages.add(0, targetLanguages.get(indexLangEn));
         names.remove(indexLangEn + 1);
         targetLanguages.remove(indexLangEn + 1);
-        int indexLangApp = targetLanguages.indexOf(appLanguage);
+        int indexLangApp = targetLanguages.indexOf(appLanguage.split("-")[0]);
         names.remove(indexLangApp);
         targetLanguages.remove(indexLangApp);
         names.add(0, getLanguage(appLanguage));
