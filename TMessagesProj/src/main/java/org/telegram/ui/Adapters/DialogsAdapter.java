@@ -87,7 +87,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
     private ArrayList<TLRPC.TL_contact> onlineContacts;
     private boolean forceUpdatingContacts;
     private int dialogsCount;
-    private int MIN_SHOW_COUNTER = 10;
+    private final int MIN_SHOW_COUNTER = 10;
     private int prevContactsCount;
     private int prevDialogsCount;
     private int dialogsType;
@@ -260,6 +260,8 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
             if (dialogsCount > MIN_SHOW_COUNTER) {
                 count++;
             }
+        } else if (folderId == 1 && dialogsCount > MIN_SHOW_COUNTER) {
+            count++;
         }
         if (dialogsType == 11 || dialogsType == 13) {
             count += 2;
@@ -638,7 +640,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
             case VIEW_TYPE_NEW_CHAT_HINT: {
                 TextInfoPrivacyCell cell = (TextInfoPrivacyCell) holder.itemView;
                 boolean hasArchive = folderId == 0 && dialogsType == 0 && MessagesController.getInstance(currentAccount).dialogs_dict.get(DialogObject.makeFolderDialogId(1)) != null;
-                cell.setText(LocaleController.formatPluralStringComma("Chats", dialogsCount - (hasArchive ? 1:folderId == 1 ? 1:0)));
+                cell.setText(LocaleController.formatPluralStringComma("Chats", dialogsCount - (hasArchive ? 1:0)));
                 /*cell.setText(LocaleController.getString("TapOnThePencil", R.string.TapOnThePencil));
                 if (arrowDrawable == null) {
                     arrowDrawable = mContext.getResources().getDrawable(R.drawable.arrow_newchat);
@@ -749,10 +751,10 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter {
                 i -= 1;
             }
         }
-        if (folderId != 1 && dialogsCount > MIN_SHOW_COUNTER && i == currentCount - (dialogsType == 0 ? 2:2)) {
+        if (folderId != 1 && dialogsCount > MIN_SHOW_COUNTER && i == currentCount - 2) {
             return VIEW_TYPE_NEW_CHAT_HINT;
         }
-        if (folderId == 1 && dialogsCount > MIN_SHOW_COUNTER && i == currentCount -1 && dialogsType == 0) {
+        if (folderId == 1 && dialogsCount > MIN_SHOW_COUNTER && i == currentCount - 1 && dialogsType == 0) {
             return VIEW_TYPE_NEW_CHAT_HINT;
         }
         int size = parentFragment.getDialogsArray(currentAccount, dialogsType, folderId, dialogsListFrozen).size();
