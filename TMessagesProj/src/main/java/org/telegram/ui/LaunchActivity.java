@@ -3956,7 +3956,7 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
     }
 
     public void checkAppUpdate(boolean force) {
-        if(!OwlConfig.notifyUpdates && !force) {
+        if((!OwlConfig.notifyUpdates && !force) || OwlConfig.getActiveAccounts() == 0) {
             return;
         }
         UpdateManager.isDownloadedUpdate(result -> {

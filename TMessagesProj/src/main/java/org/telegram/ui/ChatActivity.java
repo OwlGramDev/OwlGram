@@ -3627,7 +3627,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     } else {
                         showSearchAsIcon = false;
                     }
-                    showSearchAsIcon |= OwlConfig.searchIconInActionBar && !inPreviewMode;
+                    showSearchAsIcon |= OwlConfig.searchIconInActionBar && !inPreviewMode && !isComments && !isThreadChat();
                     if (showSearchAsIcon || showAudioCallAsIcon) {
                         if (avatarContainer != null && avatarContainer.getLayoutParams() != null) {
                             ((MarginLayoutParams) avatarContainer.getLayoutParams()).rightMargin = AndroidUtilities.dp(96);
