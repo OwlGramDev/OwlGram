@@ -94,11 +94,6 @@
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
-            </intent-filter>
-            <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:mimeType="image/*"/>
@@ -158,6 +153,97 @@
             <meta-data android:name="android.service.chooser.chooser_target_service" android:value="androidx.sharetarget.ChooserTargetServiceCompat" />
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity>
+        <activity-alias
+            android:name=".OG_Icon_Alt_Default"
+            android:enabled="true"
+            android:icon="@mipmap/owl_gram"
+            android:roundIcon="@mipmap/owl_gram_round"
+            android:targetActivity="org.telegram.ui.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".OG_Icon_Alt_Aqua"
+            android:enabled="false"
+            android:icon="@mipmap/owl_gram_aqua"
+            android:roundIcon="@mipmap/owl_gram_aqua_round"
+            android:targetActivity="org.telegram.ui.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".OG_Icon_Alt_Sunset"
+            android:enabled="false"
+            android:icon="@mipmap/owl_gram_sunset"
+            android:roundIcon="@mipmap/owl_gram_sunset_round"
+            android:targetActivity="org.telegram.ui.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".OG_Icon_Alt_MonoBlack"
+            android:enabled="false"
+            android:icon="@mipmap/owl_gram_black"
+            android:roundIcon="@mipmap/owl_gram_black_round"
+            android:targetActivity="org.telegram.ui.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".OG_Icon_Alt_Developer"
+            android:enabled="false"
+            android:icon="@mipmap/owl_gram_dev"
+            android:roundIcon="@mipmap/owl_gram_dev_round"
+            android:targetActivity="org.telegram.ui.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".OG_Icon_Alt_White"
+            android:enabled="false"
+            android:icon="@mipmap/owl_gram_white"
+            android:roundIcon="@mipmap/owl_gram_white_round"
+            android:targetActivity="org.telegram.ui.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
+            android:name=".OG_Icon_Alt_Classic"
+            android:enabled="false"
+            android:icon="@mipmap/owl_gram_classic"
+            android:roundIcon="@mipmap/owl_gram_classic_round"
+            android:targetActivity="org.telegram.ui.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
         <activity-alias
             android:name="org.telegram.ui.CallsActivity"
             android:targetActivity="org.telegram.ui.LaunchActivity"

@@ -78,6 +78,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean confirmStickersGIFs;
     public static boolean showIDAndDC;
     public static boolean xiaomiBlockedInstaller;
+    public static boolean searchIconInActionBar;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -99,10 +100,9 @@ public class OwlConfig extends SettingsManager {
     public static int cameraXFps;
     public static int maxRecentStickers;
     public static int stickerSizeStack = 0;
-    public static long lastUpdateCheck = 0;
     public static int dcStyleType;
     public static int idType;
-    public static boolean searchIconInActionBar;
+    public static long lastUpdateCheck = 0;
 
     static {
         loadConfig(true);

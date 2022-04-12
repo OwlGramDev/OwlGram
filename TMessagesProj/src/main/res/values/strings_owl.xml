@@ -234,4 +234,12 @@
     <string name="SaveWithoutMarkdown">Save without markdown</string>
     <string name="ClearRecentStickers">Clear recent stickers?</string>
     <string name="SearchIconTitleBar">Search Icon on the Title Bar</string>
+    <string name="AppIcon">App Icon</string>
+    <string name="DefaultIcon">Default</string>
+    <string name="AquaIcon">Aqua</string>
+    <string name="SunsetIcon">Sunset</string>
+    <string name="MonoBlackIcon">Mono Black</string>
+    <string name="DeveloperIcon">Developer</string>
+    <string name="ArcticIcon">Arctic</string>
+    <string name="ClassicIcon">Classic</string>
 </resources>

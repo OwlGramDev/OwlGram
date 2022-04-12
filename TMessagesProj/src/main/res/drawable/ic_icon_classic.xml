@@ -1,0 +1,5 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@mipmap/owl_gram_classic_foreground"
+        android:gravity="center" />
+</layer-list>

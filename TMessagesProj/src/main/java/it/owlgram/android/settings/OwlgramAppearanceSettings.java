@@ -14,14 +14,13 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarLayout;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
@@ -32,10 +31,12 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.components.AppIconSelectorCell;
 import it.owlgram.android.components.BlurIntensityCell;
 import it.owlgram.android.components.DrawerProfilePreviewCell;
 import it.owlgram.android.components.DynamicButtonSelector;
 import it.owlgram.android.components.ThemeSelectorDrawerCell;
+import it.owlgram.android.helpers.IconsHelper;
 
 public class OwlgramAppearanceSettings extends BaseFragment {
     private int rowCount;
@@ -75,6 +76,9 @@ public class OwlgramAppearanceSettings extends BaseFragment {
     private int slidingTitleRow;
     private int searchIconInActionBarRow;
     private int appearanceDividerRow;
+    private int selectIconHeaderRow;
+    private int selectIconRow;
+    private int selectIconDividerRow;
 
     @Override
     public boolean onFragmentCreate() {
@@ -277,6 +281,10 @@ public class OwlgramAppearanceSettings extends BaseFragment {
         dynamicButtonRow = rowCount++;
         dynamicDividerRow = rowCount++;
 
+        selectIconHeaderRow = rowCount++;
+        selectIconRow = rowCount++;
+        selectIconDividerRow = rowCount++;
+
         fontsAndEmojiHeaderRow = rowCount++;
         useSystemFontRow = rowCount++;
         useSystemEmojiRow = rowCount++;
@@ -340,6 +348,8 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                         headerCell.setText(LocaleController.getString("FontsAndEmojis", R.string.FontsAndEmojis));
                     } else if (position == appearanceHeaderRow) {
                         headerCell.setText(LocaleController.getString("Appearance", R.string.Appearance));
+                    } else if (position == selectIconHeaderRow) {
+                        headerCell.setText(LocaleController.getString("AppIcon", R.string.AppIcon));
                     }
                     break;
                 case 3:
@@ -465,6 +475,19 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                     };
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
+                case 9:
+                    view = new AppIconSelectorCell(mContext, IconsHelper.getSelectedIcon()) {
+                        @Override
+                        protected void onSelectedIcon(int iconSelected) {
+                            super.onSelectedIcon(iconSelected);
+                            AlertDialog progressDialog = new AlertDialog(getContext(), 3);
+                            progressDialog.show();
+                            AndroidUtilities.runOnUIThread(progressDialog::dismiss, 2000);
+                            IconsHelper.saveSelectedIcon(iconSelected);
+                        }
+                    };
+                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    break;
                 default:
                     view = new ShadowSectionCell(mContext);
                     break;
@@ -476,10 +499,11 @@ public class OwlgramAppearanceSettings extends BaseFragment {
         @Override
         public int getItemViewType(int position) {
             if (position == drawerDividerRow || position == editBlurDividerRow || position == themeDrawerDividerRow ||
-                    position == dynamicDividerRow || position == fontsAndEmojiDividerRow || position == appearanceDividerRow){
+                    position == dynamicDividerRow || position == fontsAndEmojiDividerRow || position == appearanceDividerRow ||
+                    position == selectIconDividerRow){
                 return 1;
             } else if (position == editBlurHeaderRow || position == themeDrawerHeader || position == dynamicButtonHeaderRow ||
-                    position == fontsAndEmojiHeaderRow || position == appearanceHeaderRow) {
+                    position == fontsAndEmojiHeaderRow || position == appearanceHeaderRow || position == selectIconHeaderRow) {
                 return 2;
             } else if ( position == roundedNumberSwitchRow || position == messageTimeSwitchRow ||
                     position == useSystemFontRow || position == useSystemEmojiRow || position == drawerAvatarAsBackgroundRow ||
@@ -498,6 +522,8 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                 return 7;
             } else if (position  == dynamicButtonRow) {
                 return 8;
+            } else if (position == selectIconRow) {
+                return 9;
             }
             return 1;
         }

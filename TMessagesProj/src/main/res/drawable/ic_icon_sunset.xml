@@ -1,0 +1,8 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@drawable/owl_gram_sunset_background"
+        android:gravity="center" />
+    <item
+        android:drawable="@drawable/owl_gram_foreground"
+        android:gravity="center" />
+</layer-list>
