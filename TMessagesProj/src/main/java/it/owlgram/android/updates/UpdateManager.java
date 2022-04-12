@@ -65,7 +65,7 @@ public class UpdateManager {
     }
 
     public static void checkUpdates(UpdateCallback updateCallback) {
-        if (StoreUtils.isDownloadedFromAnyStore()) {
+        if (StoreUtils.isFromPlayStore()) {
             AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(ApplicationLoader.applicationContext);
             Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
             appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> checkInternal(updateCallback, appUpdateInfo.availableVersionCode() / 10));

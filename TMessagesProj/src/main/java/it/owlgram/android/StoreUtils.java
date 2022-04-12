@@ -8,11 +8,11 @@ public class StoreUtils {
         return isFromPlayStore() || isFromHuaweiStore();
     }
 
-    private static boolean isFromPlayStore() {
+    public static boolean isFromPlayStore() {
         return "com.android.vending".equals(ApplicationLoader.applicationContext.getPackageManager().getInstallerPackageName(BuildConfig.APPLICATION_ID));
     }
 
-    private static boolean isFromHuaweiStore() {
+    public static boolean isFromHuaweiStore() {
         return "com.huawei.appmarket".equals(ApplicationLoader.applicationContext.getPackageManager().getInstallerPackageName(BuildConfig.APPLICATION_ID));
     }
 }

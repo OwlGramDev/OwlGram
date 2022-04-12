@@ -282,11 +282,12 @@ public class OwlgramUpdateSettings extends BaseFragment {
                             if(!StoreUtils.isDownloadedFromAnyStore()){
                                 if(!ApkDownloader.isRunningDownload()) {
                                     ApkDownloader.downloadAPK(mContext, updateAvailable.link_file, updateAvailable.version);
-                                    Log.e("TEST", "Downloading APK");
                                     updateCell.setDownloadMode();
                                 }
-                            } else {
+                            } else if (StoreUtils.isFromPlayStore()) {
                                 Browser.openUrl(getContext(), BuildVars.PLAYSTORE_APP_URL);
+                            } else if (StoreUtils.isFromHuaweiStore()) {
+                                Browser.openUrl(getContext(), BuildVars.APP_GALLERY_APP_URL);
                             }
                         }
 

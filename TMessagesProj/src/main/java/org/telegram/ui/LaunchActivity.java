@@ -3788,8 +3788,10 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                         }
                     } catch (Exception ignored){}
                 }
-            } else {
+            } else if (StoreUtils.isFromPlayStore()) {
                 Browser.openUrl(LaunchActivity.this, BuildVars.PLAYSTORE_APP_URL);
+            } else if (StoreUtils.isFromHuaweiStore()) {
+                Browser.openUrl(LaunchActivity.this, BuildVars.APP_GALLERY_APP_URL);
             }
         });
         updateLayoutIcon = new RadialProgress2(updateLayout);
