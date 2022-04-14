@@ -3,6 +3,6 @@
         android:drawable="@color/owl_gram_background"
         android:gravity="center" />
     <item
-        android:drawable="@drawable/owl_gram_foreground"
+        android:drawable="@drawable/owl_gram_foreground_my"
         android:gravity="center" />
 </layer-list>

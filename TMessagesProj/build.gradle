@@ -43,11 +43,11 @@ dependencies {
     implementation 'org.apache.commons:commons-text:1.7'
 
     // CameraX Implementation
-    implementation "androidx.camera:camera-core:1.1.0-beta02"
-    implementation "androidx.camera:camera-camera2:1.1.0-beta02"
-    implementation "androidx.camera:camera-lifecycle:1.1.0-beta02"
-    implementation "androidx.camera:camera-view:1.1.0-beta02"
-    implementation "androidx.camera:camera-extensions:1.1.0-beta02"
+    implementation "androidx.camera:camera-core:1.1.0-beta03"
+    implementation "androidx.camera:camera-camera2:1.1.0-beta03"
+    implementation "androidx.camera:camera-lifecycle:1.1.0-beta03"
+    implementation "androidx.camera:camera-view:1.1.0-beta03"
+    implementation "androidx.camera:camera-extensions:1.1.0-beta03"
     implementation 'androidx.interpolator:interpolator:1.0.0'
 
     // GOOGLE PLAY UPDATE CHECKER
@@ -312,7 +312,7 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 2609
+    defaultConfig.versionCode = 2610
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
@@ -332,7 +332,7 @@ android {
         minSdkVersion 16
         //noinspection OldTargetApi
         targetSdkVersion 30
-        versionName "1.7.3 PBeta 4"
+        versionName "1.7.3 Beta 4"
 
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
 

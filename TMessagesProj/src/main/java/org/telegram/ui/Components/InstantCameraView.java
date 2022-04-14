@@ -2669,7 +2669,11 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             pinchScale = (float) Math.hypot(ev.getX(index2) - ev.getX(index1), ev.getY(index2) - ev.getY(index1)) / pinchStartDistance;
             float zoom = Math.min(1f, Math.max(0, pinchScale - 1f));
 
-            cameraSession.setZoom(zoom);
+            if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+                cameraSession.setZoom(zoom);
+            } else {
+                cameraXController.setZoom(zoom);
+            }
         } else if ((ev.getActionMasked() == MotionEvent.ACTION_UP || (ev.getActionMasked() == MotionEvent.ACTION_POINTER_UP && checkPointerIds(ev)) || ev.getActionMasked() == MotionEvent.ACTION_CANCEL) && isInPinchToZoomTouchMode) {
             isInPinchToZoomTouchMode = false;
             finishZoom();
@@ -2689,7 +2693,11 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             finishZoomTransition = ValueAnimator.ofFloat(zoom, 0);
             finishZoomTransition.addUpdateListener(valueAnimator -> {
                 if (cameraSession != null) {
-                    cameraSession.setZoom((float) valueAnimator.getAnimatedValue());
+                    if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+                        cameraSession.setZoom((float) valueAnimator.getAnimatedValue());
+                    } else {
+                        cameraXController.setZoom((float) valueAnimator.getAnimatedValue());
+                    }
                 }
             });
             finishZoomTransition.addListener(new AnimatorListenerAdapter() {

@@ -4228,7 +4228,7 @@ public class EmojiView extends FrameLayout implements NotificationCenter.Notific
                             builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                             builder.setMessage(LocaleController.getString("ClearRecentStickers", R.string.ClearRecentStickers));
                             builder.setPositiveButton(LocaleController.getString("ClearButton", R.string.ClearButton).toUpperCase(), (dialogInterface, i) -> {
-                                ArrayList<TLRPC.Document> stickersToRemove = new ArrayList<>(recentStickers);
+                                ArrayList<TLRPC.Document> stickersToRemove = new ArrayList<>(MediaDataController.getInstance(currentAccount).getRecentStickersNoCopy(MediaDataController.TYPE_IMAGE));
                                 for (int i2 = 0; i2 < stickersToRemove.size(); i2++) {
                                     MediaDataController.getInstance(currentAccount).addRecentSticker(MediaDataController.TYPE_IMAGE, null, stickersToRemove.get(i2), (int) (System.currentTimeMillis() / 1000), true, false);
                                 }
