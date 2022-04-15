@@ -16,10 +16,10 @@ public class IconsHelper {
         DEFAULT(LocaleController.getString("DefaultIcon", R.string.DefaultIcon),"Default", 0, R.drawable.ic_icon_default),
         AQUA(LocaleController.getString("AquaIcon", R.string.AquaIcon), "Aqua", 1, R.drawable.ic_icon_aqua),
         SUNSET(LocaleController.getString("SunsetIcon", R.string.SunsetIcon), "Sunset", 2, R.drawable.ic_icon_sunset),
-        MONO_BLACK(LocaleController.getString("MonoBlackIcon", R.string.MonoBlackIcon), "MonoBlack", 4, R.drawable.ic_icon_mono_black),
-        DEVELOPER(LocaleController.getString("DeveloperIcon", R.string.DeveloperIcon), "Developer", 5, R.drawable.ic_icon_dev),
-        ARCTIC(LocaleController.getString("ArcticIcon", R.string.ArcticIcon), "White",6, R.drawable.ic_icon_white),
-        CLASSIC(LocaleController.getString("ClassicIcon", R.string.ClassicIcon), "Classic",7, R.drawable.ic_icon_classic);
+        MONO_BLACK(LocaleController.getString("MonoBlackIcon", R.string.MonoBlackIcon), "MonoBlack", 3, R.drawable.ic_icon_mono_black),
+        DEVELOPER(LocaleController.getString("DeveloperIcon", R.string.DeveloperIcon), "Developer", 4, R.drawable.ic_icon_dev),
+        ARCTIC(LocaleController.getString("ArcticIcon", R.string.ArcticIcon), "White",5, R.drawable.ic_icon_white),
+        CLASSIC(LocaleController.getString("ClassicIcon", R.string.ClassicIcon), "Classic",6, R.drawable.ic_icon_classic);
 
         private final String title;
         private final String name;
