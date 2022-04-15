@@ -396,7 +396,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                     TextCell textCell = (TextCell) holder.itemView;
                     textCell.setColors(Theme.key_windowBackgroundWhiteBlueText4, Theme.key_windowBackgroundWhiteBlueText4);
                     if (position == menuItemsRow) {
-                        textCell.setTextAndIcon(LocaleController.getString("MenuItems", R.string.MenuItems), R.drawable.msg_colors, false);
+                        textCell.setTextAndIcon(LocaleController.getString("MenuItems", R.string.MenuItems), R.drawable.menu_newfilter, false);
                     }
                     break;
             }
