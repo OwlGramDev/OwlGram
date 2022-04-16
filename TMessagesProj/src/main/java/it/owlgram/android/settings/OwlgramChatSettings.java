@@ -84,7 +84,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
     private int cameraXFpsRow;
     private int cameraAdviseRow;
     private int proximitySensorRow;
-    private int swipePiPRow;
     private int suppressionRow;
     private int betterAudioMessagesRow;
     private int turnSoundOnVDKeyRow;
@@ -256,11 +255,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                     ((TextCheckCell) view).setChecked(OwlConfig.disableProximityEvents);
                 }
                 restartTooltip.showWithAction(0, UndoView.ACTION_CACHE_WAS_CLEARED, null, null);
-            } else if (position == swipePiPRow) {
-                OwlConfig.toggleSwipeToPiP();
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.swipeToPiP);
-                }
             } else if (position == suppressionRow) {
                 OwlConfig.toggleVoicesAgc();
                 if (view instanceof TextCheckCell) {
@@ -334,7 +328,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
         }
         betterAudioMessagesRow = rowCount++;
         turnSoundOnVDKeyRow = rowCount++;
-        swipePiPRow = rowCount++;
         proximitySensorRow = rowCount++;
         rearCameraStartingRow = rowCount++;
         confirmSendRow = rowCount++;
@@ -430,8 +423,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("PerformanceMode", R.string.PerformanceMode), LocaleController.getString("PerformanceModeDesc", R.string.PerformanceModeDesc), OwlConfig.useCameraXOptimizedMode, true, true);
                     } else if (position == proximitySensorRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("DisableProximityEvents", R.string.DisableProximityEvents), OwlConfig.disableProximityEvents, true);
-                    } else if (position == swipePiPRow) {
-                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("SwipeToPiP", R.string.SwipeToPiP), LocaleController.getString("SwipeToPiPDesc", R.string.SwipeToPiPDesc), OwlConfig.swipeToPiP, true, true);
                     } else if (position == suppressionRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("VoiceEnhancements", R.string.VoiceEnhancements), LocaleController.getString("VoiceEnhancementsDesc", R.string.VoiceEnhancementsDesc), OwlConfig.voicesAgc, true, true);
                     } else if (position == betterAudioMessagesRow) {
@@ -583,9 +574,8 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                     position == playGifAsVideoRow || position == showFolderWhenForwardRow ||
                     position == rearCameraStartingRow || position == confirmSendRow || position == showGreetings ||
                     position == scrollableRow || position == showHideAllTab || position == cameraXOptimizeRow ||
-                    position == proximitySensorRow || position == swipePiPRow || position == suppressionRow ||
-                    position == betterAudioMessagesRow || position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow ||
-                    position == confirmStickersGIFsRow) {
+                    position == proximitySensorRow || position == suppressionRow || position == betterAudioMessagesRow ||
+                    position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow || position == confirmStickersGIFsRow) {
                 return 3;
             } else if (position == stickerSizeRow) {
                 return 4;

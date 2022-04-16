@@ -94,6 +94,7 @@ public class SettingsManager {
             case "stickerSize":
             case "stickerSize2":
             case "translationTarget":
+            case "swipeToPiP":
                 return false;
             default:
                 return true;

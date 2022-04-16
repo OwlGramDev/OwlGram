@@ -65,7 +65,6 @@ public class OwlConfig extends SettingsManager {
     public static boolean showSnowFalling;
     public static boolean useCameraXOptimizedMode;
     public static boolean disableProximityEvents;
-    public static boolean swipeToPiP;
     public static boolean unlimitedFavoriteStickers;
     public static boolean unlimitedPinnedDialogs;
     public static boolean devOptEnabled;
@@ -192,7 +191,6 @@ public class OwlConfig extends SettingsManager {
             cameraXFps = preferences.getInt("cameraXFps", SharedConfig.getDevicePerformanceClass() == SharedConfig.PERFORMANCE_CLASS_HIGH ? 60:30);
             useCameraXOptimizedMode = preferences.getBoolean("useCameraXOptimizedMode", SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_HIGH);
             disableProximityEvents = preferences.getBoolean("disableProximityEvents", false);
-            swipeToPiP = preferences.getBoolean("swipeToPiP", false);
             verifyLinkTip = preferences.getBoolean("verifyLinkTip", false);
             languagePackVersioning = preferences.getString("languagePackVersioning", "{}");
             xiaomiBlockedInstaller = preferences.getBoolean("xiaomiBlockedInstaller", false);
@@ -547,14 +545,6 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("disableProximityEvents", disableProximityEvents);
-        editor.apply();
-    }
-
-    public static void toggleSwipeToPiP() {
-        swipeToPiP = !swipeToPiP;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("swipeToPiP", swipeToPiP);
         editor.apply();
     }
 

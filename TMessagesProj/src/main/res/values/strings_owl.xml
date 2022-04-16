@@ -157,8 +157,6 @@
     <string name="IncreaseVoiceMessageQuality">HQ Voice Messages</string>
     <string name="TurnSoundOnVDKey">Turn Sound On by Turning Down the Volume</string>
     <string name="TurnSoundOnVDKeyDesc">It allows you to unmute videos by pressing the volume down button</string>
-    <string name="SwipeToPiP">Swipe up to Picture-in-Picture</string>
-    <string name="SwipeToPiPDesc">Swipe up in the video player to open the video in Picture-in-Picture mode</string>
     <string name="DisableProximityEvents">Disable Proximity Events</string>
     <string name="RestartAppToApplyChanges">Restart app to apply changes.</string>
     <string name="UseRearRoundVideos">Start with Rear Camera</string>
