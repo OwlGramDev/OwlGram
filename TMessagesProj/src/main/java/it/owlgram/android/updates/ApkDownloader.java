@@ -54,8 +54,7 @@ public class ApkDownloader {
         try {
             String data = OwlConfig.updateData;
             if (data.length() > 0) {
-                JSONObject jsonObject = new JSONObject(data);
-                UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(jsonObject);
+                UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(new JSONObject(data));
                 if(update.file_size == apkFile().length()) {
                     isCorrupted = false;
                 }
@@ -77,9 +76,12 @@ public class ApkDownloader {
         ApkInstaller.installApk(activity);
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void downloadAPK(Context context, String link, int version) {
         if(downloadThread != null) return;
         File output = apkFile();
+        if(output.exists())
+            output.delete();
         OwlConfig.saveOldVersion(version);
         downloadThread = new DownloadThread(context, output);
         downloadThread.downloadFile(link);
@@ -210,19 +212,13 @@ public class ApkDownloader {
         private void onProgressUpdate(int percentage, long downBytes, long totBytes) {
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoadProgressChanged);
             if(updateManager != null) {
-                try {
-                    updateManager.onProgressChange(percentage, downBytes, totBytes);
-                }catch (Exception ignored) {}
+                updateManager.onProgressChange(percentage, downBytes, totBytes);
             }
             if(updateMainManager != null) {
-                try {
-                    updateMainManager.onProgressChange(percentage, downBytes, totBytes);
-                }catch (Exception ignored) {}
+                updateMainManager.onProgressChange(percentage, downBytes, totBytes);
             }
             if(updateDialogsManager != null) {
-                try {
-                    updateDialogsManager.onProgressChange(percentage, downBytes, totBytes);
-                }catch (Exception ignored) {}
+                updateDialogsManager.onProgressChange(percentage, downBytes, totBytes);
             }
         }
 
