@@ -7146,7 +7146,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             if (getParentActivity() == null || !mentionsAdapter.isLongClickEnabled()) {
                 return false;
             }
-            Log.e("TEST", "MENTION_VIEW_LONG_CLICK");
             Object object = mentionsAdapter.getItem(position);
             int start = mentionsAdapter.getResultStartPosition();
             int len = mentionsAdapter.getResultLength();
@@ -7164,7 +7163,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     builder.setMessage(LocaleController.getString("ClearSearch", R.string.ClearSearch));
                     builder.setPositiveButton(LocaleController.getString("ClearButton", R.string.ClearButton).toUpperCase(), (dialogInterface, i) -> mentionsAdapter.clearRecentHashtags());
                     builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
-                    Log.e("TEST", "SHOW_TEST");
                     showDialog(builder.create());
                     return true;
                 }

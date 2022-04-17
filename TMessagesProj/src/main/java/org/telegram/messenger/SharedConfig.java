@@ -1196,7 +1196,6 @@ public class SharedConfig {
             } else {
                 devicePerformanceClass = PERFORMANCE_CLASS_HIGH;
             }
-            Log.e("TEST", "devicePerformanceClass = " + devicePerformanceClass);
             if (BuildVars.LOGS_ENABLED) {
                 FileLog.d("device performance info (cpu_count = " + cpuCount + ", freq = " + maxCpuFreq + ", memoryClass = " + memoryClass + ", android version " + androidVersion + ")");
             }

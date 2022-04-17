@@ -8479,6 +8479,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                     tInfo = DCHelper.getTInfo(currentUser, currentChat);
                     dc.setIdAndDC(tInfo);
+                    break;
                 case VIEW_TYPE_ADDTOGROUP_INFO:
                     TextInfoPrivacyCell addToGroupInfo = (TextInfoPrivacyCell) holder.itemView;
                     addToGroupInfo.setBackground(Theme.getThemedDrawable(mContext, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));

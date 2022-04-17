@@ -3952,8 +3952,6 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                 }
             } else if (StoreUtils.isFromPlayStore()) {
                 Browser.openUrl(LaunchActivity.this, BuildVars.PLAYSTORE_APP_URL);
-            } else if (StoreUtils.isFromHuaweiStore()) {
-                Browser.openUrl(LaunchActivity.this, BuildVars.APP_GALLERY_APP_URL);
             }
         });
         updateLayoutIcon = new RadialProgress2(updateLayout);
@@ -4120,7 +4118,7 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
     }
 
     public void checkAppUpdate(boolean force) {
-        if((!OwlConfig.notifyUpdates && !force) || OwlConfig.getActiveAccounts() == 0) {
+        if((!OwlConfig.notifyUpdates && !force) || OwlConfig.getActiveAccounts() == 0 || !StoreUtils.isFromCheckableStore()) {
             return;
         }
         UpdateManager.isDownloadedUpdate(result -> {

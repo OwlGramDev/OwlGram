@@ -34,6 +34,7 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.StoreUtils;
 
 public class OwlgramSettings extends BaseFragment {
     private int rowCount;
@@ -148,12 +149,16 @@ public class OwlgramSettings extends BaseFragment {
     @SuppressLint("NotifyDataSetChanged")
     private void updateRowsId() {
         rowCount = 0;
+        updateSettingsRow = -1;
+
         categoryHeaderRow = rowCount++;
         generalSettingsRow = rowCount++;
         appearanceSettingsRow = rowCount++;
         chatSettingsRow = rowCount++;
         experimentalSettingsRow = rowCount++;
-        updateSettingsRow = rowCount++;
+        if (StoreUtils.isFromCheckableStore()) {
+            updateSettingsRow = rowCount++;
+        }
         divisorInfoRow = rowCount++;
         infoHeaderRow = rowCount++;
         channelUpdatesRow = rowCount++;
@@ -161,6 +166,7 @@ public class OwlgramSettings extends BaseFragment {
         sourceCodeRow = rowCount++;
         supportTranslationRow = rowCount++;
         supportDonationRow = rowCount++;
+
         if (listAdapter != null) {
             listAdapter.notifyDataSetChanged();
         }

@@ -318,8 +318,6 @@ public class UpdateAlertDialog extends BottomSheet {
                 ApkDownloader.downloadAPK(context, updateAvailable.link_file, updateAvailable.version);
             } else if (StoreUtils.isFromPlayStore()) {
                 Browser.openUrl(getContext(), BuildVars.PLAYSTORE_APP_URL);
-            } else if (StoreUtils.isFromHuaweiStore()) {
-                Browser.openUrl(getContext(), BuildVars.APP_GALLERY_APP_URL);
             }
             dismiss();
         });

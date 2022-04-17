@@ -4,6 +4,7 @@ import android.content.pm.PackageInfo;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.exoplayer2.util.Log;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;

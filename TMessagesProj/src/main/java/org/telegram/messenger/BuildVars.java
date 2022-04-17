@@ -21,8 +21,8 @@ public class BuildVars {
     public static boolean CHECK_UPDATES = false;
     public static boolean IGNORE_VERSION_CHECK = false;
     public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= 29;
-    public static int BUILD_VERSION = 2623;
-    public static String BUILD_VERSION_STRING = "1.8.2";
+    public static int BUILD_VERSION = 2624;
+    public static String BUILD_VERSION_STRING = "1.8.2 Beta 1";
     public static int TELEGRAM_BUILD_VERSION = 2622;
     public static String TELEGRAM_VERSION_STRING = "8.7.0";
     public static int APP_ID = 10029733;
@@ -30,7 +30,6 @@ public class BuildVars {
 
     public static String SMS_HASH = isStandaloneApp() ? "w0lkcmTZkKh" : (DEBUG_VERSION ? "O2P2z+/jBpJ" : "oLeq9AcOZkT");
     public static String PLAYSTORE_APP_URL = "https://play.google.com/store/apps/details?id=it.owlgram.android";
-    public static String APP_GALLERY_APP_URL = "https://appgallery.cloud.huawei.com/marketshare/app/C105849965";
 
     static {
         if (ApplicationLoader.applicationContext != null) {

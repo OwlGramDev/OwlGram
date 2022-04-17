@@ -8,6 +8,10 @@ public class StoreUtils {
         return isFromPlayStore() || isFromHuaweiStore();
     }
 
+    public static boolean isFromCheckableStore() {
+        return isFromPlayStore();
+    }
+
     public static boolean isFromPlayStore() {
         return "com.android.vending".equals(ApplicationLoader.applicationContext.getPackageManager().getInstallerPackageName(BuildConfig.APPLICATION_ID));
     }

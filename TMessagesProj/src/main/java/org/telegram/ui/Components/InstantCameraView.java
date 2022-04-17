@@ -66,6 +66,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 
 import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.util.Log;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -170,7 +171,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
     @TargetApi(21)
     private CameraXController cameraXController;
     @TargetApi(21)
-    private final CameraXController.CameraLifecycle camLifecycle = new CameraXController.CameraLifecycle();
+    private CameraXController.CameraLifecycle camLifecycle;
     private boolean needDrawFlickerStub;
 
     private float panTranslationY;
@@ -338,7 +339,6 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                 }
                 switchCameraX();
             }
-            switchCamera();
             if (switchCameraDrawable != null) {
                 switchCameraDrawable.start();
             }
@@ -498,7 +498,10 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                 CameraController.getInstance().close(cameraSession, !async ? new CountDownLatch(1) : null, beforeDestroyRunnable);
             }
         } else {
-            camLifecycle.stop();
+            try {
+                cameraXController.stopVideoRecording(true);
+            } catch (Exception ignored) {}
+            cameraXController.closeCamera();
         }
     }
 
@@ -576,8 +579,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
         if (textureView != null) {
             return;
         }
-
-
+        camLifecycle = new CameraXController.CameraLifecycle();
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             switchCameraDrawable = (AnimatedVectorDrawable) ContextCompat.getDrawable(getContext(), R.drawable.avd_flip);
@@ -659,7 +661,10 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                         CameraController.getInstance().close(cameraSession, null, null);
                     }
                 } else {
-                    camLifecycle.stop();
+                    try {
+                        cameraXController.stopVideoRecording(false);
+                    } catch (Exception ignored) {}
+                    cameraXController.closeCamera();
                 }
                 return true;
             }
@@ -919,10 +924,10 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
     private void switchCameraX(){
         saveLastCameraBitmap();
         if (lastBitmap != null) {
+            needDrawFlickerStub = false;
             textureOverlayView.setImageBitmap(lastBitmap);
             textureOverlayView.setAlpha(1f);
         }
-        cameraXController.switchCamera();
         isFrontface = !isFrontface;
         cameraReady = false;
         cameraThread.reinitForNewCamera();
