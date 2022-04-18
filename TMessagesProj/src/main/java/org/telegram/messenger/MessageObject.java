@@ -159,6 +159,7 @@ public class MessageObject {
     public boolean preview;
 
     public boolean translated;
+    public boolean translating;
     public Object originalMessage;
     public ArrayList<TLRPC.MessageEntity> originalEntities;
 

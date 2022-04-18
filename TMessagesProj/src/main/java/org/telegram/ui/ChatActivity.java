@@ -25775,7 +25775,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             return false;
                         }
                         BottomSheet.Builder builder = new BottomSheet.Builder(getParentActivity(), false, themeDelegate);
-                        builder.setTitle(button.text);
+                        String link = button.url != null ? button.url:button.text;
+                        link = button.data != null ? new String(button.data):link;
+                        builder.setTitle(link);
                         builder.setItems(new CharSequence[]{
                                 LocaleController.getString("CopyTitle", R.string.CopyTitle),
                                 button.data != null ? LocaleController.getString("CopyCallback", R.string.CopyCallback) : null,

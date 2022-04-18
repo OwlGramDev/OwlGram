@@ -156,7 +156,7 @@ public class OwlgramSettings extends BaseFragment {
         appearanceSettingsRow = rowCount++;
         chatSettingsRow = rowCount++;
         experimentalSettingsRow = rowCount++;
-        if (StoreUtils.isFromCheckableStore()) {
+        if (StoreUtils.isFromCheckableStore() || !StoreUtils.isDownloadedFromAnyStore()) {
             updateSettingsRow = rowCount++;
         }
         divisorInfoRow = rowCount++;

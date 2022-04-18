@@ -100,6 +100,7 @@
     <string name="TranslatorTypeTG">Dialog Popup</string>
     <string name="TranslatorLanguageCode">Translation (%s)</string>
     <string name="MessageTranslated">translated</string>
+    <string name="MessageTranslateProgress">translating</string>
     <string name="UndoTranslate">Undo Translate</string>
     <string name="TranslationProvider">Translation Provider</string>
     <string name="TranslationProviderShort">Provider</string>

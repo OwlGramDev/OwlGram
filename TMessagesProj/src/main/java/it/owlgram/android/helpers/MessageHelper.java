@@ -142,11 +142,22 @@ public class MessageHelper extends BaseController {
         MessageObject obj = new MessageObject(currentAccount, message, true, true);
         obj.originalMessage = messageObject.originalMessage;
         obj.originalEntities = messageObject.originalEntities;
+        obj.translating = false;
         obj.translated = translated;
         if (messageObject.isSponsored()) {
             obj.sponsoredId = messageObject.sponsoredId;
             obj.botStartParam = messageObject.botStartParam;
         }
+        ArrayList<MessageObject> arrayList = new ArrayList<>();
+        arrayList.add(obj);
+        getNotificationCenter().postNotificationName(NotificationCenter.replaceMessagesObjects, dialogId, arrayList, false);
+        return obj;
+    }
+
+    public MessageObject setTranslating(long dialogId, MessageObject messageObject) {
+        TLRPC.Message message = messageObject.messageOwner;
+        MessageObject obj = new MessageObject(currentAccount, message, true, true);
+        obj.translating = true;
         ArrayList<MessageObject> arrayList = new ArrayList<>();
         arrayList.add(obj);
         getNotificationCenter().postNotificationName(NotificationCenter.replaceMessagesObjects, dialogId, arrayList, false);

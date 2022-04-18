@@ -3057,7 +3057,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                 BuildVars.DEBUG_PRIVATE_VERSION ? "Clean app update" : null,
                                 BuildVars.DEBUG_PRIVATE_VERSION ? "Reset suggestions" : null,
                                 BuildVars.DEBUG_PRIVATE_VERSION ? LocaleController.getString(SharedConfig.forceRtmpStream ? R.string.DebugMenuDisableForceRtmpStreamFlag : R.string.DebugMenuEnableForceRtmpStreamFlag) : null,
-                                BuildVars.DEBUG_PRIVATE_VERSION ? LocaleController.getString(R.string.DebugMenuClearWebViewCache) : null
+                                /**BuildVars.DEBUG_PRIVATE_VERSION ? **/LocaleController.getString(R.string.DebugMenuClearWebViewCache) /**: null**/
                         };
                         builder.setItems(items, (dialog, which) -> {
                             if (which == 0) {
@@ -3132,7 +3132,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                 getNotificationCenter().postNotificationName(NotificationCenter.newSuggestionsAvailable);
                             } else if (which == 18) {
                                 SharedConfig.toggleForceRTMPStream();
-                            } else if (which == 18) {
+                            } else if (which == 19) {
                                 ApplicationLoader.applicationContext.deleteDatabase("webview.db");
                                 ApplicationLoader.applicationContext.deleteDatabase("webviewCache.db");
                                 WebStorage.getInstance().deleteAllData();
@@ -6363,7 +6363,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                 }
 
-                if (user != null && isBot && !user.bot_nochats) { // TODO(dkaraush): and had invite button sent
+                if (user != null && isBot && !user.bot_nochats && OwlConfig.buttonStyleType == 5) { // TODO(dkaraush): and had invite button sent
                     addToGroupButtonRow = rowCount++;
                     addToGroupInfoRow = rowCount++;
                 }

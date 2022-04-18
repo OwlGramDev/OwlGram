@@ -71,6 +71,7 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.URLSpanNoUnderline;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.translator.BaseTranslator;
@@ -839,21 +840,17 @@ public class TranslateManager extends Dialog {
         }
     }
 
-    public String languageName(String locale) {
-        if (locale == null || locale.equals("und") || locale.equals("auto")) {
+    public String languageName(String language) {
+        if (language == null || language.equals("und") || language.equals("auto"))
             return null;
-        }
-        LocaleController.LocaleInfo thisLanguageInfo = LocaleController.getInstance().getBuiltinLanguageByPlural(locale),
-                currentLanguageInfo = LocaleController.getInstance().getCurrentLocaleInfo();
-        if (thisLanguageInfo == null) {
-            return null;
-        }
-        boolean isCurrentLanguageEnglish = currentLanguageInfo != null && "en".equals(currentLanguageInfo.pluralLangCode);
-        if (isCurrentLanguageEnglish) {
-            return thisLanguageInfo.nameEnglish;
+        Locale locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? Locale.forLanguageTag(language) : new Locale(language);
+        String value;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !TextUtils.isEmpty(locale.getScript())) {
+            value = AndroidUtilities.capitalize(locale.getDisplayScript());
         } else {
-            return thisLanguageInfo.name;
+            value = AndroidUtilities.capitalize(locale.getDisplayName());
         }
+        return value;
     }
 
     public void updateSourceLanguage() {

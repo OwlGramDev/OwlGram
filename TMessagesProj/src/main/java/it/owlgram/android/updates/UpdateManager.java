@@ -69,7 +69,14 @@ public class UpdateManager {
         if (StoreUtils.isFromPlayStore()) {
             AppUpdateManager appUpdateManager = AppUpdateManagerFactory.create(ApplicationLoader.applicationContext);
             Task<AppUpdateInfo> appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
-            appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> checkInternal(updateCallback, appUpdateInfo.availableVersionCode() / 10));
+            appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+                int versionCode = appUpdateInfo.availableVersionCode();
+                if (versionCode >= BuildVars.BUILD_VERSION) {
+                    checkInternal(updateCallback, versionCode / 10);
+                } else {
+                    updateCallback.onError(new Exception("No updates available, current version is " + BuildVars.BUILD_VERSION + " and available version is " + versionCode));
+                }
+            });
             appUpdateInfoTask.addOnFailureListener(updateCallback::onError);
         } else {
             checkInternal(updateCallback, -1);

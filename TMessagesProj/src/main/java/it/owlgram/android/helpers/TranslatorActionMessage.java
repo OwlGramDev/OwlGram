@@ -34,6 +34,7 @@ public class TranslatorActionMessage {
         }
         final MessageObject finalMessageObject = messageObject;
         translatingMessage.add(currentID);
+        fragment.getMessageHelper().setTranslating(dialog_id, finalMessageObject);
         Translator.translate(original, new Translator.TranslateCallBack() {
             @Override
             public void onSuccess(BaseTranslator.Result result) {

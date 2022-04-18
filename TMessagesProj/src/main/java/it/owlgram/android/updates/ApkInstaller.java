@@ -181,7 +181,6 @@ public class ApkInstaller {
                     }
                 }
             }
-
         }, 250);
     }
 
