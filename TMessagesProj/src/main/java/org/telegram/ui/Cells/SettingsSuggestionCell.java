@@ -1,6 +1,7 @@
 package org.telegram.ui.Cells;
 
 import android.content.Context;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -19,14 +20,18 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.TextStyleSpan;
 import org.telegram.ui.Components.URLSpanNoUnderline;
+import org.telegram.ui.Components.spoilers.SpoilersTextView;
+
+import it.owlgram.android.OwlConfig;
 
 public class SettingsSuggestionCell extends LinearLayout {
 
     public final static int TYPE_PHONE = 0;
     public final static int TYPE_PASSWORD = 1;
 
-    private TextView textView;
+    private SpoilersTextView textView;
     private TextView detailTextView;
     private TextView yesButton;
     private TextView noButton;
@@ -39,7 +44,7 @@ public class SettingsSuggestionCell extends LinearLayout {
         super(context);
         setOrientation(VERTICAL);
 
-        textView = new TextView(context);
+        textView = new SpoilersTextView(context);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         textView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
         textView.setEllipsize(TextUtils.TruncateAt.END);
@@ -86,7 +91,17 @@ public class SettingsSuggestionCell extends LinearLayout {
         currentType = type;
         if (type == TYPE_PHONE) {
             final TLRPC.User user = MessagesController.getInstance(currentAccount).getUser(UserConfig.getInstance(currentAccount).clientUserId);
-            textView.setText(LocaleController.formatString("CheckPhoneNumber", R.string.CheckPhoneNumber, PhoneFormat.getInstance().format("+" + user.phone)));
+            String phoneNumber = PhoneFormat.getInstance().format("+" + user.phone);
+            String phoneText = LocaleController.formatString("CheckPhoneNumber", R.string.CheckPhoneNumber, phoneNumber);
+            SpannableString phoneChars = new SpannableString(phoneText);
+            if (OwlConfig.hidePhoneNumber) {
+                TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
+                run.flags |= TextStyleSpan.FLAG_STYLE_SPOILER;
+                TextStyleSpan result = new TextStyleSpan(run);
+                String totalString = phoneNumber.split(" ", 2)[1];
+                phoneChars.setSpan(result, phoneText.indexOf(totalString), phoneText.indexOf(totalString) + totalString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            textView.setText(phoneChars);
             String text = LocaleController.getString("CheckPhoneNumberInfo", R.string.CheckPhoneNumberInfo);
             SpannableStringBuilder builder = new SpannableStringBuilder(text);
             int index1 = text.indexOf("**");

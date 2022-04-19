@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,11 +17,12 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.spoilers.SpoilersTextView;
 
 @SuppressLint("ViewConstructor")
 public class TextDetailCellMultiline extends LinearLayout {
 
-    private final SimpleTextView textView;
+    private final SpoilersTextView spoilersTextView;
     private final TextView valueTextView;
     private boolean needDivider;
     private boolean contentDescriptionValueFirst;
@@ -30,15 +32,15 @@ public class TextDetailCellMultiline extends LinearLayout {
         super(context);
 
         setOrientation(VERTICAL);
-        textView = new SimpleTextView(context);
-        textView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-        textView.setTextSize(16);
-        textView.setMaxLines(Integer.MAX_VALUE);
-        textView.setGravity(LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT);
+        spoilersTextView = new SpoilersTextView(context);
+        spoilersTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        spoilersTextView.setTextSize(16);
+        spoilersTextView.setMaxLines(Integer.MAX_VALUE);
+        spoilersTextView.setGravity(LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT);
         String linkTextColorKey = Theme.key_windowBackgroundWhiteLinkText;
-        textView.setLinkTextColor(Theme.getColor(linkTextColorKey));
-        textView.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
-        addView(textView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 23, 8, 23, 0));
+        spoilersTextView.setLinkTextColor(Theme.getColor(linkTextColorKey));
+        spoilersTextView.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+        addView(spoilersTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 23, 8, 23, 0));
 
         valueTextView = new TextView(context);
         valueTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2));
@@ -52,16 +54,17 @@ public class TextDetailCellMultiline extends LinearLayout {
     }
 
     public boolean haveSpoilers() {
-        return textView.haveSpoilers();
+        return !spoilersTextView.isSpoilersRevealed && spoilersTextView.spoilers.size() > 0;
     }
 
+    @SuppressLint("Recycle")
     public void revealSpoilers() {
-        textView.revealSpoilers();
+        spoilersTextView.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, Math.round(getWidth() / 2.0), Math.round(getHeight() / 2.0), 0));
     }
 
     public void setTextAndValue(CharSequence text, String value, boolean divider) {
         charSequence = text;
-        textView.setText(text, true);
+        spoilersTextView.setText(text);
         valueTextView.setText(value);
         needDivider = divider;
         setWillNotDraw(!needDivider);
@@ -69,7 +72,7 @@ public class TextDetailCellMultiline extends LinearLayout {
 
     public void setTextWithEmojiAndValue(CharSequence text, CharSequence value, boolean divider) {
         charSequence = text;
-        textView.setText(Emoji.replaceEmoji(text, textView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(14), false));
+        spoilersTextView.setText(Emoji.replaceEmoji(text, spoilersTextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(14), false));
         valueTextView.setText(value);
         needDivider = divider;
         setWillNotDraw(!divider);
@@ -82,7 +85,7 @@ public class TextDetailCellMultiline extends LinearLayout {
     @Override
     public void invalidate() {
         super.invalidate();
-        textView.invalidate();
+        spoilersTextView.invalidate();
     }
 
     @Override
@@ -105,7 +108,7 @@ public class TextDetailCellMultiline extends LinearLayout {
     @Override
     public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
         super.onInitializeAccessibilityNodeInfo(info);
-        final CharSequence text = textView.getText();
+        final CharSequence text = spoilersTextView.getText();
         final CharSequence valueText = valueTextView.getText();
         if (!TextUtils.isEmpty(text) && !TextUtils.isEmpty(valueText)) {
             info.setText((contentDescriptionValueFirst ? valueText : text) + ": " + (contentDescriptionValueFirst ? text : valueText));

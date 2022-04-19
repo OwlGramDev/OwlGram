@@ -21,9 +21,9 @@ import java.util.Stack;
 
 public class SpoilersTextView extends TextView {
     private SpoilersClickDetector clickDetector;
-    private List<SpoilerEffect> spoilers = new ArrayList<>();
+    public List<SpoilerEffect> spoilers = new ArrayList<>();
     private Stack<SpoilerEffect> spoilersPool = new Stack<>();
-    private boolean isSpoilersRevealed;
+    public boolean isSpoilersRevealed;
     private Path path = new Path();
     private Paint xRefPaint;
 
