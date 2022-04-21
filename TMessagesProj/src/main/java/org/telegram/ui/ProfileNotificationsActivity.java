@@ -504,7 +504,11 @@ public class ProfileNotificationsActivity extends BaseFragment implements Notifi
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.notificationsSettingsUpdated) {
-            adapter.notifyDataSetChanged();
+            try {
+                adapter.notifyDataSetChanged();
+            } catch (Exception e) {
+
+            }
         }
     }
 
@@ -520,8 +524,13 @@ public class ProfileNotificationsActivity extends BaseFragment implements Notifi
             RecyclerListView.Holder holder = (RecyclerListView.Holder) listView.getChildViewHolder(child);
             int type = holder.getItemViewType();
             int position = holder.getAdapterPosition();
-            if (position != customRow && position != enableRow && type != 0) {
+            if (position != customRow && position != enableRow) {
                 switch (type) {
+                    case 0: {
+                        HeaderCell textCell = (HeaderCell) holder.itemView;
+                        textCell.setEnabled(customEnabled && notificationsEnabled, animators);
+                        break;
+                    }
                     case 1: {
                         TextSettingsCell textCell = (TextSettingsCell) holder.itemView;
                         textCell.setEnabled(customEnabled && notificationsEnabled, animators);
@@ -840,35 +849,38 @@ public class ProfileNotificationsActivity extends BaseFragment implements Notifi
 
         @Override
         public void onViewAttachedToWindow(RecyclerView.ViewHolder holder) {
-            if (holder.getItemViewType() != 0) {
-                switch (holder.getItemViewType()) {
-                    case 1: {
-                        TextSettingsCell textCell = (TextSettingsCell) holder.itemView;
-                        textCell.setEnabled(customEnabled && notificationsEnabled, null);
-                        break;
-                    }
-                    case 2: {
-                        TextInfoPrivacyCell textCell = (TextInfoPrivacyCell) holder.itemView;
-                        textCell.setEnabled(customEnabled && notificationsEnabled, null);
-                        break;
-                    }
-                    case 3: {
-                        TextColorCell textCell = (TextColorCell) holder.itemView;
-                        textCell.setEnabled(customEnabled && notificationsEnabled, null);
-                        break;
-                    }
-                    case 4: {
-                        RadioCell radioCell = (RadioCell) holder.itemView;
-                        radioCell.setEnabled(customEnabled && notificationsEnabled, null);
-                        break;
-                    }
-                    case 8: {
-                        TextCheckCell checkCell = (TextCheckCell) holder.itemView;
-                        if (holder.getAdapterPosition() == previewRow) {
-                            checkCell.setEnabled(customEnabled && notificationsEnabled, null);
-                        } else {
-                            checkCell.setEnabled(true, null);
-                        }
+            switch (holder.getItemViewType()) {
+                case 0: {
+                    HeaderCell textCell = (HeaderCell) holder.itemView;
+                    textCell.setEnabled(customEnabled && notificationsEnabled, null);
+                    break;
+                }
+                case 1: {
+                    TextSettingsCell textCell = (TextSettingsCell) holder.itemView;
+                    textCell.setEnabled(customEnabled && notificationsEnabled, null);
+                    break;
+                }
+                case 2: {
+                    TextInfoPrivacyCell textCell = (TextInfoPrivacyCell) holder.itemView;
+                    textCell.setEnabled(customEnabled && notificationsEnabled, null);
+                    break;
+                }
+                case 3: {
+                    TextColorCell textCell = (TextColorCell) holder.itemView;
+                    textCell.setEnabled(customEnabled && notificationsEnabled, null);
+                    break;
+                }
+                case 4: {
+                    RadioCell radioCell = (RadioCell) holder.itemView;
+                    radioCell.setEnabled(customEnabled && notificationsEnabled, null);
+                    break;
+                }
+                case 8: {
+                    TextCheckCell checkCell = (TextCheckCell) holder.itemView;
+                    if (holder.getAdapterPosition() == previewRow) {
+                        checkCell.setEnabled(customEnabled && notificationsEnabled, null);
+                    } else {
+                        checkCell.setEnabled(true, null);
                     }
                 }
             }

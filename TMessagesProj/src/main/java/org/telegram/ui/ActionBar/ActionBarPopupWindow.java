@@ -552,6 +552,10 @@ public class ActionBarPopupWindow extends PopupWindow {
         public void setTopView(View topView) {
             this.topView = topView;
         }
+
+        public void setSwipeBackForegroundColor(int color) {
+            getSwipeBack().setForegroundColor(color);
+        }
     }
 
     public ActionBarPopupWindow() {
@@ -867,6 +871,7 @@ public class ActionBarPopupWindow extends PopupWindow {
 
         Paint paint = new Paint();
         String colorKey;
+        int color = 0;
         public GapView(Context context, String colorKey) {
             super(context);
             this.colorKey = colorKey;
@@ -874,8 +879,16 @@ public class ActionBarPopupWindow extends PopupWindow {
 
         @Override
         protected void onDraw(Canvas canvas) {
-            paint.setColor(Theme.getColor(colorKey));
+            if (color == 0) {
+                paint.setColor(Theme.getColor(colorKey));
+            } else {
+                paint.setColor(color);
+            }
             canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), paint);
+        }
+
+        public void setColor(int color) {
+            this.color = color;
         }
     }
 }

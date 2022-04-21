@@ -56,7 +56,6 @@ import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RLottieImageView;
 import org.telegram.ui.Components.SnowflakesEffect;
 import org.telegram.ui.ThemeActivity;
-
 import it.owlgram.android.OwlConfig;
 
 public class DrawerProfileCell extends FrameLayout {
