@@ -77,7 +77,7 @@ public class AppIconCell extends LinearLayout {
     }
 
     public int getItemID() {
-        return iconDescriptor.getId();
+        return iconDescriptor.ordinal();
     }
 
     private class IconStyleDrawable {

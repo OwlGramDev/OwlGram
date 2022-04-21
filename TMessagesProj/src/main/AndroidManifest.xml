@@ -246,6 +246,19 @@
             </intent-filter>
         </activity-alias>
         <activity-alias
+            android:name=".OG_Icon_Alt_Monet"
+            android:enabled="false"
+            android:icon="@mipmap/owl_gram_fm"
+            android:roundIcon="@mipmap/owl_gram_fm"
+            android:targetActivity="org.telegram.ui.LaunchActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+        <activity-alias
             android:name="org.telegram.ui.CallsActivity"
             android:targetActivity="org.telegram.ui.LaunchActivity"
             android:permission="android.permission.CALL_PHONE">

@@ -241,4 +241,9 @@
     <string name="DeveloperIcon">Developer</string>
     <string name="ArcticIcon">Arctic</string>
     <string name="ClassicIcon">Classic</string>
+    <string name="MonetIcon">Force Monet Icon</string>
+    <string name="MonetIconDesc">It allows you to use Material You\'s dynamic icon on Android 12.</string>
+    <string name="DisableExperimentalAlert">Are you sure you want to disable experimental settings?\n\nNote that this will disable the Monet Icon.</string>
+    <string name="ChangeIcon">Change App Icon</string>
+    <string name="ChangeIconDesc"> Since on Android 12 the monet icon was forced and you upgraded to Android 13, you need to change the app icon to the default one for a better support.</string>
 </resources>

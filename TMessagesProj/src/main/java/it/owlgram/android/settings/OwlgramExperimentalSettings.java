@@ -2,6 +2,7 @@ package it.owlgram.android.settings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -15,6 +16,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBar;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
@@ -29,6 +31,7 @@ import java.util.ArrayList;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.LabsHeader;
+import it.owlgram.android.helpers.IconsHelper;
 import it.owlgram.android.helpers.PopupHelper;
 
 public class OwlgramExperimentalSettings extends BaseFragment {
@@ -45,6 +48,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
     private int unlimitedPinnedChatsRow;
     private int maxRecentStickersRow;
     private int experimentalMessageAlert;
+    private int monetIconRow;
 
     @Override
     public boolean onFragmentCreate() {
@@ -112,26 +116,53 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                     listAdapter.notifyItemChanged(maxRecentStickersRow);
                 });
             } else if (position == checkBoxExperimentalRow) {
-                OwlConfig.toggleDevOpt();
                 if (view instanceof TextCheckCell) {
-                    boolean isEnabled = OwlConfig.isDevOptEnabled();
                     TextCheckCell textCheckCell = (TextCheckCell) view;
-                    textCheckCell.setChecked(isEnabled);
-                    textCheckCell.setText(isEnabled ? LocaleController.getString("OnModeCheckTitle", R.string.OnModeCheckTitle):LocaleController.getString("OffModeCheckTitle", R.string.OffModeCheckTitle));
-                    textCheckCell.setBackgroundColorAnimated(isEnabled, Theme.getColor(isEnabled ? Theme.key_windowBackgroundChecked : Theme.key_windowBackgroundUnchecked));
-                    if (isEnabled) {
-                        listAdapter.notifyItemRemoved(experimentalMessageAlert);
-                        updateRowsId(false);
-                        listAdapter.notifyItemRangeInserted(headerImageRow, rowCount - headerImageRow);
+                    if (IconsHelper.isSelectedMonet()) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
+                        builder.setMessage(LocaleController.getString("DisableExperimentalAlert", R.string.DisableExperimentalAlert));
+                        builder.setPositiveButton(LocaleController.getString("AutoDeleteConfirm", R.string.AutoDeleteConfirm), (dialogInterface, i) -> {
+                            IconsHelper.switchToMonet();
+                            toggleExperimentalMode(textCheckCell);
+                            AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
+                            progressDialog.show();
+                            AndroidUtilities.runOnUIThread(progressDialog::dismiss, 2000);
+                        });
+                        builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+                        builder.show();
                     } else {
-                        listAdapter.notifyItemRangeRemoved(headerImageRow, rowCount - headerImageRow);
-                        updateRowsId(false);
-                        listAdapter.notifyItemInserted(experimentalMessageAlert);
+                        toggleExperimentalMode(textCheckCell);
                     }
+                }
+            } else if (position == monetIconRow) {
+                IconsHelper.switchToMonet();
+                AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
+                progressDialog.show();
+                AndroidUtilities.runOnUIThread(progressDialog::dismiss, 2000);
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.useMonetIcon);
                 }
             }
         });
         return fragmentView;
+    }
+
+    private void toggleExperimentalMode(TextCheckCell textCheckCell) {
+        OwlConfig.toggleDevOpt();
+        boolean isEnabled = OwlConfig.isDevOptEnabled();
+        textCheckCell.setChecked(isEnabled);
+        textCheckCell.setText(isEnabled ? LocaleController.getString("OnModeCheckTitle", R.string.OnModeCheckTitle):LocaleController.getString("OffModeCheckTitle", R.string.OffModeCheckTitle));
+        textCheckCell.setBackgroundColorAnimated(isEnabled, Theme.getColor(isEnabled ? Theme.key_windowBackgroundChecked : Theme.key_windowBackgroundUnchecked));
+        if (isEnabled) {
+            listAdapter.notifyItemRemoved(experimentalMessageAlert);
+            updateRowsId(false);
+            listAdapter.notifyItemRangeInserted(headerImageRow, rowCount - headerImageRow);
+        } else {
+            listAdapter.notifyItemRangeRemoved(headerImageRow, rowCount - headerImageRow);
+            updateRowsId(false);
+            listAdapter.notifyItemInserted(experimentalMessageAlert);
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -144,6 +175,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
         unlimitedStickersRow = -1;
         unlimitedPinnedChatsRow = -1;
         maxRecentStickersRow = -1;
+        monetIconRow = -1;
         experimentalMessageAlert = -1;
 
         checkBoxExperimentalRow = rowCount++;
@@ -154,6 +186,9 @@ public class OwlgramExperimentalSettings extends BaseFragment {
             betterAudioCallRow = rowCount++;
             unlimitedStickersRow = rowCount++;
             unlimitedPinnedChatsRow = rowCount++;
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
+                monetIconRow = rowCount++;
+            }
             maxRecentStickersRow = rowCount++;
         } else {
             experimentalMessageAlert = rowCount++;
@@ -204,6 +239,8 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                         textCheckCell.setColors(Theme.key_windowBackgroundCheckText, Theme.key_switchTrackBlue, Theme.key_switchTrackBlueChecked, Theme.key_switchTrackBlueThumb, Theme.key_switchTrackBlueThumbChecked);
                         textCheckCell.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
                         textCheckCell.setHeight(56);
+                    } else if (position == monetIconRow) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("MonetIcon", R.string.MonetIcon), LocaleController.getString("MonetIconDesc", R.string.MonetIconDesc), OwlConfig.useMonetIcon, true, true);
                     }
                     break;
                 case 4:
@@ -272,7 +309,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
         @Override
         public int getItemViewType(int position) {
             if (position == unlimitedStickersRow || position == unlimitedPinnedChatsRow || position == betterAudioCallRow ||
-                    position == checkBoxExperimentalRow) {
+                    position == checkBoxExperimentalRow || position == monetIconRow) {
                 return 2;
             } else if (position == headerImageRow) {
                 return 3;

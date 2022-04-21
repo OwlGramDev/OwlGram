@@ -192,8 +192,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.AppLinkVerifyBottomSheet;
+import it.owlgram.android.components.MonetAndroidFixDialog;
 import it.owlgram.android.components.SendOptionsMenuLayout;
 import it.owlgram.android.helpers.ForwardContext;
+import it.owlgram.android.helpers.IconsHelper;
 import it.owlgram.android.updates.ApkDownloader;
 import it.owlgram.android.updates.UpdateManager;
 
@@ -3866,7 +3868,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             FilesMigrationService.checkBottomSheet(this);
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        boolean needMonetMigration = IconsHelper.needMonetMigration();
+        if (needMonetMigration) {
+            MonetAndroidFixDialog.checkBottomSheet(this);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !needMonetMigration) {
             AppLinkVerifyBottomSheet.checkBottomSheet(this);
         }
         updateMenuButton(false);

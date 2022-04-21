@@ -78,6 +78,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean showIDAndDC;
     public static boolean xiaomiBlockedInstaller;
     public static boolean searchIconInActionBar;
+    public static boolean useMonetIcon;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -214,6 +215,7 @@ public class OwlConfig extends SettingsManager {
             unlimitedPinnedDialogs = preferences.getBoolean("unlimitedPinnedDialogs"+dS, false);
             maxRecentStickers = preferences.getInt("maxRecentStickers"+dS, 20);
             betterAudioQuality = preferences.getBoolean("betterAudioQuality"+dS, false);
+            useMonetIcon = preferences.getBoolean("useMonetIcon"+dS, false);
 
             fixLanguageSelected();
             configLoaded = true;
@@ -628,6 +630,14 @@ public class OwlConfig extends SettingsManager {
         editor.apply();
     }
 
+    public static void toggleUseMonetIcon() {
+        useMonetIcon = !useMonetIcon;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("useMonetIcon", useMonetIcon);
+        editor.apply();
+    }
+
     public static void setXiaomiBlockedInstaller() {
         xiaomiBlockedInstaller = true;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
@@ -880,7 +890,7 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static boolean isDevOptEnabled() {
-        return devOptEnabled || betterAudioQuality || unlimitedFavoriteStickers || unlimitedPinnedDialogs || maxRecentStickers != 20;
+        return devOptEnabled || betterAudioQuality || unlimitedFavoriteStickers || unlimitedPinnedDialogs || maxRecentStickers != 20 || useMonetIcon;
     }
 
     public static boolean canShowFireworks() {

@@ -72,6 +72,7 @@ public class SettingsManager {
             case "translationKeyboardTarget":
             case "deepLFormality":
             case "iconStyleSelected":
+            case "useMonetIcon":
             case "DB_VERSION":
             case "NEED_RECREATE_FORMATTERS":
             case "NEED_RECREATE_SHADOW":

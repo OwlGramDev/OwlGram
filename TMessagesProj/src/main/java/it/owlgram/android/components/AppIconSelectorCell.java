@@ -80,7 +80,7 @@ public class AppIconSelectorCell extends FrameLayout {
         recyclerView.post(() -> {
             int selectedPosition = 0;
             for (int i = 0; i < rowCount; i++) {
-                if (map.get(i) != null && Objects.requireNonNull(map.get(i)).getId() == selectedDefault) {
+                if (map.get(i) != null && Objects.requireNonNull(map.get(i)).ordinal() == selectedDefault) {
                     selectedPosition = i;
                 }
             }
