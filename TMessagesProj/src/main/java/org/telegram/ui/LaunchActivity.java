@@ -178,6 +178,7 @@ import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateAlertDialog;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.LanguageHelper;
+import it.owlgram.android.helpers.StickersHelper;
 import it.owlgram.android.helpers.UpdateSignaling;
 import it.owlgram.android.settings.OwlgramAppearanceSettings;
 import it.owlgram.android.settings.OwlgramChatSettings;
@@ -2096,19 +2097,20 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                                         bulletin.show();
                                     } else if (url.startsWith("tg:laky") || url.startsWith("tg://laky") || url.startsWith("tg:fox") || url.startsWith("tg://fox")) {
                                         BaseFragment fragment = mainFragmentsStack.get(mainFragmentsStack.size() - 1);
-                                        TLRPC.Document document = MediaDataController.getInstance(currentAccount).getStickerSetByName("ArcticFox").documents.get(7);
-                                        StickerSetBulletinLayout layout = new StickerSetBulletinLayout(fragment.getParentActivity(), null, StickerSetBulletinLayout.TYPE_EMPTY, document, fragment.getResourceProvider());
-                                        layout.subtitleTextView.setVisibility(View.GONE);
-                                        String textEaster = "This is not the Fox DEVELOPER you were looking for!";
-                                        SpannableString spannableEaster = new SpannableString(textEaster);
-                                        spannableEaster.setSpan(new StrikethroughSpan(), 16, 19, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                        spannableEaster.setSpan(new StyleSpan(Typeface.BOLD), 20, 29, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                        layout.titleTextView.setText(spannableEaster);
-                                        layout.titleTextView.setTypeface(null);
-                                        layout.titleTextView.setMaxLines(3);
-                                        layout.titleTextView.setSingleLine(false);
-                                        Bulletin bulletin = Bulletin.make(fragment, layout, Bulletin.DURATION_LONG);
-                                        bulletin.show();
+                                        new StickersHelper().getStickerAsync(currentAccount, "ArcticFox", 7, document -> {
+                                            StickerSetBulletinLayout layout = new StickerSetBulletinLayout(fragment.getParentActivity(), null, StickerSetBulletinLayout.TYPE_EMPTY, document, fragment.getResourceProvider());
+                                            layout.subtitleTextView.setVisibility(View.GONE);
+                                            String textEaster = "This is not the Fox DEVELOPER you were looking for!";
+                                            SpannableString spannableEaster = new SpannableString(textEaster);
+                                            spannableEaster.setSpan(new StrikethroughSpan(), 16, 19, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                            spannableEaster.setSpan(new StyleSpan(Typeface.BOLD), 20, 29, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                            layout.titleTextView.setText(spannableEaster);
+                                            layout.titleTextView.setTypeface(null);
+                                            layout.titleTextView.setMaxLines(3);
+                                            layout.titleTextView.setSingleLine(false);
+                                            Bulletin bulletin = Bulletin.make(fragment, layout, Bulletin.DURATION_LONG);
+                                            bulletin.show();
+                                        });
                                     } else if (url.startsWith("tg:experimental") || url.startsWith("tg://experimental")) {
                                         actionBarLayout.presentFragment(new OwlgramExperimentalSettings(), false, true, true, false);
                                         if (AndroidUtilities.isTablet()) {
