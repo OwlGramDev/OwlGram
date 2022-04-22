@@ -22442,6 +22442,21 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         }
                         processSelectedOption(options.get(i));
                     });
+                    cell.setOnLongClickListener(v1 -> {
+                        if (inPreviewMode) {
+                            return false;
+                        }
+                        if (selectedObject == null || i >= options.size()) {
+                            return false;
+                        }
+                        if (processSelectedOptionLongClick(options.get(i))) {
+                            if (scrimPopupWindow != null) {
+                                scrimPopupWindow.dismiss();
+                            }
+                            return true;
+                        }
+                        return false;
+                    });
                     if (option == 201) { // OwlGram Translate Button
                         MessageObject messageObject = getMessageHelper().getMessageForTranslate(selectedObject, selectedObjectGroup);
                         TranslateManager.OnLinkPress onLinkPress = (link) -> didPressMessageUrl(link, false, selectedObject, v instanceof ChatMessageCell ? (ChatMessageCell) v : null);
