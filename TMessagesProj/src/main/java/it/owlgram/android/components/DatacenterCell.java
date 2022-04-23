@@ -34,6 +34,7 @@ public class DatacenterCell extends LinearLayout {
     private final ShimmerFrameLayout shimmerFrameLayout;
     private final CardView mainCardView;
     private boolean withBackground = false;
+    private boolean needDivider = false;
 
     @SuppressLint("SetTextI18n")
     public DatacenterCell(Context context) {
@@ -183,11 +184,11 @@ public class DatacenterCell extends LinearLayout {
         this.withBackground = themeInfo.withBackground;
         mainCardView.setRadius(themeInfo.radius);
         if (tInfo != null) {
-            setIdAndDC(tInfo);
+            setIdAndDC(tInfo, needDivider);
         }
     }
 
-    public void setIdAndDC(DCHelper.TInfo tInfo) {
+    public void setIdAndDC(DCHelper.TInfo tInfo, boolean divider) {
         this.tInfo = tInfo;
         mainLayout.setVisibility(VISIBLE);
         removeView(shimmerFrameLayout);
@@ -196,10 +197,14 @@ public class DatacenterCell extends LinearLayout {
         Drawable d = ContextCompat.getDrawable(getContext(), DCHelper.getDcIcon(tInfo.dcID));
         Objects.requireNonNull(d).setColorFilter(Theme.getColor(Theme.key_switch2TrackChecked), PorterDuff.Mode.SRC_ATOP);
         iv.setBackground(d);
+        needDivider = divider;
+        setWillNotDraw(!needDivider);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawLine(AndroidUtilities.dp(16), getMeasuredHeight() - 1, getMeasuredWidth() - AndroidUtilities.dp(16), getMeasuredHeight() - 1, Theme.dividerPaint);
+        if (needDivider) {
+            canvas.drawLine(AndroidUtilities.dp(16), getMeasuredHeight() - 1, getMeasuredWidth() - AndroidUtilities.dp(16), getMeasuredHeight() - 1, Theme.dividerPaint);
+        }
     }
 }

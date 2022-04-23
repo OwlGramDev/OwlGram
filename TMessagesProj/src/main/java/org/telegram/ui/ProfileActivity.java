@@ -8508,7 +8508,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         }
                     }
                     tInfo = DCHelper.getTInfo(currentUser, currentChat);
-                    dc.setIdAndDC(tInfo);
+                    boolean withDivider = (chatInfo != null && !TextUtils.isEmpty(chatInfo.about)) || (currentChat != null && !TextUtils.isEmpty(currentChat.username)) || currentUser != null && (UserObject.isUserSelf(currentUser) || !TextUtils.isEmpty(currentUser.username));
+                    dc.setIdAndDC(tInfo, withDivider);
                     break;
                 case VIEW_TYPE_ADDTOGROUP_INFO:
                     TextInfoPrivacyCell addToGroupInfo = (TextInfoPrivacyCell) holder.itemView;

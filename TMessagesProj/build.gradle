@@ -312,7 +312,7 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 2631
+    defaultConfig.versionCode = 2635
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
@@ -332,7 +332,7 @@ android {
         minSdkVersion 16
         //noinspection OldTargetApi
         targetSdkVersion 30
-        versionName "1.8.2"
+        versionName "1.8.3 PBeta 1"
 
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
 
