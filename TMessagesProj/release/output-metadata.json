@@ -1,0 +1,72 @@
+{
+  "version": 3,
+  "artifactType": {
+    "type": "APK",
+    "kind": "Directory"
+  },
+  "applicationId": "it.owlgram.android",
+  "variantName": "release",
+  "elements": [
+    {
+      "type": "UNIVERSAL",
+      "filters": [],
+      "attributes": [],
+      "versionCode": 26360,
+      "versionName": "1.8.3 PBeta 2",
+      "outputFile": "OwlGram-1.8.3 PBeta 2-2636-universal.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 26361,
+      "versionName": "1.8.3 PBeta 2",
+      "outputFile": "OwlGram-1.8.3 PBeta 2-2636-armeabi-v7a.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86_64"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 26366,
+      "versionName": "1.8.3 PBeta 2",
+      "outputFile": "OwlGram-1.8.3 PBeta 2-2636-x86_64.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "arm64-v8a"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 26365,
+      "versionName": "1.8.3 PBeta 2",
+      "outputFile": "OwlGram-1.8.3 PBeta 2-2636-arm64-v8a.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 26362,
+      "versionName": "1.8.3 PBeta 2",
+      "outputFile": "OwlGram-1.8.3 PBeta 2-2636-x86.apk"
+    }
+  ],
+  "elementType": "File"
+}
