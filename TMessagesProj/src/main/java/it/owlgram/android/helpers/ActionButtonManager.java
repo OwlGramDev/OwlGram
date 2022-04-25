@@ -169,10 +169,10 @@ public class ActionButtonManager {
             case "stop":
             case "block":
             case "logout":
-                return Theme.key_windowBackgroundWhiteRedText4;
+                return Theme.key_dialogTextRed;
             case "unblock":
             case "restart":
-                return Theme.key_statisticChartLine_green;
+                return Theme.key_wallet_greenText;
         }
         return Theme.key_switch2TrackChecked;
     }

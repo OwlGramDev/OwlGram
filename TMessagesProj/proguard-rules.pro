@@ -12,7 +12,7 @@
 -keep class com.google.android.exoplayer2.decoder.SimpleOutputBuffer { *; }
 
 # https://developers.google.com/ml-kit/known-issues#android_issues
--keep class com.google.mlkit.nl.languageid.internal.LanguageIdentificationJni { *; }
+-keep class com.google.mlkit.nl.languageid.internal.ThickLanguageIdentifier { *; }
 
 # Constant folding for resource integers may mean that a resource passed to this method appears to be unused. Keep the method to prevent this from happening.
 -keep class com.google.android.exoplayer2.upstream.RawResourceDataSource {
@@ -86,6 +86,15 @@
 -keepclassmembernames class org.telegram.ui.* { <fields>; }
 -keepclassmembernames class org.telegram.ui.Cells.* { <fields>; }
 -keepclassmembernames class org.telegram.ui.Components.* { <fields>; }
+
+# Keep OwlConfig fields name
+-keepnames class it.owlgram.android.OwlConfig { <fields>; }
+
+# Keep all classes of Apache Commons
+-keep class org.apache.commons.text.** { *; }
+
+# Keep all class member names of CameraX
+-keepclassmembernames class androidx.camera.extensions.impl.* { *; }
 
 -keepclassmembernames class androidx.core.widget.NestedScrollView {
     private android.widget.OverScroller mScroller;

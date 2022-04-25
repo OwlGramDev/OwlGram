@@ -12,6 +12,7 @@ x64_SDK23/
 x86/
 x86_SDK23/
 obj/
+obfuscation/
 *.iml
 *.apk
 local.properties

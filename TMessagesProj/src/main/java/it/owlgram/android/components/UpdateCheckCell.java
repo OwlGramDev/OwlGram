@@ -177,7 +177,7 @@ public class UpdateCheckCell extends RelativeLayout {
     }
 
     public void setCheckTime() {
-        int greenColor = Theme.getColor(Theme.key_statisticChartLine_green);
+        int greenColor = Theme.getColor(Theme.key_wallet_greenText);
         int orangeColor = Theme.getColor(Theme.key_statisticChartLine_orange);
         updateDotContainer.setVisibility(VISIBLE);
         checkUpdateButton.setVisibility(VISIBLE);
