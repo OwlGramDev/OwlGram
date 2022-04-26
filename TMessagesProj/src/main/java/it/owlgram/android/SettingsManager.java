@@ -96,6 +96,7 @@ public class SettingsManager {
             case "stickerSize2":
             case "translationTarget":
             case "swipeToPiP":
+            case "configLoaded":
                 return false;
             default:
                 return true;
@@ -253,6 +254,7 @@ public class SettingsManager {
                     }
                     if (!foundValid) {
                         foundValidValues--;
+                        Log.e("OwlConfig", "Invalid key: " + key);
                         break;
                     }
                 }

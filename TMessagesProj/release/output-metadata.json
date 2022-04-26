@@ -11,35 +11,9 @@
       "type": "UNIVERSAL",
       "filters": [],
       "attributes": [],
-      "versionCode": 26370,
-      "versionName": "1.8.3 PBeta 2",
-      "outputFile": "OwlGram-1.8.3 PBeta 2-2637-universal.apk"
-    },
-    {
-      "type": "ONE_OF_MANY",
-      "filters": [
-        {
-          "filterType": "ABI",
-          "value": "armeabi-v7a"
-        }
-      ],
-      "attributes": [],
-      "versionCode": 26371,
-      "versionName": "1.8.3 PBeta 2",
-      "outputFile": "OwlGram-1.8.3 PBeta 2-2637-armeabi-v7a.apk"
-    },
-    {
-      "type": "ONE_OF_MANY",
-      "filters": [
-        {
-          "filterType": "ABI",
-          "value": "x86"
-        }
-      ],
-      "attributes": [],
-      "versionCode": 26372,
-      "versionName": "1.8.3 PBeta 2",
-      "outputFile": "OwlGram-1.8.3 PBeta 2-2637-x86.apk"
+      "versionCode": 26380,
+      "versionName": "1.8.3 Beta 2",
+      "outputFile": "OwlGram-1.8.3 Beta 2-2638-universal.apk"
     },
     {
       "type": "ONE_OF_MANY",
@@ -50,9 +24,22 @@
         }
       ],
       "attributes": [],
-      "versionCode": 26375,
-      "versionName": "1.8.3 PBeta 2",
-      "outputFile": "OwlGram-1.8.3 PBeta 2-2637-arm64-v8a.apk"
+      "versionCode": 26385,
+      "versionName": "1.8.3 Beta 2",
+      "outputFile": "OwlGram-1.8.3 Beta 2-2638-arm64-v8a.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 26382,
+      "versionName": "1.8.3 Beta 2",
+      "outputFile": "OwlGram-1.8.3 Beta 2-2638-x86.apk"
     },
     {
       "type": "ONE_OF_MANY",
@@ -63,9 +50,22 @@
         }
       ],
       "attributes": [],
-      "versionCode": 26376,
-      "versionName": "1.8.3 PBeta 2",
-      "outputFile": "OwlGram-1.8.3 PBeta 2-2637-x86_64.apk"
+      "versionCode": 26386,
+      "versionName": "1.8.3 Beta 2",
+      "outputFile": "OwlGram-1.8.3 Beta 2-2638-x86_64.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 26381,
+      "versionName": "1.8.3 Beta 2",
+      "outputFile": "OwlGram-1.8.3 Beta 2-2638-armeabi-v7a.apk"
     }
   ],
   "elementType": "File"

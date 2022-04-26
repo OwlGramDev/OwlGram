@@ -109,10 +109,14 @@ android {
 
     buildTypes {
         debug {
+            minifyEnabled true
+            shrinkResources true
             if (localProperties.getProperty("storeFile") != null) {
                 signingConfig signingConfigs.sign
             }
+            jniDebuggable true
             applicationIdSuffix ".beta"
+            proguardFiles 'proguard-rules.pro'
             resValue "string", "BuildAppName", "@string/AppNameBeta"
         }
 
@@ -128,7 +132,7 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 2637
+    defaultConfig.versionCode = 2639
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
@@ -143,7 +147,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 32
-        versionName "1.8.3 PBeta 2"
+        versionName "1.8.3 Beta 3"
 
         externalNativeBuild {
             cmake {
