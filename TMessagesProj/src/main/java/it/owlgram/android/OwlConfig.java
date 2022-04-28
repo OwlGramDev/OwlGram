@@ -13,8 +13,6 @@ import org.telegram.ui.ActionBar.Theme;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import it.owlgram.android.camera.CameraXUtilities;
 import it.owlgram.android.translator.BaseTranslator;

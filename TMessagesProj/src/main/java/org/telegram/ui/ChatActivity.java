@@ -2551,7 +2551,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
         avatarContainer = new ChatAvatarContainer(context, this, currentEncryptedChat != null, themeDelegate);
         avatarContainer.setOnLongClickListener(v -> {
-            if (inPreviewMode || threadMessageId != 0 || UserObject.isReplyUser(currentUser)|| currentUser != null && currentUser.self) {
+            if (inPreviewMode || threadMessageId != 0 || UserObject.isReplyUser(currentUser)|| currentUser != null && currentUser.self || OwlConfig.searchIconInActionBar) {
                 return false;
             }
             openSearchWithText(null);
