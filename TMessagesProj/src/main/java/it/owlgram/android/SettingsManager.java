@@ -9,8 +9,6 @@ import android.text.TextUtils;
 
 import androidx.core.content.FileProvider;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -254,7 +252,6 @@ public class SettingsManager {
                     }
                     if (!foundValid) {
                         foundValidValues--;
-                        Log.e("OwlConfig", "Invalid key: " + key);
                         break;
                     }
                 }
