@@ -4,6 +4,7 @@ import java.nio.file.Paths
 plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
 configurations.all {
@@ -91,18 +92,18 @@ android {
         coreLibraryDesugaringEnabled true
     }
 
-    Properties localProperties = new Properties()
-    if (project.rootProject.file('local.properties').exists()) {
-        localProperties.load(project.rootProject.file('local.properties').newDataInputStream())
+    Properties signingProperties = new Properties()
+    if (project.rootProject.file('signing.properties').exists()) {
+        signingProperties.load(project.rootProject.file('signing.properties').newDataInputStream())
     }
 
     signingConfigs {
-        if (localProperties.getProperty("storeFile") != null) {
+        if (signingProperties.getProperty("storeFile") != null) {
             sign {
-                storeFile file(localProperties.getProperty("storeFile"))
-                storePassword localProperties.getProperty("storePassword")
-                keyAlias localProperties.getProperty("keyAlias")
-                keyPassword localProperties.getProperty("keyPassword")
+                storeFile file(signingProperties.getProperty("storeFile"))
+                storePassword signingProperties.getProperty("storePassword")
+                keyAlias signingProperties.getProperty("keyAlias")
+                keyPassword signingProperties.getProperty("keyPassword")
             }
         }
     }
@@ -111,7 +112,7 @@ android {
         debug {
             minifyEnabled true
             shrinkResources true
-            if (localProperties.getProperty("storeFile") != null) {
+            if (signingProperties.getProperty("storeFile") != null) {
                 signingConfig signingConfigs.sign
             }
             jniDebuggable true
@@ -123,7 +124,7 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            if (localProperties.getProperty("storeFile") != null) {
+            if (signingProperties.getProperty("storeFile") != null) {
                 signingConfig signingConfigs.sign
             }
             proguardFiles 'proguard-rules.pro'

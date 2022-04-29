@@ -6,7 +6,9 @@ release/
 *.iml
 *.apk
 local.properties
+signing.properties
 *.keystore
 *.jsk
 *.zip
 *.pepk
+*.json
