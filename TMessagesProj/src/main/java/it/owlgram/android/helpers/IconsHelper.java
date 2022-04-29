@@ -14,20 +14,18 @@ import it.owlgram.android.OwlConfig;
 public class IconsHelper {
 
     public enum Icons {
-        DEFAULT(LocaleController.getString("DefaultIcon", R.string.DefaultIcon),"Default", R.drawable.ic_icon_default),
-        AQUA(LocaleController.getString("AquaIcon", R.string.AquaIcon), "Aqua", R.drawable.ic_icon_aqua),
-        SUNSET(LocaleController.getString("SunsetIcon", R.string.SunsetIcon), "Sunset", R.drawable.ic_icon_sunset),
-        MONO_BLACK(LocaleController.getString("MonoBlackIcon", R.string.MonoBlackIcon), "MonoBlack", R.drawable.ic_icon_mono_black),
-        DEVELOPER(LocaleController.getString("DeveloperIcon", R.string.DeveloperIcon), "Developer", R.drawable.ic_icon_dev),
-        ARCTIC(LocaleController.getString("ArcticIcon", R.string.ArcticIcon), "White", R.drawable.ic_icon_white),
-        CLASSIC(LocaleController.getString("ClassicIcon", R.string.ClassicIcon), "Classic", R.drawable.ic_icon_classic);
+        DEFAULT("Default", R.drawable.ic_icon_default),
+        AQUA("Aqua", R.drawable.ic_icon_aqua),
+        SUNSET("Sunset", R.drawable.ic_icon_sunset),
+        MONO_BLACK("MonoBlack", R.drawable.ic_icon_mono_black),
+        DEVELOPER("Developer", R.drawable.ic_icon_dev),
+        ARCTIC("White", R.drawable.ic_icon_white),
+        CLASSIC("Classic", R.drawable.ic_icon_classic);
 
-        private final String title;
         private final String name;
         private final int icon;
 
-        Icons(String title, String name, int icon) {
-            this.title = title;
+        Icons(String name, int icon) {
             this.name = name;
             this.icon = icon;
         }
@@ -41,7 +39,23 @@ public class IconsHelper {
         }
 
         public String getTitle() {
-            return title;
+            switch (this) {
+                case DEFAULT:
+                    return LocaleController.getString("DefaultIcon", R.string.DefaultIcon);
+                case AQUA:
+                    return LocaleController.getString("AquaIcon", R.string.AquaIcon);
+                case SUNSET:
+                    return LocaleController.getString("SunsetIcon", R.string.SunsetIcon);
+                case MONO_BLACK:
+                    return LocaleController.getString("MonoBlackIcon", R.string.MonoBlackIcon);
+                case DEVELOPER:
+                    return LocaleController.getString("DeveloperIcon", R.string.DeveloperIcon);
+                case ARCTIC:
+                    return LocaleController.getString("ArcticIcon", R.string.ArcticIcon);
+                case CLASSIC:
+                    return LocaleController.getString("ClassicIcon", R.string.ClassicIcon);
+            }
+            return "???";
         }
     }
 
