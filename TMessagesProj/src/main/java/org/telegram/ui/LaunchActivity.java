@@ -178,6 +178,7 @@ import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateAlertDialog;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.LanguageHelper;
+import it.owlgram.android.helpers.MonetHelper;
 import it.owlgram.android.helpers.StickersHelper;
 import it.owlgram.android.helpers.UpdateSignaling;
 import it.owlgram.android.settings.OwlgramAppearanceSettings;
@@ -922,6 +923,9 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                 AlertsCreator.createBackgroundActivityDialog(this).show();
                 SharedConfig.BackgroundActivityPrefs.setLastCheckedBackgroundActivity(System.currentTimeMillis());
             }
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            MonetHelper.registerReceiver(this);
         }
     }
 
@@ -4697,6 +4701,9 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
 
     @Override
     protected void onDestroy() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            MonetHelper.unregisterReceiver(this);
+        }
         if (PhotoViewer.getPipInstance() != null) {
             PhotoViewer.getPipInstance().destroyPhotoViewer();
         }

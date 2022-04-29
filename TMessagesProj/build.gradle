@@ -110,14 +110,11 @@ android {
 
     buildTypes {
         debug {
-            minifyEnabled true
-            shrinkResources true
             if (signingProperties.getProperty("storeFile") != null) {
                 signingConfig signingConfigs.sign
             }
             jniDebuggable true
             applicationIdSuffix ".beta"
-            proguardFiles 'proguard-rules.pro'
             resValue "string", "BuildAppName", "@string/AppNameBeta"
         }
 

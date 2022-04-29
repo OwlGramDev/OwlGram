@@ -38,7 +38,7 @@ public class MaterialButton extends CardView {
 
         mt = new ImageView(context);
         mt.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, Color.argb(55, 0,0,0)));
+        mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(4), Theme.getColor(Theme.key_featuredStickers_addButton), Theme.getColor(Theme.key_featuredStickers_addButtonPressed)));
         mt.setLayoutParams(new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         mt.setClickable(true);
         mt.setOnTouchListener((View view, MotionEvent motionEvent) -> {
@@ -49,7 +49,7 @@ public class MaterialButton extends CardView {
         });
 
         textView = new TextView(context);
-        textView.setTextColor(Color.WHITE);
+        textView.setTextColor(Theme.getColor(Theme.key_featuredStickers_buttonText));
         textView.setLines(1);
         textView.setSingleLine(true);
         RelativeLayout.LayoutParams layoutParams8 = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
