@@ -1185,7 +1185,7 @@ public class LocationActivity extends BaseFragment implements NotificationCenter
                 if (mapView != null && getParentActivity() != null) {
                     try {
                         map.onCreate(null);
-                        MapsInitializer.initialize(ApplicationLoader.applicationContext);
+                        MapsInitializer.initialize(ApplicationLoader.applicationContext, MapsInitializer.Renderer.LATEST, null);
                         mapView.getMapAsync(map1 -> {
                             googleMap = map1;
                             if (isActiveThemeDark()) {
