@@ -13718,13 +13718,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     }
                 }
                 if (forwardNoQuoteItem != null) {
-                    forwardNoQuoteItem.setVisibility(OwlConfig.showNoQuoteForward ? View.VISIBLE:View.GONE);
-                }
-                if (forwardItem != null) {
-                    if (canSaveDocumentsCount == 1 && canEditMessagesCount == 1 && canForwardMessagesCount == 1 && OwlConfig.showNoQuoteForward) {
-                        forwardItem.setVisibility(View.GONE);
+                    if ((((canSaveMusicCount > 0 && canSaveDocumentsCount == 0) || (canSaveMusicCount == 0 && canSaveDocumentsCount > 0)) && cantSaveMessagesCount == 0) && canEditMessagesCount > 0 && canForwardMessagesCount > 0 && OwlConfig.showNoQuoteForward) {
+                        forwardNoQuoteItem.setVisibility(View.GONE);
                     } else {
-                        forwardItem.setVisibility(View.VISIBLE);
+                        forwardNoQuoteItem.setVisibility(OwlConfig.showNoQuoteForward ? View.VISIBLE:View.GONE);
                     }
                 }
                 if (saveItem != null) {
