@@ -7,11 +7,12 @@
     <string name="OwlSetting">OwlGram Settings</string>
     <string name="Chat">Chats</string>
     <string name="OwlUpdates">Updates</string>
-    <string name="Experimental">Experimental</string>
+    <string name="Experimental">Experimental Settings</string>
     <string name="OnModeCheckTitle">On</string>
     <string name="OffModeCheckTitle">Off</string>
-    <string name="ExperimentalOff">By activating these settings you will have access to experimental and unstable features, it is not recommended for less experienced users.</string>
+    <string name="ExperimentalOff">Warning! Those are experimental settings. Some may not work. Others may break the app. Any of them may disappear in the next version without a trace. Use at your own risk.</string>
     <string name="ExperimentalDesc">Try experimental features. Some may not work correctly.</string>
+    <string name="DisableExperimentalAlert">Are you sure you want to disable experimental settings?\n\nNote that this will disable the Monet Icon.</string>
     <string name="OfficialChannel">Official Channel</string>
     <string name="ChannelUsername">OwlGram</string>
     <string name="OfficialGroup">Official Group</string>
@@ -40,7 +41,7 @@
     <string name="BlurIntensity">Blur intensity</string>
     <string name="SideBarIconSet">Sidebar Icon Set</string>
     <string name="MenuItems">Menu Items</string>
-    <string name="MenuItemsOrderDesc">Customize side menu items to suit your needs.</string>
+    <string name="MenuItemsOrderDesc">Customize side menu items to better meet your needs.</string>
     <string name="RecommendedItems">Recommended Menu Items</string>
     <string name="ResetItemsOrder">Reset Items Order</string>
     <string name="DatacenterStatus">Datacenter Status</string>
@@ -52,6 +53,14 @@
     <string name="ShapePills">Pills</string>
     <string name="ShapeLinear">Linear</string>
     <string name="ShapeStock">Default</string>
+    <string name="AppIcon">App Icon</string>
+    <string name="DefaultIcon">Default</string>
+    <string name="AquaIcon">Aqua</string>
+    <string name="SunsetIcon">Sunset</string>
+    <string name="MonoBlackIcon">Mono Black</string>
+    <string name="DeveloperIcon">Developer</string>
+    <string name="ArcticIcon">Arctic</string>
+    <string name="ClassicIcon">Classic</string>
     <string name="HidePhone">Hide my Phone Number</string>
     <string name="HidePhoneDesc">It allows you to hide your phone number from settings and side menu</string>
     <string name="HidePhoneOthers">Hide other people\'s Phone Number</string>
@@ -72,6 +81,7 @@
     <string name="ShortcutsForAdmins">Shortcuts for Admins</string>
     <string name="AppBarShadow">Disable Title Bar Shadow</string>
     <string name="SlidingTitle">Sliding Title</string>
+    <string name="SearchIconTitleBar">Search Icon on the Title Bar</string>
     <string name="SlidingTitleDesc">If the chat title is long, it will scroll on the screen</string>
     <string name="AccentAsNotificationColor">Accent Color as Notification Color</string>
     <string name="ConfirmCalls">Prompt Before Calling</string>
@@ -99,8 +109,8 @@
     <string name="TranslatorTypeOwl">In-Message</string>
     <string name="TranslatorTypeTG">Dialog Popup</string>
     <string name="TranslatorLanguageCode">Translation (%s)</string>
-    <string name="MessageTranslated">translated</string>
     <string name="MessageTranslateProgress">translating</string>
+    <string name="MessageTranslated">translated</string>
     <string name="UndoTranslate">Undo Translate</string>
     <string name="TranslationProvider">Translation Provider</string>
     <string name="TranslationProviderShort">Provider</string>
@@ -158,6 +168,8 @@
     <string name="IncreaseVoiceMessageQuality">HQ Voice Messages</string>
     <string name="TurnSoundOnVDKey">Turn Sound On by Turning Down the Volume</string>
     <string name="TurnSoundOnVDKeyDesc">It allows you to unmute videos by pressing the volume down button</string>
+    <string name="SwipeToPiP">Swipe up to Picture-in-Picture</string>
+    <string name="SwipeToPiPDesc">Swipe up in the video player to open the video in Picture-in-Picture mode</string>
     <string name="DisableProximityEvents">Disable Proximity Events</string>
     <string name="RestartAppToApplyChanges">Restart app to apply changes.</string>
     <string name="UseRearRoundVideos">Start with Rear Camera</string>
@@ -196,6 +208,8 @@
     <string name="UnlimitedFavoriteStickersDesc">It allows you to add unlimited stickers to favorites, but they may not be synced to other devices</string>
     <string name="UnlimitedPinnedChats">Unlimited Pinned Chats</string>
     <string name="UnlimitedPinnedChatsDesc">It allows you to pin unlimited chats by turning off their synchronization with the Telegram server</string>
+    <string name="MonetIcon">Force Monet Icon</string>
+    <string name="MonetIconDesc">It allows you to use Material You\'s dynamic icon on Android 12.</string>
     <string name="MaxRecentStickers">Max Recent Stickers</string>
     <string name="AutoLockInstant">Instant</string>
     <string name="MKVAsVideo">Show MKV as Video</string>
@@ -231,18 +245,6 @@
     <string name="SendWithoutMarkdown">Send without markdown</string>
     <string name="SaveWithoutMarkdown">Save without markdown</string>
     <string name="ClearRecentStickers">Clear recent stickers?</string>
-    <string name="SearchIconTitleBar">Search Icon on the Title Bar</string>
-    <string name="AppIcon">App Icon</string>
-    <string name="DefaultIcon">Default</string>
-    <string name="AquaIcon">Aqua</string>
-    <string name="SunsetIcon">Sunset</string>
-    <string name="MonoBlackIcon">Mono Black</string>
-    <string name="DeveloperIcon">Developer</string>
-    <string name="ArcticIcon">Arctic</string>
-    <string name="ClassicIcon">Classic</string>
-    <string name="MonetIcon">Force Monet Icon</string>
-    <string name="MonetIconDesc">It allows you to use Material You\'s dynamic icon on Android 12.</string>
-    <string name="DisableExperimentalAlert">Are you sure you want to disable experimental settings?\n\nNote that this will disable the Monet Icon.</string>
     <string name="ChangeIcon">Change App Icon</string>
-    <string name="ChangeIconDesc"> Since on Android 12 the monet icon was forced and you upgraded to Android 13, you need to change the app icon to the default one for a better support.</string>
+    <string name="ChangeIconDesc">Since on Android 12 the monet icon was forced and you upgraded to Android 13, you need to change the app icon to the default one for a better support.</string>
 </resources>
