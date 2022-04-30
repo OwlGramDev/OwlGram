@@ -103,7 +103,7 @@ public class VoIPHelper {
 			}
 			return;
 		}
-		if (OwlConfig.confirmCall && !confirmed) {
+		if (OwlConfig.confirmCall && !confirmed && activity instanceof LaunchActivity) {
 			final BaseFragment lastFragment = ((LaunchActivity) activity).getActionBarLayout().getLastFragment();
 			if (lastFragment != null) {
 				AlertsCreator.createCallDialogAlert(lastFragment, lastFragment.getMessagesController().getUser(user.id), videoCall);
