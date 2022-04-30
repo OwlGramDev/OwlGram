@@ -145,7 +145,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 32
-        versionName "1.8.4"
+        versionName "1.8.5 PBeta 1"
 
         externalNativeBuild {
             cmake {

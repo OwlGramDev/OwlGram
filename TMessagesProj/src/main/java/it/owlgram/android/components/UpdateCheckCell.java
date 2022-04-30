@@ -1,140 +1,154 @@
 package it.owlgram.android.components;
 
+import android.animation.LayoutTransition;
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.text.Html;
-import android.text.TextUtils;
+import android.graphics.Canvas;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.widget.ImageView;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Cells.DividerCell;
+import org.telegram.ui.Components.LayoutHelper;
 
 import java.util.Date;
-import java.util.Objects;
 
 import it.owlgram.android.OwlConfig;
 
+@SuppressLint("ViewConstructor")
 public class UpdateCheckCell extends RelativeLayout {
-    final private TextView updateStatus;
-    final private TextView updateTitle;
-    final private CardView updateDotContainer;
-    final private CardView updateDot;
-    final private MaterialButton checkUpdateButton;
-    final private LinearLayout container;
+    private final TextView titleTextView, valueTextView, checkUpdateButton;
+    private final boolean needDivider;
+    private boolean canCheckForUpdate = true;
 
-    public UpdateCheckCell(Context context) {
+    @SuppressLint("ClickableViewAccessibility")
+    public UpdateCheckCell(Context context, boolean divider) {
         super(context);
-        int colorBackground = Theme.getColor(Theme.key_windowBackgroundWhite);
-        int colorDescText = Theme.getColor(Theme.key_windowBackgroundWhiteGrayText);
-        int colorText = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText);
-        setBackgroundColor(colorBackground);
+        needDivider = divider;
 
-        container = new LinearLayout(context);
-        container.setGravity(Gravity.CENTER_VERTICAL);
-        container.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        container.setPadding(AndroidUtilities.dp(20),AndroidUtilities.dp(10),0,AndroidUtilities.dp(10));
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
 
-        RelativeLayout relativeLayout = new RelativeLayout(context);
-        relativeLayout.setLayoutParams(new LinearLayout.LayoutParams(AndroidUtilities.dp(40), AndroidUtilities.dp(40)));
+        titleTextView = new TextView(context);
+        titleTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        titleTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+        titleTextView.setMaxLines(Integer.MAX_VALUE);
+        titleTextView.setGravity(LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT);
+        String linkTextColorKey = Theme.key_windowBackgroundWhiteLinkText;
+        titleTextView.setLinkTextColor(Theme.getColor(linkTextColorKey));
+        titleTextView.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+        layout.addView(titleTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 23, 8, 23, 0));
 
-        ImageView imageView = new ImageView(context);
-        imageView.setLayoutParams(new LinearLayout.LayoutParams(AndroidUtilities.dp(40), AndroidUtilities.dp(40)));
-        imageView.setRotation(45);
-        Drawable d = ContextCompat.getDrawable(context, R.drawable.round_autorenew_white_36);
-        Objects.requireNonNull(d).setColorFilter(colorText, PorterDuff.Mode.SRC_ATOP);
-        imageView.setBackground(d);
+        valueTextView = new TextView(context);
+        valueTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2));
+        valueTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 13);
+        valueTextView.setLines(1);
+        valueTextView.setMaxLines(1);
+        valueTextView.setSingleLine(true);
+        valueTextView.setGravity(LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT);
+        valueTextView.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+        layout.addView(valueTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 23, 5, 23, 8));
 
-        updateDotContainer = new CardView(context);
-        updateDotContainer.setCardBackgroundColor(colorBackground);
-        updateDotContainer.setCardElevation(0);
-        updateDotContainer.setRadius(AndroidUtilities.dp(15));
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(AndroidUtilities.dp(15), AndroidUtilities.dp(15));
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        layoutParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        layoutParams.setMargins(0,0,AndroidUtilities.dp(3), AndroidUtilities.dp(3));
-        updateDotContainer.setLayoutParams(layoutParams);
+        LinearLayout layoutRight = new LinearLayout(context);
+        LayoutTransition layoutTransition = new LayoutTransition();
+        layoutTransition.enableTransitionType(LayoutTransition.CHANGING);
+        layoutTransition.setDuration(LayoutTransition.CHANGING, 100);
+        layoutRight.setLayoutTransition(layoutTransition);
+        layoutRight.setGravity(LocaleController.isRTL ? Gravity.LEFT:Gravity.RIGHT);
 
-        LinearLayout linearLayout2 = new LinearLayout(context);
-        linearLayout2.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        linearLayout2.setGravity(Gravity.CENTER);
+        checkUpdateButton = new TextView(context);
+        checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
+        checkUpdateButton.setTextColor(Theme.getColor(Theme.key_featuredStickers_buttonText));
+        checkUpdateButton.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(16), Theme.getColor(Theme.key_featuredStickers_addButton), Theme.getColor(Theme.key_featuredStickers_addButtonPressed)));
+        checkUpdateButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+        checkUpdateButton.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
+        checkUpdateButton.setGravity(Gravity.CENTER);
+        checkUpdateButton.setOnTouchListener((View view, MotionEvent motionEvent) -> {
+            if (!canCheckForUpdate) {
+                return true;
+            }
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                onCheckUpdate();
+            }
+            return false;
+        });
+        checkUpdateButton.setClickable(true);
+        checkUpdateButton.setPadding(AndroidUtilities.dp(14), 0, AndroidUtilities.dp(14), 0);
+        layoutRight.addView(checkUpdateButton, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32));
 
-        updateDot = new CardView(context);
-        updateDot.setCardElevation(0);
-        updateDot.setRadius(AndroidUtilities.dp(15));
-        updateDot.setLayoutParams(new CardView.LayoutParams(AndroidUtilities.dp(10), AndroidUtilities.dp(10)));
+        addView(layout, LayoutHelper.createRelative(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 0, LocaleController.isRTL ? RelativeLayout.ALIGN_PARENT_RIGHT:RelativeLayout.ALIGN_PARENT_LEFT));
+        addView(layoutRight, LayoutHelper.createRelative(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, LocaleController.isRTL ? 22:0, 0, LocaleController.isRTL ? 0:22,0,RelativeLayout.CENTER_VERTICAL | (LocaleController.isRTL ? RelativeLayout.ALIGN_PARENT_LEFT:RelativeLayout.ALIGN_PARENT_RIGHT)));
+    }
 
-        LinearLayout linearLayout3 = new LinearLayout(context);
-        LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        layoutParams2.setMargins(AndroidUtilities.dp(15), 0,0,0);
-        linearLayout3.setLayoutParams(layoutParams2);
-        linearLayout3.setOrientation(LinearLayout.VERTICAL);
+    @Override
+    protected void onDraw(Canvas canvas) {
+        if (needDivider) {
+            canvas.drawLine(
+                    LocaleController.isRTL ? 0 : AndroidUtilities.dp(20),
+                    getMeasuredHeight() - 1,
+                    getMeasuredWidth() - (LocaleController.isRTL ? AndroidUtilities.dp(20) : 0),
+                    getMeasuredHeight() - 1,
+                    Theme.dividerPaint
+            );
+        }
+    }
 
-        String update_text = LocaleController.getString("CheckUpdates", R.string.CheckUpdates);
-        updateTitle = new TextView(context);
-        LinearLayout.LayoutParams layoutParams4 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        layoutParams4.setMargins(0,0,AndroidUtilities.dp(5+15+50) + (AndroidUtilities.dp(4) * update_text.length()) + AndroidUtilities.dp(40), 0);
-        updateTitle.setLayoutParams(layoutParams4);
-        updateTitle.setTextColor(colorText);
-        updateTitle.setSingleLine(true);
-        updateTitle.setEllipsize(TextUtils.TruncateAt.END);
-        updateTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+    public void setCheckTime() {
+        long date = OwlConfig.lastUpdateCheck;
+        if (date != 0) {
+            titleTextView.setText(LocaleController.getString("NoUpdateAvailable", R.string.NoUpdateAvailable));
+        } else {
+            titleTextView.setText(LocaleController.getString("NeverChecked", R.string.NeverChecked));
+        }
+        checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
+        setTime(date);
+        canCheckForUpdate = true;
+        OwlConfig.saveUpdateStatus(0);
+    }
 
-        updateStatus = new TextView(context);
-        updateStatus.setLayoutParams(layoutParams4);
-        updateStatus.setTextColor(colorDescText);
-        updateStatus.setSingleLine(true);
-        updateStatus.setEllipsize(TextUtils.TruncateAt.END);
-        updateStatus.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
-
-        checkUpdateButton = new MaterialButton(context);
-        RelativeLayout.LayoutParams layoutParams10 = new RelativeLayout.LayoutParams((AndroidUtilities.dp(4) * update_text.length()) + AndroidUtilities.dp(40), AndroidUtilities.dp(35));
-        layoutParams10.addRule(RelativeLayout.CENTER_VERTICAL);
-        layoutParams10.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-        layoutParams10.setMargins(0,0,AndroidUtilities.dp(25),0);
-        checkUpdateButton.setLayoutParams(layoutParams10);
-        checkUpdateButton.setOnClickListener(view -> onCheckUpdate());
-        checkUpdateButton.setText(update_text);
-
-        DividerCell dividerCell = new DividerCell(context);
-        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        layoutParams3.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-        dividerCell.setLayoutParams(layoutParams3);
-        dividerCell.setPadding(AndroidUtilities.dp(20), AndroidUtilities.dp(4), 0, 0);
-
-        linearLayout3.addView(updateTitle);
-        linearLayout3.addView(updateStatus);
-        linearLayout2.addView(updateDot);
-        updateDotContainer.addView(linearLayout2);
-        relativeLayout.addView(imageView);
-        relativeLayout.addView(updateDotContainer);
-        container.addView(relativeLayout);
-        container.addView(linearLayout3);
-        addView(checkUpdateButton);
-        addView(container);
-        addView(dividerCell);
+    private void setTime(long date) {
+        String dateString;
+        if (date != 0){
+            dateString = LocaleController.formatString("formatDateAtTime", R.string.formatDateAtTime, LocaleController.getInstance().formatterYear.format(new Date(date)), LocaleController.getInstance().formatterDay.format(new Date(date)));
+        } else {
+            dateString = LocaleController.getString("LastCheckNever", R.string.LastCheckNever);
+        }
+        valueTextView.setText(LocaleController.formatString("LastCheck", R.string.LastCheck, dateString));
     }
 
     public void setCheckingStatus() {
-        updateDotContainer.setVisibility(GONE);
-        checkUpdateButton.setVisibility(GONE);
-        updateStatus.setText(LocaleController.getString("CheckingUpdates", R.string.CheckingUpdates));
+        checkUpdateButton.setText(LocaleController.getString("Checking", R.string.Checking));
+        setTime(OwlConfig.lastUpdateCheck);
+        canCheckForUpdate = false;
     }
 
-    public void setClickable(boolean enabled) {
-        checkUpdateButton.setAlpha(enabled ? 1.0f:0.5f);
-        container.setAlpha(enabled ? 1.0f:0.5f);
+    public void setUpdateAvailableStatus() {
+        titleTextView.setText(LocaleController.getString("UpdateAvailable", R.string.UpdateAvailable));
+        checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
+        setTime(OwlConfig.lastUpdateCheck);
+        canCheckForUpdate = true;
+        OwlConfig.saveUpdateStatus(1);
+    }
+
+    public void setFailedStatus() {
+        valueTextView.setText(LocaleController.getString("CheckFailed", R.string.CheckFailed));
+        checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
+        OwlConfig.saveUpdateStatus(2);
+        canCheckForUpdate = true;
+    }
+
+    public void setCanCheckForUpdate(boolean canCheckForUpdate) {
+        this.canCheckForUpdate = canCheckForUpdate;
+        checkUpdateButton.setAlpha(canCheckForUpdate ? 1.0f:0.5f);
+        titleTextView.setAlpha(canCheckForUpdate ? 1.0f:0.5f);
+        valueTextView.setAlpha(canCheckForUpdate ? 1.0f:0.5f);
     }
 
     public void loadLastStatus() {
@@ -152,63 +166,6 @@ public class UpdateCheckCell extends RelativeLayout {
             default:
                 setCheckTime();
                 break;
-        }
-    }
-
-    public void setFailedStatus() {
-        int redColor = Theme.getColor(Theme.key_windowBackgroundWhiteRedText4);
-        updateDotContainer.setVisibility(VISIBLE);
-        checkUpdateButton.setVisibility(VISIBLE);
-        updateDot.setCardBackgroundColor(redColor);
-        setTextEntities(updateTitle, "<b>" + LocaleController.getString("CheckFailed", R.string.CheckFailed) + "</b>");
-        updateStatus.setText(LocaleController.getString("CheckingUpdates", R.string.CheckingUpdates));
-        setTime(OwlConfig.lastUpdateCheck);
-        OwlConfig.saveUpdateStatus(2);
-    }
-
-    public void setUpdateAvailableStatus() {
-        int orangeColor = Theme.getColor(Theme.key_statisticChartLine_orange);
-        updateDotContainer.setVisibility(VISIBLE);
-        checkUpdateButton.setVisibility(VISIBLE);
-        setTextEntities(updateTitle, "<b>" + LocaleController.getString("UpdateAvailable", R.string.UpdateAvailable) + "</b>");
-        updateDot.setCardBackgroundColor(orangeColor);
-        setTime(OwlConfig.lastUpdateCheck);
-        OwlConfig.saveUpdateStatus(1);
-    }
-
-    public void setCheckTime() {
-        int greenColor = Theme.getColor(Theme.key_wallet_greenText);
-        int orangeColor = Theme.getColor(Theme.key_statisticChartLine_orange);
-        updateDotContainer.setVisibility(VISIBLE);
-        checkUpdateButton.setVisibility(VISIBLE);
-        long date = OwlConfig.lastUpdateCheck;
-        if (date != 0) {
-            setTextEntities(updateTitle, "<b>" + LocaleController.getString("NoUpdateAvailable", R.string.NoUpdateAvailable) + "</b>");
-            updateDot.setCardBackgroundColor(greenColor);
-        } else {
-            setTextEntities(updateTitle, "<b>" + LocaleController.getString("NeverChecked", R.string.NeverChecked) + "</b>");
-            updateDot.setCardBackgroundColor(orangeColor);
-        }
-        setTime(date);
-        OwlConfig.saveUpdateStatus(0);
-    }
-
-    private void setTime(long date) {
-        String dateString;
-        if (date != 0){
-            dateString = LocaleController.formatString("formatDateAtTime", R.string.formatDateAtTime, LocaleController.getInstance().formatterYear.format(new Date(date)), LocaleController.getInstance().formatterDay.format(new Date(date)));
-        } else {
-            dateString = LocaleController.getString("LastCheckNever", R.string.LastCheckNever);
-        }
-        updateStatus.setText(LocaleController.formatString("LastCheck", R.string.LastCheck, dateString));
-    }
-
-    private void setTextEntities(TextView tv, String text) {
-        text = text.replace("\n", "<br>");
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
-            tv.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
-        }else{
-            tv.setText(Html.fromHtml(text));
         }
     }
 

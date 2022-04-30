@@ -7,23 +7,23 @@ import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.NinePatchDrawable;
+import android.os.Bundle;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
-
-import androidx.cardview.widget.CardView;
-import androidx.core.widget.NestedScrollView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildVars;
@@ -35,6 +35,7 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.LaunchActivity;
 
 import it.owlgram.android.StoreUtils;
 import it.owlgram.android.updates.ApkDownloader;
@@ -42,12 +43,129 @@ import it.owlgram.android.updates.UpdateManager;
 
 public class UpdateAlertDialog extends BottomSheet {
 
-    private final LinearLayout linearLayout;
-    private int scrollOffsetY;
-    private final NestedScrollView scrollView;
-    private final int[] location = new int[2];
-    private final View shadow;
-    private AnimatorSet shadowAnimation;
+    UpdateManager.UpdateAvailable update;
+    private final LaunchActivity parentActivity;
+
+    public UpdateAlertDialog(LaunchActivity activity, UpdateManager.UpdateAvailable updateAvailable) {
+        super(activity, false);
+        update = updateAvailable;
+        parentActivity = activity;
+        int colorText = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText);
+
+        FrameLayout frameLayout = new FrameLayout(activity);
+        BackupImageView backupImageView = new BackupImageView(parentActivity) {
+            @SuppressLint("DrawAllocation")
+            @Override
+            protected void onDraw(Canvas canvas) {
+                super.onDraw(canvas);
+                int colorBackground = Theme.getColor(Theme.key_dialogBackground);
+                GradientDrawable gd1 = new GradientDrawable(
+                        GradientDrawable.Orientation.BOTTOM_TOP,
+                        new int[]{colorBackground, AndroidUtilities.getTransparentColor(colorBackground, 0)});
+                gd1.setBounds(0, 0, getMeasuredWidth(), getMeasuredHeight());
+                gd1.draw(canvas);
+                GradientDrawable gd2 = new GradientDrawable(
+                        GradientDrawable.Orientation.LEFT_RIGHT,
+                        new int[]{colorBackground, AndroidUtilities.getTransparentColor(colorBackground, 0)});
+                gd2.setBounds(0, 0, getMeasuredWidth(), getMeasuredHeight());
+                gd2.draw(canvas);
+                Paint paint = new Paint();
+                paint.setColor(AndroidUtilities.getTransparentColor(colorBackground, 0.3F));
+                canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), paint);
+                Drawable mask = parentActivity.getResources().getDrawable(R.drawable.sheet_shadow_round).mutate();
+                ((NinePatchDrawable) mask).getPaint().setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
+                mask.setBounds(0, 0, getMeasuredWidth(), getMeasuredHeight());
+                mask.draw(canvas);
+            }
+        };
+        backupImageView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        backupImageView.setImage(update.banner, null, null);
+        frameLayout.addView(backupImageView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 270));
+
+        LinearLayout linearLayout = new LinearLayout(activity);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.setPadding(backgroundPaddingLeft, AndroidUtilities.dp(8) + backgroundPaddingTop - 1, backgroundPaddingLeft, AndroidUtilities.dp(8));
+        frameLayout.addView(linearLayout);
+
+        LinearLayout linearLayout2 = new LinearLayout(activity);
+        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams3.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75),0);
+        linearLayout2.setLayoutParams(layoutParams3);
+        linearLayout2.setOrientation(LinearLayout.VERTICAL);
+
+        TextView updateTitle = new TextView(activity);
+        LinearLayout.LayoutParams layoutParams4 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams4.setMargins(0, AndroidUtilities.dp(25), 0,0);
+        updateTitle.setLayoutParams(layoutParams4);
+        updateTitle.setTextColor(colorText);
+        updateTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 23);
+        setTextEntities(updateTitle, updateAvailable.title);
+        linearLayout2.addView(updateTitle);
+
+        TextView descMessage = new TextView(activity);
+        LinearLayout.LayoutParams layoutParams5 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams5.setMargins(0, AndroidUtilities.dp(10), 0,0);
+        descMessage.setLayoutParams(layoutParams5);
+        descMessage.setTextColor(colorText);
+        descMessage.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
+        descMessage.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+        descMessage.setMovementMethod(new AndroidUtilities.LinkMovementMethodMy());
+        descMessage.setGravity(Gravity.LEFT | Gravity.TOP);
+        descMessage.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
+        setTextEntities(descMessage, updateAvailable.desc);
+        linearLayout2.addView(descMessage);
+
+        TextView note = new TextView(activity);
+        LinearLayout.LayoutParams layoutParams6 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams6.setMargins(0, AndroidUtilities.dp(20), 0,0);
+        note.setLayoutParams(layoutParams6);
+        note.setTextColor(colorText);
+        note.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
+        note.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+        note.setMovementMethod(new AndroidUtilities.LinkMovementMethodMy());
+        note.setGravity(Gravity.LEFT | Gravity.TOP);
+        note.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
+        setTextEntities(note, "<b>"+ LocaleController.getString("UpdateNote", R.string.UpdateNote) + "</b> " + updateAvailable.note);
+        linearLayout2.addView(note);
+
+        linearLayout.addView(linearLayout2);
+
+        BottomSheetCell doneButton = new BottomSheetCell(activity, false);
+        doneButton.setText(LocaleController.formatString("AppUpdateDownloadNow", R.string.AppUpdateDownloadNow), false);
+        doneButton.background.setOnClickListener(v -> {
+            if(!StoreUtils.isDownloadedFromAnyStore()){
+                ApkDownloader.downloadAPK(activity, updateAvailable.link_file, updateAvailable.version);
+            } else if (StoreUtils.isFromPlayStore()) {
+                Browser.openUrl(getContext(), BuildVars.PLAYSTORE_APP_URL);
+            }
+            dismiss();
+        });
+        linearLayout.addView(doneButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50, 0,AndroidUtilities.dp(8), 0, 0));
+
+        BottomSheetCell scheduleButton = new BottomSheetCell(activity, true);
+        scheduleButton.setText(LocaleController.getString("AppUpdateRemindMeLater", R.string.AppUpdateRemindMeLater), false);
+        scheduleButton.background.setOnClickListener(v -> dismiss());
+        linearLayout.addView(scheduleButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
+
+        ScrollView scrollView = new ScrollView(activity);
+        scrollView.addView(frameLayout);
+        setCustomView(scrollView);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        containerView.setPadding(0, 0, 0, containerView.getPaddingBottom());
+    }
+
+    private void setTextEntities(TextView tv, String text) {
+        text = text.replace("\n", "<br>");
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+            tv.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
+        }else{
+            tv.setText(Html.fromHtml(text));
+        }
+    }
 
     private static class BottomSheetCell extends FrameLayout {
 
@@ -118,274 +236,6 @@ public class UpdateAlertDialog extends BottomSheet {
                 });
                 animatorSet.start();
             }
-        }
-    }
-
-    public UpdateAlertDialog(Context context, UpdateManager.UpdateAvailable updateAvailable) {
-        super(context, false);
-        setCanceledOnTouchOutside(false);
-
-        int colorText = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText);
-
-        setApplyTopPadding(false);
-        setApplyBottomPadding(false);
-
-        int colorBackground = Theme.getColor(Theme.key_dialogBackground);
-
-        shadowDrawable = context.getResources().getDrawable(R.drawable.sheet_shadow_round).mutate();
-        shadowDrawable.setColorFilter(new PorterDuffColorFilter(colorBackground, PorterDuff.Mode.MULTIPLY));
-
-        FrameLayout container = new FrameLayout(context) {
-            @Override
-            public void setTranslationY(float translationY) {
-                super.setTranslationY(translationY);
-                updateLayout();
-            }
-
-            @Override
-            public boolean onInterceptTouchEvent(MotionEvent ev) {
-                if (ev.getAction() == MotionEvent.ACTION_DOWN && scrollOffsetY != 0 && ev.getY() < scrollOffsetY) {
-                    dismiss();
-                    return true;
-                }
-                return super.onInterceptTouchEvent(ev);
-            }
-
-            @SuppressLint("ClickableViewAccessibility")
-            @Override
-            public boolean onTouchEvent(MotionEvent e) {
-                return !isDismissed() && super.onTouchEvent(e);
-            }
-
-            @Override
-            protected void onDraw(Canvas canvas) {
-                int top = (int) (scrollOffsetY - backgroundPaddingTop - getTranslationY());
-                shadowDrawable.setBounds(0, top, getMeasuredWidth(), getMeasuredHeight());
-                shadowDrawable.draw(canvas);
-            }
-        };
-        container.setWillNotDraw(false);
-        containerView = container;
-
-        scrollView = new NestedScrollView(context) {
-
-            private boolean ignoreLayout;
-
-            @Override
-            protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-                int height = MeasureSpec.getSize(heightMeasureSpec);
-                measureChildWithMargins(linearLayout, widthMeasureSpec, 0, heightMeasureSpec, 0);
-                int contentHeight = linearLayout.getMeasuredHeight();
-                int padding = (height / 5 * 2);
-                int visiblePart = height - padding;
-                if (contentHeight - visiblePart < AndroidUtilities.dp(90) || contentHeight < height / 2 + AndroidUtilities.dp(90)) {
-                    padding = height - contentHeight;
-                }
-                if (padding < 0) {
-                    padding = 0;
-                }
-                if (getPaddingTop() != padding) {
-                    ignoreLayout = true;
-                    setPadding(0, padding, 0, 0);
-                    ignoreLayout = false;
-                }
-                super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
-            }
-
-            @Override
-            protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-                super.onLayout(changed, left, top, right, bottom);
-                updateLayout();
-            }
-
-            @Override
-            public void requestLayout() {
-                if (ignoreLayout) {
-                    return;
-                }
-                super.requestLayout();
-            }
-
-            @Override
-            protected void onScrollChanged(int l, int t, int old_l, int old_t) {
-                super.onScrollChanged(l, t, old_l, old_t);
-                updateLayout();
-            }
-        };
-        scrollView.setFillViewport(true);
-        scrollView.setWillNotDraw(false);
-        scrollView.setClipToPadding(false);
-        scrollView.setVerticalScrollBarEnabled(false);
-        container.addView(scrollView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 130));
-
-        linearLayout = new LinearLayout(context);
-        linearLayout.setOrientation(LinearLayout.VERTICAL);
-        scrollView.addView(linearLayout, LayoutHelper.createScroll(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP));
-
-        CardView cardView = new CardView(context);
-        cardView.setRadius(40);
-        cardView.setCardElevation(0);
-        cardView.setCardBackgroundColor(colorBackground);
-
-        RelativeLayout relativeLayout = new RelativeLayout(context);
-        linearLayout.addView(relativeLayout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 270, 0, 4, 0, 4, 0));
-        relativeLayout.addView(cardView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 270));
-
-        BackupImageView imageView = new BackupImageView(context);
-        imageView.setImage(updateAvailable.banner, null, null);
-        cardView.addView(imageView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-
-        ImageView iv1 = new ImageView(context);
-        GradientDrawable gd = new GradientDrawable(
-                GradientDrawable.Orientation.BOTTOM_TOP,
-                new int[] {colorBackground, AndroidUtilities.getTransparentColor(colorBackground, 0)});
-        gd.setCornerRadius(38f);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        layoutParams.setMargins(0, AndroidUtilities.dp(20),0,0);
-        iv1.setLayoutParams(layoutParams);
-        iv1.setBackground(gd);
-        relativeLayout.addView(iv1);
-        ImageView iv2 = new ImageView(context);
-        GradientDrawable gd2 = new GradientDrawable(
-                GradientDrawable.Orientation.LEFT_RIGHT,
-                new int[] {colorBackground, AndroidUtilities.getTransparentColor(colorBackground, 0)});
-        gd2.setCornerRadius(38f);
-        RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        layoutParams2.setMargins(0, 0, AndroidUtilities.dp(20),0);
-        iv2.setLayoutParams(layoutParams2);
-        iv2.setBackground(gd2);
-        relativeLayout.addView(iv2);
-        ImageView iv3 = new ImageView(context);
-        iv3.setLayoutParams(new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-        iv3.setBackgroundColor(AndroidUtilities.getTransparentColor(colorBackground, 0.3F));
-        relativeLayout.addView(iv3);
-
-        LinearLayout linearLayout2 = new LinearLayout(context);
-        RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-        layoutParams3.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75),0);
-        linearLayout2.setLayoutParams(layoutParams3);
-        linearLayout2.setOrientation(LinearLayout.VERTICAL);
-
-        TextView updateTitle = new TextView(context);
-        LinearLayout.LayoutParams layoutParams4 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams4.setMargins(0, AndroidUtilities.dp(25), 0,0);
-        updateTitle.setLayoutParams(layoutParams4);
-        updateTitle.setTextColor(colorText);
-        updateTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 23);
-
-        TextView descMessage = new TextView(context);
-        LinearLayout.LayoutParams layoutParams5 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams5.setMargins(0, AndroidUtilities.dp(10), 0,0);
-        descMessage.setLayoutParams(layoutParams5);
-        descMessage.setTextColor(colorText);
-        descMessage.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
-        descMessage.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
-        descMessage.setMovementMethod(new AndroidUtilities.LinkMovementMethodMy());
-        descMessage.setGravity(Gravity.LEFT | Gravity.TOP);
-        descMessage.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
-
-        TextView note = new TextView(context);
-        LinearLayout.LayoutParams layoutParams6 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams6.setMargins(0, AndroidUtilities.dp(20), 0,0);
-        note.setLayoutParams(layoutParams6);
-        note.setTextColor(colorText);
-        note.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
-        note.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
-        note.setMovementMethod(new AndroidUtilities.LinkMovementMethodMy());
-        note.setGravity(Gravity.LEFT | Gravity.TOP);
-        note.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
-        setTextEntities(updateTitle, updateAvailable.title);
-        setTextEntities(descMessage, updateAvailable.desc);
-        setTextEntities(note, "<b>"+LocaleController.getString("UpdateNote", R.string.UpdateNote) + "</b> " + updateAvailable.note);
-
-        linearLayout2.addView(updateTitle);
-        linearLayout2.addView(descMessage);
-        linearLayout2.addView(note);
-        relativeLayout.addView(linearLayout2);
-
-        FrameLayout.LayoutParams frameLayoutParams = new FrameLayout.LayoutParams(LayoutHelper.MATCH_PARENT, AndroidUtilities.getShadowHeight(), Gravity.BOTTOM | Gravity.LEFT);
-        frameLayoutParams.bottomMargin = AndroidUtilities.dp(130);
-        shadow = new View(context);
-        shadow.setBackgroundColor(Theme.getColor(Theme.key_dialogShadowLine));
-        shadow.setAlpha(0.0f);
-        shadow.setTag(1);
-        container.addView(shadow, frameLayoutParams);
-
-        BottomSheetCell doneButton = new BottomSheetCell(context, false);
-        doneButton.setText(LocaleController.formatString("AppUpdateDownloadNow", R.string.AppUpdateDownloadNow), false);
-        doneButton.background.setOnClickListener(v -> {
-            if(!StoreUtils.isDownloadedFromAnyStore()){
-                ApkDownloader.downloadAPK(context, updateAvailable.link_file, updateAvailable.version);
-            } else if (StoreUtils.isFromPlayStore()) {
-                Browser.openUrl(getContext(), BuildVars.PLAYSTORE_APP_URL);
-            }
-            dismiss();
-        });
-        container.addView(doneButton, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 50, Gravity.LEFT | Gravity.BOTTOM, 0, 0, 0, 50));
-        BottomSheetCell scheduleButton = new BottomSheetCell(context, true);
-        scheduleButton.setText(LocaleController.getString("AppUpdateRemindMeLater", R.string.AppUpdateRemindMeLater), false);
-        scheduleButton.background.setOnClickListener(v -> dismiss());
-        container.addView(scheduleButton, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 50, Gravity.LEFT | Gravity.BOTTOM, 0, 0, 0, 0));
-
-    }
-
-    private void runShadowAnimation(final boolean show) {
-        if (show && shadow.getTag() != null || !show && shadow.getTag() == null) {
-            shadow.setTag(show ? null : 1);
-            if (show) {
-                shadow.setVisibility(View.VISIBLE);
-            }
-            if (shadowAnimation != null) {
-                shadowAnimation.cancel();
-            }
-            shadowAnimation = new AnimatorSet();
-            shadowAnimation.playTogether(ObjectAnimator.ofFloat(shadow, View.ALPHA, show ? 1.0f : 0.0f));
-            shadowAnimation.setDuration(150);
-            shadowAnimation.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    if (shadowAnimation != null && shadowAnimation.equals(animation)) {
-                        if (!show) {
-                            shadow.setVisibility(View.INVISIBLE);
-                        }
-                        shadowAnimation = null;
-                    }
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                    if (shadowAnimation != null && shadowAnimation.equals(animation)) {
-                        shadowAnimation = null;
-                    }
-                }
-            });
-            shadowAnimation.start();
-        }
-    }
-
-    private void updateLayout() {
-        View child = linearLayout.getChildAt(0);
-        child.getLocationInWindow(location);
-        int top = location[1];
-        int newOffset = Math.max(top, 0);
-        runShadowAnimation(!(location[1] + linearLayout.getMeasuredHeight() <= container.getMeasuredHeight() - AndroidUtilities.dp(113) + containerView.getTranslationY()));
-        if (scrollOffsetY != newOffset) {
-            scrollOffsetY = newOffset;
-            scrollView.invalidate();
-        }
-    }
-
-    @Override
-    protected boolean canDismissWithSwipe() {
-        return false;
-    }
-
-    private void setTextEntities(TextView tv, String text) {
-        text = text.replace("\n", "<br>");
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
-            tv.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
-        }else{
-            tv.setText(Html.fromHtml(text));
         }
     }
 }

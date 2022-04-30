@@ -166,7 +166,6 @@
     <string name="ConfirmStickersGIFs">Confirm Sending Stickers and GIFs</string>
     <string name="InAppUpdates">In-App Updates</string>
     <string name="CheckUpdates">Check</string>
-    <string name="CheckingUpdates">Checking for updates…</string>
     <string name="UpdateAvailable">Update Available</string>
     <string name="UpdateOwlGram">Update OwlGram</string>
     <string name="DownloadUpdate">Download</string>

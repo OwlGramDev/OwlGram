@@ -2,12 +2,16 @@ package it.owlgram.android.components;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,7 +42,7 @@ public class UpdateCell extends FrameLayout {
     private final LinearLayout downloadUpdate;
     private final LinearLayout installUpdate;
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "ClickableViewAccessibility"})
     public UpdateCell(Context context) {
         super(context);
         int colorBackground = Theme.getColor(Theme.key_windowBackgroundWhite);
@@ -125,21 +129,45 @@ public class UpdateCell extends FrameLayout {
         downloadUpdate.setLayoutParams(layoutParams7);
         downloadUpdate.setPadding(0,0, 0, AndroidUtilities.dp(20));
 
-        MaterialButton materialButton = new MaterialButton(context);
+        TextView materialButton = new TextView(context);
+        materialButton.setText(LocaleController.getString("DownloadUpdate", R.string.DownloadUpdate));
         LinearLayout.LayoutParams layoutParams10 = new LinearLayout.LayoutParams(0, AndroidUtilities.dp(40), 1.0f);
         layoutParams10.setMargins(0,0,AndroidUtilities.dp(10), 0);
         materialButton.setLayoutParams(layoutParams10);
-        materialButton.setText(LocaleController.getString("DownloadUpdate", R.string.DownloadUpdate));
-        materialButton.setOnClickListener(view -> onConfirmUpdate());
+        materialButton.setOnTouchListener((View view, MotionEvent motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                onConfirmUpdate();
+            }
+            return false;
+        });
+        materialButton.setClickable(true);
+        materialButton.setLines(1);
+        materialButton.setSingleLine(true);
+        materialButton.setEllipsize(TextUtils.TruncateAt.END);
+        materialButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        materialButton.setGravity(Gravity.CENTER);
+        materialButton.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
+        materialButton.setTextColor(Theme.getColor(Theme.key_featuredStickers_buttonText));
+        materialButton.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(5), Theme.getColor(Theme.key_featuredStickers_addButton), Theme.getColor(Theme.key_featuredStickers_addButtonPressed)));
 
-        MaterialButton materialButton2 = new MaterialButton(context);
-        materialButton2.setOutlineMode();
-        LinearLayout.LayoutParams layoutParams11 = new LinearLayout.LayoutParams(0, AndroidUtilities.dp(40), 1.0f);
-        layoutParams11.setMargins(AndroidUtilities.dp(10),0,0, 0);
-        materialButton2.setLayoutParams(layoutParams11);
+        TextView materialButton2 = new TextView(context);
         materialButton2.setLayoutParams(new LinearLayout.LayoutParams(0, AndroidUtilities.dp(40), 1.0f));
         materialButton2.setText(LocaleController.getString("RemindUpdate", R.string.RemindUpdate));
-        materialButton2.setOnClickListener(view -> onRemindUpdate());
+        materialButton2.setOnTouchListener((View view, MotionEvent motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                onRemindUpdate();
+            }
+            return false;
+        });
+        materialButton2.setClickable(true);
+        materialButton2.setLines(1);
+        materialButton2.setSingleLine(true);
+        materialButton2.setEllipsize(TextUtils.TruncateAt.END);
+        materialButton2.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        materialButton2.setGravity(Gravity.CENTER);
+        materialButton2.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
+        materialButton2.setTextColor(Theme.getColor(Theme.key_featuredStickers_addButton));
+        materialButton2.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(5), Color.TRANSPARENT, AndroidUtilities.getTransparentColor(Theme.getColor(Theme.key_featuredStickers_addButton), 0.5f)));
 
         downloadingUpdate = new LinearLayout(context);
         RelativeLayout.LayoutParams layoutParams8 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
@@ -201,11 +229,26 @@ public class UpdateCell extends FrameLayout {
         installUpdate.setVisibility(GONE);
         installUpdate.setPadding(0,0,0, AndroidUtilities.dp(15));
 
-        MaterialButton materialButton3 = new MaterialButton(context);
+        TextView materialButton3 = new TextView(context);
         LinearLayout.LayoutParams layoutParams14 = new LinearLayout.LayoutParams(0, AndroidUtilities.dp(50), 1.0f);
         materialButton3.setLayoutParams(layoutParams14);
         materialButton3.setText(LocaleController.getString("InstallUpdate", R.string.InstallUpdate));
-        materialButton3.setOnClickListener(view -> onInstallUpdate());
+        materialButton3.setOnTouchListener((View view, MotionEvent motionEvent) -> {
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                onInstallUpdate();
+            }
+            return false;
+        });
+        materialButton3.setClickable(true);
+        materialButton3.setLines(1);
+        materialButton3.setSingleLine(true);
+        materialButton3.setEllipsize(TextUtils.TruncateAt.END);
+        materialButton3.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+        materialButton3.setGravity(Gravity.CENTER);
+        materialButton3.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
+        materialButton3.setTextColor(Theme.getColor(Theme.key_featuredStickers_buttonText));
+        materialButton3.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(5), Theme.getColor(Theme.key_featuredStickers_addButton), Theme.getColor(Theme.key_featuredStickers_addButtonPressed)));
+
 
         downloadUpdate.addView(materialButton);
         downloadUpdate.addView(materialButton2);

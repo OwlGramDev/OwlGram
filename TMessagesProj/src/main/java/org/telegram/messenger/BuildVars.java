@@ -22,7 +22,7 @@ public class BuildVars {
     public static boolean IGNORE_VERSION_CHECK = false;
     public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= 29;
     public static int BUILD_VERSION = 2642;
-    public static String BUILD_VERSION_STRING = "1.8.4";
+    public static String BUILD_VERSION_STRING = "1.8.5 PBeta 1";
     public static int TELEGRAM_BUILD_VERSION = 2636;
     public static String TELEGRAM_VERSION_STRING = "8.7.4";
     public static int APP_ID = 10029733;

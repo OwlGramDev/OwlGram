@@ -11,8 +11,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildVars;
@@ -115,8 +113,8 @@ public class OwlgramUpdateSettings extends BaseFragment {
                         OwlConfig.setUpdateData("");
                         OwlConfig.remindUpdate(updateAvailable.version);
                         updateAvailable = null;
-                        listAdapter.notifyItemRemoved(updateSectionAvailableRow);
-                        listAdapter.notifyItemRemoved(updateSectionDividerRow);
+                        listAdapter.notifyItemRangeRemoved(updateSectionAvailableRow, 2);
+                        listAdapter.notifyItemRangeChanged(updateSectionAvailableRow, 1);
                         updateRowsId();
                     }
                     checkUpdates();
@@ -148,7 +146,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
             public void onFinished() {
                 if(updateCell != null) {
                     changeBetaMode.setEnabled(!ApkDownloader.updateDownloaded(), null);
-                    updateCheckCell.setClickable(!ApkDownloader.updateDownloaded());
+                    updateCheckCell.setCanCheckForUpdate(!ApkDownloader.updateDownloaded());
                     if(ApkDownloader.updateDownloaded()) {
                         updateCell.setInstallMode();
                     } else {
@@ -236,7 +234,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
                 case 4:
                     UpdateCheckCell updateCheckCell = (UpdateCheckCell) holder.itemView;
                     updateCheckCell.loadLastStatus();
-                    updateCheckCell.setClickable(!ApkDownloader.updateDownloaded());
+                    updateCheckCell.setCanCheckForUpdate(!ApkDownloader.updateDownloaded());
                     break;
                 case 5:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
@@ -298,8 +296,8 @@ public class OwlgramUpdateSettings extends BaseFragment {
                                 OwlConfig.setUpdateData("");
                                 OwlConfig.remindUpdate(updateAvailable.version);
                                 updateAvailable = null;
-                                listAdapter.notifyItemRemoved(updateSectionAvailableRow);
-                                listAdapter.notifyItemRemoved(updateSectionDividerRow);
+                                listAdapter.notifyItemRangeRemoved(updateSectionAvailableRow, 2);
+                                listAdapter.notifyItemRangeChanged(updateSectionAvailableRow, 1);
                                 updateRowsId();
                             }
                         }
@@ -310,7 +308,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
                 case 4:
-                    view = new UpdateCheckCell(mContext) {
+                    view = new UpdateCheckCell(mContext, true) {
                         @Override
                         protected void onCheckUpdate() {
                             super.onCheckUpdate();
@@ -319,6 +317,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
                             }
                         }
                     };
+                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     updateCheckCell = (UpdateCheckCell) view;
                     break;
                 case 5:
@@ -357,7 +356,6 @@ public class OwlgramUpdateSettings extends BaseFragment {
     }
     private void checkUpdates() {
         updateCheckCell.setCheckingStatus();
-        checkingUpdates = true;
         UpdateManager.checkUpdates(new UpdateManager.UpdateCallback() {
             @Override
             public void onSuccess(Object updateResult) {
@@ -368,8 +366,8 @@ public class OwlgramUpdateSettings extends BaseFragment {
                     if (updateAvailable == null) {
                         OwlConfig.setUpdateData(updateResult.toString());
                         updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
-                        listAdapter.notifyItemInserted(updateSectionAvailableRow);
-                        listAdapter.notifyItemInserted(updateSectionDividerRow);
+                        listAdapter.notifyItemRangeInserted(updateSectionAvailableRow, 2);
+                        listAdapter.notifyItemRangeChanged(updateSectionAvailableRow, 1);
                         updateRowsId();
                         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                     }
@@ -378,8 +376,8 @@ public class OwlgramUpdateSettings extends BaseFragment {
                     if (updateAvailable != null) {
                         OwlConfig.setUpdateData("");
                         updateAvailable = null;
-                        listAdapter.notifyItemRemoved(updateSectionAvailableRow);
-                        listAdapter.notifyItemRemoved(updateSectionDividerRow);
+                        listAdapter.notifyItemRangeRemoved(updateSectionAvailableRow, 2);
+                        listAdapter.notifyItemRangeChanged(updateSectionAvailableRow, 1);
                         updateRowsId();
                     }
                 }
