@@ -832,17 +832,15 @@ public class FilterCreateActivity extends BaseFragment {
                     PollEditTextCell cell = new PollEditTextCell(mContext, false, null, view1 -> {
                         iconSelectorAlert = new IconSelectorAlert(mContext) {
                             @Override
-                            protected void onItemClick(int pos) {
-                                super.onItemClick(pos);
-                                ImageView pollEditTextCell = (ImageView) view1;
-                                pollEditTextCell.setImageResource(FolderIconHelper.icons[pos]);
-                                newFilterEmoticon = FolderIconHelper.emojis[pos];
+                            protected void onItemClick(String emoticon) {
+                                super.onItemClick(emoticon);
+                                newFilterEmoticon = emoticon;
+                                adapter.notifyItemChanged(nameRow);
                                 checkDoneButton(true);
                             }
                         };
                         iconSelectorAlert.show();
                     });
-                    cell.setIcon(FolderIconHelper.getTabIcon(newFilterEmoticon, false));
                     cell.createErrorTextView();
                     cell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     cell.addTextWatcher(new TextWatcher() {
@@ -1026,7 +1024,11 @@ public class FilterCreateActivity extends BaseFragment {
                         holder.itemView.setBackgroundDrawable(Theme.getThemedDrawable(mContext, R.drawable.greydivider_bottom, Theme.key_windowBackgroundGrayShadow));
                     } else {
                         holder.itemView.setBackgroundDrawable(Theme.getThemedDrawable(mContext, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
-                    }
+                    } break;
+                }
+                case 2: {
+                    PollEditTextCell cell = (PollEditTextCell) holder.itemView;
+                    cell.setIcon(FolderIconHelper.getTabIcon(newFilterEmoticon));
                     break;
                 }
                 case 4: {

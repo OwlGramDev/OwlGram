@@ -15,13 +15,8 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -47,9 +42,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.exoplayer2.util.Log;
-
-import org.checkerframework.checker.units.qual.A;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.LocaleController;
@@ -83,14 +75,14 @@ public class FilterTabsView extends FrameLayout {
     private class Tab {
         public int id;
         public String title;
-        public String emoticon;
         public int titleWidth;
+        public String emoticon;
         public int iconWidth;
         public int counter;
 
         public Tab(int i, String t, String e) {
             id = i;
-            title = OwlConfig.tabMode != 2 ? t:"";
+            title = OwlConfig.tabMode != OwlConfig.TAB_TYPE_ICON ? t:"";
             emoticon = i != Integer.MAX_VALUE ? e:"\uD83D\uDCAC";
         }
 
@@ -123,7 +115,7 @@ public class FilterTabsView extends FrameLayout {
             if (TextUtils.equals(title, newTitle)) {
                 return false;
             }
-            title = OwlConfig.tabMode != 2 ? newTitle:"";
+            title = OwlConfig.tabMode != OwlConfig.TAB_TYPE_ICON ? newTitle:"";
             return true;
         }
     }
@@ -139,6 +131,9 @@ public class FilterTabsView extends FrameLayout {
         private String currentText;
         private StaticLayout textLayout;
         private int textOffsetX;
+        private String currentEmoticon;
+        private Drawable icon;
+        private Drawable activeIcon;
 
         public boolean animateChange;
         public float changeProgress;
@@ -149,6 +144,14 @@ public class FilterTabsView extends FrameLayout {
         float lastTextX;
         float animateFromTextX;
         boolean animateTextX;
+
+        String lastEmoticon;
+        float lastIconX;
+        float animateFromIconX;
+        boolean animateIconX;
+        private boolean animateIconChange;
+        private Drawable iconAnimateInDrawable;
+        private Drawable iconAnimateOutDrawable;
 
         boolean animateTabCounter;
         int lastTabCount = -1;
@@ -184,7 +187,6 @@ public class FilterTabsView extends FrameLayout {
         public void setTab(Tab tab, int position) {
             currentTab = tab;
             currentPosition = position;
-            setContentDescription(tab.title);
             requestLayout();
         }
 
@@ -200,6 +202,8 @@ public class FilterTabsView extends FrameLayout {
             animateCounterChange = false;
             animateTextChange = false;
             animateTextX = false;
+            animateIconX = false;
+            animateIconChange = false;
             animateTabWidth = false;
             if (changeAnimator != null) {
                 changeAnimator.removeAllListeners();
@@ -219,6 +223,11 @@ public class FilterTabsView extends FrameLayout {
         @SuppressLint("DrawAllocation")
         @Override
         protected void onDraw(Canvas canvas) {
+            if (currentTab.counter > 0) {
+                setContentDescription(currentTab.title + " ("+ currentTab.counter + ")");
+            } else {
+                setContentDescription(currentTab.title);
+            }
             if (currentTab.id != Integer.MAX_VALUE && editingAnimationProgress != 0) {
                 canvas.save();
                 float p = editingAnimationProgress * (currentPosition % 2 == 0 ? 1.0f : -1.0f);
@@ -274,7 +283,6 @@ public class FilterTabsView extends FrameLayout {
             }
 
             float counterWidth;
-            int emoticonWidth = FolderIconHelper.getIconWidth();
             int countWidth;
             String counterText;
 
@@ -301,7 +309,7 @@ public class FilterTabsView extends FrameLayout {
             if (currentTab.id != Integer.MAX_VALUE && (isEditing || editingStartAnimationProgress != 0)) {
                 countWidth = (int) (countWidth + (AndroidUtilities.dp(20) - countWidth) * editingStartAnimationProgress);
             }
-            if (OwlConfig.tabMode != 2) {
+            if (OwlConfig.tabMode != OwlConfig.TAB_TYPE_ICON) {
                 tabWidth = currentTab.iconWidth + currentTab.titleWidth + ((countWidth != 0 && !animateCounterRemove) ? countWidth + AndroidUtilities.dp(6 * (counterText != null ? 1.0f : editingStartAnimationProgress)) : 0);
             } else {
                 tabWidth = currentTab.iconWidth + ((countWidth != 0 && !animateCounterRemove) ? countWidth + AndroidUtilities.dp(6 * (counterText != null ? 1.0f : editingStartAnimationProgress)) : 0);
@@ -318,7 +326,6 @@ public class FilterTabsView extends FrameLayout {
                 textHeight = textLayout.getHeight();
                 textOffsetX = (int) -textLayout.getLineLeft(0);
             }
-
 
             float titleOffsetX = 0;
             if (animateTextChange) {
@@ -350,55 +357,80 @@ public class FilterTabsView extends FrameLayout {
             } else {
                 if (textLayout != null) {
                     canvas.save();
-                    canvas.translate( textX + textOffsetX, (getMeasuredHeight() - textHeight) / 2f + 1);
+                    canvas.translate(textX + textOffsetX, (getMeasuredHeight() - textHeight) / 2f + 1);
                     textLayout.draw(canvas);
                     canvas.restore();
                 }
             }
 
+            int iconX = 0;
             // TAB ICON
-            if (textLayout != null && OwlConfig.tabMode != 0) {
-                int y_offset = (int)((getMeasuredHeight() - emoticonWidth) / 2f);
-                int x_offset = (int)((getMeasuredWidth() - tabWidth) / 2f);
-                int alphaAnimation = 0;
-                if (animateToKey == null) {
-                    if ((animatingIndicator || manualScrollingToId != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
-                        alphaAnimation = (int)(255 * animatingIndicatorProgress);
-                        if (currentTab.id == id2) {
-                            alphaAnimation = 255 - alphaAnimation;
-                        }
-                    } else if (currentTab.id == id1) {
-                        alphaAnimation = 255;
+            if (OwlConfig.tabMode != OwlConfig.TAB_TYPE_TEXT) {
+                int emoticonWidth = FolderIconHelper.getIconWidth();
+                if (!TextUtils.equals(currentTab.emoticon, currentEmoticon)) {
+                    currentEmoticon = currentTab.emoticon;
+                    android.graphics.Rect bounds = new android.graphics.Rect(0, 0, emoticonWidth, emoticonWidth);
+                    activeIcon = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.emoticon)).mutate();
+                    icon = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.emoticon)).mutate();
+                    activeIcon.setBounds(bounds);
+                    icon.setBounds(bounds);
+                }
+                icon.setTint(textPaint.getColor());
+                activeIcon.setTint(textPaint.getColor());
+                iconX = (int) ((getMeasuredWidth() - tabWidth) / 2f);
+                if (animateIconX) {
+                    iconX = (int) (iconX * changeProgress + animateFromIconX * (1f - changeProgress));
+                }
+                int iconY = (int) ((getMeasuredHeight() - emoticonWidth) / 2f);
+                if (animateIconChange) {
+                    if (iconAnimateOutDrawable != null) {
+                        canvas.save();
+                        canvas.translate(iconX, iconY);
+                        int alpha = iconAnimateOutDrawable.getAlpha();
+                        iconAnimateOutDrawable.setAlpha((int) (alpha * (1f - changeProgress)));
+                        iconAnimateOutDrawable.draw(canvas);
+                        canvas.restore();
+                        iconAnimateOutDrawable.setAlpha(alpha);
+                    }
+                    if (iconAnimateInDrawable != null) {
+                        canvas.save();
+                        canvas.translate(iconX, iconY);
+                        int alpha = iconAnimateInDrawable.getAlpha();
+                        iconAnimateInDrawable.setAlpha((int) (alpha * changeProgress));
+                        iconAnimateInDrawable.draw(canvas);
+                        canvas.restore();
+                        iconAnimateInDrawable.setAlpha(alpha);
                     }
                 } else {
-                    if ((animatingIndicator || manualScrollingToPosition != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
-                        alphaAnimation = (int)(255 * animationValue);
-                        if (currentTab.id == id2) {
-                            alphaAnimation = 255 - alphaAnimation;
+                    int alphaAnimation = 0;
+                    if (animateToKey == null) {
+                        if ((animatingIndicator || manualScrollingToId != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
+                            alphaAnimation = (int) (255 * animatingIndicatorProgress);
+                            if (currentTab.id == id2) {
+                                alphaAnimation = 255 - alphaAnimation;
+                            }
+                        } else if (currentTab.id == id1) {
+                            alphaAnimation = 255;
                         }
-                    } else if (currentTab.id == id1) {
-                        alphaAnimation = 255;
+                    } else {
+                        if ((animatingIndicator || manualScrollingToPosition != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
+                            alphaAnimation = (int) (255 * animationValue);
+                            if (currentTab.id == id2) {
+                                alphaAnimation = 255 - alphaAnimation;
+                            }
+                        } else if (currentTab.id == id1) {
+                            alphaAnimation = 255;
+                        }
                     }
+                    canvas.save();
+                    canvas.translate(iconX, iconY);
+                    activeIcon.setAlpha(alphaAnimation);
+                    activeIcon.draw(canvas);
+                    icon.setAlpha(255 - alphaAnimation);
+                    icon.draw(canvas);
+                    canvas.restore();
                 }
-                canvas.save();
-
-                PorterDuffColorFilter colorFilter = new PorterDuffColorFilter(textPaint.getColor(), PorterDuff.Mode.SRC_ATOP);
-                Rect boundRect = new Rect(x_offset, y_offset,emoticonWidth + x_offset,y_offset + emoticonWidth);
-
-                Drawable icon_active = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.emoticon, true));
-                icon_active.setBounds(boundRect);
-                icon_active.setColorFilter(colorFilter);
-                icon_active.setAlpha(alphaAnimation);
-                icon_active.draw(canvas);
-
-                Drawable icon = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.emoticon, false));
-                icon.setBounds(boundRect);
-                icon.setColorFilter(colorFilter);
-                icon.setAlpha(255 - alphaAnimation);
-                icon.draw(canvas);
-                canvas.restore();
             }
-            // END TAB ICON
 
             if (animateCounterEnter || counterText != null || currentTab.id != Integer.MAX_VALUE && (isEditing || editingStartAnimationProgress != 0)) {
                 if (aBackgroundColorKey == null) {
@@ -425,15 +457,15 @@ public class FilterTabsView extends FrameLayout {
                 if (animateTextChange) {
                     titleWidth = animateFromTitleWidth * (1f - changeProgress) + currentTab.titleWidth * changeProgress;
                 }
-                int textSpace = OwlConfig.tabMode != 2 ? AndroidUtilities.dp(6):0;
+                int textSpace = OwlConfig.tabMode != OwlConfig.TAB_TYPE_ICON ? AndroidUtilities.dp(6) : 0;
                 if (animateTextChange && titleAnimateOutLayout == null) {
                     x = textX - titleXOffset + titleOffsetX + titleWidth + textSpace;
                 } else {
                     x = textX + titleWidth + textSpace;
                 }
-
                 int countTop = (getMeasuredHeight() - AndroidUtilities.dp(20)) / 2;
-                if ( (isEditing || editingStartAnimationProgress != 0) && counterText == null) {
+
+                if ((isEditing || editingStartAnimationProgress != 0) && counterText == null) {
                     counterPaint.setAlpha((int) (editingStartAnimationProgress * 255));
                 } else {
                     counterPaint.setAlpha(255);
@@ -512,7 +544,9 @@ public class FilterTabsView extends FrameLayout {
                 canvas.restore();
             }
 
+            lastEmoticon = currentEmoticon;
             lastTextX = textX;
+            lastIconX = iconX;
             lastTabCount = currentTab.counter;
             lastTitleLayout = textLayout;
             lastTitle = currentText;
@@ -570,8 +604,13 @@ public class FilterTabsView extends FrameLayout {
             } else {
                 countWidth = 0;
             }
-            int tabWidth = currentTab.iconWidth + currentTab.titleWidth + (countWidth != 0 ? countWidth + AndroidUtilities.dp(6 * (counterText != null ? 1.0f : editingStartAnimationProgress)) : 0);
-            int textX = (getMeasuredWidth() - tabWidth) / 2;
+            int tabWidth;
+            if (OwlConfig.tabMode != OwlConfig.TAB_TYPE_ICON) {
+                tabWidth = currentTab.iconWidth + currentTab.titleWidth + (countWidth != 0 ? countWidth + AndroidUtilities.dp(6 * 1.0f) : 0);
+            } else {
+                tabWidth = currentTab.iconWidth + (countWidth != 0 ? countWidth + AndroidUtilities.dp(6 * 1.0f) : 0);
+            }
+            int textX = (getMeasuredWidth() - tabWidth) / 2 + currentTab.iconWidth;
 
             if (textX != lastTextX) {
                 animateTextX = true;
@@ -624,6 +663,30 @@ public class FilterTabsView extends FrameLayout {
                 }
             }
 
+            if (OwlConfig.tabMode != OwlConfig.TAB_TYPE_TEXT) {
+                int iconX = (int) ((getMeasuredWidth() - tabWidth) / 2f);
+
+                if (iconX != lastIconX) {
+                    animateIconX = true;
+                    animateFromIconX = lastIconX;
+                    changed = true;
+                }
+
+                if (lastEmoticon != null && !currentTab.emoticon.equals(lastEmoticon)) {
+                    int emoticonWidth = FolderIconHelper.getIconWidth();
+                    boolean active = selectedTabId == currentTab.id;
+                    android.graphics.Rect bounds = new android.graphics.Rect(0, 0, emoticonWidth, emoticonWidth);
+                    iconAnimateOutDrawable = getResources().getDrawable(FolderIconHelper.getTabIcon(lastEmoticon)).mutate();
+                    iconAnimateInDrawable = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.emoticon)).mutate();
+                    iconAnimateOutDrawable.setBounds(bounds);
+                    iconAnimateInDrawable.setBounds(bounds);
+                    iconAnimateOutDrawable.setTint(textPaint.getColor());
+                    iconAnimateInDrawable.setTint(textPaint.getColor());
+                    animateIconChange = true;
+                    changed = true;
+                }
+            }
+
             if (tabWidth != lastTabWidth || getMeasuredWidth() != lastWidth) {
                 animateTabWidth = true;
                 animateFromTabWidth = lastTabWidth;
@@ -652,6 +715,8 @@ public class FilterTabsView extends FrameLayout {
             animateCounterChange = false;
             animateTextChange = false;
             animateTextX = false;
+            animateIconX = false;
+            animateIconChange = false;
             animateTabWidth = false;
             changeAnimator = null;
             invalidate();

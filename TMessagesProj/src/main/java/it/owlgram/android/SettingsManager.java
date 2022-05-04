@@ -79,6 +79,9 @@ public class SettingsManager {
             case "INVALID_CONFIGURATION":
             case "VALID_CONFIGURATION":
             case "NEED_UPDATE_CONFIGURATION":
+            case "TAB_TYPE_TEXT":
+            case "TAB_TYPE_ICON":
+            case "TAB_TYPE_MIX":
                 return false;
             default:
                 return true;

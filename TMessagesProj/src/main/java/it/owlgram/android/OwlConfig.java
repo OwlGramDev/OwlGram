@@ -20,6 +20,10 @@ import it.owlgram.android.translator.DeepLTranslator;
 import it.owlgram.android.translator.Translator;
 
 public class OwlConfig extends SettingsManager {
+    public static final int TAB_TYPE_TEXT = 0;
+    public static final int TAB_TYPE_MIX = 1;
+    public static final int TAB_TYPE_ICON = 2;
+
     private static final Object sync = new Object();
     public static boolean hidePhoneNumber;
     public static boolean hideContactNumber;

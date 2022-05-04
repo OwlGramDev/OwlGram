@@ -809,11 +809,11 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
                 case 6: {
                     RadioCell radioCell = (RadioCell) holder.itemView;
                     if (position == folderStyleTitlesRow) {
-                        radioCell.setText(LocaleController.getString("FoldersTypeTitles", R.string.FoldersTypeTitles), OwlConfig.tabMode == 0, true);
+                        radioCell.setText(LocaleController.getString("FoldersTypeTitles", R.string.FoldersTypeTitles), OwlConfig.tabMode == OwlConfig.TAB_TYPE_TEXT, true);
                     } else if (position == folderStyleEmojiRow) {
-                        radioCell.setText(LocaleController.getString("FoldersTypeIcons", R.string.FoldersTypeIcons), OwlConfig.tabMode == 2, true);
+                        radioCell.setText(LocaleController.getString("FoldersTypeIcons", R.string.FoldersTypeIcons), OwlConfig.tabMode == OwlConfig.TAB_TYPE_ICON, true);
                     } else if (position == folderStyleEmojiTitlesRow) {
-                        radioCell.setText(LocaleController.getString("FoldersTypeIconsTitles", R.string.FoldersTypeIconsTitles), OwlConfig.tabMode == 1, true);
+                        radioCell.setText(LocaleController.getString("FoldersTypeIconsTitles", R.string.FoldersTypeIconsTitles), OwlConfig.tabMode == OwlConfig.TAB_TYPE_MIX, true);
                     }
 
                     break;
