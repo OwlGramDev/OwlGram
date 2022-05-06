@@ -21907,11 +21907,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 icons.add(R.drawable.msg_report);
                             }
                         }
-                        if (chatMode != MODE_SCHEDULED && OwlConfig.showMessageDetails) {
-                            items.add(LocaleController.getString("MessageDetails", R.string.MessageDetails));
-                            options.add(203);
-                            icons.add(R.drawable.menu_info_little);
-                        }
                         if (message.canDeleteMessage(chatMode == MODE_SCHEDULED, currentChat) && (threadMessageObjects == null || !threadMessageObjects.contains(message))) {
                             items.add(LocaleController.getString("Delete", R.string.Delete));
                             options.add(1);
@@ -22002,6 +21997,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         options.add(1);
                         icons.add(selectedObject.messageOwner.ttl_period != 0 ? R.drawable.msg_delete_auto : R.drawable.msg_delete);
                     }
+                }
+
+                if (OwlConfig.showMessageDetails) {
+                    items.add(LocaleController.getString("MessageDetails", R.string.MessageDetails));
+                    options.add(203);
+                    icons.add(R.drawable.menu_info_little);
                 }
             }
 

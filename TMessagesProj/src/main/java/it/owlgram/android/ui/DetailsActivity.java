@@ -284,7 +284,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
 
         if (fromUser != null){
             aboutInfoHeaderRow = rowCount++;
-            if (!TextUtils.isEmpty(fromUser.username)){
+            if (!TextUtils.isEmpty(fromUser.username) && !fromUser.username.equals("null")){
                 nameUserHeaderRow = rowCount++;
             }
             if (fromUser.first_name != null){
@@ -298,7 +298,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
         }
         messageHeaderRow = rowCount++;
         messageIdRow = rowCount++;
-        if (messageObject.messageOwner.fwd_from == null && !TextUtils.isEmpty(messageObject.messageOwner.message)){
+        if (messageObject.messageOwner.fwd_from == null && !TextUtils.isEmpty(messageObject.messageText)){
             messageTextRow = rowCount++;
         }
         if (messageObject.messageOwner.forwards > 0) {
@@ -313,7 +313,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
         if (messageObject.messageOwner.fwd_from != null){
             messageDividerRow = rowCount++;
             forwardMessageHeaderRow = rowCount++;
-            if (!TextUtils.isEmpty(messageObject.messageOwner.message)){
+            if (!TextUtils.isEmpty(messageObject.messageText)){
                 messageTextRow = rowCount++;
             }
             forwardMessageDateRow = rowCount++;
@@ -324,7 +324,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     forwardUserNameRow = rowCount++;
                 }
                 if (fromForwardedUser.id != 0){
-                    if (fromForwardedUser.username != null) {
+                    if (fromForwardedUser.username != null && !fromForwardedUser.username.equals("null")) {
                         forwardUserUsernameRow = rowCount++;
                     }
                     if (fromForwardedUser.photo != null) {
@@ -348,7 +348,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                 if (fromRepliedUser.first_name != null){
                     repliedUserNameRow = rowCount++;
                 }
-                if (fromRepliedUser.username != null) {
+                if (fromRepliedUser.username != null && !fromRepliedUser.username.equals("null")) {
                     repliedUserUsernameRow = rowCount++;
                 }
                 if (fromRepliedUser.photo != null) {
@@ -420,7 +420,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                 fileHeaderRow = -1;
                 rowCount -= 2;
             }
-            if (messageObject.getSize() != 0) {
+            if (messageObject.getSize() != 0 || !TextUtils.isEmpty(filePath)) {
                 fileSizeRow = rowCount++;
             }
         }
@@ -489,7 +489,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == messageIdRow) {
                         textDetailCell.setTextAndValue(String.valueOf(messageObject.getId()), "ID", true);
                     } else if (position == messageTextRow) {
-                        CharSequence message = messageObject.messageOwner.message;
+                        CharSequence message = messageObject.messageText;
                         message = EntitiesHelper.getSpannableString(message.toString(), messageObject.messageOwner.entities, true);
                         textDetailCell.setTextWithEmojiAndValue(EntitiesHelper.getUrlNoUnderlineText(message), LocaleController.getString("MessageText", R.string.MessageText),true);
                     } else if (position == messageDateRow) {
@@ -531,7 +531,11 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == repliedUserUsernameRow) {
                         textDetailCell.setTextAndValue("@" + fromRepliedUser.username, LocaleController.getString("Username", R.string.Username),true);
                     } else if (position == groupNameRow) {
-                        textDetailCell.setTextWithEmojiAndValue(fromChat.title, LocaleController.getString("GroupName", R.string.GroupName),true);
+                        if (fromChat.broadcast) {
+                            textDetailCell.setTextWithEmojiAndValue(fromChat.title, LocaleController.getString("EnterChannelName", R.string.EnterChannelName),true);
+                        } else {
+                            textDetailCell.setTextWithEmojiAndValue(fromChat.title, LocaleController.getString("GroupName", R.string.GroupName),true);
+                        }
                     } else if (position == groupUsernameRow) {
                         textDetailCell.setTextAndValue("@" + fromChat.username, LocaleController.getString("Username", R.string.Username),true);
                     } else if (position == groupIdRow) {
@@ -541,7 +545,8 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == filePathRow) {
                         textDetailCell.setTextAndValue(filePath, LocaleController.getString("FilePath", R.string.FilePath),true);
                     } else if (position == fileSizeRow) {
-                        textDetailCell.setTextAndValue(AndroidUtilities.formatFileSize(messageObject.getSize()), LocaleController.getString("FileSize", R.string.FileSize),true);
+                        long size = messageObject.getSize() != 0 ? messageObject.getSize():new File(filePath).length();
+                        textDetailCell.setTextAndValue(AndroidUtilities.formatFileSize(size), LocaleController.getString("FileSize", R.string.FileSize),true);
                     } else if (position == fileDCRow) {
                         int DC = -1;
                         if (messageObject.messageOwner.media.photo != null && messageObject.messageOwner.media.photo.dc_id > 0) {
