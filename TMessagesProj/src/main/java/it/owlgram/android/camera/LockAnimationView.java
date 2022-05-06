@@ -3,7 +3,6 @@ package it.owlgram.android.camera;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -12,7 +11,6 @@ import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import org.checkerframework.checker.units.qual.A;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;

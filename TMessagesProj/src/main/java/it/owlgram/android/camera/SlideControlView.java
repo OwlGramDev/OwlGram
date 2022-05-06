@@ -65,7 +65,7 @@ public class SlideControlView extends View {
         void didSlide(float sliderValue);
     }
 
-    public final Property<SlideControlView, Float> SLIDER_PROPERTY = new AnimationProperties.FloatProperty<SlideControlView>("clipProgress") {
+    public final Property<SlideControlView, Float> SLIDER_PROPERTY = new AnimationProperties.FloatProperty<>("clipProgress") {
         @Override
         public void setValue(SlideControlView object, float value) {
             sliderValue = value;

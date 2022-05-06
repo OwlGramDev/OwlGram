@@ -28,7 +28,7 @@ import java.util.List;
 public class CameraXUtilities {
 
     public static boolean isCameraXSupported() {
-        return SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_AVERAGE && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+        return SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_AVERAGE;
     }
 
     public static int getDefault() {
@@ -42,7 +42,7 @@ public class CameraXUtilities {
     @SuppressLint("UnsafeOptInUsageError")
     public static CameraSelector getDefaultWideAngleCamera(ProcessCameraProvider provider) {
         String wideCamera = getWideCameraId(provider);
-        if (wideCamera != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (wideCamera != null) {
             return new CameraSelector.Builder().addCameraFilter(cameraInfo -> {
                 List<CameraInfo> cameraFiltered = new ArrayList<>();
                 for (int i= 0; i < cameraInfo.size(); i++) {
@@ -62,35 +62,32 @@ public class CameraXUtilities {
 
     @SuppressLint({"RestrictedApi", "UnsafeOptInUsageError"})
     public static String getWideCameraId(ProcessCameraProvider provider) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            float lowestAngledCamera = Integer.MAX_VALUE;
-            List<CameraInfo> cameraInfoList = provider.getAvailableCameraInfos();
-            String cameraId = null;
-            int availableBackCamera = 0;
-            boolean foundWideAngleOnPrimaryCamera = false;
-            for (int i = 0; i < cameraInfoList.size(); i++) {
-                CameraInfo cameraInfo = cameraInfoList.get(i);
-                String id = Camera2CameraInfo.from(cameraInfo).getCameraId();
-                CameraCharacteristics cameraCharacteristics = Camera2CameraInfo.from(cameraInfo).getCameraCharacteristicsMap().get(id);
-                if (cameraCharacteristics != null) {
-                    if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) == LENS_FACING_BACK) {
-                        availableBackCamera++;
-                        ZoomState zoomState = cameraInfo.getZoomState().getValue();
-                        if (zoomState != null && zoomState.getMinZoomRatio() < 1.0F && zoomState.getMinZoomRatio() > 0) {
-                            foundWideAngleOnPrimaryCamera = true;
-                        }
-                        float[] listLensAngle = cameraCharacteristics.get(LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
-                        if (listLensAngle.length > 0) {
-                            if (listLensAngle[0] < 3.0f && listLensAngle[0] < lowestAngledCamera) {
-                                lowestAngledCamera = listLensAngle[0];
-                                cameraId = id;
-                            }
+        float lowestAngledCamera = Integer.MAX_VALUE;
+        List<CameraInfo> cameraInfoList = provider.getAvailableCameraInfos();
+        String cameraId = null;
+        int availableBackCamera = 0;
+        boolean foundWideAngleOnPrimaryCamera = false;
+        for (int i = 0; i < cameraInfoList.size(); i++) {
+            CameraInfo cameraInfo = cameraInfoList.get(i);
+            String id = Camera2CameraInfo.from(cameraInfo).getCameraId();
+            CameraCharacteristics cameraCharacteristics = Camera2CameraInfo.from(cameraInfo).getCameraCharacteristicsMap().get(id);
+            if (cameraCharacteristics != null) {
+                if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) == LENS_FACING_BACK) {
+                    availableBackCamera++;
+                    ZoomState zoomState = cameraInfo.getZoomState().getValue();
+                    if (zoomState != null && zoomState.getMinZoomRatio() < 1.0F && zoomState.getMinZoomRatio() > 0) {
+                        foundWideAngleOnPrimaryCamera = true;
+                    }
+                    float[] listLensAngle = cameraCharacteristics.get(LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+                    if (listLensAngle.length > 0) {
+                        if (listLensAngle[0] < 3.0f && listLensAngle[0] < lowestAngledCamera) {
+                            lowestAngledCamera = listLensAngle[0];
+                            cameraId = id;
                         }
                     }
                 }
             }
-            return availableBackCamera >= 2 && !foundWideAngleOnPrimaryCamera ? cameraId:null;
         }
-        return null;
+        return availableBackCamera >= 2 && !foundWideAngleOnPrimaryCamera ? cameraId:null;
     }
 }

@@ -1,7 +1,6 @@
 package it.owlgram.android.components;
 
 import android.app.Activity;
-import android.content.Context;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.FrameLayout;
@@ -13,18 +12,14 @@ import androidx.core.graphics.ColorUtils;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
-import org.telegram.messenger.MessageObject;
-import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.StickerImageView;
 
-import it.owlgram.android.OwlConfig;
 import it.owlgram.android.helpers.IconsHelper;
 
 public class MonetAndroidFixDialog extends BottomSheet {

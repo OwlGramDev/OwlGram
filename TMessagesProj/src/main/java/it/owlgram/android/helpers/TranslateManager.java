@@ -51,8 +51,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.widget.NestedScrollView;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.Emoji;
@@ -60,7 +58,6 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
-import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
@@ -243,7 +240,7 @@ public class TranslateManager extends Dialog {
 
         if (Build.VERSION.SDK_INT >= 30) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        } else if (Build.VERSION.SDK_INT >= 21) {
+        } else {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         }
 
@@ -255,13 +252,11 @@ public class TranslateManager extends Dialog {
         contentView.setBackground(backDrawable);
         contentView.setClipChildren(false);
         contentView.setClipToPadding(false);
-        if (Build.VERSION.SDK_INT >= 21) {
-            contentView.setFitsSystemWindows(true);
-            if (Build.VERSION.SDK_INT >= 30) {
-                contentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |  View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-            } else {
-                contentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            }
+        contentView.setFitsSystemWindows(true);
+        if (Build.VERSION.SDK_INT >= 30) {
+            contentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |  View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        } else {
+            contentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
         }
 
         Paint containerPaint = new Paint();
@@ -337,9 +332,7 @@ public class TranslateManager extends Dialog {
 
         subtitleView = new LinearLayout(context);
         subtitleView.setOrientation(LinearLayout.HORIZONTAL);
-        if (Build.VERSION.SDK_INT >= 17) {
-            subtitleView.setLayoutDirection(LocaleController.isRTL ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
-        }
+        subtitleView.setLayoutDirection(LocaleController.isRTL ? View.LAYOUT_DIRECTION_RTL : View.LAYOUT_DIRECTION_LTR);
         subtitleView.setGravity(LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT);
 
         String fromLanguageName = languageName(fromLanguage);
@@ -746,12 +739,10 @@ public class TranslateManager extends Dialog {
         params.dimAmount = 0;
         params.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
         params.flags |= WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
-        if (Build.VERSION.SDK_INT >= 21) {
-            params.flags |=
-                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
-                            WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR |
-                            WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
-        }
+        params.flags |=
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN |
+                        WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR |
+                        WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
         params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         params.height = ViewGroup.LayoutParams.MATCH_PARENT;
         window.setAttributes(params);
@@ -843,9 +834,9 @@ public class TranslateManager extends Dialog {
     public String languageName(String language) {
         if (language == null || language.equals("und") || language.equals("auto"))
             return null;
-        Locale locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? Locale.forLanguageTag(language) : new Locale(language);
+        Locale locale = Locale.forLanguageTag(language);
         String value;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !TextUtils.isEmpty(locale.getScript())) {
+        if (!TextUtils.isEmpty(locale.getScript())) {
             value = AndroidUtilities.capitalize(locale.getDisplayScript());
         } else {
             value = AndroidUtilities.capitalize(locale.getDisplayName());

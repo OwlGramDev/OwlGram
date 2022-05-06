@@ -2,7 +2,6 @@ package it.owlgram.android.settings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -317,8 +316,8 @@ public class OwlgramGeneralSettings extends BaseFragment {
                         if (language.equals("app")) {
                             value = LocaleController.getString("Default", R.string.Default);
                         } else {
-                            Locale locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? Locale.forLanguageTag(language) : new Locale(language);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !TextUtils.isEmpty(locale.getScript())) {
+                            Locale locale = Locale.forLanguageTag(language);
+                            if (!TextUtils.isEmpty(locale.getScript())) {
                                 value = HtmlCompat.fromHtml(AndroidUtilities.capitalize(locale.getDisplayScript()), HtmlCompat.FROM_HTML_MODE_LEGACY);
                             } else {
                                 value = AndroidUtilities.capitalize(locale.getDisplayName());
@@ -331,8 +330,8 @@ public class OwlgramGeneralSettings extends BaseFragment {
                         if (langCodes.size() == 1) {
                             try {
                                 String language = langCodes.iterator().next();
-                                Locale locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? Locale.forLanguageTag(language) : new Locale(language);
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !TextUtils.isEmpty(locale.getScript())) {
+                                Locale locale = Locale.forLanguageTag(language);
+                                if (!TextUtils.isEmpty(locale.getScript())) {
                                     doNotTranslateCellValue = HtmlCompat.fromHtml(AndroidUtilities.capitalize(locale.getDisplayScript()), HtmlCompat.FROM_HTML_MODE_LEGACY).toString();
                                 } else {
                                     doNotTranslateCellValue = AndroidUtilities.capitalize(locale.getDisplayName());

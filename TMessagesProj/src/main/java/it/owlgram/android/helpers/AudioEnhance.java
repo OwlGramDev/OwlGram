@@ -1,6 +1,5 @@
 package it.owlgram.android.helpers;
 
-import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.audiofx.AcousticEchoCanceler;
 import android.media.audiofx.AutomaticGainControl;

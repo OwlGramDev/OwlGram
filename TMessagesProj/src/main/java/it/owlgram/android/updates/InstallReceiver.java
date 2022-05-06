@@ -41,23 +41,13 @@ public class InstallReceiver extends BroadcastReceiver {
         }
         int status = i.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE_INVALID);
         resultValue = status;
-        switch (status) {
-            case PackageInstaller.STATUS_PENDING_USER_ACTION:
-                intent = i.getParcelableExtra(Intent.EXTRA_INTENT);
-                break;
-            case PackageInstaller.STATUS_FAILURE:
-            case PackageInstaller.STATUS_FAILURE_BLOCKED:
-            case PackageInstaller.STATUS_FAILURE_CONFLICT:
-            case PackageInstaller.STATUS_FAILURE_INCOMPATIBLE:
-            case PackageInstaller.STATUS_FAILURE_INVALID:
-            case PackageInstaller.STATUS_FAILURE_STORAGE:
-            case PackageInstaller.STATUS_FAILURE_ABORTED:
-            case PackageInstaller.STATUS_SUCCESS:
-            default:
-                if (onSuccess != null) {
-                    onSuccess.run();
-                }
-                context.unregisterReceiver(this);
+        if (status == PackageInstaller.STATUS_PENDING_USER_ACTION) {
+            intent = i.getParcelableExtra(Intent.EXTRA_INTENT);
+        } else {
+            if (onSuccess != null) {
+                onSuccess.run();
+            }
+            context.unregisterReceiver(this);
         }
         latch.countDown();
     }

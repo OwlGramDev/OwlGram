@@ -22,27 +22,11 @@ import java.net.URL;
 import it.owlgram.android.OwlConfig;
 
 public class ApkDownloader {
-    private static final Object sync = new Object();
-    private static boolean configLoaded;
     @SuppressLint("StaticFieldLeak")
     private static DownloadThread downloadThread;
     private static UpdateListener updateManager;
     private static UpdateListener updateMainManager;
     private static UpdateListener updateDialogsManager;
-
-    static {
-        loadDownloadInfo();
-    }
-
-    private static void loadDownloadInfo() {
-        synchronized (sync) {
-            if (configLoaded) {
-                return;
-            }
-            downloadThread = null;
-            configLoaded = true;
-        }
-    }
 
     public static boolean updateDownloaded() {
         int code = 0;

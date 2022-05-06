@@ -9,7 +9,6 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Components.RLottieDrawable;
 
 import it.owlgram.android.OwlConfig;
 

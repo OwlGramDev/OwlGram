@@ -156,9 +156,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                     ((TextCheckCell) view).setChecked(OwlConfig.avatarAsDrawerBackground);
                 }
                 getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    TransitionManager.beginDelayedTransition(profilePreviewCell);
-                }
+                TransitionManager.beginDelayedTransition(profilePreviewCell);
                 listAdapter.notifyItemChanged(drawerRow, new Object());
                 if (OwlConfig.avatarAsDrawerBackground) {
                     updateRowsId(false);

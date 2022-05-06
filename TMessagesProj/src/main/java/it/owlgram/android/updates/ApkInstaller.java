@@ -61,7 +61,7 @@ public class ApkInstaller {
 
     public static void installApk(Activity context) {
         File apk = ApkDownloader.apkFile();
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP || OwlConfig.xiaomiBlockedInstaller && XiaomiUtilities.isMIUI()) {
+        if (OwlConfig.xiaomiBlockedInstaller && XiaomiUtilities.isMIUI()) {
             AndroidUtilities.openForView(apk, "update.apk", "application/vnd.android.package-archive", context, null);
             return;
         }
@@ -165,20 +165,18 @@ public class ApkInstaller {
 
     public static void checkCanceledInstallation(Context context) {
         AndroidUtilities.runOnUIThread(() -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                float installationProgress = checkInstallation(context);
+            float installationProgress = checkInstallation(context);
+            if (updateInstallingDialog != null) {
+                updateInstallingDialog.setInstallingProgress(installationProgress);
+            }
+            if (installationProgress < 0.9f) {
+                clearUpdates(context);
                 if (updateInstallingDialog != null) {
-                    updateInstallingDialog.setInstallingProgress(installationProgress);
+                    updateInstallingDialog.cancel();
                 }
-                if (installationProgress < 0.9f) {
-                    clearUpdates(context);
-                    if (updateInstallingDialog != null) {
-                        updateInstallingDialog.cancel();
-                    }
-                    if (installReceiver != null) {
-                        context.unregisterReceiver(installReceiver);
-                        installReceiver = null;
-                    }
+                if (installReceiver != null) {
+                    context.unregisterReceiver(installReceiver);
+                    installReceiver = null;
                 }
             }
         }, 250);

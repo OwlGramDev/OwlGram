@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -27,8 +26,6 @@ import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RLottieImageView;
-
-import java.util.Objects;
 
 @SuppressLint("ViewConstructor")
 public class PillsButtonCell extends SimpleActionCell {

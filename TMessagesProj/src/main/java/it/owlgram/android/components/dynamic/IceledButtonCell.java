@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -22,15 +21,11 @@ import android.widget.TextView;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RLottieImageView;
-
-import java.util.Objects;
 
 @SuppressLint("ViewConstructor")
 public class IceledButtonCell extends SimpleActionCell {

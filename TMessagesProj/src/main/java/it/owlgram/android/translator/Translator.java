@@ -2,7 +2,6 @@ package it.owlgram.android.translator;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -19,13 +18,10 @@ import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.helpers.PopupHelper;
-import it.owlgram.android.settings.DoNotTranslateSettings;
 
 public class Translator {
 
@@ -141,8 +137,8 @@ public class Translator {
         ArrayList<String> targetLanguages = new ArrayList<>(translator.getTargetLanguages());
         ArrayList<CharSequence> names = new ArrayList<>();
         for (String language : targetLanguages) {
-            Locale locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? Locale.forLanguageTag(language) : new Locale(language);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !TextUtils.isEmpty(locale.getScript())) {
+            Locale locale = Locale.forLanguageTag(language);
+            if (!TextUtils.isEmpty(locale.getScript())) {
                 names.add(HtmlCompat.fromHtml(String.format("%s - %s", AndroidUtilities.capitalize(locale.getDisplayScript()), AndroidUtilities.capitalize(locale.getDisplayScript(locale))), HtmlCompat.FROM_HTML_MODE_LEGACY).toString());
             } else {
                 names.add(String.format("%s - %s", AndroidUtilities.capitalize(locale.getDisplayName()), AndroidUtilities.capitalize(locale.getDisplayName(locale))));

@@ -31,7 +31,7 @@ public class DcStyleSelector extends LinearLayout {
     };
     public static int TELEGRAM_DC = 1;
     public static int OWLGRAM_DC = 2;
-    private final NumberPicker picker1;
+
     public DcStyleSelector(Context context) {
         super(context);
         pickerDividersPaint.setStyle(Paint.Style.STROKE);
@@ -82,7 +82,7 @@ public class DcStyleSelector extends LinearLayout {
 
         addView(imageView);
 
-        picker1 = new NumberPicker(context, 13) {
+        NumberPicker picker1 = new NumberPicker(context, 13) {
             @Override
             protected void onDraw(Canvas canvas) {
                 super.onDraw(canvas);

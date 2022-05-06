@@ -1,15 +1,10 @@
 package it.owlgram.android.components.dynamic;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import androidx.core.graphics.ColorUtils;
 
-import com.google.android.exoplayer2.util.Log;
-
-import org.telegram.messenger.AndroidUtilities;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RLottieImageView;
