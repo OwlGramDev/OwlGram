@@ -2116,7 +2116,7 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                                             bulletin.show();
                                         });
                                     } else if (url.startsWith("tg:experimental") || url.startsWith("tg://experimental")) {
-                                        actionBarLayout.presentFragment(new OwlgramExperimentalSettings(), false, true, true, false);
+                                        AndroidUtilities.runOnUIThread(() -> presentFragment(new OwlgramExperimentalSettings(), false, false));
                                         if (AndroidUtilities.isTablet()) {
                                             actionBarLayout.showLastFragment();
                                             rightActionBarLayout.showLastFragment();
@@ -2125,7 +2125,7 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                                             drawerLayoutContainer.setAllowOpenDrawer(true, false);
                                         }
                                     } else if (url.startsWith("tg:chat") || url.startsWith("tg://chat")) {
-                                        actionBarLayout.presentFragment(new OwlgramChatSettings(), false, true, true, false);
+                                        AndroidUtilities.runOnUIThread(() -> presentFragment(new OwlgramChatSettings(), false, false));
                                         if (AndroidUtilities.isTablet()) {
                                             actionBarLayout.showLastFragment();
                                             rightActionBarLayout.showLastFragment();
@@ -2134,7 +2134,7 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                                             drawerLayoutContainer.setAllowOpenDrawer(true, false);
                                         }
                                     } else if (url.startsWith("tg:general") || url.startsWith("tg://general")) {
-                                        actionBarLayout.presentFragment(new OwlgramGeneralSettings(), false, true, true, false);
+                                        AndroidUtilities.runOnUIThread(() -> presentFragment(new OwlgramGeneralSettings(), false, false));
                                         if (AndroidUtilities.isTablet()) {
                                             actionBarLayout.showLastFragment();
                                             rightActionBarLayout.showLastFragment();
@@ -2143,7 +2143,7 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                                             drawerLayoutContainer.setAllowOpenDrawer(true, false);
                                         }
                                     } else if (url.startsWith("tg:appearance") || url.startsWith("tg://appearance")) {
-                                        actionBarLayout.presentFragment(new OwlgramAppearanceSettings(), false, true, true, false);
+                                        AndroidUtilities.runOnUIThread(() -> presentFragment(new OwlgramAppearanceSettings(), false, false));
                                         if (AndroidUtilities.isTablet()) {
                                             actionBarLayout.showLastFragment();
                                             rightActionBarLayout.showLastFragment();
