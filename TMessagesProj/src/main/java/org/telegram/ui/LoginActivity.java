@@ -85,6 +85,7 @@ import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
+import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.ContactsController;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLog;
@@ -105,6 +106,8 @@ import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
+import org.telegram.ui.ActionBar.ActionBarMenu;
+import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
@@ -254,7 +257,7 @@ public class LoginActivity extends BaseFragment {
     private SizeNotifierFrameLayout sizeNotifierFrameLayout;
     private Runnable keyboardHideCallback;
 
-    private ImageView backButtonView;
+    private ImageView backButtonView, proxyButtonView;
     private RadialProgressView radialProgressView;
 
     // Open animation stuff
@@ -428,6 +431,9 @@ public class LoginActivity extends BaseFragment {
                 marginLayoutParams = (MarginLayoutParams) backButtonView.getLayoutParams();
                 marginLayoutParams.topMargin = AndroidUtilities.dp(16) + statusBarHeight;
 
+                marginLayoutParams = (MarginLayoutParams) proxyButtonView.getLayoutParams();
+                marginLayoutParams.topMargin = AndroidUtilities.dp(16) + statusBarHeight;
+
                 marginLayoutParams = (MarginLayoutParams) radialProgressView.getLayoutParams();
                 marginLayoutParams.topMargin = AndroidUtilities.dp(16) + statusBarHeight;
 
@@ -578,6 +584,14 @@ public class LoginActivity extends BaseFragment {
         int padding = AndroidUtilities.dp(4);
         backButtonView.setPadding(padding, padding, padding, padding);
         sizeNotifierFrameLayout.addView(backButtonView, LayoutHelper.createFrame(32, 32, Gravity.LEFT | Gravity.TOP, 16, 16, 0, 0));
+
+        proxyButtonView = new ImageView(context);
+        proxyButtonView.setImageResource(R.drawable.proxy_on);
+        proxyButtonView.setOnClickListener(v -> presentFragment(new ProxyListActivity()));
+        proxyButtonView.setContentDescription(LocaleController.getString("ProxySettings", R.string.ProxySettings));
+        padding = AndroidUtilities.dp(3);
+        proxyButtonView.setPadding(padding, padding, padding, padding);
+        sizeNotifierFrameLayout.addView(proxyButtonView, LayoutHelper.createFrame(32, 32, Gravity.RIGHT | Gravity.TOP, 0, 16, 16, 0));
 
         radialProgressView = new RadialProgressView(context);
         radialProgressView.setSize(AndroidUtilities.dp(20));
@@ -5836,6 +5850,8 @@ public class LoginActivity extends BaseFragment {
 
         backButtonView.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
         backButtonView.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector)));
+        proxyButtonView.setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        proxyButtonView.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_listSelector)));
 
         radialProgressView.setProgressColor(Theme.getColor(Theme.key_chats_actionBackground));
 
