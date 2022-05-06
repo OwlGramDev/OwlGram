@@ -2530,7 +2530,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 }
                             } else if (i == 2 && finalCanShowRead) {
                                 if (dialogFilter == null) {
-                                    getMessagesStorage().readAllDialogs(-1);
+                                    getMessagesStorage().readAllDialogs(-2);
                                 } else {
                                     for (TLRPC.Dialog dialog : dialogFilter.dialogs) {
                                         if (dialog.unread_count == 0 && dialog.unread_mentions_count == 0)

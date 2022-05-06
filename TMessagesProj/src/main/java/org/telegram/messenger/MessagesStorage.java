@@ -2194,6 +2194,8 @@ public class MessagesStorage extends BaseController {
                 SQLiteCursor cursor;
                 if (folderId >= 0) {
                     cursor = database.queryFinalized(String.format(Locale.US, "SELECT did, last_mid, unread_count, date FROM dialogs WHERE unread_count > 0 AND folder_id = %1$d", folderId));
+                } else if (folderId == -2) {
+                    cursor = database.queryFinalized("SELECT did, last_mid, unread_count, date FROM dialogs WHERE unread_count > 0 AND folder_id != 1");
                 } else {
                     cursor = database.queryFinalized("SELECT did, last_mid, unread_count, date FROM dialogs WHERE unread_count > 0");
                 }
