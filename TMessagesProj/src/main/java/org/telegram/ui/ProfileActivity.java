@@ -173,6 +173,7 @@ import org.telegram.ui.Components.SharedMediaLayout;
 import org.telegram.ui.Components.SizeNotifierFrameLayout;
 import org.telegram.ui.Components.StickerEmptyView;
 import org.telegram.ui.Components.TimerDrawable;
+import org.telegram.ui.Components.TranslateAlert;
 import org.telegram.ui.Components.UndoView;
 import org.telegram.ui.Components.voip.VoIPHelper;
 
@@ -202,9 +203,9 @@ import it.owlgram.android.components.DcStyleSelector;
 import it.owlgram.android.components.dynamic.SimpleActionCell;
 import it.owlgram.android.helpers.ActionButtonManager;
 import it.owlgram.android.helpers.DCHelper;
-import it.owlgram.android.helpers.TranslateManager;
 import it.owlgram.android.settings.DoNotTranslateSettings;
 import it.owlgram.android.settings.OwlgramSettings;
+import it.owlgram.android.translator.AutoTranslatePopupWrapper;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
 
@@ -4408,7 +4409,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 }
             });
         } else {
-            TranslateManager.translate(bio, getParentActivity(), ProfileActivity.this, false, urlSpan -> {
+            TranslateAlert.showAlert(getParentActivity(), this, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], bio, false, urlSpan -> {
                 String url = urlSpan.toString();
                 if (url.startsWith("@")) {
                     getMessagesController().openByUserName(url.substring(1), ProfileActivity.this, 0);
@@ -4425,7 +4426,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         }
                     }
                 }
-            });
+            }, null);
         }
     }
 
@@ -6881,6 +6882,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 }
                 if (isBot || getContactsController().contactsDict.get(userId) == null) {
                     if (MessagesController.isSupportUser(user)) {
+                        createAutoTranslateItem(context, userId);
                         if (userBlocked && OwlConfig.buttonStyleType == 5) {
                             otherItem.addSubItem(block_contact, R.drawable.msg_block, LocaleController.getString("Unblock", R.string.Unblock));
                         }
@@ -6888,6 +6890,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         if (currentEncryptedChat == null) {
                             createAutoDeleteItem(context);
                         }
+                        createAutoTranslateItem(context, userId);
                         if (isBot) {
                             if (!user.bot_nochats) {
                                 if (!actionButtonManager.hasItem("add_bot")) {
@@ -6917,6 +6920,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     if (currentEncryptedChat == null) {
                         createAutoDeleteItem(context);
                     }
+                    createAutoTranslateItem(context, userId);
 
                     if (!TextUtils.isEmpty(user.phone)) {
                         if (!actionButtonManager.hasItem("share_contact")) {
@@ -6940,6 +6944,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (ChatObject.canUserDoAdminAction(chat, ChatObject.ACTION_DELETE_MESSAGES)) {
                 createAutoDeleteItem(context);
             }
+            createAutoTranslateItem(context, -chatId);
             if (ChatObject.isChannel(chat)) {
                 /*if (ChatObject.hasAdminRights(chat) || chat.megagroup && ChatObject.canChangeChatInfo(chat)) {
                     editItemVisible = true;
@@ -7217,8 +7222,14 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
         autoDeleteItemDrawable = TimerDrawable.getTtlIcon(ttl);
         autoDeleteItem = otherItem.addSwipeBackItem(0, autoDeleteItemDrawable, LocaleController.getString("AutoDeletePopupTitle", R.string.AutoDeletePopupTitle), autoDeletePopupWrapper.windowLayout);
-        otherItem.addColoredGap();
+        //otherItem.addColoredGap();
         updateAutoDeleteItem();
+    }
+
+    private void createAutoTranslateItem(Context context, long dialogId) {
+        AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, getResourceProvider());
+        otherItem.addSwipeBackItem(R.drawable.msg_translate, null, LocaleController.getString("AutoTranslate", R.string.AutoTranslate), autoTranslatePopupWrapper.windowLayout);
+        otherItem.addColoredGap();
     }
 
     private void setAutoDeleteHistory(int time, int action) {

@@ -1,8 +1,6 @@
 package it.owlgram.android.helpers;
 
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.R;
 
@@ -84,7 +82,6 @@ public class FolderIconHelper {
     }
 
     public static int getTabIcon(String emoji) {
-        Log.e("Emoji", "getTabIcon: " + emoji);
         if (emoji != null) {
             var folderIcon = folderIcons.get(emoji);
             if (folderIcon != null) {

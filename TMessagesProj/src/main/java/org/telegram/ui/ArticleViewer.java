@@ -176,7 +176,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import it.owlgram.android.helpers.TranslateManager;
+import it.owlgram.android.translator.Translator;
 
 public class ArticleViewer implements NotificationCenter.NotificationCenterDelegate {
 
@@ -3709,7 +3709,8 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             @Override
             public void startTranslate(CharSequence text, Runnable onAlertDismiss) {
                 super.startTranslate(text, onAlertDismiss);
-                TranslateManager.translate(text, activity, parentFragment, false, null, onAlertDismiss);
+                TranslateAlert alert = TranslateAlert.showAlert(activity, parentFragment, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], text, false, null, onAlertDismiss);
+                alert.showDim(false);
             }
         });
         containerView.addView(textSelectionHelper.getOverlayView(activity));

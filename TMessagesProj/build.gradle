@@ -36,7 +36,6 @@ dependencies {
     implementation 'com.stripe:stripe-android:2.0.2'
     implementation 'com.google.mlkit:language-id:17.0.3'
     implementation files('libs/libgsaverification-client.aar')
-    implementation files('libs/org.deepl.jar')
     implementation 'org.apache.commons:commons-text:1.9'
 
     // CameraX Implementation

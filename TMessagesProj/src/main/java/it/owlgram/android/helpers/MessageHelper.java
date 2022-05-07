@@ -112,6 +112,10 @@ public class MessageHelper extends BaseController {
         return localInstance;
     }
 
+    public boolean isMessageObjectTranslatable(MessageObject messageObject) {
+        return !messageObject.isAnimatedEmoji() && !TextUtils.isEmpty(messageObject.messageOwner.message) || messageObject.isPoll();
+    }
+
     public MessageObject getMessageForRepeat(MessageObject selectedObject, MessageObject.GroupedMessages selectedObjectGroup) {
         MessageObject messageObject = null;
         if (selectedObjectGroup != null && !selectedObjectGroup.isDocuments) {
@@ -142,6 +146,7 @@ public class MessageHelper extends BaseController {
         MessageObject obj = new MessageObject(currentAccount, message, true, true);
         obj.originalMessage = messageObject.originalMessage;
         obj.originalEntities = messageObject.originalEntities;
+        obj.originalReplyMarkupRows = messageObject.originalReplyMarkupRows;
         obj.translating = false;
         obj.translated = translated;
         if (messageObject.isSponsored()) {
@@ -154,13 +159,44 @@ public class MessageHelper extends BaseController {
         return obj;
     }
 
-    public MessageObject setTranslating(long dialogId, MessageObject messageObject) {
+    public MessageObject setTranslating(long dialogId, MessageObject messageObject, boolean translating) {
         TLRPC.Message message = messageObject.messageOwner;
         MessageObject obj = new MessageObject(currentAccount, message, true, true);
-        obj.translating = true;
+        obj.translating = translating;
         ArrayList<MessageObject> arrayList = new ArrayList<>();
         arrayList.add(obj);
         getNotificationCenter().postNotificationName(NotificationCenter.replaceMessagesObjects, dialogId, arrayList, false);
         return obj;
+    }
+
+    public static class ReplyMarkupButtonsTexts {
+        private final ArrayList<ArrayList<String>> texts = new ArrayList<>();
+
+        public ReplyMarkupButtonsTexts(ArrayList<TLRPC.TL_keyboardButtonRow> source) {
+            for (int a = 0; a < source.size(); a++) {
+                ArrayList<TLRPC.KeyboardButton> buttonRow = source.get(a).buttons;
+                ArrayList<String> row = new ArrayList<>();
+                for (int b = 0; b < buttonRow.size(); b++) {
+                    TLRPC.KeyboardButton button2 = buttonRow.get(b);
+                    row.add(button2.text);
+                }
+                texts.add(row);
+            }
+        }
+
+        public ArrayList<ArrayList<String>> getTexts() {
+            return texts;
+        }
+
+        public void applyTextToKeyboard(ArrayList<TLRPC.TL_keyboardButtonRow> rows) {
+            for (int a = 0; a < rows.size(); a++) {
+                ArrayList<TLRPC.KeyboardButton> buttonRow = rows.get(a).buttons;
+                ArrayList<String> row = texts.get(a);
+                for (int b = 0; b < buttonRow.size(); b++) {
+                    TLRPC.KeyboardButton button2 = buttonRow.get(b);
+                    button2.text = row.get(b);
+                }
+            }
+        }
     }
 }

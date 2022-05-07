@@ -9,6 +9,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Scanner;
 
+import it.owlgram.android.translator.BaseTranslator;
+
 public class StandardHTTPRequest {
     private final HttpURLConnection httpURLConnection;
 
@@ -41,14 +43,19 @@ public class StandardHTTPRequest {
 
     public String request() throws IOException {
         httpURLConnection.connect();
+        if (httpURLConnection.getResponseCode() == 429) {
+            throw new BaseTranslator.Http429Exception();
+        }
         InputStream stream;
         if (httpURLConnection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
             stream = httpURLConnection.getInputStream();
         } else {
             stream = httpURLConnection.getErrorStream();
         }
-        return new Scanner(stream, "UTF-8")
+        String response = new Scanner(stream, "UTF-8")
                 .useDelimiter("\\A")
                 .next();
+        stream.close();
+        return response;
     }
 }

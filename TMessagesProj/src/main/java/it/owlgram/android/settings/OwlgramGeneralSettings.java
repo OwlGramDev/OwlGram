@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
@@ -26,6 +27,7 @@ import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextSettingsCell;
+import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
@@ -43,6 +45,7 @@ import it.owlgram.android.translator.Translator;
 public class OwlgramGeneralSettings extends BaseFragment {
     private int rowCount;
     private ListAdapter listAdapter;
+    private final boolean supportLanguageDetector;
 
     private int divisorPrivacyRow;
     private int privacyHeaderRow;
@@ -53,6 +56,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
     private int translationProviderSelectRow;
     private int destinationLanguageSelectRow;
     private int doNotTranslateSelectRow;
+    private int autoTranslateRow;
     private int divisorTranslationRow;
     private int hintTranslation1;
     private int hintTranslation2;
@@ -68,6 +72,10 @@ public class OwlgramGeneralSettings extends BaseFragment {
     private int callHeaderRow;
     private int confirmCallSwitchRow;
     private int deepLFormalityRow;
+
+    public OwlgramGeneralSettings() {
+        supportLanguageDetector = LanguageDetector.hasSupport();
+    }
 
     @Override
     public boolean onFragmentCreate() {
@@ -161,6 +169,10 @@ public class OwlgramGeneralSettings extends BaseFragment {
             } else if (position == destinationLanguageSelectRow) {
                 presentFragment(new SelectLanguageSettings());
             } else if (position == doNotTranslateSelectRow) {
+                if (!supportLanguageDetector) {
+                    BulletinFactory.of(this).createErrorBulletinSubtitle(LocaleController.getString("BrokenMLKit", R.string.BrokenMLKit), LocaleController.getString("BrokenMLKitDetail", R.string.BrokenMLKitDetail), null).show();
+                    return;
+                }
                 presentFragment(new DoNotTranslateSettings());
             } else if (position == deepLFormalityRow) {
                 ArrayList<String> arrayList = new ArrayList<>();
@@ -197,6 +209,15 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     listAdapter.notifyItemChanged(idTypeRow);
                     parentLayout.rebuildAllFragmentViews(false, false);
                 });
+            } else if (position == autoTranslateRow) {
+                if (!supportLanguageDetector) {
+                    BulletinFactory.of(this).createErrorBulletinSubtitle(LocaleController.getString("BrokenMLKit", R.string.BrokenMLKit), LocaleController.getString("BrokenMLKitDetail", R.string.BrokenMLKitDetail), null).show();
+                    return;
+                }
+                OwlConfig.toggleAutoTranslate();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.autoTranslate);
+                }
             }
         });
         return fragmentView;
@@ -216,6 +237,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
         destinationLanguageSelectRow = rowCount++;
         doNotTranslateSelectRow = rowCount++;
         deepLFormalityRow = OwlConfig.translationProvider == Translator.PROVIDER_DEEPL ? rowCount++:-1;
+        autoTranslateRow = rowCount++;
         divisorTranslationRow = rowCount++;
         hintTranslation1 = rowCount++;
         hintTranslation2 = rowCount++;
@@ -291,6 +313,8 @@ public class OwlgramGeneralSettings extends BaseFragment {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("ConfirmCalls", R.string.ConfirmCalls), LocaleController.getString("ConfirmCallsDesc", R.string.ConfirmCallsDesc), OwlConfig.confirmCall, true, true);
                     } else if (position == notificationAccentRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("AccentAsNotificationColor", R.string.AccentAsNotificationColor), OwlConfig.accentAsNotificationColor, true);
+                    } else if (position == autoTranslateRow) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("AutoTranslate", R.string.AutoTranslate), LocaleController.getString("AutoTranslateDesc", R.string.AutoTranslateDesc), OwlConfig.autoTranslate, true, false);
                     }
                     break;
                 case 4:
@@ -357,7 +381,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
                                 value = LocaleController.getString("DeepLFormalityLess", R.string.DeepLFormalityLess);
                                 break;
                         }
-                        textSettingsCell.setTextAndValue(LocaleController.getString("DeepLFormality", R.string.DeepLFormality), value, false);
+                        textSettingsCell.setTextAndValue(LocaleController.getString("DeepLFormality", R.string.DeepLFormality), value, true);
                     } else if (position == translationStyle) {
                         String value;
                         switch (OwlConfig.translatorStyle) {
@@ -410,6 +434,10 @@ public class OwlgramGeneralSettings extends BaseFragment {
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int type = holder.getItemViewType();
+            int position = holder.getAdapterPosition();
+            if (position == autoTranslateRow || position == doNotTranslateSelectRow) {
+                return supportLanguageDetector;
+            }
             return type == 3 || type == 4;
         }
 
@@ -462,7 +490,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     position == dcIdSettingsHeaderRow || position == notificationHeaderRow) {
                 return 2;
             } else if (position == phoneNumberSwitchRow || position == phoneContactsSwitchRow || position == dcIdRow ||
-                    position == confirmCallSwitchRow || position == notificationAccentRow) {
+                    position == confirmCallSwitchRow || position == notificationAccentRow || position == autoTranslateRow) {
                 return 3;
             } else if ( position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow ||
                     position == translationStyle || position == doNotTranslateSelectRow || position == idTypeRow) {

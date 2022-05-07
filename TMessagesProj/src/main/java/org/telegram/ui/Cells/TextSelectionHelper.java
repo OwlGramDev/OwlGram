@@ -58,12 +58,10 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ArticleViewer;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
-import org.telegram.ui.RestrictedLanguagesSelectActivity;
 
 import java.util.ArrayList;
 
 import it.owlgram.android.helpers.EntitiesHelper;
-import it.owlgram.android.helpers.TranslateManager;
 import it.owlgram.android.settings.DoNotTranslateSettings;
 
 public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.SelectableView> {

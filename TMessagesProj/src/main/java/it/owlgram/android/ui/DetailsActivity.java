@@ -284,10 +284,10 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
 
         if (fromUser != null){
             aboutInfoHeaderRow = rowCount++;
-            if (!TextUtils.isEmpty(fromUser.username) && !fromUser.username.equals("null")){
+            if (fromUser.first_name != null){
                 nameUserHeaderRow = rowCount++;
             }
-            if (fromUser.first_name != null){
+            if (!TextUtils.isEmpty(fromUser.username)){
                 usernameRow = rowCount++;
             }
             if (fromUser.photo != null) {
@@ -324,7 +324,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     forwardUserNameRow = rowCount++;
                 }
                 if (fromForwardedUser.id != 0){
-                    if (fromForwardedUser.username != null && !fromForwardedUser.username.equals("null")) {
+                    if (!TextUtils.isEmpty(fromForwardedUser.username)) {
                         forwardUserUsernameRow = rowCount++;
                     }
                     if (fromForwardedUser.photo != null) {
@@ -348,7 +348,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                 if (fromRepliedUser.first_name != null){
                     repliedUserNameRow = rowCount++;
                 }
-                if (fromRepliedUser.username != null && !fromRepliedUser.username.equals("null")) {
+                if (!TextUtils.isEmpty(fromRepliedUser.username)) {
                     repliedUserUsernameRow = rowCount++;
                 }
                 if (fromRepliedUser.photo != null) {

@@ -81,6 +81,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean xiaomiBlockedInstaller;
     public static boolean searchIconInActionBar;
     public static boolean useMonetIcon;
+    public static boolean autoTranslate;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -208,6 +209,7 @@ public class OwlConfig extends SettingsManager {
             dcStyleType = preferences.getInt("dcStyleType", 0);
             idType = preferences.getInt("idType", 0);
             searchIconInActionBar = preferences.getBoolean("searchIconInActionBar", false);
+            autoTranslate = preferences.getBoolean("autoTranslate", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -637,6 +639,14 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("useMonetIcon", useMonetIcon);
+        editor.apply();
+    }
+
+    public static void toggleAutoTranslate() {
+        autoTranslate = !autoTranslate;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("autoTranslate", autoTranslate);
         editor.apply();
     }
 

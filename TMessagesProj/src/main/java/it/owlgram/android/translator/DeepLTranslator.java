@@ -2,12 +2,11 @@ package it.owlgram.android.translator;
 
 import android.text.TextUtils;
 
-import org.deepl.DeepLTranslater;
-
 import java.util.Arrays;
 import java.util.List;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.translator.raw.RawDeepLTranslator;
 
 public class DeepLTranslator extends BaseTranslator {
 
@@ -19,7 +18,7 @@ public class DeepLTranslator extends BaseTranslator {
     private final List<String> targetLanguages = Arrays.asList(
             "bg", "pl", "da", "de", "ru", "fr", "fi", "nl", "cs", "lv", "lt", "ro",
             "pt", "pt-PT", "pt-BR", "ja", "sv", "sk", "sl", "es", "el", "hu", "it", "en", "en-GB", "en-US", "zh");
-    private final DeepLTranslater deeplTranslater = new DeepLTranslater();
+    private final RawDeepLTranslator deeplTranslator = new RawDeepLTranslator();
 
     static DeepLTranslator getInstance() {
         if (instance == null) {
@@ -56,7 +55,7 @@ public class DeepLTranslator extends BaseTranslator {
 
     @Override
     protected Result translate(String query, String tl) throws Exception {
-        String[] result = deeplTranslater.translate(query, "auto", tl.toUpperCase(), getFormalityString());
+        String[] result = deeplTranslator.translate(query, tl, getFormalityString(), "newlines");
         return new Result(result[1], result[0]);
     }
 

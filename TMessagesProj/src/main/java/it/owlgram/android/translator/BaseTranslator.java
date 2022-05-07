@@ -1,6 +1,8 @@
 package it.owlgram.android.translator;
 
 import androidx.annotation.Nullable;
+import androidx.collection.LruCache;
+import androidx.core.util.Pair;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
@@ -8,13 +10,18 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.helpers.MessageHelper;
 
 
 abstract public class BaseTranslator {
+
+    private final LruCache<Pair<Object, String>, Result> cache = new LruCache<>(200);
 
     public static final int INLINE_STYLE = 0;
     public static final int DIALOG_STYLE = 1;
@@ -28,6 +35,11 @@ abstract public class BaseTranslator {
     }
 
     public void startTask(Object query, String toLang, Translator.TranslateCallBack translateCallBack) {
+        Result result = cache.get(Pair.create(query, toLang));
+        if (result != null) {
+            translateCallBack.onSuccess(result);
+            return;
+        }
         new Thread() {
             @Override
             public void run() {
@@ -35,6 +47,25 @@ abstract public class BaseTranslator {
                     if (query instanceof CharSequence) {
                         Result result = translate(query.toString(), toLang);
                         if (result != null) {
+                            cache.put(Pair.create(query, result.sourceLanguage), result);
+                            AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(result));
+                        } else {
+                            AndroidUtilities.runOnUIThread(() -> translateCallBack.onError(null));
+                        }
+                    } else if (query instanceof AdditionalObjectTranslation) {
+                        Result result = translate((String)((AdditionalObjectTranslation) query).translation, toLang);
+                        if (result != null) {
+                            if (((AdditionalObjectTranslation) query).additionalInfo != null && ((AdditionalObjectTranslation) query).additionalInfo instanceof MessageHelper.ReplyMarkupButtonsTexts) {
+                                MessageHelper.ReplyMarkupButtonsTexts buttonRows = (MessageHelper.ReplyMarkupButtonsTexts) ((AdditionalObjectTranslation) query).additionalInfo;
+                                for (int i = 0; i < buttonRows.getTexts().size(); i++) {
+                                    ArrayList<String> buttonsRow = buttonRows.getTexts().get(i);
+                                    for (int j = 0; j < buttonsRow.size(); j++) {
+                                        buttonsRow.set(j, (String) translate(buttonsRow.get(j), toLang).translation);
+                                    }
+                                }
+                                result.additionalInfo = buttonRows;
+                            }
+                            cache.put(Pair.create(query, result.sourceLanguage), result);
                             AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(result));
                         } else {
                             AndroidUtilities.runOnUIThread(() -> translateCallBack.onError(null));
@@ -102,14 +133,28 @@ abstract public class BaseTranslator {
         return getTargetLanguage(OwlConfig.translationKeyboardTarget);
     }
 
+    public static class Http429Exception extends IOException {}
+
     public static class Result {
         public Object translation;
+        @Nullable
+        public Object additionalInfo;
         @Nullable
         public String sourceLanguage;
 
         public Result(Object translation, @Nullable String sourceLanguage) {
+            this(translation, null, sourceLanguage);
+        }
+
+        public Result(Object translation, @Nullable TLRPC.ReplyMarkup additionalInfo, @Nullable String sourceLanguage) {
             this.translation = translation;
+            this.additionalInfo = additionalInfo;
             this.sourceLanguage = sourceLanguage;
         }
+    }
+
+    public static class AdditionalObjectTranslation {
+        public Object translation;
+        public Object additionalInfo;
     }
 }

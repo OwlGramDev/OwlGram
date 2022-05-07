@@ -97,7 +97,10 @@ public class Translator {
             builder.setMessage(LocaleController.getString("TranslateApiUnsupported", R.string.TranslateApiUnsupported));
             builder.setPositiveButton(LocaleController.getString("TranslationProviderShort", R.string.TranslationProviderShort), (dialog, which) -> showTranslationProviderSelector(context, null, resourcesProvider));
         } else {
-            if (e != null && e.getLocalizedMessage() != null) {
+            if (e instanceof BaseTranslator.Http429Exception) {
+                builder.setTitle(LocaleController.getString("TranslateFailed", R.string.TranslateFailed));
+                builder.setMessage(LocaleController.getString("FloodWait", R.string.FloodWait));
+            } else if (e != null && e.getLocalizedMessage() != null) {
                 builder.setTitle(LocaleController.getString("TranslationFailed", R.string.TranslationFailed));
                 builder.setMessage(e.getLocalizedMessage());
             } else {
