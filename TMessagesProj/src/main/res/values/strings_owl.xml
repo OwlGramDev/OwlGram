@@ -224,7 +224,6 @@
     <string name="OwlSoundOff">Disable Owl Sound</string>
     <string name="MutualContact">Mutual Contact</string>
     <string name="MutualContactDesc">**%s** and you have added each other in the contacts list.</string>
-    <string name="SelectBetween">Select between two messages</string>
     <string name="JumpToBeginning">Jump to Beginning</string>
     <string name="CreateMention">Create Mention</string>
     <string name="CopyTitle">Copy Title</string>
@@ -247,9 +246,11 @@
     <string name="ClearRecentStickers">Clear recent stickers?</string>
     <string name="ChangeIcon">Change App Icon</string>
     <string name="ChangeIconDesc">Since on Android 12 the monet icon was forced and you upgraded to Android 13, you need to change the app icon to the default one for a better support.</string>
-    <string name="TranslateFailed">Translation failed</string>
     <string name="AutoTranslate">Auto-Translate</string>
     <string name="AutoTranslateDesc">Automatically translate messages that are in another language.</string>
     <string name="BrokenMLKit">Option unavailable</string>
     <string name="BrokenMLKitDetail">Google MLKit language identifier is somehow broken on this device.</string>
+    <string name="Select">Select</string>
+    <string name="MessageAlreadyInX">You cannot translate 1 message since it is already in %1$s.</string>
+    <string name="MessagesAlreadyInX">You cannot translate %1$d messages since they are already in %2$s.</string>
 </resources>

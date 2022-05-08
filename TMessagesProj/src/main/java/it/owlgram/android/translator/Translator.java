@@ -98,7 +98,7 @@ public class Translator {
             builder.setPositiveButton(LocaleController.getString("TranslationProviderShort", R.string.TranslationProviderShort), (dialog, which) -> showTranslationProviderSelector(context, null, resourcesProvider));
         } else {
             if (e instanceof BaseTranslator.Http429Exception) {
-                builder.setTitle(LocaleController.getString("TranslateFailed", R.string.TranslateFailed));
+                builder.setTitle(LocaleController.getString("TranslationFailed", R.string.TranslationFailed));
                 builder.setMessage(LocaleController.getString("FloodWait", R.string.FloodWait));
             } else if (e != null && e.getLocalizedMessage() != null) {
                 builder.setTitle(LocaleController.getString("TranslationFailed", R.string.TranslationFailed));

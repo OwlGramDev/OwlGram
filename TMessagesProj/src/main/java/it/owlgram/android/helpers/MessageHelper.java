@@ -112,14 +112,18 @@ public class MessageHelper extends BaseController {
         return localInstance;
     }
 
-    public boolean isMessageObjectAutoTranslatable(MessageObject messageObject) {
-        if (messageObject.translated || messageObject.translating || messageObject.isOutOwner()) {
-            return false;
-        }
+    public boolean isMessageTranslatable(MessageObject messageObject) {
         if (messageObject.isPoll()) {
             return true;
         }
         return !TextUtils.isEmpty(messageObject.messageOwner.message) && !isLinkOrEmojiOnlyMessage(messageObject);
+    }
+
+    public boolean isMessageObjectAutoTranslatable(MessageObject messageObject) {
+        if (messageObject.translated || messageObject.translating || messageObject.isOutOwner()) {
+            return false;
+        }
+        return isMessageTranslatable(messageObject);
     }
 
     public boolean isLinkOrEmojiOnlyMessage(MessageObject messageObject) {

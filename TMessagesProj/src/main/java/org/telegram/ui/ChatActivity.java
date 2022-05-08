@@ -92,6 +92,7 @@ import androidx.collection.LongSparseArray;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.graphics.ColorUtils;
+import androidx.core.text.HtmlCompat;
 import androidx.exifinterface.media.ExifInterface;
 import androidx.recyclerview.widget.ChatListItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -272,6 +273,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -1281,7 +1283,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private final static int copy = 10;
     private final static int forward = 11;
     private final static int forward_noquote = 204;
-    private final static int select_between = 86;
+    private final static int translate_multiple = 208;
     private final static int delete = 12;
     private final static int chat_enc_timer = 13;
     private final static int chat_menu_attach = 14;
@@ -2286,32 +2288,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         return;
                     }
                     createDeleteMessagesAlert(null, null);
-                } else if (id == select_between) {
-                    ArrayList<Integer> ids = new ArrayList<>();
-                    for (int a = 1; a >= 0; a--) {
-                        for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
-                            ids.add(selectedMessagesIds[a].keyAt(b));
-                        }
-                    }
-                    Collections.sort(ids);
-                    Integer begin = ids.get(0);
-                    Integer end = ids.get(ids.size() - 1);
-                    for (int i = 0; i < messages.size(); i++) {
-                        int msgId = messages.get(i).getId();
-                        if (msgId > begin && msgId < end && selectedMessagesIds[0].indexOfKey(msgId) < 0) {
-                            MessageObject message = messages.get(i);
-                            int type = getMessageType(message);
-                            if (type < 2 || type == 20) {
-                                continue;
-                            }
-                            addToSelectedMessages(message, true);
-                            if (selectedMessagesIds[0].size() + selectedMessagesIds[1].size() >= 100) {
-                                break;
-                            }
-                        }
-                    }
-                    updateActionModeTitle();
-                    updateVisibleRows();
+                } else if (id == translate_multiple) {
+                    multiTranslateMessage();
+                    clearSelectionMode();
                 } else if (id == forward || id == forward_noquote) {
                     setForwardParams(id == forward_noquote);
                     openForward(true);
@@ -3012,7 +2991,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (currentEncryptedChat == null) {
             actionModeViews.add(actionMode.addItemWithWidth(save_to, R.drawable.msg_download, AndroidUtilities.dp(54), LocaleController.getString("SaveToMusic", R.string.SaveToMusic)));
             actionModeViews.add(actionMode.addItemWithWidth(edit, R.drawable.msg_edit, AndroidUtilities.dp(54), LocaleController.getString("Edit", R.string.Edit)));
-            actionModeViews.add(actionMode.addItemWithWidth(select_between, R.drawable.round_checklist_white_28, AndroidUtilities.dp(54), LocaleController.getString("SelectBetween", R.string.SelectBetween)));
+            actionModeViews.add(actionMode.addItemWithWidth(translate_multiple, R.drawable.msg_translate, AndroidUtilities.dp(54), LocaleController.getString("TranslateMessages", R.string.TranslateMessages)));
             actionModeViews.add(actionMode.addItemWithWidth(star, R.drawable.msg_fave, AndroidUtilities.dp(54), LocaleController.getString("AddToFavorites", R.string.AddToFavorites)));
             actionModeViews.add(actionMode.addItemWithWidth(copy, R.drawable.msg_copy, AndroidUtilities.dp(54), LocaleController.getString("Copy", R.string.Copy)));
             actionModeViews.add(actionMode.addItemWithWidth(forward, R.drawable.msg_forward, AndroidUtilities.dp(54), LocaleController.getString("Forward", R.string.Forward)));
@@ -3020,37 +2999,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             actionModeViews.add(actionMode.addItemWithWidth(delete, R.drawable.msg_delete, AndroidUtilities.dp(54), LocaleController.getString("Delete", R.string.Delete)));
         } else {
             actionModeViews.add(actionMode.addItemWithWidth(edit, R.drawable.msg_edit, AndroidUtilities.dp(54), LocaleController.getString("Edit", R.string.Edit)));
-            actionModeViews.add(actionMode.addItemWithWidth(select_between, R.drawable.round_checklist_white_28, AndroidUtilities.dp(54), LocaleController.getString("SelectBetween", R.string.SelectBetween)));
+            actionModeViews.add(actionMode.addItemWithWidth(translate_multiple, R.drawable.msg_translate, AndroidUtilities.dp(54), LocaleController.getString("TranslateMessages", R.string.TranslateMessages)));
             actionModeViews.add(actionMode.addItemWithWidth(star, R.drawable.msg_fave, AndroidUtilities.dp(54), LocaleController.getString("AddToFavorites", R.string.AddToFavorites)));
             actionModeViews.add(actionMode.addItemWithWidth(copy, R.drawable.msg_copy, AndroidUtilities.dp(54), LocaleController.getString("Copy", R.string.Copy)));
             actionModeViews.add(actionMode.addItemWithWidth(delete, R.drawable.msg_delete, AndroidUtilities.dp(54), LocaleController.getString("Delete", R.string.Delete)));
         }
         actionMode.getItem(edit).setVisibility(canEditMessagesCount == 1 && selectedMessagesIds[0].size() + selectedMessagesIds[1].size() == 1 ? View.VISIBLE : View.GONE);
-        int newVisibility = View.GONE;
-        if (selectedMessagesIds[0].size() > 1) {
-            ArrayList<Integer> ids = new ArrayList<>();
-            for (int a = 1; a >= 0; a--) {
-                for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
-                    ids.add(selectedMessagesIds[a].keyAt(b));
-                }
-            }
-            Collections.sort(ids);
-            Integer begin = ids.get(0);
-            Integer end = ids.get(ids.size() - 1);
-            for (int i = 0; i < messages.size(); i++) {
-                int msgId = messages.get(i).getId();
-                if (msgId > begin && msgId < end && selectedMessagesIds[0].indexOfKey(msgId) < 0) {
-                    MessageObject message = messages.get(i);
-
-                    if (message.contentType != 0) {
-                        continue;
-                    }
-                    newVisibility = View.VISIBLE;
-                    break;
-                }
-            }
-        }
-        actionMode.getItem(select_between).setVisibility(newVisibility);
+        actionMode.getItem(translate_multiple).setVisibility(selectedMessagesIds[0].size() + selectedMessagesIds[1].size() > 1 ? View.VISIBLE : View.GONE);
         actionMode.getItem(copy).setVisibility(!getMessagesController().isChatNoForwards(currentChat) && selectedMessagesCanCopyIds[0].size() + selectedMessagesCanCopyIds[1].size() != 0 ? View.VISIBLE : View.GONE);
         actionMode.getItem(star).setVisibility(selectedMessagesCanStarIds[0].size() + selectedMessagesCanStarIds[1].size() != 0 ? View.VISIBLE : View.GONE);
         actionMode.getItem(delete).setVisibility(cantDeleteMessagesCount == 0 ? View.VISIBLE : View.GONE);
@@ -8526,21 +8481,49 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         image.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_actionBarActionModeDefaultIcon), PorterDuff.Mode.MULTIPLY));
         replyButton.setCompoundDrawablesWithIntrinsicBounds(image, null, null, null);
         replyButton.setOnClickListener(v -> {
-            MessageObject messageObject = null;
-            for (int a = 1; a >= 0; a--) {
-                if (messageObject == null && selectedMessagesIds[a].size() != 0) {
-                    messageObject = messagesDict[a].get(selectedMessagesIds[a].keyAt(0));
+            if (v.getTag() == null || ((String) v.getTag()).equals("reply")) {
+                MessageObject messageObject = null;
+                for (int a = 1; a >= 0; a--) {
+                    if (messageObject == null && selectedMessagesIds[a].size() != 0) {
+                        messageObject = messagesDict[a].get(selectedMessagesIds[a].keyAt(0));
+                    }
+                    selectedMessagesIds[a].clear();
+                    selectedMessagesCanCopyIds[a].clear();
+                    selectedMessagesCanStarIds[a].clear();
                 }
-                selectedMessagesIds[a].clear();
-                selectedMessagesCanCopyIds[a].clear();
-                selectedMessagesCanStarIds[a].clear();
+                hideActionMode();
+                if (messageObject != null && (messageObject.messageOwner.id > 0 || messageObject.messageOwner.id < 0 && currentEncryptedChat != null)) {
+                    showFieldPanelForReply(messageObject);
+                }
+                updatePinnedMessageView(true);
+                updateVisibleRows();
+            } else {
+                ArrayList<Integer> ids = new ArrayList<>();
+                for (int a = 1; a >= 0; a--) {
+                    for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
+                        ids.add(selectedMessagesIds[a].keyAt(b));
+                    }
+                }
+                Collections.sort(ids);
+                Integer begin = ids.get(0);
+                Integer end = ids.get(ids.size() - 1);
+                for (int i = 0; i < messages.size(); i++) {
+                    int msgId = messages.get(i).getId();
+                    if (msgId > begin && msgId < end && selectedMessagesIds[0].indexOfKey(msgId) < 0) {
+                        MessageObject message = messages.get(i);
+                        int type = getMessageType(message);
+                        if (type < 2 || type == 20) {
+                            continue;
+                        }
+                        addToSelectedMessages(message, true);
+                        if (selectedMessagesIds[0].size() + selectedMessagesIds[1].size() >= 100) {
+                            break;
+                        }
+                    }
+                }
+                updateActionModeTitle();
+                updateVisibleRows();
             }
-            hideActionMode();
-            if (messageObject != null && (messageObject.messageOwner.id > 0 || messageObject.messageOwner.id < 0 && currentEncryptedChat != null)) {
-                showFieldPanelForReply(messageObject);
-            }
-            updatePinnedMessageView(true);
-            updateVisibleRows();
         });
         bottomMessagesActionContainer.addView(replyButton, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP));
 
@@ -13653,7 +13636,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 ActionBarMenuItem editItem = actionBar.createActionMode().getItem(edit);
                 ActionBarMenuItem forwardItem = actionBar.createActionMode().getItem(forward);
                 ActionBarMenuItem forwardNoQuoteItem = actionBar.createActionMode().getItem(forward_noquote);
-                ActionBarMenuItem selectItem = actionBar.createActionMode().getItem(select_between);
+                ActionBarMenuItem translateItem = actionBar.createActionMode().getItem(translate_multiple);
                 boolean noforwards = getMessagesController().isChatNoForwards(currentChat) || hasSelectedNoforwardsMessage();
                 if (prevCantForwardCount == 0 && cantForwardMessagesCount != 0 || prevCantForwardCount != 0 && cantForwardMessagesCount == 0) {
                     forwardButtonAnimation = new AnimatorSet();
@@ -13733,31 +13716,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
                 int copyVisible = copyItem.getVisibility();
                 int starVisible = starItem.getVisibility();
-                int newVisibility = View.GONE;
-                if (selectedMessagesIds[0].size() > 1) {
-                    ArrayList<Integer> ids = new ArrayList<>();
-                    for (int a = 1; a >= 0; a--) {
-                        for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
-                            ids.add(selectedMessagesIds[a].keyAt(b));
-                        }
-                    }
-                    Collections.sort(ids);
-                    Integer begin = ids.get(0);
-                    Integer end = ids.get(ids.size() - 1);
-                    for (int i = 0; i < messages.size(); i++) {
-                        int msgId = messages.get(i).getId();
-                        if (msgId > begin && msgId < end && selectedMessagesIds[0].indexOfKey(msgId) < 0) {
-                            MessageObject message = messages.get(i);
-
-                            if (message.contentType != 0) {
-                                continue;
-                            }
-                            newVisibility = View.VISIBLE;
-                            break;
-                        }
-                    }
-                }
-                selectItem.setVisibility(newVisibility);
+                int newVisibility;
+                translateItem.setVisibility(selectedMessagesIds[0].size() + selectedMessagesIds[1].size() > 1 ? View.VISIBLE : View.GONE);
                 copyItem.setVisibility(!noforwards && selectedMessagesCanCopyIds[0].size() + selectedMessagesCanCopyIds[1].size() != 0 ? View.VISIBLE : View.GONE);
                 starItem.setVisibility(getMediaDataController().canAddStickerToFavorites() && (selectedMessagesCanStarIds[0].size() + selectedMessagesCanStarIds[1].size()) == selectedCount ? View.VISIBLE : View.GONE);
                 int newCopyVisible = copyItem.getVisibility();
@@ -13807,6 +13767,33 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             }
                         }
                     }
+                    // CHECK IF CAN SELECT BETWEEN
+                    String oldTag = replyButton.getTag() instanceof String ? (String) replyButton.getTag() : null;
+                    replyButton.setTag("reply");
+                    if (selectedMessagesIds[0].size() > 1) {
+                        ArrayList<Integer> ids = new ArrayList<>();
+                        for (int a = 1; a >= 0; a--) {
+                            for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
+                                ids.add(selectedMessagesIds[a].keyAt(b));
+                            }
+                        }
+                        Collections.sort(ids);
+                        Integer begin = ids.get(0);
+                        Integer end = ids.get(ids.size() - 1);
+                        for (int i = 0; i < messages.size(); i++) {
+                            int msgId = messages.get(i).getId();
+                            if (msgId > begin && msgId < end && selectedMessagesIds[0].indexOfKey(msgId) < 0) {
+                                MessageObject message = messages.get(i);
+
+                                if (message.contentType != 0) {
+                                    continue;
+                                }
+                                newVisibility = View.VISIBLE;
+                                replyButton.setTag("select_between");
+                                break;
+                            }
+                        }
+                    }
                     if (threadMessageObjects != null && newVisibility == View.VISIBLE) {
                         for (int b = 0, N = selectedMessagesIds[0].size(); b < N; b++) {
                             MessageObject message = selectedMessagesIds[0].valueAt(b);
@@ -13815,7 +13802,56 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             }
                         }
                     }
-
+                    if (oldTag != null && !oldTag.equals((String) replyButton.getTag()) && replyButton.getVisibility() == newVisibility) {
+                        if (replyButtonAnimation != null) {
+                            replyButtonAnimation.cancel();
+                        }
+                        ObjectAnimator alpha = ObjectAnimator.ofFloat(replyButton, View.ALPHA, 0.0f);
+                        ObjectAnimator scaleY = ObjectAnimator.ofFloat(replyButton, View.SCALE_Y, 0.0f);
+                        alpha.setRepeatMode(ValueAnimator.REVERSE);
+                        alpha.setRepeatCount(1);
+                        scaleY.setRepeatMode(ValueAnimator.REVERSE);
+                        scaleY.setRepeatCount(1);
+                        alpha.addListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationRepeat(Animator animation) {
+                                super.onAnimationRepeat(animation);
+                                Drawable image;
+                                if ("select_between".equals((String) replyButton.getTag())) {
+                                    image = getParentActivity().getResources().getDrawable(R.drawable.round_checklist_white_28).mutate();
+                                    replyButton.setText(LocaleController.getString("ReportSelectMessages", R.string.ReportSelectMessages));
+                                } else {
+                                    image = getParentActivity().getResources().getDrawable(R.drawable.input_reply).mutate();
+                                    replyButton.setText(LocaleController.getString("Reply", R.string.Reply));
+                                }
+                                image.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_actionBarActionModeDefaultIcon), PorterDuff.Mode.MULTIPLY));
+                                replyButton.setCompoundDrawablesWithIntrinsicBounds(image, null, null, null);
+                            }
+                        });
+                        replyButtonAnimation = new AnimatorSet();
+                        replyButtonAnimation.playTogether(alpha, scaleY);
+                        replyButtonAnimation.setDuration(100);
+                        replyButtonAnimation.addListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationCancel(Animator animation) {
+                                if (replyButtonAnimation != null && replyButtonAnimation.equals(animation)) {
+                                    replyButtonAnimation = null;
+                                }
+                            }
+                        });
+                        replyButtonAnimation.start();
+                    } else if (newVisibility == View.VISIBLE) {
+                        Drawable image;
+                        if ("select_between".equals((String) replyButton.getTag())) {
+                            image = getParentActivity().getResources().getDrawable(R.drawable.round_checklist_white_28).mutate();
+                            replyButton.setText(LocaleController.getString("ReportSelectMessages", R.string.ReportSelectMessages));
+                        } else {
+                            image = getParentActivity().getResources().getDrawable(R.drawable.input_reply).mutate();
+                            replyButton.setText(LocaleController.getString("Reply", R.string.Reply));
+                        }
+                        image.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_actionBarActionModeDefaultIcon), PorterDuff.Mode.MULTIPLY));
+                        replyButton.setCompoundDrawablesWithIntrinsicBounds(image, null, null, null);
+                    }
                     if (replyButton.getVisibility() != newVisibility) {
                         if (replyButtonAnimation != null) {
                             replyButtonAnimation.cancel();
@@ -16647,6 +16683,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             int loadIndex = did == dialog_id ? 0 : 1;
             ArrayList<MessageObject> messageObjects = (ArrayList<MessageObject>) args[1];
             replaceMessageObjects(messageObjects, loadIndex, false);
+            for (int a = 0; a < messageObjects.size(); a++) {
+                handleAutoTranslate(messageObjects.get(a));
+            }
         } else if (id == NotificationCenter.notificationsSettingsUpdated) {
             updateTitleIcons();
             if (ChatObject.isChannel(currentChat) || UserObject.isReplyUser(currentUser)) {
@@ -23146,7 +23185,58 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         MediaController.saveFile(path, getParentActivity(), messageObject.isVideo() ? 1 : 0, null, null);
     }
 
+    private void handleAutoTranslate(MessageObject messageObject) {
+        if (AutoTranslateConfig.isAutoTranslateEnabled(dialog_id)) {
+            if (!messageObject.translated && !messageObject.translating && getMessageHelper().isMessageObjectAutoTranslatable(messageObject)) {
+                LanguageDetector.detectLanguage(
+                        messageObject.messageOwner.message,
+                        (String lang) -> {
+                            if (!DoNotTranslateSettings.getRestrictedLanguages().contains(lang.split("-")[0])) {
+                                translateMessage(messageObject, true);
+                            }
+                        },
+                        (Exception e) -> {
+                            FileLog.e("mlkit: failed to detect language in message");
+                            e.printStackTrace();
+                        });
+            }
+        }
+    }
+
+    private void multiTranslateMessage() {
+        int untranslatedCount = 0;
+        for (int a = 1; a >= 0; a--) {
+            for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
+                MessageObject messageObject = selectedMessagesIds[a].valueAt(b);
+                if (messageObject.translating || messageObject.translated) {
+                    untranslatedCount++;
+                    continue;
+                }
+                if (getMessageHelper().isMessageTranslatable(messageObject)) {
+                    translateMessage(messageObject, true);
+                }
+            }
+        }
+        String language = OwlConfig.translationTarget;
+        CharSequence languageName;
+        if (language.equals("app")) {
+            language = Translator.getCurrentTranslator().getCurrentAppLanguage();
+        }
+        Locale locale = Locale.forLanguageTag(language);
+        if (!TextUtils.isEmpty(locale.getScript())) {
+            languageName = HtmlCompat.fromHtml(AndroidUtilities.capitalize(locale.getDisplayScript()), HtmlCompat.FROM_HTML_MODE_LEGACY);
+        } else {
+            languageName = AndroidUtilities.capitalize(locale.getDisplayName());
+        }
+        if (untranslatedCount == 1) {
+            BulletinFactory.of(ChatActivity.this).createErrorBulletin(LocaleController.formatString("MessageAlreadyInX", R.string.MessageAlreadyInX, languageName), themeDelegate).show();
+        } else if (untranslatedCount > 1) {
+            BulletinFactory.of(ChatActivity.this).createErrorBulletin(LocaleController.formatString("MessagesAlreadyInX", R.string.MessagesAlreadyInX, untranslatedCount, languageName), themeDelegate).show();
+        }
+    }
+
     private void translateMessage(MessageObject messageObject, boolean force) {
+        if (messageObject.translated || messageObject.translating) return;
         TranslatorHelper.translate(new TranslatorHelper.TranslatorContext(messageObject), new TranslatorHelper.TranslateCallback() {
             @Override
             public void onTranslate(BaseTranslator.Result result) {
@@ -26993,22 +27083,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         startMessageUnselect();
                     }
                 }
-                if (AutoTranslateConfig.isAutoTranslateEnabled(dialog_id)) {
-                    final MessageObject messageObject = messageCell.getMessageObject();
-                    if (!messageObject.translated && !messageObject.translating && getMessageHelper().isMessageObjectAutoTranslatable(messageObject)) {
-                        LanguageDetector.detectLanguage(
-                                messageObject.messageOwner.message,
-                                (String lang) -> {
-                                    if (!DoNotTranslateSettings.getRestrictedLanguages().contains(lang.split("-")[0])) {
-                                        translateMessage(messageObject, true);
-                                    }
-                                },
-                                (Exception e) -> {
-                                    FileLog.e("mlkit: failed to detect language in message");
-                                    e.printStackTrace();
-                                });
-                    }
-                }
+                handleAutoTranslate(messageCell.getMessageObject());
             }
 
             int position = holder.getAdapterPosition();
