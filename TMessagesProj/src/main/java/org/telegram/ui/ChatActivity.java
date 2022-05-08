@@ -277,6 +277,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23204,35 +23205,57 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     private void multiTranslateMessage() {
-        int untranslatedCount = 0;
+        ArrayList<MessageObject> selectedMessagesObject = new ArrayList<>();
         for (int a = 1; a >= 0; a--) {
             for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
-                MessageObject messageObject = selectedMessagesIds[a].valueAt(b);
-                if (messageObject.translating || messageObject.translated) {
-                    untranslatedCount++;
-                    continue;
-                }
-                if (getMessageHelper().isMessageTranslatable(messageObject)) {
-                    translateMessage(messageObject, true);
-                }
+                selectedMessagesObject.add(selectedMessagesIds[a].valueAt(b));
             }
         }
-        String language = OwlConfig.translationTarget;
-        CharSequence languageName;
-        if (language.equals("app")) {
-            language = Translator.getCurrentTranslator().getCurrentAppLanguage();
+        CountDownLatch doneSignal = new CountDownLatch(selectedMessagesObject.size());
+        AtomicInteger untranslatedCount = new AtomicInteger(0);
+        for (int a = 0; a < selectedMessagesObject.size(); a++) {
+            MessageObject messageObject = selectedMessagesObject.get(a);
+            LanguageDetector.detectLanguage(
+                    getMessageHelper().getPlainText(messageObject),
+                    (String lang) -> {
+                        boolean isUntranslatable = false;
+                        if ((lang != null && DoNotTranslateSettings.getRestrictedLanguages().contains(lang.split("-")[0]))
+                                || messageObject.translating || messageObject.translated) {
+                            untranslatedCount.getAndIncrement();
+                            isUntranslatable = true;
+                        }
+                        if (getMessageHelper().isMessageTranslatable(messageObject) && !isUntranslatable) {
+                            translateMessage(messageObject, true);
+                        }
+                        doneSignal.countDown();
+                    },
+                    (Exception e) -> {
+                        doneSignal.countDown();
+                    });
         }
-        Locale locale = Locale.forLanguageTag(language);
-        if (!TextUtils.isEmpty(locale.getScript())) {
-            languageName = HtmlCompat.fromHtml(AndroidUtilities.capitalize(locale.getDisplayScript()), HtmlCompat.FROM_HTML_MODE_LEGACY);
-        } else {
-            languageName = AndroidUtilities.capitalize(locale.getDisplayName());
-        }
-        if (untranslatedCount == 1) {
-            BulletinFactory.of(ChatActivity.this).createErrorBulletin(LocaleController.formatString("MessageAlreadyInX", R.string.MessageAlreadyInX, languageName), themeDelegate).show();
-        } else if (untranslatedCount > 1) {
-            BulletinFactory.of(ChatActivity.this).createErrorBulletin(LocaleController.formatString("MessagesAlreadyInX", R.string.MessagesAlreadyInX, untranslatedCount, languageName), themeDelegate).show();
-        }
+        new Thread(() -> {
+            try {
+                doneSignal.await();
+            } catch (Exception ignored) {}
+            AndroidUtilities.runOnUIThread(() -> {
+                String language = OwlConfig.translationTarget;
+                CharSequence languageName;
+                if (language.equals("app")) {
+                    language = Translator.getCurrentTranslator().getCurrentAppLanguage();
+                }
+                Locale locale = Locale.forLanguageTag(language);
+                if (!TextUtils.isEmpty(locale.getScript())) {
+                    languageName = HtmlCompat.fromHtml(AndroidUtilities.capitalize(locale.getDisplayScript()), HtmlCompat.FROM_HTML_MODE_LEGACY);
+                } else {
+                    languageName = AndroidUtilities.capitalize(locale.getDisplayName());
+                }
+                if (untranslatedCount.get() == 1) {
+                    BulletinFactory.of(ChatActivity.this).createErrorBulletin(LocaleController.formatString("MessageAlreadyInX", R.string.MessageAlreadyInX, languageName), themeDelegate).show();
+                } else if (untranslatedCount.get() > 1) {
+                    BulletinFactory.of(ChatActivity.this).createErrorBulletin(LocaleController.formatString("MessagesAlreadyInX", R.string.MessagesAlreadyInX, untranslatedCount.get(), languageName), themeDelegate).show();
+                }
+            });
+        }).start();
     }
 
     private void translateMessage(MessageObject messageObject, boolean force) {
