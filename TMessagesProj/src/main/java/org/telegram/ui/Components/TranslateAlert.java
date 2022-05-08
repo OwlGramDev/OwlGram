@@ -75,6 +75,7 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.TranslatorHelper;
@@ -863,23 +864,17 @@ public class TranslateAlert extends Dialog {
         }
     }
 
-    public String languageName(String locale) {
-        // sorry, no more vodka
-        if (locale == null || locale.equals("und") || locale.equals("auto")) {
+    public String languageName(String language) {
+        if (language == null || language.equals("und") || language.equals("auto"))
             return null;
-        }
-        LocaleController.LocaleInfo thisLanguageInfo = LocaleController.getInstance().getBuiltinLanguageByPlural(locale),
-                                    currentLanguageInfo = LocaleController.getInstance().getCurrentLocaleInfo();
-        if (thisLanguageInfo == null) {
-            return null;
-        }
-        boolean isCurrentLanguageEnglish = currentLanguageInfo != null && "en".equals(currentLanguageInfo.pluralLangCode);
-        if (isCurrentLanguageEnglish) {
-            // trying to show this language in a language of the interface, but there are only names in english and its own
-            return thisLanguageInfo.nameEnglish;
+        Locale locale = Locale.forLanguageTag(language);
+        String value;
+        if (!TextUtils.isEmpty(locale.getScript())) {
+            value = AndroidUtilities.capitalize(locale.getDisplayScript());
         } else {
-            return thisLanguageInfo.name;
+            value = AndroidUtilities.capitalize(locale.getDisplayName());
         }
+        return value;
     }
 
     public void updateSourceLanguage() {

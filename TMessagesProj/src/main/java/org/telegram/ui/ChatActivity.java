@@ -22501,8 +22501,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             if (messageObject.translated && messageObject.originalMessage != null) {
                                 TranslatorHelper.resetTranslatedMessage(dialog_id, ChatActivity.this, messageObject);
                             } else {
-                                if (OwlConfig.translatorStyle == BaseTranslator.DIALOG_STYLE && messageObject.type != MessageObject.TYPE_POLL) {
-                                    TranslateAlert alert = TranslateAlert.showAlert(getParentActivity(), this, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], messageObject.messageOwner.message, noforwards, onLinkPress, () -> dimBehindView(false));
+                                if (OwlConfig.translatorStyle == BaseTranslator.DIALOG_STYLE) {
+                                    TranslateAlert alert = TranslateAlert.showAlert(getParentActivity(), this, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], getMessageHelper().getPlainText(messageObject), noforwards, onLinkPress, () -> dimBehindView(false));
                                     alert.showDim(false);
                                     return;
                                 }
@@ -26993,9 +26993,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         startMessageUnselect();
                     }
                 }
-                if (AutoTranslateConfig.isAutoTranslateEnabled(dialog_id) && OwlConfig.translatorStyle == BaseTranslator.INLINE_STYLE) {
+                if (AutoTranslateConfig.isAutoTranslateEnabled(dialog_id)) {
                     final MessageObject messageObject = messageCell.getMessageObject();
-                    if (!messageObject.translated && !messageObject.translating && getMessageHelper().isMessageObjectTranslatable(messageObject)) {
+                    if (!messageObject.translated && !messageObject.translating && getMessageHelper().isMessageObjectAutoTranslatable(messageObject)) {
                         LanguageDetector.detectLanguage(
                                 messageObject.messageOwner.message,
                                 (String lang) -> {

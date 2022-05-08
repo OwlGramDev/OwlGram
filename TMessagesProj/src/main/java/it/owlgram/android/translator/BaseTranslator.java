@@ -53,42 +53,46 @@ abstract public class BaseTranslator {
                             AndroidUtilities.runOnUIThread(() -> translateCallBack.onError(null));
                         }
                     } else if (query instanceof AdditionalObjectTranslation) {
-                        Result result = translate((String)((AdditionalObjectTranslation) query).translation, toLang);
-                        if (result != null) {
-                            if (((AdditionalObjectTranslation) query).additionalInfo != null && ((AdditionalObjectTranslation) query).additionalInfo instanceof MessageHelper.ReplyMarkupButtonsTexts) {
-                                MessageHelper.ReplyMarkupButtonsTexts buttonRows = (MessageHelper.ReplyMarkupButtonsTexts) ((AdditionalObjectTranslation) query).additionalInfo;
-                                for (int i = 0; i < buttonRows.getTexts().size(); i++) {
-                                    ArrayList<String> buttonsRow = buttonRows.getTexts().get(i);
-                                    for (int j = 0; j < buttonsRow.size(); j++) {
-                                        buttonsRow.set(j, (String) translate(buttonsRow.get(j), toLang).translation);
-                                    }
-                                }
-                                result.additionalInfo = buttonRows;
+                        if (((AdditionalObjectTranslation) query).translation instanceof TLRPC.Poll) {
+                            TLRPC.TL_poll poll = new TLRPC.TL_poll();
+                            TLRPC.TL_poll original = (TLRPC.TL_poll) ((AdditionalObjectTranslation) query).translation;
+                            poll.question = (String) translate(original.question, toLang).translation;
+                            for (int i = 0; i < original.answers.size(); i++) {
+                                TLRPC.TL_pollAnswer answer = new TLRPC.TL_pollAnswer();
+                                answer.text = (String) translate(original.answers.get(i).text, toLang).translation;
+                                answer.option = original.answers.get(i).option;
+                                poll.answers.add(answer);
                             }
-                            cache.put(Pair.create(query, result.sourceLanguage), result);
-                            AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(result));
+                            poll.close_date = original.close_date;
+                            poll.close_period = original.close_period;
+                            poll.closed = original.closed;
+                            poll.flags = original.flags;
+                            poll.id = original.id;
+                            poll.multiple_choice = original.multiple_choice;
+                            poll.public_voters = original.public_voters;
+                            poll.quiz = original.quiz;
+                            AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(new Result(poll, null)));
+                        } else if (((AdditionalObjectTranslation) query).translation instanceof String) {
+                            Result result = translate((String)((AdditionalObjectTranslation) query).translation, toLang);
+                            if (result != null) {
+                                if (((AdditionalObjectTranslation) query).additionalInfo != null && ((AdditionalObjectTranslation) query).additionalInfo instanceof MessageHelper.ReplyMarkupButtonsTexts) {
+                                    MessageHelper.ReplyMarkupButtonsTexts buttonRows = (MessageHelper.ReplyMarkupButtonsTexts) ((AdditionalObjectTranslation) query).additionalInfo;
+                                    for (int i = 0; i < buttonRows.getTexts().size(); i++) {
+                                        ArrayList<String> buttonsRow = buttonRows.getTexts().get(i);
+                                        for (int j = 0; j < buttonsRow.size(); j++) {
+                                            buttonsRow.set(j, (String) translate(buttonsRow.get(j), toLang).translation);
+                                        }
+                                    }
+                                    result.additionalInfo = buttonRows;
+                                }
+                                cache.put(Pair.create(query, result.sourceLanguage), result);
+                                AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(result));
+                            } else {
+                                AndroidUtilities.runOnUIThread(() -> translateCallBack.onError(null));
+                            }
                         } else {
-                            AndroidUtilities.runOnUIThread(() -> translateCallBack.onError(null));
+                            throw new UnsupportedOperationException("Unsupported translation query");
                         }
-                    } else if (query instanceof TLRPC.Poll) {
-                        TLRPC.TL_poll poll = new TLRPC.TL_poll();
-                        TLRPC.TL_poll original = (TLRPC.TL_poll) query;
-                        poll.question = (String) translate(original.question, toLang).translation;
-                        for (int i = 0; i < original.answers.size(); i++) {
-                            TLRPC.TL_pollAnswer answer = new TLRPC.TL_pollAnswer();
-                            answer.text = (String) translate(original.answers.get(i).text, toLang).translation;
-                            answer.option = original.answers.get(i).option;
-                            poll.answers.add(answer);
-                        }
-                        poll.close_date = original.close_date;
-                        poll.close_period = original.close_period;
-                        poll.closed = original.closed;
-                        poll.flags = original.flags;
-                        poll.id = original.id;
-                        poll.multiple_choice = original.multiple_choice;
-                        poll.public_voters = original.public_voters;
-                        poll.quiz = original.quiz;
-                        AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(new Result(poll, null)));
                     } else {
                         throw new UnsupportedOperationException("Unsupported translation query");
                     }

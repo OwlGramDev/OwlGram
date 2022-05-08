@@ -248,7 +248,7 @@
     <string name="ChangeIcon">Change App Icon</string>
     <string name="ChangeIconDesc">Since on Android 12 the monet icon was forced and you upgraded to Android 13, you need to change the app icon to the default one for a better support.</string>
     <string name="TranslateFailed">Translation failed</string>
-    <string name="AutoTranslate">Auto-translate</string>
+    <string name="AutoTranslate">Auto-Translate</string>
     <string name="AutoTranslateDesc">Automatically translate messages that are in another language.</string>
     <string name="BrokenMLKit">Option unavailable</string>
     <string name="BrokenMLKitDetail">Google MLKit language identifier is somehow broken on this device.</string>
