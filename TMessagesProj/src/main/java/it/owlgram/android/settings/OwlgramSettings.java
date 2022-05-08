@@ -105,7 +105,7 @@ public class OwlgramSettings extends BaseFragment {
         ActionBarMenuItem menuItem = menu.addItem(0, R.drawable.ic_ab_other);
         menuItem.setContentDescription(LocaleController.getString("AccDescrMoreOptions", R.string.AccDescrMoreOptions));
         menuItem.addSubItem(1, R.drawable.round_settings_backup_restore, LocaleController.getString("ExportSettings", R.string.ExportSettings));
-        menuItem.addSubItem(2, R.drawable.msg_reset, LocaleController.getString("ThemeResetToDefaultsTitle", R.string.ThemeResetToDefaultsTitle));
+        menuItem.addSubItem(2, R.drawable.round_settings_backup_reset, LocaleController.getString("ThemeResetToDefaultsTitle", R.string.ThemeResetToDefaultsTitle));
 
         listAdapter = new ListAdapter(context);
         fragmentView = new FrameLayout(context);
