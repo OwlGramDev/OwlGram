@@ -131,7 +131,7 @@ public class FilterTabsView extends FrameLayout {
         private String currentText;
         private StaticLayout textLayout;
         private int textOffsetX;
-        private String currentEmoticon;
+        private String currentEmoticon = "undefined";
         private Drawable icon;
         private Drawable activeIcon;
 
