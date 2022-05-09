@@ -6599,7 +6599,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             x = max;
         }
         videoPreviewFrame.setTranslationX(x);
-    }
+     }
 
     private void showVideoSeekPreviewPosition(boolean show) {
         if (show && videoPreviewFrame.getTag() != null || !show && videoPreviewFrame.getTag() == null) {
@@ -11258,10 +11258,6 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
                 checkProgress(1, true, false);
                 checkProgress(2, true, false);
-                if (videoFrameBitmap != null) {
-                    videoFrameBitmap.recycle();
-                    videoFrameBitmap = null;
-                }
             } else if (prevIndex < currentIndex) {
                 ImageReceiver temp = leftImage;
                 leftImage = centerImage;
@@ -11287,6 +11283,10 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
                 checkProgress(1, true, false);
                 checkProgress(2, true, false);
+            }
+            if (videoFrameBitmap != null) {
+                videoFrameBitmap.recycle();
+                videoFrameBitmap = null;
             }
         }
         detectFaces();
@@ -12046,7 +12046,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         if (Instance != null) {
             result = Instance.isVisible && !Instance.disableShowCheck && object != null &&
                     ((Instance.currentFileLocation != null && object.local_id == Instance.currentFileLocation.location.local_id && object.volume_id == Instance.currentFileLocation.location.volume_id && object.dc_id == Instance.currentFileLocation.dc_id) ||
-                            (Instance.currentFileLocationVideo != null && object.local_id == Instance.currentFileLocationVideo.location.local_id && object.volume_id == Instance.currentFileLocationVideo.location.volume_id && object.dc_id == Instance.currentFileLocationVideo.dc_id));
+                     (Instance.currentFileLocationVideo != null && object.local_id == Instance.currentFileLocationVideo.location.local_id && object.volume_id == Instance.currentFileLocationVideo.location.volume_id && object.dc_id == Instance.currentFileLocationVideo.dc_id));
         }
         return result;
     }
@@ -12540,19 +12540,19 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 layoutParams.height = 100;
             }
 
-            for (ClippingImageView imageView : animatingImageViews) {
+            for (int i = 0; i < animatingImageViews.length; i++) {
                 if (animatingImageViews.length > 1) {
-                    imageView.setAlpha(0.0f);
+                    animatingImageViews[i].setAlpha(0.0f);
                 } else {
-                    imageView.setAlpha(1.0f);
+                    animatingImageViews[i].setAlpha(1.0f);
                 }
-                imageView.setPivotX(0.0f);
-                imageView.setPivotY(0.0f);
-                imageView.setScaleX(object.scale);
-                imageView.setScaleY(object.scale);
-                imageView.setTranslationX(object.viewX + drawRegion.left * object.scale);
-                imageView.setTranslationY(object.viewY + drawRegion.top * object.scale);
-                imageView.setLayoutParams(layoutParams);
+                animatingImageViews[i].setPivotX(0.0f);
+                animatingImageViews[i].setPivotY(0.0f);
+                animatingImageViews[i].setScaleX(object.scale);
+                animatingImageViews[i].setScaleY(object.scale);
+                animatingImageViews[i].setTranslationX(object.viewX + drawRegion.left * object.scale);
+                animatingImageViews[i].setTranslationY(object.viewY + drawRegion.top * object.scale);
+                animatingImageViews[i].setLayoutParams(layoutParams);
             }
 
             windowView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener(){
