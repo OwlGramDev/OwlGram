@@ -22,9 +22,9 @@ dependencies {
 
     compileOnly 'org.checkerframework:checker-qual:3.22.0'
     compileOnly 'org.checkerframework:checker-compat-qual:2.5.5'
-    implementation 'com.google.firebase:firebase-messaging:23.0.3'
-    implementation 'com.google.firebase:firebase-config:21.0.2'
-    implementation 'com.google.firebase:firebase-datatransport:18.1.2'
+    implementation 'com.google.firebase:firebase-messaging:23.0.4'
+    implementation 'com.google.firebase:firebase-config:21.1.0'
+    implementation 'com.google.firebase:firebase-datatransport:18.1.3'
     implementation 'com.google.firebase:firebase-appindexing:20.0.0'
     implementation 'com.google.android.gms:play-services-maps:18.0.2'
     implementation 'com.google.android.gms:play-services-auth:20.2.0'
@@ -129,7 +129,7 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 2645
+    defaultConfig.versionCode = 2646
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
@@ -144,7 +144,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 32
-        versionName "1.9.0 PBeta 4"
+        versionName "1.9.0 Beta 1"
 
         externalNativeBuild {
             cmake {

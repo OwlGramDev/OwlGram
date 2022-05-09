@@ -375,60 +375,62 @@ public class FilterTabsView extends FrameLayout {
                     activeIcon.setBounds(bounds);
                     icon.setBounds(bounds);
                 }
-                icon.setTint(textPaint.getColor());
-                activeIcon.setTint(textPaint.getColor());
-                iconX = (int) ((getMeasuredWidth() - tabWidth) / 2f);
-                if (animateIconX) {
-                    iconX = (int) (iconX * changeProgress + animateFromIconX * (1f - changeProgress));
-                }
-                int iconY = (int) ((getMeasuredHeight() - emoticonWidth) / 2f);
-                if (animateIconChange) {
-                    if (iconAnimateOutDrawable != null) {
-                        canvas.save();
-                        canvas.translate(iconX, iconY);
-                        int alpha = iconAnimateOutDrawable.getAlpha();
-                        iconAnimateOutDrawable.setAlpha((int) (alpha * (1f - changeProgress)));
-                        iconAnimateOutDrawable.draw(canvas);
-                        canvas.restore();
-                        iconAnimateOutDrawable.setAlpha(alpha);
+                if (icon != null && activeIcon != null) {
+                    icon.setTint(textPaint.getColor());
+                    activeIcon.setTint(textPaint.getColor());
+                    iconX = (int) ((getMeasuredWidth() - tabWidth) / 2f);
+                    if (animateIconX) {
+                        iconX = (int) (iconX * changeProgress + animateFromIconX * (1f - changeProgress));
                     }
-                    if (iconAnimateInDrawable != null) {
-                        canvas.save();
-                        canvas.translate(iconX, iconY);
-                        int alpha = iconAnimateInDrawable.getAlpha();
-                        iconAnimateInDrawable.setAlpha((int) (alpha * changeProgress));
-                        iconAnimateInDrawable.draw(canvas);
-                        canvas.restore();
-                        iconAnimateInDrawable.setAlpha(alpha);
-                    }
-                } else {
-                    int alphaAnimation = 0;
-                    if (animateToKey == null) {
-                        if ((animatingIndicator || manualScrollingToId != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
-                            alphaAnimation = (int) (255 * animatingIndicatorProgress);
-                            if (currentTab.id == id2) {
-                                alphaAnimation = 255 - alphaAnimation;
-                            }
-                        } else if (currentTab.id == id1) {
-                            alphaAnimation = 255;
+                    int iconY = (int) ((getMeasuredHeight() - emoticonWidth) / 2f);
+                    if (animateIconChange) {
+                        if (iconAnimateOutDrawable != null) {
+                            canvas.save();
+                            canvas.translate(iconX, iconY);
+                            int alpha = iconAnimateOutDrawable.getAlpha();
+                            iconAnimateOutDrawable.setAlpha((int) (alpha * (1f - changeProgress)));
+                            iconAnimateOutDrawable.draw(canvas);
+                            canvas.restore();
+                            iconAnimateOutDrawable.setAlpha(alpha);
+                        }
+                        if (iconAnimateInDrawable != null) {
+                            canvas.save();
+                            canvas.translate(iconX, iconY);
+                            int alpha = iconAnimateInDrawable.getAlpha();
+                            iconAnimateInDrawable.setAlpha((int) (alpha * changeProgress));
+                            iconAnimateInDrawable.draw(canvas);
+                            canvas.restore();
+                            iconAnimateInDrawable.setAlpha(alpha);
                         }
                     } else {
-                        if ((animatingIndicator || manualScrollingToPosition != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
-                            alphaAnimation = (int) (255 * animationValue);
-                            if (currentTab.id == id2) {
-                                alphaAnimation = 255 - alphaAnimation;
+                        int alphaAnimation = 0;
+                        if (animateToKey == null) {
+                            if ((animatingIndicator || manualScrollingToId != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
+                                alphaAnimation = (int) (255 * animatingIndicatorProgress);
+                                if (currentTab.id == id2) {
+                                    alphaAnimation = 255 - alphaAnimation;
+                                }
+                            } else if (currentTab.id == id1) {
+                                alphaAnimation = 255;
                             }
-                        } else if (currentTab.id == id1) {
-                            alphaAnimation = 255;
+                        } else {
+                            if ((animatingIndicator || manualScrollingToPosition != -1) && (currentTab.id == id1 || currentTab.id == id2)) {
+                                alphaAnimation = (int) (255 * animationValue);
+                                if (currentTab.id == id2) {
+                                    alphaAnimation = 255 - alphaAnimation;
+                                }
+                            } else if (currentTab.id == id1) {
+                                alphaAnimation = 255;
+                            }
                         }
+                        canvas.save();
+                        canvas.translate(iconX, iconY);
+                        activeIcon.setAlpha(alphaAnimation);
+                        activeIcon.draw(canvas);
+                        icon.setAlpha(255 - alphaAnimation);
+                        icon.draw(canvas);
+                        canvas.restore();
                     }
-                    canvas.save();
-                    canvas.translate(iconX, iconY);
-                    activeIcon.setAlpha(alphaAnimation);
-                    activeIcon.draw(canvas);
-                    icon.setAlpha(255 - alphaAnimation);
-                    icon.draw(canvas);
-                    canvas.restore();
                 }
             }
 
