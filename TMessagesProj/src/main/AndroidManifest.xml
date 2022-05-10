@@ -160,8 +160,7 @@
             <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity>
         <service
-            android:name="androidx.sharetarget.ChooserTargetServiceCompat"
-            android:exported="false" />
+            android:name="androidx.sharetarget.ChooserTargetServiceCompat"/>
         <activity-alias
             android:name=".OG_Icon_Alt_Default"
             android:enabled="true"
