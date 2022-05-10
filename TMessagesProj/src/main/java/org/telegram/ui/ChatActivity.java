@@ -23188,7 +23188,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
     private void handleAutoTranslate(MessageObject messageObject) {
         if (AutoTranslateConfig.isAutoTranslateEnabled(dialog_id)) {
-            if (!messageObject.translated && !messageObject.translating && getMessageHelper().isMessageObjectAutoTranslatable(messageObject)) {
+            if (!messageObject.translated && !messageObject.translating && !messageObject.canceledTranslation && getMessageHelper().isMessageObjectAutoTranslatable(messageObject)) {
                 LanguageDetector.detectLanguage(
                         messageObject.messageOwner.message,
                         (String lang) -> {
@@ -23258,12 +23258,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }).start();
     }
 
-    private void translateMessage(MessageObject messageObject, boolean force) {
+    private void translateMessage(MessageObject messageObject, boolean isAutoTranslate) {
         if (messageObject.translated || messageObject.translating) return;
         TranslatorHelper.translate(new TranslatorHelper.TranslatorContext(messageObject), new TranslatorHelper.TranslateCallback() {
             @Override
             public void onTranslate(BaseTranslator.Result result) {
-                TranslatorHelper.applyTranslatedMessage(result, messageObject, dialog_id, ChatActivity.this);
+                TranslatorHelper.applyTranslatedMessage(result, messageObject, dialog_id, ChatActivity.this, isAutoTranslate);
             }
 
             @Override
@@ -23274,7 +23274,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             @Override
             public void onError(Exception error) {
                 ChatActivity.this.getMessageHelper().setTranslating(dialog_id, messageObject, false);
-                if (force) return;
+                if (isAutoTranslate) return;
                 Translator.handleTranslationError(ChatActivity.this.getParentActivity(), error, () -> translateMessage(messageObject, false), themeDelegate);
             }
         });

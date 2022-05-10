@@ -187,6 +187,10 @@ public class MessageHelper extends BaseController {
     }
 
     public MessageObject resetMessageContent(long dialogId, MessageObject messageObject, boolean translated) {
+        return resetMessageContent(dialogId, messageObject, translated, false);
+    }
+
+    public MessageObject resetMessageContent(long dialogId, MessageObject messageObject, boolean translated, boolean canceled) {
         TLRPC.Message message = messageObject.messageOwner;
         MessageObject obj = new MessageObject(currentAccount, message, true, true);
         obj.originalMessage = messageObject.originalMessage;
@@ -194,6 +198,7 @@ public class MessageHelper extends BaseController {
         obj.originalReplyMarkupRows = messageObject.originalReplyMarkupRows;
         obj.translating = false;
         obj.translated = translated;
+        obj.canceledTranslation = canceled;
         if (messageObject.isSponsored()) {
             obj.sponsoredId = messageObject.sponsoredId;
             obj.botStartParam = messageObject.botStartParam;

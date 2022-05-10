@@ -165,6 +165,7 @@ public class MessageObject {
     public Object originalMessage;
     public ArrayList<TLRPC.MessageEntity> originalEntities;
     public MessageHelper.ReplyMarkupButtonsTexts originalReplyMarkupRows;
+    public boolean canceledTranslation;
 
     public ArrayList<TLRPC.TL_pollAnswer> checkedVotes;
 

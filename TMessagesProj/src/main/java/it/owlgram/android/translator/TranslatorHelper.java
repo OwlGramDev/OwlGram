@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.helpers.EntitiesHelper;
 import it.owlgram.android.helpers.MessageHelper;
+import it.owlgram.android.settings.DoNotTranslateSettings;
 
 public class TranslatorHelper {
 
@@ -41,7 +42,7 @@ public class TranslatorHelper {
         });
     }
 
-    public static MessageObject applyTranslatedMessage(BaseTranslator.Result result, MessageObject messageObject, long dialog_id, BaseFragment fragment) {
+    public static MessageObject applyTranslatedMessage(BaseTranslator.Result result, MessageObject messageObject, long dialog_id, BaseFragment fragment, boolean autoTranslate) {
         if (result.translation instanceof String) {
             if(messageObject.originalEntities != null && result.sourceLanguage != null){
                 String src_lang = result.sourceLanguage.toUpperCase();
@@ -49,29 +50,38 @@ public class TranslatorHelper {
                 String top_html = "<b>" + LocaleController.formatString("TranslatorLanguageCode", R.string.TranslatorLanguageCode, src_lang + " → " + language) +"</b>\n\n";
                 String result_translation = top_html + result.translation;
                 EntitiesHelper.TextWithMention entitiesResult = EntitiesHelper.getEntities(result_translation, messageObject.originalEntities, !isSupportHTMLMode());
-                messageObject.messageOwner.message = entitiesResult.text;
-                messageObject.messageOwner.entities = entitiesResult.entities;
-                if (result.additionalInfo instanceof MessageHelper.ReplyMarkupButtonsTexts) {
-                    ((MessageHelper.ReplyMarkupButtonsTexts) result.additionalInfo).applyTextToKeyboard(messageObject.messageOwner.reply_markup.rows);
-                }
-                if (fragment == null) {
-                    messageObject.translated = true;
+                String clean_translation = entitiesResult.text.split("\n\n", 2).length > 1 ? entitiesResult.text.split("\n\n", 2)[1] : entitiesResult.text;
+                if (autoTranslate && (clean_translation.equalsIgnoreCase(messageObject.originalMessage.toString()) || DoNotTranslateSettings.getRestrictedLanguages().contains(src_lang.toLowerCase()))) {
                     messageObject.translating = false;
-                    messageObject.caption = null;
-                    messageObject.generateCaption();
+                    messageObject.translated = false;
+                    messageObject.canceledTranslation = true;
+                } else {
+                    messageObject.messageOwner.message = entitiesResult.text;
+                    messageObject.messageOwner.entities = entitiesResult.entities;
+                    messageObject.translated = true;
+                    if (result.additionalInfo instanceof MessageHelper.ReplyMarkupButtonsTexts) {
+                        ((MessageHelper.ReplyMarkupButtonsTexts) result.additionalInfo).applyTextToKeyboard(messageObject.messageOwner.reply_markup.rows);
+                    }
+                    if (fragment == null) {
+                        messageObject.translating = false;
+                        messageObject.caption = null;
+                        messageObject.generateCaption();
+                    }
                 }
+
             }
         } else if (result.translation instanceof TLRPC.TL_poll) {
+            messageObject.translated = true;
             ((TLRPC.TL_messageMediaPoll) messageObject.messageOwner.media).poll = (TLRPC.TL_poll) result.translation;
         }
         if (fragment != null) {
-            fragment.getMessageHelper().resetMessageContent(dialog_id, messageObject, true);
+            fragment.getMessageHelper().resetMessageContent(dialog_id, messageObject, messageObject.translated, messageObject.canceledTranslation);
         }
         return messageObject;
     }
 
     public static MessageObject applyTranslatedMessage(BaseTranslator.Result result, MessageObject messageObject) {
-        return applyTranslatedMessage(result, messageObject, 0, null);
+        return applyTranslatedMessage(result, messageObject, 0, null, false);
     }
 
     public static MessageObject resetTranslatedMessage(long dialog_id, BaseFragment fragment, MessageObject messageObject) {
@@ -93,7 +103,7 @@ public class TranslatorHelper {
         } else if (messageObject.originalMessage instanceof TLRPC.TL_poll) {
             ((TLRPC.TL_messageMediaPoll) messageObject.messageOwner.media).poll = (TLRPC.TL_poll) messageObject.originalMessage;
         }
-        return fragment.getMessageHelper().resetMessageContent(dialog_id, messageObject, false);
+        return fragment.getMessageHelper().resetMessageContent(dialog_id, messageObject, false, true);
     }
 
     public static MessageObject resetTranslatedCaption(MessageObject messageObject) {
