@@ -4187,7 +4187,6 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                                 UpdateManager.UpdateAvailable updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
                                 (new UpdateAlertDialog(LaunchActivity.this, updateAvailable)).show();
                                 OwlConfig.saveUpdateStatus(1);
-                                OwlConfig.saveLastUpdateCheck();
                                 updateAppUpdateViews();
                             }
                         } else {
@@ -4196,6 +4195,7 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                             }
                             OwlConfig.saveUpdateStatus(0);
                         }
+                        OwlConfig.saveLastUpdateCheck();
                     }
 
                     @Override
