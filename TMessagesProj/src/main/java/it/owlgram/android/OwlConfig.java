@@ -220,8 +220,6 @@ public class OwlConfig extends SettingsManager {
             maxRecentStickers = preferences.getInt("maxRecentStickers"+dS, 20);
             betterAudioQuality = preferences.getBoolean("betterAudioQuality"+dS, false);
             useMonetIcon = preferences.getBoolean("useMonetIcon"+dS, false);
-
-            fixLanguageSelected();
             configLoaded = true;
         }
     }
@@ -911,12 +909,5 @@ public class OwlConfig extends SettingsManager {
         int monthOfYear = calendar.get(Calendar.MONTH);
         int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
         return monthOfYear == 1 && dayOfMonth == 1;
-    }
-
-    public static void fixLanguageSelected() {
-        BaseTranslator translator = Translator.getCurrentTranslator();
-        if (translationTarget.equals(translator.getCurrentAppLanguage())) {
-            OwlConfig.setTranslationTarget("app");
-        }
     }
 }

@@ -26,7 +26,6 @@ public class InstallReceiver extends BroadcastReceiver {
         this.onSuccess = onSuccess;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onReceive(Context c, Intent i) {
         if (Intent.ACTION_PACKAGE_ADDED.equals(i.getAction())) {

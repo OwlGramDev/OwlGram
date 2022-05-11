@@ -44,7 +44,6 @@ import org.telegram.ui.Components.LayoutHelper;
 import java.io.File;
 
 @SuppressLint("ViewConstructor")
-@androidx.annotation.RequiresApi(api = android.os.Build.VERSION_CODES.LOLLIPOP)
 public class CameraXView extends BaseCameraView {
     private boolean isStreaming = false;
     private final PreviewView previewView;

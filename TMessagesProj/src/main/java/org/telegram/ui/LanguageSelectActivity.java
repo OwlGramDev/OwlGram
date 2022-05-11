@@ -205,7 +205,6 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                     }
                     preferences.edit().putStringSet("translate_button_restricted_languages", newSelectedLanguages).apply();
 
-                    OwlConfig.fixLanguageSelected();
                     finishFragment();
                 }
             } catch (Exception e) {

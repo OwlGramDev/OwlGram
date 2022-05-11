@@ -35,7 +35,6 @@ public class ApkInstaller {
     @SuppressLint("StaticFieldLeak")
     private static UpdateInstallingDialog updateInstallingDialog;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private static void prepareApkFile(Activity context, File apk) {
         int flag = PendingIntent.FLAG_UPDATE_CURRENT;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -135,7 +134,6 @@ public class ApkInstaller {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private static float checkInstallation(Context context) {
         PackageInstaller installer = context.getPackageManager().getPackageInstaller();
         PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
@@ -150,7 +148,6 @@ public class ApkInstaller {
         return statusInstallation;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static void clearUpdates(Context context) {
         PackageInstaller installer = context.getPackageManager().getPackageInstaller();
         PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);

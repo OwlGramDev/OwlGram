@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
@@ -154,11 +156,13 @@ public class SelectLanguageSettings extends BaseFragment {
         targetLanguages.add(0, targetLanguages.get(indexLangEn));
         names.remove(indexLangEn + 1);
         targetLanguages.remove(indexLangEn + 1);
+        int indexLangClient = targetLanguages.indexOf(appLanguage);
+        names.add(0, names.get(indexLangClient));
+        targetLanguages.add(0, targetLanguages.get(indexLangClient));
+        names.remove(indexLangClient + 1);
+        targetLanguages.remove(indexLangClient + 1);
         targetLanguages.add(0, "app");
-        names.add(0, LocaleController.getString("Default", R.string.Default) + " - " + getLanguage(appLanguage));
-        int indexLangApp = targetLanguages.indexOf(appLanguage);
-        names.remove(indexLangApp);
-        targetLanguages.remove(indexLangApp);
+        names.add(0, getLanguage(appLanguage) + " - " + LocaleController.getString("Default", R.string.Default));
         if (!OwlConfig.translationTarget.equals("app")) {
             int indexLangSelected = targetLanguages.indexOf(OwlConfig.translationTarget);
             names.add(0, names.get(indexLangSelected));
@@ -169,8 +173,8 @@ public class SelectLanguageSettings extends BaseFragment {
     }
 
     private static String getLanguage(String language) {
-        Locale locale = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? Locale.forLanguageTag(language) : new Locale(language);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !TextUtils.isEmpty(locale.getScript())) {
+        Locale locale = Locale.forLanguageTag(language);
+        if (!TextUtils.isEmpty(locale.getScript())) {
             return HtmlCompat.fromHtml(String.format("%s - %s", AndroidUtilities.capitalize(locale.getDisplayScript()), AndroidUtilities.capitalize(locale.getDisplayScript(locale))), HtmlCompat.FROM_HTML_MODE_LEGACY).toString();
         } else {
             return String.format("%s - %s", AndroidUtilities.capitalize(locale.getDisplayName()), AndroidUtilities.capitalize(locale.getDisplayName(locale)));
@@ -198,7 +202,7 @@ public class SelectLanguageSettings extends BaseFragment {
         ArrayList<CharSequence> namesTemp = new ArrayList<>();
         for (int i = 0; i < targetLanguages.size(); i++) {
             String[] languages = names.get(i).toString().split(" - ");
-            if (languages[1].toLowerCase().contains(filter) || languages[0].toLowerCase().contains(filter)) {
+            if ((languages.length > 2 ? languages[2]:languages[1]).toLowerCase().contains(filter) || languages[0].toLowerCase().contains(filter)) {
                 targetLanguagesTemp.add(targetLanguages.get(i));
                 namesTemp.add(names.get(i));
             }
@@ -226,7 +230,13 @@ public class SelectLanguageSettings extends BaseFragment {
                     TextRadioCell textRadioCell = (TextRadioCell) holder.itemView;
                     String[] languages = names.get(position - languagesStartRow).toString().split(" - ");
                     boolean isSelectedLanguage = OwlConfig.translationTarget.equals(targetLanguages.get(position - languagesStartRow));
-                    textRadioCell.setTextAndValueAndCheck(languages[1], languages[0], isSelectedLanguage, false, true);
+                    textRadioCell.setTextAndValueAndCheck(
+                            languages.length > 2 ? languages[2]:languages[1],
+                            languages[0],
+                            isSelectedLanguage,
+                            false,
+                            true
+                    );
                     break;
                 case 2:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;

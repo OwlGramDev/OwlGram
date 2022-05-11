@@ -54,7 +54,7 @@ public class EffectSelector extends LinearLayout {
     }
 
     public void loadEffects(CameraXView cameraXView) {
-        if (getChildCount() == 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (getChildCount() == 0) {
             ArrayList<Integer> list_effect = new ArrayList<>();
             if(cameraXView.isNightModeSupported()) {
                 list_effect.add(CameraXController.CAMERA_NIGHT);
