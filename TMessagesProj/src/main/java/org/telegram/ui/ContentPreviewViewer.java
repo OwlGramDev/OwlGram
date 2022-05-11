@@ -33,10 +33,7 @@ import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.ImageLoader;
 import org.telegram.messenger.MediaDataController;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLoader;
@@ -58,7 +55,6 @@ import org.telegram.ui.Cells.ContextLinkCell;
 import org.telegram.ui.Cells.StickerCell;
 import org.telegram.ui.Cells.StickerEmojiCell;
 import org.telegram.ui.Components.AlertsCreator;
-import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.EmojiView;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
@@ -427,7 +423,7 @@ public class ContentPreviewViewer {
     }
 
     public boolean isSendingMode() {
-        return parentActivity == null || windowView == null;
+        return delegate.getClass().getName().contains(EmojiView.class.getName());
     }
 
     public boolean onTouch(MotionEvent event, final RecyclerListView listView, final int height, final Object listener, ContentPreviewViewerDelegate contentPreviewViewerDelegate, Theme.ResourcesProvider resourcesProvider) {
@@ -435,16 +431,16 @@ public class ContentPreviewViewer {
         this.resourcesProvider = resourcesProvider;
         if (openPreviewRunnable != null || isVisible()) {
             if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_POINTER_UP) {
-                if (!OwlConfig.confirmStickersGIFs && isSendingMode()) {
+                if (!OwlConfig.confirmStickersGIFs || !isSendingMode()) {
                     AndroidUtilities.runOnUIThread(() -> {
-                        if (listView instanceof RecyclerListView) {
+                        if (listView != null) {
                             listView.setOnItemClickListener((RecyclerListView.OnItemClickListener) listener);
                         }
                     }, 150);
                 } else {
                     confirmSending();
                 }
-                if (openPreviewRunnable != null && !OwlConfig.confirmStickersGIFs && isSendingMode()) {
+                if (openPreviewRunnable != null && (!OwlConfig.confirmStickersGIFs || !isSendingMode())) {
                     AndroidUtilities.cancelRunOnUIThread(openPreviewRunnable);
                     openPreviewRunnable = null;
                 } else if (openPreviewRunnable != null && isSendingMode()) {
