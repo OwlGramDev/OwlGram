@@ -2274,8 +2274,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             if (str.length() != 0) {
                                 str.append("\n\n");
                             }
-                            String messageContent = getMessageContent(messageObject, previousUid, ids.size() != 1 && (currentUser == null || !currentUser.self));
-                            str.append(new SpannableString(EntitiesHelper.getSpannableString(messageContent, messageObject.messageOwner.entities)));
+                            SpannableString messageContent = getMessageContent(messageObject, previousUid, ids.size() != 1 && (currentUser == null || !currentUser.self));
+                            str.append(messageContent);
                             previousUid = messageObject.getFromChatId();
                         }
                     }
@@ -23099,7 +23099,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    private String getMessageContent(MessageObject messageObject, long previousUid, boolean name) {
+    private SpannableString getMessageContent(MessageObject messageObject, long previousUid, boolean name) {
         String str = "";
         if (name) {
             long fromId = messageObject.getFromChatId();
@@ -23117,6 +23117,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             }
         }
+        int offset = str.length();
         String restrictionReason = MessagesController.getRestrictionReason(messageObject.messageOwner.restriction_reason);
         if (!TextUtils.isEmpty(restrictionReason)) {
             str += restrictionReason;
@@ -23127,7 +23128,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         } else {
             str += messageObject.messageText;
         }
-        return str;
+        return new SpannableString(EntitiesHelper.getSpannableString(str, messageObject.messageOwner.entities, offset));
     }
 
     private void unpinMessage(MessageObject messageObject) {
@@ -23344,10 +23345,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         finalText = new SpannableString(EntitiesHelper.getSpannableString(caption.toString(), selectedObject.messageOwner.entities));
                         AndroidUtilities.addToClipboard(finalText);
                     } else {
-                        String messageContent = getMessageContent(selectedObject, 0, false);
-                        SpannableString finalText = new SpannableString(messageContent);
-                        finalText = new SpannableString(EntitiesHelper.getSpannableString(messageContent, selectedObject.messageOwner.entities));
-                        AndroidUtilities.addToClipboard(finalText);
+                        SpannableString messageContent = getMessageContent(selectedObject, 0, false);
+                        AndroidUtilities.addToClipboard(messageContent);
                     }
                 }
                 undoView.showWithAction(0, UndoView.ACTION_MESSAGE_COPIED, null);

@@ -119,6 +119,14 @@ public class EntitiesHelper {
                 "[\u231A\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA]\uFE0F?)+");
     }
 
+    public static Spanned getSpannableString(String text, ArrayList<TLRPC.MessageEntity> entities, int offset) {
+        for (int a = 0; a < entities.size(); a++) {
+            TLRPC.MessageEntity entity = entities.get(a);
+            entity.offset = entity.offset + offset;
+        }
+        return getSpannableString(text, entities, false);
+    }
+
     public static Spanned getSpannableString(String text, ArrayList<TLRPC.MessageEntity> entities) {
         return getSpannableString(text, entities, false);
     }
