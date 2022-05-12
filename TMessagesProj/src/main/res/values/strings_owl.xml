@@ -255,4 +255,5 @@
     <string name="MessagesAlreadyInX">You cannot translate %1$d messages since they are already in %2$s.</string>
     <string name="CopyPhoto">Copy Photo</string>
     <string name="PhotoCopied">Photo copied to clipboard.</string>
+    <string name="AccountNameTitleBar">Account Name on the Title Bar</string>
 </resources>

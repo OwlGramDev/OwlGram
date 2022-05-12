@@ -83,6 +83,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean searchIconInActionBar;
     public static boolean useMonetIcon;
     public static boolean autoTranslate;
+    public static boolean showNameInActionBar;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -212,6 +213,7 @@ public class OwlConfig extends SettingsManager {
             searchIconInActionBar = preferences.getBoolean("searchIconInActionBar", false);
             autoTranslate = preferences.getBoolean("autoTranslate", false);
             showCopyPhoto = preferences.getBoolean("showCopyPhoto", false);
+            showNameInActionBar = preferences.getBoolean("showNameInActionBar", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -519,6 +521,14 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showCopyPhoto", showCopyPhoto);
+        editor.apply();
+    }
+
+    public static void toggleShowNameInActionBar() {
+        showNameInActionBar = !showNameInActionBar;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showNameInActionBar", showNameInActionBar);
         editor.apply();
     }
 

@@ -2238,10 +2238,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (folderId != 0) {
                 actionBar.setTitle(LocaleController.getString("ArchivedChats", R.string.ArchivedChats));
             } else {
-                if (BuildVars.DEBUG_VERSION) {
-                    actionBar.setTitle("OwlGram Beta");
+                if (OwlConfig.showNameInActionBar) {
+                    TLRPC.User selfUser = UserConfig.getInstance(currentAccount).getCurrentUser();
+                    actionBar.setTitle(selfUser.first_name + " " + selfUser.last_name);
                 } else {
-                    actionBar.setTitle("OwlGram");
+                    actionBar.setTitle(LocaleController.getString("BuildAppName", R.string.BuildAppName));
                 }
             }
             if (folderId == 0) {
