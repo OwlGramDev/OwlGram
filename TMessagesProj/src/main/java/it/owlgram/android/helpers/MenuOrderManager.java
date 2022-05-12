@@ -28,6 +28,7 @@ public class MenuOrderManager {
             "telegram_features",
             "archived_messages",
             "datacenter_status",
+            "qr_login",
     };
 
     static {
@@ -300,6 +301,13 @@ public class MenuOrderManager {
                 new EditableMenuItem(
                         list_items[12],
                         LocaleController.getString("DatacenterStatus", R.string.DatacenterStatus),
+                        false
+                )
+        );
+        list.add(
+                new EditableMenuItem(
+                        list_items[13],
+                        LocaleController.getString("AuthAnotherClient", R.string.AuthAnotherClient),
                         false
                 )
         );

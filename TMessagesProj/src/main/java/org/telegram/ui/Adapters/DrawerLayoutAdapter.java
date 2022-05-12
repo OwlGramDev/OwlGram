@@ -339,45 +339,48 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
 
                 switch (data.id) {
                     case "new_group":
-                        items.add(new Item(2, LocaleController.getString("NewGroup", R.string.NewGroup), newGroupIcon));
+                        items.add(new Item(2, data.text, newGroupIcon));
                         break;
                     case "new_channel":
-                        items.add(new Item(4, LocaleController.getString("NewChannel", R.string.NewChannel), newChannelIcon));
+                        items.add(new Item(4, data.text, newChannelIcon));
                         break;
                     case "new_secret_chat":
-                        items.add(new Item(3, LocaleController.getString("NewSecretChat", R.string.NewSecretChat), newSecretIcon));
+                        items.add(new Item(3, data.text, newSecretIcon));
                         break;
                     case "contacts":
-                        items.add(new Item(6, LocaleController.getString("Contacts", R.string.Contacts), contactsIcon));
+                        items.add(new Item(6, data.text, contactsIcon));
                         break;
                     case "calls":
-                        items.add(new Item(10, LocaleController.getString("Calls", R.string.Calls), callsIcon));
+                        items.add(new Item(10, data.text, callsIcon));
                         break;
                     case "nearby_people":
                         if (hasGps) {
-                            items.add(new Item(12, LocaleController.getString("PeopleNearby", R.string.PeopleNearby), peopleNearbyIcon));
+                            items.add(new Item(12, data.text, peopleNearbyIcon));
                         }
                         break;
                     case "saved_message":
-                        items.add(new Item(11, LocaleController.getString("SavedMessages", R.string.SavedMessages), savedIcon));
+                        items.add(new Item(11, data.text, savedIcon));
                         break;
                     case "settings":
-                        items.add(new Item(8, LocaleController.getString("Settings", R.string.Settings), settingsIcon));
+                        items.add(new Item(8, data.text, settingsIcon));
                         break;
                     case "owlgram_settings":
-                        items.add(new Item(201, LocaleController.getString("OwlSetting", R.string.OwlSetting), settingsIcon));
+                        items.add(new Item(201, data.text, settingsIcon));
                         break;
                     case "invite_friends":
-                        items.add(new Item(7, LocaleController.getString("InviteFriends", R.string.InviteFriends), inviteIcon));
+                        items.add(new Item(7, data.text, inviteIcon));
                         break;
                     case "telegram_features":
-                        items.add(new Item(13, LocaleController.getString("TelegramFeatures", R.string.TelegramFeatures), helpIcon));
+                        items.add(new Item(13, data.text, helpIcon));
                         break;
                     case "archived_messages":
-                        items.add(new Item(202, LocaleController.getString("ArchivedChats", R.string.ArchivedChats), R.drawable.msg_archive));
+                        items.add(new Item(202, data.text, R.drawable.msg_archive));
                         break;
                     case "datacenter_status":
-                        items.add(new Item(203, LocaleController.getString("DatacenterStatus", R.string.DatacenterStatus), R.drawable.round_construction_white));
+                        items.add(new Item(203, data.text, R.drawable.round_construction_white));
+                        break;
+                    case "qr_login":
+                        items.add(new Item(204, LocaleController.getString("AuthAnotherClient", R.string.AuthAnotherClient), R.drawable.msg_qrcode));
                         break;
                 }
             }
