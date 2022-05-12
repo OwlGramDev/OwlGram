@@ -21745,6 +21745,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                         items.add(LocaleController.getString("SaveToGallery", R.string.SaveToGallery));
                                         options.add(4);
                                         icons.add(R.drawable.msg_gallery);
+                                        if (OwlConfig.showCopyPhoto) {
+                                            items.add(LocaleController.getString("CopyPhoto", R.string.CopyPhoto));
+                                            options.add(209);
+                                            icons.add(R.drawable.msg_copy);
+                                        }
                                     }
                                 }
                             }
@@ -23951,6 +23956,14 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 } else {
                     BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.gigagroup_convert, LocaleController.getString("UpdateToImport", R.string.UpdateToImport), true).show();
                 }
+                break;
+            }
+            case 209: {
+                getMessageHelper().addMessageToClipboard(selectedObject, () -> {
+                    if (BulletinFactory.canShowBulletin(ChatActivity.this)) {
+                        BulletinFactory.of(this).createCopyBulletin(LocaleController.getString("PhotoCopied", R.string.PhotoCopied)).show();
+                    }
+                });
                 break;
             }
             case OPTION_SEND_NOW: {

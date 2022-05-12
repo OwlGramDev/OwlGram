@@ -1,11 +1,19 @@
 package it.owlgram.android.helpers;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.text.TextUtils;
 
+import androidx.core.content.FileProvider;
+
+import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BaseController;
+import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.MediaController;
@@ -273,6 +281,26 @@ public class MessageHelper extends BaseController {
                     button2.text = row.get(b);
                 }
             }
+        }
+    }
+
+    public void addMessageToClipboard(MessageObject selectedObject, Runnable callback) {
+        String path = getPathToMessage(selectedObject);
+        if (!TextUtils.isEmpty(path)) {
+            addFileToClipboard(new File(path), callback);
+        }
+    }
+
+    public static void addFileToClipboard(File file, Runnable callback) {
+        try {
+            Context context = ApplicationLoader.applicationContext;
+            ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file);
+            ClipData clip = ClipData.newUri(context.getContentResolver(), "label", uri);
+            clipboard.setPrimaryClip(clip);
+            callback.run();
+        } catch (Exception e) {
+            FileLog.e(e);
         }
     }
 }

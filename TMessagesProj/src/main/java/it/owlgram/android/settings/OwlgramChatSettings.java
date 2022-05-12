@@ -71,7 +71,8 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
     private int showRepeatRow;
     private int showNoQuoteForwardRow;
     private int showReportRow;
-    private int showMessageDetails;
+    private int showMessageDetailsRow;
+    private int showCopyPhotoRow;
     private int audioVideoDividerRow;
     private int audioVideoHeaderRow;
     private int rearCameraStartingRow;
@@ -202,7 +203,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                 if (view instanceof TextCheckbox2Cell) {
                     ((TextCheckbox2Cell) view).setChecked(OwlConfig.showRepeat);
                 }
-            } else if (position == showMessageDetails) {
+            } else if (position == showMessageDetailsRow) {
                 OwlConfig.toggleShowMessageDetails();
                 if (view instanceof TextCheckbox2Cell) {
                     ((TextCheckbox2Cell) view).setChecked(OwlConfig.showMessageDetails);
@@ -226,6 +227,11 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                 OwlConfig.toggleShowDeleteDownloadedFile();
                 if (view instanceof TextCheckbox2Cell) {
                     ((TextCheckbox2Cell) view).setChecked(OwlConfig.showDeleteDownloadedFile);
+                }
+            } else if (position == showCopyPhotoRow) {
+                OwlConfig.toggleShowCopyPhoto();
+                if (view instanceof TextCheckbox2Cell) {
+                    ((TextCheckbox2Cell) view).setChecked(OwlConfig.showCopyPhoto);
                 }
             } else if (position == showHideAllTab) {
                 OwlConfig.toggleHideAllTab();
@@ -341,12 +347,13 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
 
         messageMenuHeaderRow = rowCount++;
         showDeleteRow = rowCount++;
+        showCopyPhotoRow = rowCount++;
         showNoQuoteForwardRow = rowCount++;
         showAddToSMRow = rowCount++;
         showRepeatRow = rowCount++;
         showTranslateRow = rowCount++;
         showReportRow = rowCount++;
-        showMessageDetails = rowCount++;
+        showMessageDetailsRow = rowCount++;
 
         if (listAdapter != null && notify) {
             listAdapter.notifyDataSetChanged();
@@ -481,8 +488,10 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                         textCheckbox2Cell.setTextAndCheck(LocaleController.getString("TranslateMessage", R.string.TranslateMessage), OwlConfig.showTranslate, true);
                     } else if (position == showReportRow) {
                         textCheckbox2Cell.setTextAndCheck(LocaleController.getString("ReportChat", R.string.ReportChat), OwlConfig.showReportMessage, true);
-                    } else if (position == showMessageDetails) {
+                    } else if (position == showMessageDetailsRow) {
                         textCheckbox2Cell.setTextAndCheck(LocaleController.getString("MessageDetails", R.string.MessageDetails), OwlConfig.showMessageDetails, false);
+                    } else if (position == showCopyPhotoRow) {
+                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("CopyPhoto", R.string.CopyPhoto), OwlConfig.showCopyPhoto, true);
                     }
                     break;
             }
@@ -587,7 +596,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                 return 7;
             } else if (position == showDeleteRow || position == showNoQuoteForwardRow || position == showAddToSMRow ||
                     position == showRepeatRow || position == showTranslateRow || position == showReportRow ||
-                    position == showMessageDetails) {
+                    position == showMessageDetailsRow || position == showCopyPhotoRow) {
                 return 8;
             }
             return 1;

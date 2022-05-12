@@ -253,4 +253,6 @@
     <string name="Select">Select</string>
     <string name="MessageAlreadyInX">You cannot translate 1 message since it is already in %1$s.</string>
     <string name="MessagesAlreadyInX">You cannot translate %1$d messages since they are already in %2$s.</string>
+    <string name="CopyPhoto">Copy Photo</string>
+    <string name="PhotoCopied">Photo copied to clipboard.</string>
 </resources>

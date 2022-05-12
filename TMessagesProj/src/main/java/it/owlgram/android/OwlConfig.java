@@ -44,6 +44,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean showSaveMessage;
     public static boolean showRepeat;
     public static boolean showNoQuoteForward;
+    public static boolean showCopyPhoto;
     public static boolean showMessageDetails;
     public static boolean betaUpdates;
     public static boolean notifyUpdates;
@@ -210,6 +211,7 @@ public class OwlConfig extends SettingsManager {
             idType = preferences.getInt("idType", 0);
             searchIconInActionBar = preferences.getBoolean("searchIconInActionBar", false);
             autoTranslate = preferences.getBoolean("autoTranslate", false);
+            showCopyPhoto = preferences.getBoolean("showCopyPhoto", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -509,6 +511,14 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showDeleteDownloadedFile", showDeleteDownloadedFile);
+        editor.apply();
+    }
+
+    public static void toggleShowCopyPhoto() {
+        showCopyPhoto = !showCopyPhoto;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showCopyPhoto", showCopyPhoto);
         editor.apply();
     }
 
