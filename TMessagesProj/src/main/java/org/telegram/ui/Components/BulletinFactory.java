@@ -221,6 +221,22 @@ public final class BulletinFactory {
     }
 
     @CheckResult
+    public Bulletin createCopyBulletin(String message, int backgroundColor, int textColor) {
+        if (!AndroidUtilities.shouldShowClipboardToast()) {
+            return new Bulletin.EmptyBulletin();
+        }
+        Bulletin.LottieLayout layout;
+        if (backgroundColor != 0 && textColor != 0) {
+            layout = new Bulletin.LottieLayout(getContext(), resourcesProvider, backgroundColor, textColor);
+        } else {
+            layout = new Bulletin.LottieLayout(getContext(), resourcesProvider);
+        }
+        layout.setAnimation(R.raw.copy, 36, 36, "NULL ROTATION", "Back", "Front");
+        layout.textView.setText(message);
+        return create(layout, Bulletin.DURATION_SHORT);
+    }
+
+    @CheckResult
     public Bulletin createCopyLinkBulletin(boolean isPrivate, Theme.ResourcesProvider resourcesProvider) {
         if (!AndroidUtilities.shouldShowClipboardToast()) {
             return new Bulletin.EmptyBulletin();
