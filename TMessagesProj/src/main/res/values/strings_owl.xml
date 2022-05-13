@@ -256,4 +256,5 @@
     <string name="CopyPhoto">Copy Photo</string>
     <string name="PhotoCopied">Photo copied to clipboard.</string>
     <string name="AccountNameTitleBar">Account Name on the Title Bar</string>
+    <string name="SendAsEmoji">Send as emoji</string>
 </resources>

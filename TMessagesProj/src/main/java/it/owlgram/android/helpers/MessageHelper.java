@@ -14,6 +14,8 @@ import androidx.core.content.FileProvider;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BaseController;
 import org.telegram.messenger.BuildConfig;
+import org.telegram.messenger.ChatObject;
+import org.telegram.messenger.DialogObject;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.MediaController;
@@ -22,6 +24,7 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.ChatActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -302,5 +305,14 @@ public class MessageHelper extends BaseController {
         } catch (Exception e) {
             FileLog.e(e);
         }
+    }
+
+    public static boolean canSendAsDice(String text, ChatActivity parentFragment, long dialog_id) {
+        boolean canSendGames = true;
+        if (DialogObject.isChatDialog(dialog_id)) {
+            TLRPC.Chat chat = parentFragment.getMessagesController().getChat(-dialog_id);
+            canSendGames = ChatObject.canSendStickers(chat);
+        }
+        return canSendGames && parentFragment.getMessagesController().diceEmojies.contains(text.replace("\ufe0f", ""));
     }
 }

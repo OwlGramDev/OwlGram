@@ -154,6 +154,7 @@ import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.helpers.EntitiesHelper;
+import it.owlgram.android.helpers.MessageHelper;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
 
@@ -3680,6 +3681,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
     }
 
     private boolean oldMDCheck = false;
+    private boolean oldSendGamesCheck = false;
     @SuppressLint("ClickableViewAccessibility")
     private boolean onSendLongClick(View view) {
         if (isInScheduleMode()) {
@@ -3688,8 +3690,10 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
 
         boolean self = parentFragment != null && UserObject.isUserSelf(parentFragment.getCurrentUser());
         boolean checkMD = EntitiesHelper.containsMarkdown(messageEditText.getText());
-        if (sendPopupLayout == null || oldMDCheck != checkMD) {
+        boolean checkGames = MessageHelper.canSendAsDice(messageEditText.getText().toString(), parentFragment, dialog_id);
+        if (sendPopupLayout == null || oldMDCheck != checkMD || oldSendGamesCheck != checkGames) {
             oldMDCheck = checkMD;
+            oldSendGamesCheck = checkGames;
             sendPopupLayout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(parentActivity, resourcesProvider);
             sendPopupLayout.setAnimationEnabled(false);
             sendPopupLayout.setOnTouchListener(new OnTouchListener() {
@@ -3755,14 +3759,25 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                         if (sendPopupWindow != null && sendPopupWindow.isShowing()) {
                             sendPopupWindow.dismiss();
                         }
-                        sendMessageInternal(true, 0, false);
+                        sendMessageInternal(true, 0, false, true);
+                    });
+                    sendPopupLayout.addView(sendWithoutMarkdownButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
+                } else if (MessageHelper.canSendAsDice(messageEditText.getText().toString(), parentFragment, dialog_id)) {
+                    ActionBarMenuSubItem sendWithoutMarkdownButton = new ActionBarMenuSubItem(getContext(), false, false, resourcesProvider);
+                    sendWithoutMarkdownButton.setTextAndIcon(LocaleController.getString("SendAsEmoji", R.string.SendAsEmoji), R.drawable.casino_icon);
+                    sendWithoutMarkdownButton.setMinimumWidth(AndroidUtilities.dp(196));
+                    sendWithoutMarkdownButton.setOnClickListener(v -> {
+                        if (sendPopupWindow != null && sendPopupWindow.isShowing()) {
+                            sendPopupWindow.dismiss();
+                        }
+                        sendMessageInternal(true, 0, true, false);
                     });
                     sendPopupLayout.addView(sendWithoutMarkdownButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
                 }
 
                 ActionBarMenuSubItem preSentTranslateButton = new ActionBarMenuSubItem(getContext(), false, false, resourcesProvider);
-                String languageText = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetKeyboardLanguage();
-                preSentTranslateButton.setTextAndIcon(LocaleController.getString("TranslateMessage", R.string.TranslateMessage) + " (" + languageText + ")", R.drawable.round_translate_white_28);
+                String languageText = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetKeyboardLanguage().toUpperCase();
+                preSentTranslateButton.setTextAndIcon(LocaleController.getString("TranslateMessage", R.string.TranslateMessage) + " (" + languageText + ")", R.drawable.translate_inline_icon);
                 preSentTranslateButton.setMinimumWidth(AndroidUtilities.dp(196));
                 preSentTranslateButton.setOnClickListener(v -> {
                     if (sendPopupWindow != null && sendPopupWindow.isShowing()) {
@@ -3775,8 +3790,8 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                         sendPopupWindow.dismiss();
                     }
                     Translator.showTranslationTargetSelector(getContext(), true, () -> {
-                        String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetKeyboardLanguage();
-                        preSentTranslateButton.setTextAndIcon(LocaleController.getString("TranslateMessage", R.string.TranslateMessage) + " (" + language + ")", R.drawable.round_translate_white_28);
+                        String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetKeyboardLanguage().toUpperCase();
+                        preSentTranslateButton.setTextAndIcon(LocaleController.getString("TranslateMessage", R.string.TranslateMessage) + " (" + language + ")", R.drawable.translate_inline_icon);
                         translatePreSend();
                     }, resourcesProvider);
                     return false;
@@ -4801,9 +4816,9 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
 
 
     private void sendMessageInternal(boolean notify, int scheduleDate) {
-        sendMessageInternal(notify, scheduleDate, true);
+        sendMessageInternal(notify, scheduleDate, true, true);
     }
-    private void sendMessageInternal(boolean notify, int scheduleDate, boolean withMarkdown) {
+    private void sendMessageInternal(boolean notify, int scheduleDate, boolean withMarkdown, boolean withGame) {
         if (slowModeTimer == Integer.MAX_VALUE && !isInScheduleMode()) {
             if (delegate != null) {
                 delegate.scrollToSendingMessage();
@@ -4855,7 +4870,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 }
             }
         }
-        if (processSendingText(message, notify, scheduleDate, withMarkdown)) {
+        if (processSendingText(message, notify, scheduleDate, withMarkdown, withGame)) {
             if (delegate.hasForwardingMessages() || (scheduleDate != 0 && !isInScheduleMode()) || isInScheduleMode()) {
                 messageEditText.setText("");
                 if (delegate != null) {
@@ -4918,7 +4933,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         setEditingMessageObject(null, false);
     }
 
-    public boolean processSendingText(CharSequence text, boolean notify, int scheduleDate, boolean withMarkdown) {
+    public boolean processSendingText(CharSequence text, boolean notify, int scheduleDate, boolean withMarkdown, boolean withGame) {
         text = AndroidUtilities.getTrimmedString(text);
         boolean supportsNewEntities = supportsSendingNewEntities();
         int maxLength = accountInstance.getMessagesController().maxMessageLength;
@@ -4978,7 +4993,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                     message[0] = text.toString();
                     entities = new ArrayList<>();
                 }
-                SendMessagesHelper.getInstance(currentAccount).sendMessage(message[0].toString(), dialog_id, replyingMessageObject, getThreadMessage(), messageWebPage, messageWebPageSearch, entities, null, null, notify, scheduleDate, sendAnimationData);
+                SendMessagesHelper.getInstance(currentAccount).sendMessage(message[0].toString(), dialog_id, replyingMessageObject, getThreadMessage(), messageWebPage, messageWebPageSearch, entities, null, null, notify, scheduleDate, sendAnimationData, withGame);
                 start = end + 1;
             } while (end != text.length());
             return true;
