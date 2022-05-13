@@ -3777,7 +3777,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
 
                 ActionBarMenuSubItem preSentTranslateButton = new ActionBarMenuSubItem(getContext(), false, false, resourcesProvider);
                 String languageText = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetKeyboardLanguage().toUpperCase();
-                preSentTranslateButton.setTextAndIcon(LocaleController.getString("TranslateMessage", R.string.TranslateMessage) + " (" + languageText + ")", R.drawable.translate_inline_icon);
+                preSentTranslateButton.setTextAndIcon(LocaleController.getString("TranslateMessage", R.string.TranslateMessage) + " (" + languageText + ")", R.drawable.msg_translate);
                 preSentTranslateButton.setMinimumWidth(AndroidUtilities.dp(196));
                 preSentTranslateButton.setOnClickListener(v -> {
                     if (sendPopupWindow != null && sendPopupWindow.isShowing()) {
@@ -3791,7 +3791,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                     }
                     Translator.showTranslationTargetSelector(getContext(), true, () -> {
                         String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetKeyboardLanguage().toUpperCase();
-                        preSentTranslateButton.setTextAndIcon(LocaleController.getString("TranslateMessage", R.string.TranslateMessage) + " (" + language + ")", R.drawable.translate_inline_icon);
+                        preSentTranslateButton.setTextAndIcon(LocaleController.getString("TranslateMessage", R.string.TranslateMessage) + " (" + language + ")", R.drawable.msg_translate);
                         translatePreSend();
                     }, resourcesProvider);
                     return false;
