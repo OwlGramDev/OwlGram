@@ -2240,7 +2240,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             } else {
                 if (OwlConfig.showNameInActionBar) {
                     TLRPC.User selfUser = UserConfig.getInstance(currentAccount).getCurrentUser();
-                    actionBar.setTitle(selfUser.first_name + " " + selfUser.last_name);
+                    actionBar.setTitle(selfUser.first_name + " " + (selfUser.last_name != null ? selfUser.last_name : ""));
                 } else {
                     actionBar.setTitle(LocaleController.getString("BuildAppName", R.string.BuildAppName));
                 }
