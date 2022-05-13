@@ -157,6 +157,7 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.helpers.MessageHelper;
 
 public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate, ImageReceiver.ImageReceiverDelegate, DownloadController.FileDownloadProgressListener, TextSelectionHelper.SelectableView, NotificationCenter.NotificationCenterDelegate {
 
@@ -10293,10 +10294,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 }
             }
         }
-        if (currentMessageObject.translated) {
-            timeString = LocaleController.getString("MessageTranslated", R.string.MessageTranslated) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
-        } else if (currentMessageObject.translating) {
-            timeString = LocaleController.getString("MessageTranslateProgress", R.string.MessageTranslateProgress) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
+        if (currentMessageObject.translating || currentMessageObject.translated) {
+            timeString = MessageHelper.createTranslateString(getContext(), currentMessageObject) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
         } else if (currentMessageObject.isSponsored()) {
             timeString = LocaleController.getString("SponsoredMessage", R.string.SponsoredMessage);
         } else if (currentMessageObject.scheduled && currentMessageObject.messageOwner.date == 0x7FFFFFFE) {

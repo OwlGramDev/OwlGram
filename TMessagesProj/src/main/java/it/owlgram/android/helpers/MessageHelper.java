@@ -7,9 +7,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.ImageSpan;
 
 import androidx.core.content.FileProvider;
+import androidx.core.text.HtmlCompat;
 
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BaseController;
@@ -18,9 +22,11 @@ import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.DialogObject;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.NotificationCenter;
+import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
@@ -29,6 +35,7 @@ import org.telegram.ui.ChatActivity;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class MessageHelper extends BaseController {
 
@@ -209,6 +216,7 @@ public class MessageHelper extends BaseController {
         obj.originalReplyMarkupRows = messageObject.originalReplyMarkupRows;
         obj.translating = false;
         obj.translated = translated;
+        obj.translatedLanguage = messageObject.translatedLanguage;
         obj.canceledTranslation = canceled;
         if (messageObject.isSponsored()) {
             obj.sponsoredId = messageObject.sponsoredId;
@@ -228,6 +236,21 @@ public class MessageHelper extends BaseController {
         arrayList.add(obj);
         getNotificationCenter().postNotificationName(NotificationCenter.replaceMessagesObjects, dialogId, arrayList, false);
         return obj;
+    }
+
+    public static CharSequence createTranslateString(Context context, MessageObject messageObject) {
+        if (messageObject.translating) {
+            return LocaleController.getString("MessageTranslateProgress", R.string.MessageTranslateProgress);
+        }
+        var translatedLanguage = messageObject.translatedLanguage;
+        if (translatedLanguage == null || translatedLanguage.first == null || translatedLanguage.second == null) {
+            return LocaleController.getString("MessageTranslated", R.string.MessageTranslated);
+        }
+        Locale from = Locale.forLanguageTag(translatedLanguage.first);
+        Locale to = Locale.forLanguageTag(translatedLanguage.second);
+        String fromLanguage = (!TextUtils.isEmpty(from.getScript()) ? String.valueOf(HtmlCompat.fromHtml(from.getDisplayScript(), HtmlCompat.FROM_HTML_MODE_LEGACY)) : from.getDisplayName());
+        String toLanguage = (!TextUtils.isEmpty(to.getScript()) ? String.valueOf(HtmlCompat.fromHtml(to.getDisplayScript(), HtmlCompat.FROM_HTML_MODE_LEGACY)) : to.getDisplayName());
+        return TextUtils.concat(fromLanguage, " → ", toLanguage);
     }
 
     public String getPlainText(MessageObject messageObject) {

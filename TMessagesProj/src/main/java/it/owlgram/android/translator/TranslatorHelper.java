@@ -1,10 +1,10 @@
 package it.owlgram.android.translator;
 
+import androidx.core.util.Pair;
+
 import com.google.android.exoplayer2.util.Log;
 
-import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
-import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.BaseFragment;
 
@@ -43,36 +43,41 @@ public class TranslatorHelper {
     }
 
     public static MessageObject applyTranslatedMessage(BaseTranslator.Result result, MessageObject messageObject, long dialog_id, BaseFragment fragment, boolean autoTranslate) {
-        if (result.translation instanceof String) {
-            if(messageObject.originalEntities != null && result.sourceLanguage != null){
-                String src_lang = result.sourceLanguage.toUpperCase();
-                String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage().toUpperCase();
-                String top_html = "<b>" + LocaleController.formatString("TranslatorLanguageCode", R.string.TranslatorLanguageCode, src_lang + " → " + language) +"</b>\n\n";
-                String result_translation = top_html + result.translation;
-                EntitiesHelper.TextWithMention entitiesResult = EntitiesHelper.getEntities(result_translation, messageObject.originalEntities, !isSupportHTMLMode());
-                String clean_translation = entitiesResult.text.split("\n\n", 2).length > 1 ? entitiesResult.text.split("\n\n", 2)[1] : entitiesResult.text;
-                if (autoTranslate && (clean_translation.equalsIgnoreCase(messageObject.originalMessage.toString()) || DoNotTranslateSettings.getRestrictedLanguages().contains(src_lang.toLowerCase()))) {
-                    messageObject.translating = false;
-                    messageObject.translated = false;
-                    messageObject.canceledTranslation = true;
-                } else {
-                    messageObject.messageOwner.message = entitiesResult.text;
-                    messageObject.messageOwner.entities = entitiesResult.entities;
-                    messageObject.translated = true;
-                    if (result.additionalInfo instanceof MessageHelper.ReplyMarkupButtonsTexts) {
-                        ((MessageHelper.ReplyMarkupButtonsTexts) result.additionalInfo).applyTextToKeyboard(messageObject.messageOwner.reply_markup.rows);
-                    }
-                    if (fragment == null) {
+        if (result.sourceLanguage != null) {
+            String src_lang = result.sourceLanguage.toUpperCase();
+            String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage().toUpperCase();
+            if (result.translation instanceof String) {
+                if(messageObject.originalEntities != null){
+                    EntitiesHelper.TextWithMention entitiesResult = EntitiesHelper.getEntities((String) result.translation, messageObject.originalEntities, !isSupportHTMLMode());
+                    if (autoTranslate && (entitiesResult.text.equalsIgnoreCase(messageObject.originalMessage.toString()) || DoNotTranslateSettings.getRestrictedLanguages().contains(src_lang.toLowerCase()))) {
                         messageObject.translating = false;
-                        messageObject.caption = null;
-                        messageObject.generateCaption();
+                        messageObject.translated = false;
+                        messageObject.canceledTranslation = true;
+                    } else {
+                        messageObject.messageOwner.message = entitiesResult.text;
+                        messageObject.messageOwner.entities = entitiesResult.entities;
+                        messageObject.translated = true;
+                        messageObject.translatedLanguage = Pair.create(src_lang, language);
+                        if (result.additionalInfo instanceof MessageHelper.ReplyMarkupButtonsTexts) {
+                            ((MessageHelper.ReplyMarkupButtonsTexts) result.additionalInfo).applyTextToKeyboard(messageObject.messageOwner.reply_markup.rows);
+                        }
+                        if (fragment == null) {
+                            messageObject.translating = false;
+                            messageObject.caption = null;
+                            messageObject.generateCaption();
+                        }
                     }
                 }
-
+            } else if (result.translation instanceof TLRPC.TL_poll) {
+                messageObject.translated = true;
+                messageObject.translatedLanguage = Pair.create(src_lang, language);
+                ((TLRPC.TL_messageMediaPoll) messageObject.messageOwner.media).poll = (TLRPC.TL_poll) result.translation;
             }
-        } else if (result.translation instanceof TLRPC.TL_poll) {
-            messageObject.translated = true;
-            ((TLRPC.TL_messageMediaPoll) messageObject.messageOwner.media).poll = (TLRPC.TL_poll) result.translation;
+        } else {
+            messageObject.translating = false;
+            messageObject.translated = false;
+            messageObject.canceledTranslation = true;
+            messageObject.translatedLanguage = null;
         }
         if (fragment != null) {
             fragment.getMessageHelper().resetMessageContent(dialog_id, messageObject, messageObject.translated, messageObject.canceledTranslation);
@@ -103,6 +108,7 @@ public class TranslatorHelper {
         } else if (messageObject.originalMessage instanceof TLRPC.TL_poll) {
             ((TLRPC.TL_messageMediaPoll) messageObject.messageOwner.media).poll = (TLRPC.TL_poll) messageObject.originalMessage;
         }
+        messageObject.translatedLanguage = null;
         return fragment.getMessageHelper().resetMessageContent(dialog_id, messageObject, false, true);
     }
 
