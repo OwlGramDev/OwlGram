@@ -357,6 +357,8 @@ public class SettingsManager {
                 case "showIDAndDC":
                 case "buttonStyleType":
                 case "hidePhoneNumber":
+                case "showNameInActionBar":
+                case "useSystemFont":
                     returnStatus = addWithCheck(returnStatus, NEED_FRAGMENT_REBASE);
                     break;
                 case "fullTime":
@@ -366,7 +368,7 @@ public class SettingsManager {
                 case "disableAppBarShadow":
                     returnStatus = addWithCheck(returnStatus, NEED_RECREATE_SHADOW);
                 case "roundedNumbers":
-                case "useSystemFont":
+                case "showPencilIcon":
                     returnStatus = addWithCheck(returnStatus, NEED_FRAGMENT_REBASE_WITH_LAST);
                     break;
             }

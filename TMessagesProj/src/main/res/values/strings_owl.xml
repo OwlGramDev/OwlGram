@@ -256,4 +256,5 @@
     <string name="PhotoCopied">Photo copied to clipboard.</string>
     <string name="AccountNameTitleBar">Account Name on the Title Bar</string>
     <string name="SendAsEmoji">Send as emoji</string>
+    <string name="ShowPencilIcon">Pencil Icon for Edited Messages</string>
 </resources>

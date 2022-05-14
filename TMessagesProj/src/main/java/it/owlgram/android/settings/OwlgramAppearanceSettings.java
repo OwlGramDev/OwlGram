@@ -79,6 +79,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
     private int selectIconRow;
     private int selectIconDividerRow;
     private int showNameInActionBarRow;
+    private int showPencilIconRow;
 
     @Override
     public boolean onFragmentCreate() {
@@ -243,6 +244,12 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                     ((TextCheckCell) view).setChecked(OwlConfig.showNameInActionBar);
                     parentLayout.rebuildAllFragmentViews(false, false);
                 }
+            } else if (position == showPencilIconRow) {
+                OwlConfig.toggleShowPencilIcon();
+                parentLayout.rebuildAllFragmentViews(false, false);
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.showPencilIcon);
+                }
             }
         });
         return fragmentView;
@@ -302,6 +309,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
         }
         messageTimeSwitchRow = rowCount++;
         roundedNumberSwitchRow = rowCount++;
+        showPencilIconRow = rowCount++;
         smartButtonsRow = rowCount++;
         appBarShadowRow = rowCount++;
         slidingTitleRow = rowCount++;
@@ -393,6 +401,8 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                         textCheckCell.setTextAndCheck(LocaleController.getString("SearchIconTitleBar", R.string.SearchIconTitleBar), OwlConfig.searchIconInActionBar, true);
                     } else if (position == showNameInActionBarRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("AccountNameTitleBar", R.string.AccountNameTitleBar), OwlConfig.showNameInActionBar, true);
+                    } else if (position == showPencilIconRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("ShowPencilIcon", R.string.ShowPencilIcon), OwlConfig.showPencilIcon, true);
                     }
                     break;
                 case 4:
@@ -517,7 +527,8 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                     position == drawerDarkenBackgroundRow || position == drawerBlurBackgroundRow || position == showGradientRow ||
                     position == showAvatarRow || position == forcePacmanRow || position == smartButtonsRow ||
                     position == appBarShadowRow|| position == showSantaHatRow || position == showFallingSnowRow ||
-                    position == slidingTitleRow || position == searchIconInActionBarRow || position == showNameInActionBarRow) {
+                    position == slidingTitleRow || position == searchIconInActionBarRow || position == showNameInActionBarRow ||
+                    position == showPencilIconRow) {
                 return 3;
             } else if (position == drawerRow) {
                 return 4;

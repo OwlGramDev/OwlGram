@@ -41,11 +41,15 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 
+import it.owlgram.android.OwlConfig;
+
 public class MessageHelper extends BaseController {
 
     private static final MessageHelper[] Instance = new MessageHelper[UserConfig.MAX_ACCOUNT_COUNT];
     private static SpannableStringBuilder arrowSpan;
     public static Drawable arrowDrawable;
+    public static SpannableStringBuilder editedSpan;
+    public static Drawable editedDrawable;
 
     public MessageHelper(int num) {
         super(num);
@@ -228,6 +232,22 @@ public class MessageHelper extends BaseController {
         arrayList.add(obj);
         getNotificationCenter().postNotificationName(NotificationCenter.replaceMessagesObjects, dialogId, arrayList, false);
         return obj;
+    }
+
+    public static CharSequence createEditedString(MessageObject messageObject) {
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+        if (editedDrawable == null) {
+            editedDrawable = Objects.requireNonNull(ContextCompat.getDrawable(ApplicationLoader.applicationContext, R.drawable.msg_edited)).mutate();
+        }
+        if (editedSpan == null) {
+            editedSpan = new SpannableStringBuilder("\u200B");
+            editedSpan.setSpan(new ColoredImageSpan(editedDrawable), 0, 1, 0);
+        }
+        spannableStringBuilder
+                .append(OwlConfig.showPencilIcon ? editedSpan : LocaleController.getString("EditedMessage", R.string.EditedMessage))
+                .append(' ')
+                .append(LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000));
+        return spannableStringBuilder;
     }
 
     public static CharSequence createTranslateString(MessageObject messageObject) {

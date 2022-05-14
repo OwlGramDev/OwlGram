@@ -84,6 +84,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean useMonetIcon;
     public static boolean autoTranslate;
     public static boolean showNameInActionBar;
+    public static boolean showPencilIcon;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -214,6 +215,7 @@ public class OwlConfig extends SettingsManager {
             autoTranslate = preferences.getBoolean("autoTranslate", false);
             showCopyPhoto = preferences.getBoolean("showCopyPhoto", false);
             showNameInActionBar = preferences.getBoolean("showNameInActionBar", false);
+            showPencilIcon = preferences.getBoolean("showPencilIcon", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -665,6 +667,14 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("autoTranslate", autoTranslate);
+        editor.apply();
+    }
+
+    public static void toggleShowPencilIcon() {
+        showPencilIcon = !showPencilIcon;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showPencilIcon", showPencilIcon);
         editor.apply();
     }
 
