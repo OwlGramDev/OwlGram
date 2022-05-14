@@ -869,7 +869,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     private int timeWidth;
     private int timeTextWidth;
     private int timeX;
-    private String currentTimeString;
+    private SpannableStringBuilder currentTimeString;
     private boolean drawTime = true;
     private boolean forceNotDrawTime;
 
@@ -10271,7 +10271,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         } else {
             signString = null;
         }
-        String timeString;
+        CharSequence timeString;
         TLRPC.User author = null;
         if (currentMessageObject.isFromUser()) {
             author = MessagesController.getInstance(currentAccount).getUser(fromId);
@@ -10295,7 +10295,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
         }
         if (currentMessageObject.translating || currentMessageObject.translated) {
-            timeString = MessageHelper.createTranslateString(getContext(), currentMessageObject) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
+            timeString = MessageHelper.createTranslateString(currentMessageObject);;
         } else if (currentMessageObject.isSponsored()) {
             timeString = LocaleController.getString("SponsoredMessage", R.string.SponsoredMessage);
         } else if (currentMessageObject.scheduled && currentMessageObject.messageOwner.date == 0x7FFFFFFE) {
@@ -10305,16 +10305,18 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         } else {
             timeString = LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
         }
+        currentTimeString = new SpannableStringBuilder(timeString);
         if (signString != null) {
             if (messageObject.messageOwner.fwd_from != null && messageObject.messageOwner.fwd_from.imported) {
-                currentTimeString = " " + timeString;
+                currentTimeString.insert(0, " ");
             } else {
-                currentTimeString = ", " + timeString;
+                currentTimeString.insert(0, ", ");
             }
-        } else {
-            currentTimeString = timeString;
         }
-        timeTextWidth = timeWidth = (int) Math.ceil(Theme.chat_timePaint.measureText(currentTimeString));
+        timeTextWidth = timeWidth = (int) Math.ceil(Theme.chat_timePaint.measureText(currentTimeString.toString()));
+        if (timeString instanceof SpannableStringBuilder) {
+            timeTextWidth = timeWidth += MessageHelper.arrowDrawable.getIntrinsicWidth();
+        }
         if (currentMessageObject.scheduled && currentMessageObject.messageOwner.date == 0x7FFFFFFE) {
             timeWidth -= AndroidUtilities.dp(8);
         }
@@ -10366,7 +10368,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     width = widthForSign;
                 }
             }
-            currentTimeString = signString + currentTimeString;
+            currentTimeString.insert(0, signString);
             timeTextWidth += width;
             timeWidth += width;
         }

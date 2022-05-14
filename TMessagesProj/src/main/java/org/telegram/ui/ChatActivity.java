@@ -23280,7 +23280,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         TranslatorHelper.translate(new TranslatorHelper.TranslatorContext(messageObject), new TranslatorHelper.TranslateCallback() {
             @Override
             public void onTranslate(BaseTranslator.Result result) {
-                TranslatorHelper.applyTranslatedMessage(result, messageObject, dialog_id, ChatActivity.this, isAutoTranslate);
+                new Thread() {
+                    @Override
+                    public void run() {
+                        TranslatorHelper.applyTranslatedMessage(result, messageObject, dialog_id, ChatActivity.this, isAutoTranslate);
+                    }
+                }.start();
             }
 
             @Override

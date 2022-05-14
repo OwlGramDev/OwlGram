@@ -4,6 +4,7 @@ import androidx.core.util.Pair;
 
 import com.google.android.exoplayer2.util.Log;
 
+import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.MessageObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -80,7 +81,7 @@ public class TranslatorHelper {
             messageObject.translatedLanguage = null;
         }
         if (fragment != null) {
-            fragment.getMessageHelper().resetMessageContent(dialog_id, messageObject, messageObject.translated, messageObject.canceledTranslation);
+            AndroidUtilities.runOnUIThread(() ->  fragment.getMessageHelper().resetMessageContent(dialog_id, messageObject, messageObject.translated, messageObject.canceledTranslation));
         }
         return messageObject;
     }

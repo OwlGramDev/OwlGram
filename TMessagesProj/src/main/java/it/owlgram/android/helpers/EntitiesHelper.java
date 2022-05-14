@@ -106,7 +106,7 @@ public class EntitiesHelper {
         return html_result;
     }
 
-    private static boolean isEmoji(String message){
+    public static boolean isEmoji(String message){
         return message.matches("(?:[\uD83D\uDE00-\uD83D\uDE4F]|" +
                 "[\u2600-\u26FF]\uFE0F?|[\u2700-\u27BF]\uFE0F?|\u24C2\uFE0F?|" +
                 "[\uD83C\uDDE6-\uD83C\uDDFF]{1,2}|" +
