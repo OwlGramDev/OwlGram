@@ -377,7 +377,7 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
                         items.add(new Item(202, data.text, R.drawable.msg_archive));
                         break;
                     case "datacenter_status":
-                        items.add(new Item(203, data.text, R.drawable.round_construction_white));
+                        items.add(new Item(203, data.text, R.drawable.datacenter_status));
                         break;
                     case "qr_login":
                         items.add(new Item(204, LocaleController.getString("AuthAnotherClient", R.string.AuthAnotherClient), R.drawable.msg_qrcode));
