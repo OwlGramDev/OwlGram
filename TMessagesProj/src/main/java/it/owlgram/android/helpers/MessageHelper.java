@@ -244,6 +244,7 @@ public class MessageHelper extends BaseController {
             editedSpan.setSpan(new ColoredImageSpan(editedDrawable), 0, 1, 0);
         }
         spannableStringBuilder
+                .append(' ')
                 .append(OwlConfig.showPencilIcon ? editedSpan : LocaleController.getString("EditedMessage", R.string.EditedMessage))
                 .append(' ')
                 .append(LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000));
