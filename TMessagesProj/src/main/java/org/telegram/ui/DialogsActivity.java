@@ -196,6 +196,7 @@ import it.owlgram.android.components.MonetAndroidFixDialog;
 import it.owlgram.android.components.SendOptionsMenuLayout;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.IconsHelper;
+import it.owlgram.android.helpers.PasscodeHelper;
 import it.owlgram.android.updates.ApkDownloader;
 import it.owlgram.android.updates.UpdateManager;
 
@@ -2650,6 +2651,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
             for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
                 TLRPC.User u = AccountInstance.getInstance(a).getUserConfig().getCurrentUser();
+                if (PasscodeHelper.isDoubleBottomAccount(u.id)) continue;
                 if (u != null) {
                     AccountSelectCell cell = new AccountSelectCell(context, false);
                     cell.setAccount(a, true);

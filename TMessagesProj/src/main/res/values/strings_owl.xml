@@ -257,4 +257,14 @@
     <string name="AccountNameTitleBar">Account Name on the Title Bar</string>
     <string name="SendAsEmoji">Send as emoji</string>
     <string name="ShowPencilIcon">Pencil Icon for Edited Messages</string>
+    <string name="DoubleBottom">Double Bottom</string>
+    <string name="DoubleBottomDesc">When the double bottom is on, tap the lock icon on the chats page and enter the unique passcode to access your hidden account.</string>
+    <string name="DoubleBottomHint">Hide your accounts and access them by using a unique passcode.</string>
+    <string name="EnableDoubleBottom">Enable Double Bottom</string>
+    <string name="CreatePasscodeInfoPIN2">Please enter any 4 digits that you will use to unlock your Telegram account.</string>
+    <string name="CreatePasscodeInfoPassword2">Please enter the password you will use to unlock your Telegram account.</string>
+    <string name="SelectAccountDesc">Choose the account to lock with the passcode.</string>
+    <string name="PasscodeAlreadyUsed"> Passcode already used. Please choose another one.</string>
+    <string name="DisableDoubleBottom">Disable Double Bottom</string>
+    <string name="DisableDoubleBottomConfirmMessage">Are you sure you want to turn off Double Bottom?</string>
 </resources>

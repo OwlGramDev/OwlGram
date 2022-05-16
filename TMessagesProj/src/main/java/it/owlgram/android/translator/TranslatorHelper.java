@@ -98,12 +98,6 @@ public class TranslatorHelper {
                 messageObject.messageOwner.entities = new ArrayList<>(messageObject.originalEntities);
             }
             if(messageObject.originalReplyMarkupRows != null){
-                for (int i = 0; i < messageObject.messageOwner.reply_markup.rows.size(); i++) {
-                    ArrayList<TLRPC.KeyboardButton> buttonsRow = new ArrayList<>(messageObject.messageOwner.reply_markup.rows.get(i).buttons);
-                    for (int j = 0; j < buttonsRow.size(); j++) {
-                        Log.e("Translator", "resetTranslatedMessage: " + buttonsRow.get(j).text);
-                    }
-                }
                 ((MessageHelper.ReplyMarkupButtonsTexts) messageObject.originalReplyMarkupRows).applyTextToKeyboard(messageObject.messageOwner.reply_markup.rows);
             }
         } else if (messageObject.originalMessage instanceof TLRPC.TL_poll) {

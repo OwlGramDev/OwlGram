@@ -52,6 +52,7 @@ public class UserCell extends FrameLayout {
     private TextView adminTextView;
     private TextView addButton;
     private ImageView mutualView;
+    private ImageView checkImageView;
 
     private AvatarDrawable avatarDrawable;
     private Object currentObject;
@@ -80,10 +81,14 @@ public class UserCell extends FrameLayout {
     }
 
     public UserCell(Context context, int padding, int checkbox, boolean admin, boolean needAddButton) {
-        this(context, padding, checkbox, admin, needAddButton, false);
+        this(context, padding, checkbox, admin, needAddButton, false, false);
     }
 
     public UserCell(Context context, int padding, int checkbox, boolean admin, boolean needAddButton, boolean needMutualIcon) {
+        this(context, padding, checkbox, admin, needAddButton, needMutualIcon, false);
+    }
+
+    public UserCell(Context context, int padding, int checkbox, boolean admin, boolean needAddButton, boolean needMutualIcon, boolean needRightCheck) {
         super(context);
 
         int additionalPadding;
@@ -158,6 +163,13 @@ public class UserCell extends FrameLayout {
             addView(mutualView, LayoutHelper.createFrame(40, 40, (LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT) | Gravity.CENTER_VERTICAL, LocaleController.isRTL ? 8 : 0, 0, LocaleController.isRTL ? 0 : 8, 0));
         }
 
+        if (needRightCheck) {
+            checkImageView = new ImageView(context);
+            checkImageView.setImageResource(R.drawable.account_check);
+            checkImageView.setScaleType(ImageView.ScaleType.CENTER);
+            checkImageView.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_switchTrackChecked), PorterDuff.Mode.MULTIPLY));
+            addView(checkImageView, LayoutHelper.createFrame(40, LayoutHelper.MATCH_PARENT, (LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT) | Gravity.TOP, LocaleController.isRTL ? 8 : 0, 0, LocaleController.isRTL ? 0 : 8, 0));
+        }
         setFocusable(true);
     }
 
@@ -206,6 +218,11 @@ public class UserCell extends FrameLayout {
 
     public CharSequence getName() {
         return nameTextView.getText();
+    }
+
+    public void setCheckedRight(boolean enabled) {
+        super.setEnabled(enabled);
+        checkImageView.setAlpha(enabled ? 1.0f : 0f);
     }
 
     public void setData(Object object, CharSequence name, CharSequence status, int resId) {

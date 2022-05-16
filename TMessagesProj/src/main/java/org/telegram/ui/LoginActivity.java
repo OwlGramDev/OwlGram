@@ -158,6 +158,7 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.helpers.PasscodeHelper;
 
 @SuppressLint("HardwareIds")
 public class LoginActivity extends BaseFragment {
@@ -1489,6 +1490,7 @@ public class LoginActivity extends BaseFragment {
     }
 
     private void onAuthSuccess(TLRPC.TL_auth_authorization res, boolean afterSignup) {
+        PasscodeHelper.removePasscodeForAccount(res.user.id);
         MessagesController.getInstance(currentAccount).cleanup();
         ConnectionsManager.getInstance(currentAccount).setUserId(res.user.id);
         UserConfig.getInstance(currentAccount).clearConfig();

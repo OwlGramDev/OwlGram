@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.helpers.MenuOrderManager;
+import it.owlgram.android.helpers.PasscodeHelper;
 
 public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
 
@@ -224,6 +225,7 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
     private void resetItems() {
         accountNumbers.clear();
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+            if (PasscodeHelper.isDoubleBottomAccount(UserConfig.getInstance(a).getClientUserId())) continue;
             if (UserConfig.getInstance(a).isClientActivated()) {
                 accountNumbers.add(a);
             }

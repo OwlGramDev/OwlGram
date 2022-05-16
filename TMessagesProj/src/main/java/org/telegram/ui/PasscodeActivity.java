@@ -93,6 +93,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import it.owlgram.android.helpers.PasscodeHelper;
+import it.owlgram.android.settings.DoubleBottomSettings;
+import it.owlgram.android.ui.DoubleBottomIntro;
+
 public class PasscodeActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
     public final static int TYPE_MANAGE_CODE_SETTINGS = 0,
             TYPE_SETUP_CODE = 1,
@@ -118,6 +122,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
     private EditTextBoldCursor passwordEditText;
     private CodeFieldContainer codeFieldContainer;
     private TextView passcodesDoNotMatchTextView;
+    private TextView passcodeAlreadyUsedTextView;
 
     private ImageView passwordButton;
 
@@ -141,6 +146,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
     private int changePasscodeRow;
     private int fingerprintRow;
     private int autoLockRow;
+    private int doubleBottomRow;
     private int autoLockDetailRow;
 
     private int captureHeaderRow;
@@ -159,7 +165,21 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
         AndroidUtilities.updateViewVisibilityAnimated(passcodesDoNotMatchTextView, false);
     };
 
+    private boolean postedHideAlreadyUsedPasscode;
+    private Runnable hideAlreadyUsedPasscode = () -> {
+        postedHideAlreadyUsedPasscode = false;
+        AndroidUtilities.updateViewVisibilityAnimated(passcodeAlreadyUsedTextView, false);
+    };
+
     private Runnable onShowKeyboardCallback;
+
+    private long accountId = -1;
+
+    public PasscodeActivity(@PasscodeActivityType int type, long accountId) {
+        super();
+        this.type = type;
+        this.accountId = accountId;
+    }
 
     public PasscodeActivity(@PasscodeActivityType int type) {
         super();
@@ -371,6 +391,12 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                         if (!SharedConfig.allowScreenCapture) {
                             AlertsCreator.showSimpleAlert(PasscodeActivity.this, LocaleController.getString("ScreenCaptureAlert", R.string.ScreenCaptureAlert));
                         }
+                    } else if (position == doubleBottomRow) {
+                        if (PasscodeHelper.existAtLeastOnePasscode()) {
+                            presentFragment(new DoubleBottomSettings());
+                        } else {
+                            presentFragment(new DoubleBottomIntro(DoubleBottomIntro.CONFIRM_DOUBLE_BOTTOM));
+                        }
                     }
                 });
                 break;
@@ -481,6 +507,14 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                 AndroidUtilities.updateViewVisibilityAnimated(passcodesDoNotMatchTextView, false, 1f, false);
                 frameLayout.addView(passcodesDoNotMatchTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0, 0, 16));
 
+                passcodeAlreadyUsedTextView = new TextView(context);
+                passcodeAlreadyUsedTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+                passcodeAlreadyUsedTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGrayText6));
+                passcodeAlreadyUsedTextView.setText(LocaleController.getString("PasscodeAlreadyUsed", R.string.PasscodeAlreadyUsed));
+                passcodeAlreadyUsedTextView.setPadding(0, AndroidUtilities.dp(12), 0, AndroidUtilities.dp(12));
+                AndroidUtilities.updateViewVisibilityAnimated(passcodeAlreadyUsedTextView, false, 1f, false);
+                frameLayout.addView(passcodeAlreadyUsedTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0, 0, 16));
+
                 outlinePasswordView = new OutlineTextContainerView(context);
                 outlinePasswordView.setText(LocaleController.getString(R.string.EnterPassword));
 
@@ -576,6 +610,10 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                             codeFieldContainer.removeCallbacks(hidePasscodesDoNotMatch);
                             hidePasscodesDoNotMatch.run();
                         }
+                        if (postedHideAlreadyUsedPasscode) {
+                            codeFieldContainer.removeCallbacks(hideAlreadyUsedPasscode);
+                            hideAlreadyUsedPasscode.run();
+                        }
                     }
 
                     @Override
@@ -623,6 +661,10 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                             if (postedHidePasscodesDoNotMatch) {
                                 codeFieldContainer.removeCallbacks(hidePasscodesDoNotMatch);
                                 hidePasscodesDoNotMatch.run();
+                            }
+                            if (postedHideAlreadyUsedPasscode) {
+                                codeFieldContainer.removeCallbacks(hideAlreadyUsedPasscode);
+                                hideAlreadyUsedPasscode.run();
                             }
                         }
 
@@ -890,6 +932,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
             FileLog.e(e);
         }
         autoLockRow = rowCount++;
+        doubleBottomRow = rowCount++;
         autoLockDetailRow = rowCount++;
         captureHeaderRow = rowCount++;
         captureRow = rowCount++;
@@ -920,6 +963,12 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
         String text;
         if (type == TYPE_ENTER_CODE_TO_MANAGE_SETTINGS) {
             text = LocaleController.getString(R.string.EnterYourPasscodeInfo);
+        } else if (accountId != -1) {
+            if (currentPasswordType == SharedConfig.PASSCODE_TYPE_PIN) {
+                text = LocaleController.getString("CreatePasscodeInfoPIN2", R.string.CreatePasscodeInfoPIN2);
+            } else {
+                text = LocaleController.getString("CreatePasscodeInfoPassword2", R.string.CreatePasscodeInfoPassword2);
+            }
         } else if (passcodeSetStep == 0) {
             text = LocaleController.getString(currentPasswordType == SharedConfig.PASSCODE_TYPE_PIN ? R.string.CreatePasscodeInfoPIN : R.string.CreatePasscodeInfoPassword);
         } else text = descriptionTextSwitcher.getCurrentView().getText().toString();
@@ -927,6 +976,12 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
         boolean animate = !(descriptionTextSwitcher.getCurrentView().getText().equals(text) || TextUtils.isEmpty(descriptionTextSwitcher.getCurrentView().getText()));
         if (type == TYPE_ENTER_CODE_TO_MANAGE_SETTINGS) {
             descriptionTextSwitcher.setText(LocaleController.getString(R.string.EnterYourPasscodeInfo), animate);
+        } else if (accountId != -1) {
+            if (currentPasswordType == SharedConfig.PASSCODE_TYPE_PIN) {
+                descriptionTextSwitcher.setText(LocaleController.getString("CreatePasscodeInfoPIN2", R.string.CreatePasscodeInfoPIN2));
+            } else {
+                descriptionTextSwitcher.setText(LocaleController.getString("CreatePasscodeInfoPassword2", R.string.CreatePasscodeInfoPassword2));
+            }
         } else if (passcodeSetStep == 0) {
             descriptionTextSwitcher.setText(LocaleController.getString(currentPasswordType == SharedConfig.PASSCODE_TYPE_PIN ? R.string.CreatePasscodeInfoPIN : R.string.CreatePasscodeInfoPassword), animate);
         }
@@ -962,6 +1017,25 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
     private void processNext() {
         if (currentPasswordType == SharedConfig.PASSCODE_TYPE_PASSWORD && passwordEditText.getText().length() == 0 || currentPasswordType == SharedConfig.PASSCODE_TYPE_PIN && codeFieldContainer.getCode().length() != 4) {
             onPasscodeError();
+            return;
+        }
+
+        if (PasscodeHelper.checkIsAlreadySetPasscode(isPinCode() ? codeFieldContainer.getCode() : passwordEditText.getText().toString())) {
+            AndroidUtilities.updateViewVisibilityAnimated(passcodeAlreadyUsedTextView, true);
+            for (CodeNumberField f : codeFieldContainer.codeField) {
+                f.setText("");
+            }
+            if (isPinCode()) {
+                codeFieldContainer.codeField[0].requestFocus();
+            }
+            passwordEditText.setText("");
+            onPasscodeError();
+
+            codeFieldContainer.removeCallbacks(hideAlreadyUsedPasscode);
+            codeFieldContainer.post(()->{
+                codeFieldContainer.postDelayed(hideAlreadyUsedPasscode, 3000);
+                postedHideAlreadyUsedPasscode = true;
+            });
             return;
         }
 
@@ -1015,18 +1089,24 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                 return;
             }
 
-            boolean isFirst = SharedConfig.passcodeHash.length() == 0;
-            try {
-                SharedConfig.passcodeSalt = new byte[16];
-                Utilities.random.nextBytes(SharedConfig.passcodeSalt);
-                byte[] passcodeBytes = firstPassword.getBytes("UTF-8");
-                byte[] bytes = new byte[32 + passcodeBytes.length];
-                System.arraycopy(SharedConfig.passcodeSalt, 0, bytes, 0, 16);
-                System.arraycopy(passcodeBytes, 0, bytes, 16, passcodeBytes.length);
-                System.arraycopy(SharedConfig.passcodeSalt, 0, bytes, passcodeBytes.length + 16, 16);
-                SharedConfig.passcodeHash = Utilities.bytesToHex(Utilities.computeSHA256(bytes, 0, bytes.length));
-            } catch (Exception e) {
-                FileLog.e(e);
+            boolean isFirst;
+            if (accountId != -1) {
+                isFirst = !PasscodeHelper.existAtLeastOnePasscode();
+                PasscodeHelper.setPasscodeForAccount(firstPassword, accountId);
+            } else {
+                isFirst = SharedConfig.passcodeHash.length() == 0;
+                try {
+                    SharedConfig.passcodeSalt = new byte[16];
+                    Utilities.random.nextBytes(SharedConfig.passcodeSalt);
+                    byte[] passcodeBytes = firstPassword.getBytes("UTF-8");
+                    byte[] bytes = new byte[32 + passcodeBytes.length];
+                    System.arraycopy(SharedConfig.passcodeSalt, 0, bytes, 0, 16);
+                    System.arraycopy(passcodeBytes, 0, bytes, 16, passcodeBytes.length);
+                    System.arraycopy(SharedConfig.passcodeSalt, 0, bytes, passcodeBytes.length + 16, 16);
+                    SharedConfig.passcodeHash = Utilities.bytesToHex(Utilities.computeSHA256(bytes, 0, bytes.length));
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
             }
             SharedConfig.allowScreenCapture = true;
             SharedConfig.passcodeType = currentPasswordType;
@@ -1043,7 +1123,11 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
             animateSuccessAnimation(() -> {
                 getMediaDataController().buildShortcuts();
                 if (isFirst) {
-                    presentFragment(new PasscodeActivity(TYPE_MANAGE_CODE_SETTINGS), true);
+                    if (accountId != -1) {
+                        presentFragment(new DoubleBottomSettings(), true);
+                    } else {
+                        presentFragment(new PasscodeActivity(TYPE_MANAGE_CODE_SETTINGS), true);
+                    }
                 } else {
                     finishFragment();
                 }
@@ -1064,7 +1148,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                 onPasscodeError();
                 return;
             }
-            if (!SharedConfig.checkPasscode(password)) {
+            if (!PasscodeHelper.checkPasscode(getParentActivity(), password) && !SharedConfig.checkPasscode(password)) {
                 SharedConfig.increaseBadPasscodeTries();
                 passwordEditText.setText("");
                 for (CodeNumberField f : codeFieldContainer.codeField) {
@@ -1132,7 +1216,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int position = holder.getAdapterPosition();
-            return position == fingerprintRow || position == autoLockRow || position == captureRow ||
+            return position == fingerprintRow || position == autoLockRow || position == doubleBottomRow || position == captureRow ||
                     position == changePasscodeRow || position == disablePasscodeRow;
         }
 
@@ -1212,6 +1296,8 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                         textCell.setText(LocaleController.getString(R.string.DisablePasscode), false);
                         textCell.setTag(Theme.key_dialogTextRed);
                         textCell.setTextColor(Theme.getColor(Theme.key_dialogTextRed));
+                    } else if (position == doubleBottomRow) {
+                        textCell.setText(LocaleController.getString("DoubleBottom", R.string.DoubleBottom), false);
                     }
                     break;
                 }
@@ -1253,7 +1339,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
         public int getItemViewType(int position) {
             if (position == fingerprintRow || position == captureRow) {
                 return VIEW_TYPE_CHECK;
-            } else if (position == changePasscodeRow || position == autoLockRow || position == disablePasscodeRow) {
+            } else if (position == changePasscodeRow || position == autoLockRow || position == disablePasscodeRow || position == doubleBottomRow) {
                 return VIEW_TYPE_SETTING;
             } else if (position == autoLockDetailRow || position == captureDetailRow || position == hintRow) {
                 return VIEW_TYPE_INFO;
