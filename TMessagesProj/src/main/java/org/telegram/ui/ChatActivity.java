@@ -13830,10 +13830,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 super.onAnimationRepeat(animation);
                                 Drawable image;
                                 if ("select_between".equals((String) replyButton.getTag())) {
-                                    image = getParentActivity().getResources().getDrawable(R.drawable.round_checklist_white_28).mutate();
+                                    image = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.round_checklist_white_28).mutate();
                                     replyButton.setText(LocaleController.getString("ReportSelectMessages", R.string.ReportSelectMessages));
                                 } else {
-                                    image = getParentActivity().getResources().getDrawable(R.drawable.input_reply).mutate();
+                                    image = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.input_reply).mutate();
                                     replyButton.setText(LocaleController.getString("Reply", R.string.Reply));
                                 }
                                 image.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_actionBarActionModeDefaultIcon), PorterDuff.Mode.MULTIPLY));
@@ -13855,10 +13855,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     } else if (newVisibility == View.VISIBLE) {
                         Drawable image;
                         if ("select_between".equals((String) replyButton.getTag())) {
-                            image = getParentActivity().getResources().getDrawable(R.drawable.round_checklist_white_28).mutate();
+                            image = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.round_checklist_white_28).mutate();
                             replyButton.setText(LocaleController.getString("ReportSelectMessages", R.string.ReportSelectMessages));
                         } else {
-                            image = getParentActivity().getResources().getDrawable(R.drawable.input_reply).mutate();
+                            image = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.input_reply).mutate();
                             replyButton.setText(LocaleController.getString("Reply", R.string.Reply));
                         }
                         image.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_actionBarActionModeDefaultIcon), PorterDuff.Mode.MULTIPLY));
