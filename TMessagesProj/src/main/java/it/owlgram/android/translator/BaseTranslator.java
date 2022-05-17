@@ -56,7 +56,8 @@ abstract public class BaseTranslator {
                         if (((AdditionalObjectTranslation) query).translation instanceof TLRPC.Poll) {
                             TLRPC.TL_poll poll = new TLRPC.TL_poll();
                             TLRPC.TL_poll original = (TLRPC.TL_poll) ((AdditionalObjectTranslation) query).translation;
-                            poll.question = (String) translate(original.question, toLang).translation;
+                            Result questionResult = translate(original.question, toLang);
+                            poll.question = (String) questionResult.translation;
                             for (int i = 0; i < original.answers.size(); i++) {
                                 TLRPC.TL_pollAnswer answer = new TLRPC.TL_pollAnswer();
                                 answer.text = (String) translate(original.answers.get(i).text, toLang).translation;
@@ -71,7 +72,7 @@ abstract public class BaseTranslator {
                             poll.multiple_choice = original.multiple_choice;
                             poll.public_voters = original.public_voters;
                             poll.quiz = original.quiz;
-                            AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(new Result(poll, null)));
+                            AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(new Result(poll, questionResult.sourceLanguage)));
                         } else if (((AdditionalObjectTranslation) query).translation instanceof String) {
                             Result result = translate((String)((AdditionalObjectTranslation) query).translation, toLang);
                             if (result != null) {

@@ -176,6 +176,7 @@ import java.util.regex.Pattern;
 import it.owlgram.android.StoreUtils;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateAlertDialog;
+import it.owlgram.android.Crashlytics;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.LanguageHelper;
 import it.owlgram.android.helpers.MonetHelper;
@@ -4788,6 +4789,9 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
     @Override
     protected void onResume() {
         super.onResume();
+        if(!(Thread.getDefaultUncaughtExceptionHandler() instanceof Crashlytics)) {
+            Thread.setDefaultUncaughtExceptionHandler(new Crashlytics());
+        }
         ApkInstaller.checkCanceledInstallation(LaunchActivity.this);
         isResumed = true;
         if (onResumeStaticCallback != null) {

@@ -4672,8 +4672,8 @@ public class AlertsCreator {
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             TLRPC.User u = UserConfig.getInstance(a).getCurrentUser();
-            if (PasscodeHelper.isDoubleBottomAccount(u.id)) continue;
             if (u != null) {
+                if (PasscodeHelper.isDoubleBottomAccount(u.id)) continue;
                 AccountSelectCell cell = new AccountSelectCell(parentActivity, false);
                 cell.setAccount(a, false);
                 cell.setPadding(AndroidUtilities.dp(14), 0, AndroidUtilities.dp(14), 0);

@@ -21,6 +21,7 @@ import androidx.core.graphics.ColorUtils;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.OneUIUtilities;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
@@ -30,7 +31,6 @@ import org.telegram.ui.Components.StickerImageView;
 
 import java.util.Map;
 
-import it.owlgram.android.DeviceUtils;
 import it.owlgram.android.OwlConfig;
 
 @RequiresApi(api = Build.VERSION_CODES.S)
@@ -132,7 +132,7 @@ public class AppLinkVerifyBottomSheet extends BottomSheet {
 
         buttonTextView.setOnClickListener(view -> {
             Intent intent;
-            if (DeviceUtils.isSamsung()) {
+            if (OneUIUtilities.isOneUI()) {
                 intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + context.getPackageName()));
             } else {
                 intent = new Intent(Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS, Uri.parse("package:" + context.getPackageName()));

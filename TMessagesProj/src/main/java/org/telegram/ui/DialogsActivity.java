@@ -82,8 +82,6 @@ import androidx.recyclerview.widget.LinearSmoothScrollerCustom;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.json.JSONObject;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -192,8 +190,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.AppLinkVerifyBottomSheet;
+import it.owlgram.android.components.CrashReportBottomSheet;
 import it.owlgram.android.components.MonetAndroidFixDialog;
 import it.owlgram.android.components.SendOptionsMenuLayout;
+import it.owlgram.android.Crashlytics;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.IconsHelper;
 import it.owlgram.android.helpers.PasscodeHelper;
@@ -2651,8 +2651,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
             for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
                 TLRPC.User u = AccountInstance.getInstance(a).getUserConfig().getCurrentUser();
-                if (PasscodeHelper.isDoubleBottomAccount(u.id)) continue;
                 if (u != null) {
+                    if (PasscodeHelper.isDoubleBottomAccount(u.id)) continue;
                     AccountSelectCell cell = new AccountSelectCell(context, false);
                     cell.setAccount(a, true);
                     switchItem.addSubItem(10 + a, cell, AndroidUtilities.dp(230), AndroidUtilities.dp(48));
@@ -3871,11 +3871,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             FilesMigrationService.checkBottomSheet(this);
         }
+        boolean foundCrashReport = Crashlytics.isCrashed();
         boolean needMonetMigration = IconsHelper.needMonetMigration();
-        if (needMonetMigration) {
+        if (foundCrashReport) {
+            CrashReportBottomSheet.checkBottomSheet(this);
+        }else if (needMonetMigration) {
             MonetAndroidFixDialog.checkBottomSheet(this);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !needMonetMigration) {
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             AppLinkVerifyBottomSheet.checkBottomSheet(this);
         }
         updateMenuButton(false);

@@ -1132,6 +1132,9 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                     finishFragment();
                 }
                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetPasscode);
+                if (accountId != -1) {
+                    NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.mainUserInfoChanged);
+                }
             });
         } else if (type == TYPE_ENTER_CODE_TO_MANAGE_SETTINGS) {
             if (SharedConfig.passcodeRetryInMs > 0) {
@@ -1148,7 +1151,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                 onPasscodeError();
                 return;
             }
-            if (!PasscodeHelper.checkPasscode(getParentActivity(), password) && !SharedConfig.checkPasscode(password)) {
+            if (!SharedConfig.checkPasscode(password)) {
                 SharedConfig.increaseBadPasscodeTries();
                 passwordEditText.setText("");
                 for (CodeNumberField f : codeFieldContainer.codeField) {

@@ -267,4 +267,6 @@
     <string name="PasscodeAlreadyUsed"> Passcode already used. Please choose another one.</string>
     <string name="DisableDoubleBottom">Disable Double Bottom</string>
     <string name="DisableDoubleBottomConfirmMessage">Are you sure you want to turn off Double Bottom?</string>
+    <string name="AppCrashed">Something went wrong</string>
+    <string name="AppCrashedDesc">OwlGram has stopped working. Please, send logs to the developers so that they can fix this bug as soon as possible.</string>
 </resources>
