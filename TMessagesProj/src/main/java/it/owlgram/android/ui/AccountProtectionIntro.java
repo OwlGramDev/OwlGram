@@ -27,7 +27,7 @@ import java.lang.annotation.RetentionPolicy;
 
 import it.owlgram.android.components.AccountSelectList;
 
-public class DoubleBottomIntro extends BaseFragment {
+public class AccountProtectionIntro extends BaseFragment {
     private RLottieImageView imageView;
     private TextView buttonTextView;
     private TextView descriptionText;
@@ -46,7 +46,7 @@ public class DoubleBottomIntro extends BaseFragment {
     })
     public @interface ActionType {}
 
-    public DoubleBottomIntro(@ActionType int type) {
+    public AccountProtectionIntro(@ActionType int type) {
         super();
         currentType = type;
     }
@@ -218,7 +218,7 @@ public class DoubleBottomIntro extends BaseFragment {
         }
         buttonTextView.setOnClickListener(v -> {
             if (currentType == CONFIRM_DOUBLE_BOTTOM) {
-                presentFragment(new DoubleBottomIntro(SELECT_ACCOUNT), true);
+                presentFragment(new AccountProtectionIntro(SELECT_ACCOUNT), true);
             }
         });
         imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
@@ -231,9 +231,9 @@ public class DoubleBottomIntro extends BaseFragment {
         switch (currentType) {
             case CONFIRM_DOUBLE_BOTTOM:
                 imageView.setAnimation(R.raw.double_bottom, 200, 200);
-                titleTextView.setText(LocaleController.getString("DoubleBottom", R.string.DoubleBottom));
-                descriptionText.setText(LocaleController.getString("DoubleBottomDesc", R.string.DoubleBottomDesc));
-                buttonTextView.setText(LocaleController.getString("EnableDoubleBottom", R.string.EnableDoubleBottom));
+                titleTextView.setText(LocaleController.getString("AccountProtection", R.string.AccountProtection));
+                descriptionText.setText(LocaleController.getString("AccountProtectionDesc", R.string.AccountProtectionDesc));
+                buttonTextView.setText(LocaleController.getString("EnableAccountProtection", R.string.EnableAccountProtection));
                 flickerButton = true;
                 break;
             case SELECT_ACCOUNT:

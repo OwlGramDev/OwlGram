@@ -257,16 +257,17 @@
     <string name="AccountNameTitleBar">Account Name on the Title Bar</string>
     <string name="SendAsEmoji">Send as emoji</string>
     <string name="ShowPencilIcon">Pencil Icon for Edited Messages</string>
-    <string name="DoubleBottom">Double Bottom</string>
-    <string name="DoubleBottomDesc">When the double bottom is on, tap the lock icon on the chats page and enter the unique passcode to access your hidden account.</string>
-    <string name="DoubleBottomHint">Hide your accounts and access them by using a unique passcode.</string>
-    <string name="EnableDoubleBottom">Enable Double Bottom</string>
+    <string name="AccountProtection">Account Protection</string>
+    <string name="AccountProtectionDesc">Protect your accounts with a unique passcode. Tap the lock icon on the chats page to access them.</string>
+    <string name="AccountProtectionHint1">Tap the lock icon on the chats page to access your hidden accounts.</string>
+    <string name="AccountProtectionHint2">When an account is protected with a passcode, it will be hidden from the side menu.</string>
+    <string name="EnableAccountProtection">Enable Account Protection</string>
     <string name="CreatePasscodeInfoPIN2">Please enter any 4 digits that you will use to unlock your Telegram account.</string>
     <string name="CreatePasscodeInfoPassword2">Please enter the password you will use to unlock your Telegram account.</string>
-    <string name="SelectAccountDesc">Choose the account to lock with the passcode.</string>
+    <string name="SelectAccountDesc">Choose an account to protect with a passcode.</string>
     <string name="PasscodeAlreadyUsed"> Passcode already used. Please choose another one.</string>
-    <string name="DisableDoubleBottom">Disable Double Bottom</string>
-    <string name="DisableDoubleBottomConfirmMessage">Are you sure you want to turn off Double Bottom?</string>
+    <string name="DisableAccountProtection">Disable Account Protection</string>
+    <string name="DisableAccountProtectionAlert">Are you sure you want to disable the account protection feature?</string>
     <string name="AppCrashed">Something went wrong</string>
     <string name="AppCrashedDesc">OwlGram has stopped working. Please, send logs to the developers so that they can fix this bug as soon as possible.</string>
 </resources>

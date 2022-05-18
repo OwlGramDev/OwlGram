@@ -88,9 +88,6 @@ public class DatacenterActivity extends BaseFragment {
             ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        listView.setOnItemClickListener((view, position, x, y) -> {
-
-        });
         datacenterStatusChecker = new DCHelper.DatacenterStatusChecker();
         datacenterStatusChecker.setOnUpdate(result -> {
             datacenterList = result;

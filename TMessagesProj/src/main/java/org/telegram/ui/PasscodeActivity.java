@@ -94,8 +94,8 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import it.owlgram.android.helpers.PasscodeHelper;
-import it.owlgram.android.settings.DoubleBottomSettings;
-import it.owlgram.android.ui.DoubleBottomIntro;
+import it.owlgram.android.settings.AccountProtectionSettings;
+import it.owlgram.android.ui.AccountProtectionIntro;
 
 public class PasscodeActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
     public final static int TYPE_MANAGE_CODE_SETTINGS = 0,
@@ -146,7 +146,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
     private int changePasscodeRow;
     private int fingerprintRow;
     private int autoLockRow;
-    private int doubleBottomRow;
+    private int accountProtectionRow;
     private int autoLockDetailRow;
 
     private int captureHeaderRow;
@@ -391,11 +391,11 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                         if (!SharedConfig.allowScreenCapture) {
                             AlertsCreator.showSimpleAlert(PasscodeActivity.this, LocaleController.getString("ScreenCaptureAlert", R.string.ScreenCaptureAlert));
                         }
-                    } else if (position == doubleBottomRow) {
+                    } else if (position == accountProtectionRow) {
                         if (PasscodeHelper.existAtLeastOnePasscode()) {
-                            presentFragment(new DoubleBottomSettings());
+                            presentFragment(new AccountProtectionSettings());
                         } else {
-                            presentFragment(new DoubleBottomIntro(DoubleBottomIntro.CONFIRM_DOUBLE_BOTTOM));
+                            presentFragment(new AccountProtectionIntro(AccountProtectionIntro.CONFIRM_DOUBLE_BOTTOM));
                         }
                     }
                 });
@@ -932,7 +932,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
             FileLog.e(e);
         }
         autoLockRow = rowCount++;
-        doubleBottomRow = rowCount++;
+        accountProtectionRow = rowCount++;
         autoLockDetailRow = rowCount++;
         captureHeaderRow = rowCount++;
         captureRow = rowCount++;
@@ -1124,7 +1124,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                 getMediaDataController().buildShortcuts();
                 if (isFirst) {
                     if (accountId != -1) {
-                        presentFragment(new DoubleBottomSettings(), true);
+                        presentFragment(new AccountProtectionSettings(), true);
                     } else {
                         presentFragment(new PasscodeActivity(TYPE_MANAGE_CODE_SETTINGS), true);
                     }
@@ -1219,7 +1219,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int position = holder.getAdapterPosition();
-            return position == fingerprintRow || position == autoLockRow || position == doubleBottomRow || position == captureRow ||
+            return position == fingerprintRow || position == autoLockRow || position == accountProtectionRow || position == captureRow ||
                     position == changePasscodeRow || position == disablePasscodeRow;
         }
 
@@ -1299,8 +1299,8 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                         textCell.setText(LocaleController.getString(R.string.DisablePasscode), false);
                         textCell.setTag(Theme.key_dialogTextRed);
                         textCell.setTextColor(Theme.getColor(Theme.key_dialogTextRed));
-                    } else if (position == doubleBottomRow) {
-                        textCell.setText(LocaleController.getString("DoubleBottom", R.string.DoubleBottom), false);
+                    } else if (position == accountProtectionRow) {
+                        textCell.setText(LocaleController.getString("AccountProtection", R.string.AccountProtection), false);
                     }
                     break;
                 }
@@ -1342,7 +1342,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
         public int getItemViewType(int position) {
             if (position == fingerprintRow || position == captureRow) {
                 return VIEW_TYPE_CHECK;
-            } else if (position == changePasscodeRow || position == autoLockRow || position == disablePasscodeRow || position == doubleBottomRow) {
+            } else if (position == changePasscodeRow || position == autoLockRow || position == disablePasscodeRow || position == accountProtectionRow) {
                 return VIEW_TYPE_SETTING;
             } else if (position == autoLockDetailRow || position == captureDetailRow || position == hintRow) {
                 return VIEW_TYPE_INFO;

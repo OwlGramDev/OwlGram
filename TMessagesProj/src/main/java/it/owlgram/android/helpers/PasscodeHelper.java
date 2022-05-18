@@ -25,7 +25,7 @@ public class PasscodeHelper {
         boolean defaultReturn = checkPasscodeHash(passcode, SharedConfig.passcodeHash, Base64.encodeToString(SharedConfig.passcodeSalt, Base64.DEFAULT));
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             UserConfig userConfig = UserConfig.getInstance(a);
-            if (userConfig.isClientActivated() && isDoubleBottomAccount(userConfig.getClientUserId())) {
+            if (userConfig.isClientActivated() && isProtectedAccount(userConfig.getClientUserId())) {
                 String passcodeHash = preferences.getString("passcodeHash" + userConfig.getClientUserId(), "");
                 String passcodeSaltString = preferences.getString("passcodeSalt" + userConfig.getClientUserId(), "");
                 if (checkPasscodeHash(passcode, passcodeHash, passcodeSaltString)) {
@@ -57,7 +57,7 @@ public class PasscodeHelper {
     public static boolean checkPasscode(Activity activity, String passcode) {
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             UserConfig userConfig = UserConfig.getInstance(a);
-            if (userConfig.isClientActivated() && isDoubleBottomAccount(userConfig.getClientUserId())) {
+            if (userConfig.isClientActivated() && isProtectedAccount(userConfig.getClientUserId())) {
                 String passcodeHash = preferences.getString("passcodeHash" + userConfig.getClientUserId(), "");
                 String passcodeSaltString = preferences.getString("passcodeSalt" + userConfig.getClientUserId(), "");
                 if (checkPasscodeHash(passcode, passcodeHash, passcodeSaltString)) {
@@ -100,11 +100,11 @@ public class PasscodeHelper {
                 .apply();
     }
 
-    public static boolean isDoubleBottomAccount(long accountId) {
+    public static boolean isProtectedAccount(long accountId) {
         return preferences.contains("passcodeHash" + accountId) && preferences.contains("passcodeSalt" + accountId) && SharedConfig.passcodeHash.length() > 0;
     }
 
-    public static void disableDoubleBottom() {
+    public static void disableAccountProtection() {
         preferences.edit().clear().apply();
     }
 }

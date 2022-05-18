@@ -38,7 +38,7 @@ import java.util.ArrayList;
 
 import it.owlgram.android.helpers.PasscodeHelper;
 
-public class DoubleBottomSettings extends BaseFragment {
+public class AccountProtectionSettings extends BaseFragment {
     private int rowCount;
     private ListAdapter listAdapter;
     private int dbAnRow;
@@ -47,7 +47,7 @@ public class DoubleBottomSettings extends BaseFragment {
     private int accountsStartRow;
     private int accountsEndRow;
     private int accountsDetailsRow;
-    private int disableDoubleBottomRow;
+    private int disableAccountProtectionRow;
     private final ArrayList<TLRPC.User> accounts = new ArrayList<>();
 
     @Override
@@ -60,7 +60,7 @@ public class DoubleBottomSettings extends BaseFragment {
     @Override
     public View createView(Context context) {
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setTitle(LocaleController.getString("DoubleBottom", R.string.DoubleBottom));
+        actionBar.setTitle(LocaleController.getString("AccountProtection", R.string.AccountProtection));
         actionBar.setAllowOverlayTitle(false);
         if (AndroidUtilities.isTablet()) {
             actionBar.setOccupyStatusBar(false);
@@ -83,13 +83,13 @@ public class DoubleBottomSettings extends BaseFragment {
         listView.setVerticalScrollBarEnabled(false);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener((view, position) -> {
-           if (position == disableDoubleBottomRow) {
+           if (position == disableAccountProtectionRow) {
                AlertDialog alertDialog = new AlertDialog.Builder(getParentActivity())
-                       .setTitle(LocaleController.getString("DisableDoubleBottom", R.string.DisableDoubleBottom))
-                       .setMessage(LocaleController.getString("DisableDoubleBottomConfirmMessage", R.string.DisableDoubleBottomConfirmMessage))
+                       .setTitle(LocaleController.getString("DisableAccountProtection", R.string.DisableAccountProtection))
+                       .setMessage(LocaleController.getString("DisableAccountProtectionAlert", R.string.DisableAccountProtectionAlert))
                        .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
                        .setPositiveButton(LocaleController.getString(R.string.DisablePasscodeTurnOff), (dialog, which) -> {
-                           PasscodeHelper.disableDoubleBottom();
+                           PasscodeHelper.disableAccountProtection();
                            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetPasscode);
                            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.mainUserInfoChanged);
                            finishFragment();
@@ -98,7 +98,7 @@ public class DoubleBottomSettings extends BaseFragment {
                ((TextView)alertDialog.getButton(Dialog.BUTTON_POSITIVE)).setTextColor(Theme.getColor(Theme.key_dialogTextRed));
            } else if (position >= accountsStartRow && position < accountsEndRow) {
                TLRPC.User user = accounts.get(position - accountsStartRow);
-               if (PasscodeHelper.isDoubleBottomAccount(user.id)) {
+               if (PasscodeHelper.isProtectedAccount(user.id)) {
                    final ArrayList<String> items = new ArrayList<>();
                    final ArrayList<Integer> icons = new ArrayList<>();
                    final ArrayList<Integer> actions = new ArrayList<>();
@@ -170,7 +170,7 @@ public class DoubleBottomSettings extends BaseFragment {
         rowCount += getActiveAccounts();
         accountsEndRow = rowCount;
         accountsDetailsRow = rowCount++;
-        disableDoubleBottomRow = rowCount++;
+        disableAccountProtectionRow = rowCount++;
 
         if (listAdapter != null) {
             listAdapter.notifyDataSetChanged();
@@ -204,11 +204,11 @@ public class DoubleBottomSettings extends BaseFragment {
                 case 0:
                     TextInfoPrivacyCell cell = (TextInfoPrivacyCell) holder.itemView;
                     if (position == hintRow) {
-                        cell.setText(LocaleController.getString("DoubleBottomHint", R.string.DoubleBottomHint));
+                        cell.setText(LocaleController.getString("AccountProtectionHint1", R.string.AccountProtectionHint1));
                         cell.setBackground(null);
                         cell.getTextView().setGravity(Gravity.CENTER_HORIZONTAL);
                     } else if (position == accountsDetailsRow) {
-                        cell.setText(LocaleController.getString(R.string.PasscodeScreenHint));
+                        cell.setText(LocaleController.getString("AccountProtectionHint2", R.string.AccountProtectionHint2));
                         cell.setBackground(Theme.getThemedDrawable(mContext, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
                         cell.getTextView().setGravity(LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT);
                     }
@@ -229,13 +229,13 @@ public class DoubleBottomSettings extends BaseFragment {
                     int accountNum = position - accountsStartRow;
                     TLRPC.User user = accounts.get(accountNum);
                     UserCell userCell = (UserCell) holder.itemView;
-                    userCell.setCheckedRight(PasscodeHelper.isDoubleBottomAccount(user.id));
+                    userCell.setCheckedRight(PasscodeHelper.isProtectedAccount(user.id));
                     userCell.setData(user, null, null, 0, accountNum != accounts.size() - 1);
                     break;
                 case 5:
                     TextSettingsCell textCell = (TextSettingsCell) holder.itemView;
-                    if (position == disableDoubleBottomRow) {
-                        textCell.setText(LocaleController.getString("DisableDoubleBottom", R.string.DisableDoubleBottom), false);
+                    if (position == disableAccountProtectionRow) {
+                        textCell.setText(LocaleController.getString("DisableAccountProtection", R.string.DisableAccountProtection), false);
                         textCell.setTag(Theme.key_dialogTextRed);
                         textCell.setTextColor(Theme.getColor(Theme.key_dialogTextRed));
                     }
@@ -285,7 +285,7 @@ public class DoubleBottomSettings extends BaseFragment {
                 return 2;
             } else if (position >= accountsStartRow && position < accountsEndRow) {
                 return 3;
-            } else if (position == disableDoubleBottomRow) {
+            } else if (position == disableAccountProtectionRow) {
                 return 5;
             }
             return 0;

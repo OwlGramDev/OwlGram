@@ -33,8 +33,8 @@ public class DatacenterHeaderRow extends LinearLayout {
         setGravity(Gravity.CENTER_HORIZONTAL);
         setOrientation(VERTICAL);
         StickerImageView rLottieImageView = new StickerImageView(context, UserConfig.selectedAccount);
-        rLottieImageView.setStickerPackName("AniDucks");
-        rLottieImageView.setStickerNum(2);
+        rLottieImageView.setStickerPackName("UtyaDuck");
+        rLottieImageView.setStickerNum(31);
         rLottieImageView.getImageReceiver().setAutoRepeat(1);
         addView(rLottieImageView, LayoutHelper.createLinear(120, 120, Gravity.CENTER_HORIZONTAL, 0, 20, 0, 0));
 
