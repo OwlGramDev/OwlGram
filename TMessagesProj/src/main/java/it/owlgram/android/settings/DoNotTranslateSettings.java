@@ -55,7 +55,7 @@ public class DoNotTranslateSettings extends BaseFragment {
     @Override
     public boolean onFragmentCreate() {
         super.onFragmentCreate();
-        selectedLanguages = getRestrictedLanguages();
+        selectedLanguages = getRestrictedLanguages(false);
         fixMostImportantLanguages(loadLanguages().getCurrentAppLanguage());
         updateRowsId();
         return true;
@@ -149,11 +149,20 @@ public class DoNotTranslateSettings extends BaseFragment {
     }
 
     public static HashSet<String> getRestrictedLanguages() {
+        return getRestrictedLanguages(true);
+    }
+
+    public static HashSet<String> getRestrictedLanguages(boolean detectMode) {
         try {
+            BaseTranslator translator = Translator.getCurrentTranslator();
             JSONArray array = new JSONArray(OwlConfig.doNotTranslateLanguages);
             HashSet<String> result = new HashSet<>();
             for (int a = 0; a < array.length(); a++) {
-                result.add(array.getString(a));
+                if (detectMode) {
+                    result.add(translator.getTargetLanguage(array.getString(a)));
+                } else {
+                    result.add(array.getString(a));
+                }
             }
             return result;
         } catch (JSONException e) {
@@ -199,8 +208,10 @@ public class DoNotTranslateSettings extends BaseFragment {
         int indexLangApp = targetLanguages.indexOf(appLanguage.split("-")[0]);
         names.remove(indexLangApp);
         targetLanguages.remove(indexLangApp);
-        names.add(0, getLanguage(appLanguage));
         targetLanguages.add(0, appLanguage);
+        names.add(0, getLanguage(appLanguage));
+        targetLanguages.add(0, "app");
+        names.add(0, getLanguage(appLanguage) + " - " + LocaleController.getString("Default", R.string.Default));
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -224,7 +235,7 @@ public class DoNotTranslateSettings extends BaseFragment {
         ArrayList<CharSequence> namesTemp = new ArrayList<>();
         for (int i = 0; i < targetLanguages.size(); i++) {
             String[] languages = names.get(i).toString().split(" - ");
-            if (languages[1].toLowerCase().contains(filter) || languages[0].toLowerCase().contains(filter)) {
+            if ((languages.length > 2 ? languages[2]:languages[1]).toLowerCase().contains(filter) || languages[0].toLowerCase().contains(filter)) {
                 targetLanguagesTemp.add(targetLanguages.get(i));
                 namesTemp.add(names.get(i));
             }
@@ -252,7 +263,13 @@ public class DoNotTranslateSettings extends BaseFragment {
                     TextCheckbox2Cell textRadioCell = (TextCheckbox2Cell) holder.itemView;
                     String[] languages = names.get(position - languagesStartRow).toString().split(" - ");
                     boolean isSelectedLanguage = selectedLanguages.contains(targetLanguages.get(position - languagesStartRow));
-                    textRadioCell.setTextAndValueAndCheck(languages[1], languages[0], isSelectedLanguage, false, true);
+                    textRadioCell.setTextAndValueAndCheck(
+                            languages.length > 2 ? languages[2]:languages[1],
+                            languages[0],
+                            isSelectedLanguage,
+                            false,
+                            true
+                    );
                     break;
                 case 2:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;

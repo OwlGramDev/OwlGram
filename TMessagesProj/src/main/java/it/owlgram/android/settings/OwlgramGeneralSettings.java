@@ -350,15 +350,19 @@ public class OwlgramGeneralSettings extends BaseFragment {
                         textSettingsCell.setTextAndValue(LocaleController.getString("TranslationLanguage", R.string.TranslationLanguage), value, true);
                     } else if (position == doNotTranslateSelectRow) {
                         String doNotTranslateCellValue = null;
-                        HashSet<String> langCodes = DoNotTranslateSettings.getRestrictedLanguages();
+                        HashSet<String> langCodes = DoNotTranslateSettings.getRestrictedLanguages(false);
                         if (langCodes.size() == 1) {
                             try {
                                 String language = langCodes.iterator().next();
-                                Locale locale = Locale.forLanguageTag(language);
-                                if (!TextUtils.isEmpty(locale.getScript())) {
-                                    doNotTranslateCellValue = HtmlCompat.fromHtml(AndroidUtilities.capitalize(locale.getDisplayScript()), HtmlCompat.FROM_HTML_MODE_LEGACY).toString();
+                                if (language.equals("app")) {
+                                    doNotTranslateCellValue = LocaleController.getString("Default", R.string.Default);
                                 } else {
-                                    doNotTranslateCellValue = AndroidUtilities.capitalize(locale.getDisplayName());
+                                    Locale locale = Locale.forLanguageTag(language);
+                                    if (!TextUtils.isEmpty(locale.getScript())) {
+                                        doNotTranslateCellValue = HtmlCompat.fromHtml(AndroidUtilities.capitalize(locale.getDisplayScript()), HtmlCompat.FROM_HTML_MODE_LEGACY).toString();
+                                    } else {
+                                        doNotTranslateCellValue = AndroidUtilities.capitalize(locale.getDisplayName());
+                                    }
                                 }
                             } catch (Exception ignored) {}
                         } else if (langCodes.size() == 0) {

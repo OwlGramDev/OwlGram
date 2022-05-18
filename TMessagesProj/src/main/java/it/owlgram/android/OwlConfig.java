@@ -208,7 +208,7 @@ public class OwlConfig extends SettingsManager {
             slidingChatTitle = preferences.getBoolean("slidingChatTitle", false);
             confirmStickersGIFs = preferences.getBoolean("confirmStickersGIFs", false);
             showIDAndDC = preferences.getBoolean("showIDAndDC", true);
-            doNotTranslateLanguages = preferences.getString("doNotTranslateLanguages", "[]");
+            doNotTranslateLanguages = preferences.getString("doNotTranslateLanguages", "[\"app\"]");
             dcStyleType = preferences.getInt("dcStyleType", 0);
             idType = preferences.getInt("idType", 0);
             searchIconInActionBar = preferences.getBoolean("searchIconInActionBar", false);
