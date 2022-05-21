@@ -405,7 +405,7 @@ public class LoginActivity extends BaseFragment {
             }
         });
 
-        if (OwlConfig.getActiveAccounts() == 0) {
+        if (UserConfig.getActivatedAccountsCount() == 0) {
             OwlConfig.updateCurrentVersion();
         }
 

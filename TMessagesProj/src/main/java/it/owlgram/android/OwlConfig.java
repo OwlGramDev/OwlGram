@@ -3,6 +3,7 @@ package it.owlgram.android;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
+import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
@@ -907,16 +908,6 @@ public class OwlConfig extends SettingsManager {
         } else {
             return 0xff11acfa;
         }
-    }
-
-    public static int getActiveAccounts() {
-        int accountsNumber = 0;
-        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
-            if (UserConfig.getInstance(a).isClientActivated()) {
-                accountsNumber++;
-            }
-        }
-        return accountsNumber;
     }
 
     public static void toggleDevOpt() {

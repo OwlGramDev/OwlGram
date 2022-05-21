@@ -16,7 +16,7 @@ public class UpdateSignaling {
         String oldBuildVersion = OwlConfig.oldBuildVersion;
         int selected_account = UserConfig.selectedAccount;
         if (oldBuildVersion == null) {
-            for (int i = 0; i < OwlConfig.getActiveAccounts(); i++) {
+            for (int i = 0; i < UserConfig.getActivatedAccountsCount(); i++) {
                 MessagesController messagesController = AccountInstance.getInstance(i).getMessagesController();
                 messagesController.loadRemoteFilters(true);
                 if (messagesController.suggestedFilters.isEmpty()) {

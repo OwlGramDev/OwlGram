@@ -107,4 +107,15 @@ public class PasscodeHelper {
     public static void disableAccountProtection() {
         preferences.edit().clear().apply();
     }
+
+    public static int getUnprotectedAccounts() {
+        int count = 0;
+        for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
+            UserConfig userConfig = UserConfig.getInstance(a);
+            if (userConfig.isClientActivated() && !isProtectedAccount(userConfig.getClientUserId())) {
+                count++;
+            }
+        }
+        return count;
+    }
 }
