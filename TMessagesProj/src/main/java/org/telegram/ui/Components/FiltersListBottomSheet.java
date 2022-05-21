@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import it.owlgram.android.helpers.FolderIconHelper;
+
 public class FiltersListBottomSheet extends BottomSheet implements NotificationCenter.NotificationCenterDelegate {
 
     private RecyclerListView listView;
@@ -391,8 +393,8 @@ public class FiltersListBottomSheet extends BottomSheet implements NotificationC
                 cell.getImageView().setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_dialogIcon), PorterDuff.Mode.MULTIPLY));
                 MessagesController.DialogFilter filter = dialogFilters.get(position);
                 cell.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
-                int icon;
-                if ((filter.flags & MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS) == (MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS)) {
+                int icon = FolderIconHelper.getTabIcon(filter.emoticon);
+                /*if ((filter.flags & MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS) == (MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS)) {
                     icon = R.drawable.menu_private;
                 } else if ((filter.flags & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ) != 0 && (filter.flags & MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS) == MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS) {
                     icon = R.drawable.menu_unread;
@@ -406,7 +408,7 @@ public class FiltersListBottomSheet extends BottomSheet implements NotificationC
                     icon = R.drawable.menu_bots;
                 } else {
                     icon = R.drawable.menu_folders;
-                }
+                }*/
                 cell.setTextAndIcon(filter.name, icon);
             } else {
                 cell.getImageView().setColorFilter(null);
