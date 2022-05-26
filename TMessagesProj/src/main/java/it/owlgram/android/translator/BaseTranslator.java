@@ -4,6 +4,8 @@ import androidx.annotation.Nullable;
 import androidx.collection.LruCache;
 import androidx.core.util.Pair;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
@@ -115,7 +117,7 @@ abstract public class BaseTranslator {
         Locale locale = LocaleController.getInstance().getCurrentLocale();
         toLang = convertLanguageCode(locale.getLanguage(), locale.getCountry());
         if (!supportLanguage(toLang)) {
-            toLang = convertLanguageCode(LocaleController.getString("LanguageCode", R.string.LanguageCode), null);
+            toLang = convertLanguageCode("en", null);
         }
         return toLang;
     }

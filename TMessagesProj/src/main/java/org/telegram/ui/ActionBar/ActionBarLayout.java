@@ -37,9 +37,13 @@ import android.view.ViewOutlineProvider;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.Toast;
+
 import androidx.annotation.Keep;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.math.MathUtils;
+
+import com.google.android.exoplayer2.util.Log;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
@@ -196,7 +200,7 @@ public class ActionBarLayout extends FrameLayout {
             if (OwlConfig.scrollableChatPreview && inPreviewMode && previewMenu == null) {
                 View view = containerView.getChildAt(0);
                 if (view != null) {
-                    int y = (int) (view.getTop() + containerView.getTranslationY() - AndroidUtilities.dp(Build.VERSION.SDK_INT < 21 ? 20 : 0));
+                    int y = (int) (view.getTop() + containerView.getTranslationY());
                     y += AndroidUtilities.dp(24);
                     if (ev.getY() <= y && ev.getAction() == MotionEvent.ACTION_DOWN) {
                         movePreviewFragment(AndroidUtilities.dp(65));
@@ -204,16 +208,15 @@ public class ActionBarLayout extends FrameLayout {
                     boolean isValidTouch = ev.getX() >= AndroidUtilities.dp(8);
                     isValidTouch &= ev.getX() <= view.getRight() - AndroidUtilities.dp(8);
                     isValidTouch &= ev.getY() <= view.getBottom();
-                    isValidTouch &= ev.getY() >= y + AndroidUtilities.dp(70);
-                    if (!isValidTouch) {
-                        if (ev.getY() > view.getBottom() && ev.getAction() == MotionEvent.ACTION_DOWN) {
+                    isValidTouch &= ev.getY() > (y + AndroidUtilities.dp(70));
+                    if (!isValidTouch && ev.getAction() == MotionEvent.ACTION_DOWN) {
+                        if (ev.getY() > view.getBottom()) {
                             finishPreviewFragment();
                         }
                         return false;
                     }
                 }
             }
-            //
             try {
                 return (!passivePreview || this != containerView) && super.dispatchTouchEvent(ev);
             } catch (Throwable e) {

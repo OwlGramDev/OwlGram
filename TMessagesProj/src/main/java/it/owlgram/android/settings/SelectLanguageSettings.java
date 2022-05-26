@@ -154,12 +154,15 @@ public class SelectLanguageSettings extends BaseFragment {
         names.remove(indexLangEn + 1);
         targetLanguages.remove(indexLangEn + 1);
         int indexLangClient = targetLanguages.indexOf(appLanguage);
-        names.add(0, names.get(indexLangClient));
-        targetLanguages.add(0, targetLanguages.get(indexLangClient));
-        names.remove(indexLangClient + 1);
-        targetLanguages.remove(indexLangClient + 1);
+        if (indexLangClient != -1) {
+            names.add(0, names.get(indexLangClient));
+            targetLanguages.add(0, targetLanguages.get(indexLangClient));
+            names.remove(indexLangClient + 1);
+            targetLanguages.remove(indexLangClient + 1);
+        }
         targetLanguages.add(0, "app");
         names.add(0, getLanguage(appLanguage) + " - " + LocaleController.getString("Default", R.string.Default));
+
         if (!OwlConfig.translationTarget.equals("app")) {
             int indexLangSelected = targetLanguages.indexOf(OwlConfig.translationTarget);
             names.add(0, names.get(indexLangSelected));

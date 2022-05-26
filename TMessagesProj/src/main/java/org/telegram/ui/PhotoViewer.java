@@ -1216,8 +1216,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     private final static int gallery_menu_edit_avatar = 17;
     private final static int gallery_menu_share2 = 18;
     private final static int gallery_menu_speed = 19;
-    private final static int gallery_menu_translate = 200;
-    private final static int gallery_menu_copy = 201;
+    private final static int gallery_menu_translate = 94;
+    private final static int gallery_menu_copy = 95;
 
     private static DecelerateInterpolator decelerateInterpolator;
     private static Paint progressPaint;

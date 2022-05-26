@@ -501,7 +501,9 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             try {
                 cameraXController.stopVideoRecording(true);
             } catch (Exception ignored) {}
-            cameraXController.closeCamera();
+            try {
+                cameraXController.closeCamera();
+            }  catch (Exception ignored) {}
         }
     }
 
@@ -664,7 +666,9 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                     try {
                         cameraXController.stopVideoRecording(false);
                     } catch (Exception ignored) {}
-                    cameraXController.closeCamera();
+                    try {
+                        cameraXController.closeCamera();
+                    }  catch (Exception ignored) {}
                 }
                 return true;
             }
