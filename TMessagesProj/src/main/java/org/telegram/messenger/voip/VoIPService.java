@@ -3645,8 +3645,8 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 		}
 
 		if (Build.VERSION.SDK_INT >= 21) {
-			WebRtcAudioTrack.setAudioTrackUsageAttribute(hasRtmpStream() ? AudioAttributes.USAGE_MEDIA : AudioAttributes.USAGE_VOICE_COMMUNICATION);
-			WebRtcAudioTrack.setAudioStreamType(hasRtmpStream() ? AudioManager.USE_DEFAULT_STREAM_TYPE : AudioManager.STREAM_VOICE_CALL);
+			WebRtcAudioTrack.setAudioTrackUsageAttribute(hasRtmpStream() || OwlConfig.betterAudioQuality ? AudioAttributes.USAGE_MEDIA : AudioAttributes.USAGE_VOICE_COMMUNICATION);
+			WebRtcAudioTrack.setAudioStreamType(hasRtmpStream() || OwlConfig.betterAudioQuality ? AudioManager.USE_DEFAULT_STREAM_TYPE : AudioManager.STREAM_VOICE_CALL);
 		}
 
 		needPlayEndSound = true;
@@ -3654,7 +3654,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 		if (!USE_CONNECTION_SERVICE) {
 			Utilities.globalQueue.postRunnable(() -> {
 				try {
-					if (hasRtmpStream()) {
+					if (hasRtmpStream() || OwlConfig.betterAudioQuality) {
 						am.setMode(AudioManager.MODE_NORMAL);
 						am.setBluetoothScoOn(false);
 						AndroidUtilities.runOnUIThread(() -> {
@@ -4386,7 +4386,7 @@ public class VoIPService extends Service implements SensorEventListener, AudioMa
 	}
 
 	public void updateOutputGainControlState() {
-		if (hasRtmpStream()) {
+		if (hasRtmpStream() || OwlConfig.betterAudioQuality) {
 			return;
 		}
 		if (tgVoip[CAPTURE_DEVICE_CAMERA] != null) {
