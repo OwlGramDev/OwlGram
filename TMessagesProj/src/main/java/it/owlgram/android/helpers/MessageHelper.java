@@ -149,7 +149,7 @@ public class MessageHelper extends BaseController {
     }
 
     public boolean isMessageObjectAutoTranslatable(MessageObject messageObject) {
-        if (messageObject.translated || messageObject.translating || messageObject.isOutOwner()) {
+        if (messageObject.translated || messageObject.translating || messageObject.isOutOwner() || EntitiesHelper.isEmoji(messageObject.messageOwner.message)) {
             return false;
         }
         return isMessageTranslatable(messageObject);

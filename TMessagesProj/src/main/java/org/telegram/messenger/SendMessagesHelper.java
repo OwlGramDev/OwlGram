@@ -81,6 +81,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import it.owlgram.android.entities.EntitiesHelper;
+
 public class SendMessagesHelper extends BaseController implements NotificationCenter.NotificationCenterDelegate {
 
     private HashMap<String, ArrayList<DelayedMessage>> delayedMessages = new HashMap<>();
@@ -3117,7 +3119,9 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         if (message == null && caption == null) {
             caption = "";
         }
-
+        if (caption != null && entities != null) {
+            caption = (String) EntitiesHelper.applySyntaxHighlight(caption, entities);
+        }
         String originalPath = null;
         if (params != null && params.containsKey("originalPath")) {
             originalPath = params.get("originalPath");

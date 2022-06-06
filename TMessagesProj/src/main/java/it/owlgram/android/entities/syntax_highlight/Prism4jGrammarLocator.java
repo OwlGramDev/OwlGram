@@ -96,6 +96,7 @@ public class Prism4jGrammarLocator implements GrammarLocator {
                 out = "markup";
                 break;
             case "dotnet":
+            case "c#":
                 out = "csharp";
                 break;
             case "jsonp":
@@ -103,6 +104,9 @@ public class Prism4jGrammarLocator implements GrammarLocator {
                 break;
             case "golang":
                 out = "go";
+                break;
+            case "c++":
+                out = "cpp";
                 break;
             default:
                 out = name;

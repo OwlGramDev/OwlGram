@@ -227,6 +227,9 @@ public class EntitiesHelper {
                 TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
                 run.flags |= TextStyleSpan.FLAG_STYLE_SPOILER;
                 result = new TextStyleSpan(run);
+            } else if (mSpan instanceof ForegroundColorSpan){
+                editTextCaption.getText().removeSpan(mSpan);
+                continue;
             }
             if (result != null) {
                 if (result instanceof TextStyleSpan) {
@@ -289,6 +292,32 @@ public class EntitiesHelper {
             + " }";
     }
 
+    private static CharSequence extractLanguage(CharSequence lang) {
+        StringBuilder result = new StringBuilder();
+        for (int a = 0; a < lang.length(); a++) {
+            char c = lang.charAt(a);
+            if (AndroidUtilities.getTrimmedString(result).length() == 0 || (c != '\n' && c != '\t' && c != '\r')) {
+                result.append(c);
+            } else {
+                break;
+            }
+        }
+        return result.toString();
+    }
+
+    private static int getLengthSpace(CharSequence ch) {
+        int length = 0;
+        for (int a = 0; a < ch.length(); a++) {
+            char c = ch.charAt(a);
+            if (c == '\n' || c == ' ') {
+                length++;
+            } else {
+                break;
+            }
+        }
+        return length;
+    }
+
     public static CharSequence applySyntaxHighlight(CharSequence text, ArrayList<TLRPC.MessageEntity> entities) {
         SpannableStringBuilder messSpan = new SpannableStringBuilder(text);
         MediaDataController.addTextStyleRuns(entities, text, messSpan);
@@ -296,30 +325,33 @@ public class EntitiesHelper {
         TextStyleSpan[] result = messSpan.getSpans(0, messSpan.length(), TextStyleSpan.class);
         for (TextStyleSpan span:result) {
             if (span.isMono()) {
-                CharSequence language = messSpan.subSequence(messSpan.getSpanStart(span), messSpan.getSpanEnd(span)).toString().split("\n")[0];
-                if (grammarCheck.grammar(language.toString()).isPresent()) {
+                CharSequence language = extractLanguage(messSpan.subSequence(messSpan.getSpanStart(span), messSpan.getSpanEnd(span)));
+                String fixedLanguage = AndroidUtilities.getTrimmedString(language).toString();
+                if (grammarCheck.grammar(fixedLanguage).isPresent()) {
                     int start = messSpan.getSpanStart(span);
                     int end = messSpan.getSpanEnd(span);
-                    int endCode = end - AndroidUtilities.getTrimmedString(messSpan.subSequence(start + language.length(), end)).length() - (end == messSpan.length() ? 0 : 1);
-                    messSpan = messSpan.delete(start, endCode);
+                    int endCode = language.length() + getLengthSpace(messSpan.subSequence(start + language.length(), end));
+                    messSpan = messSpan.delete(start, start + endCode);
                     TLRPC.TL_messageEntityPre entity = new TLRPC.TL_messageEntityPre();
                     entity.offset = start;
                     entity.length = end - entity.offset;
-                    entity.language = language.toString();
+                    entity.language = fixedLanguage;
                     span.getTextStyleRun().urlEntity = entity;
                     span.getTextStyleRun().end -= endCode;
                 }
             }
         }
-        CharSequence[] message = new CharSequence[]{AndroidUtilities.getTrimmedString(messSpan)};
-        ArrayList<TLRPC.MessageEntity> entitiesNew = MediaDataController.getInstance(UserConfig.selectedAccount).getEntities(message, true);
+        messSpan = (SpannableStringBuilder) AndroidUtilities.getTrimmedString(messSpan);
+        CharSequence[] message = new CharSequence[]{messSpan};
+        ArrayList<TLRPC.MessageEntity> entitiesNew = MediaDataController.getInstance(UserConfig.selectedAccount).getEntities(message, false);
         entities.clear();
         entities.addAll(entitiesNew);
         return messSpan.toString();
     }
 
     public static boolean isEmoji(String message){
-        return message.matches("(?:[\uD83D\uDE00-\uD83D\uDE4F]|" +
+        return message.matches("(?:[\uD83C\uDF00-\uD83D\uDDFF]|[\uD83E\uDD00-\uD83E\uDDFF]|" +
+                "[\uD83D\uDE00-\uD83D\uDE4F]|[\uD83D\uDE80-\uD83D\uDEFF]|" +
                 "[\u2600-\u26FF]\uFE0F?|[\u2700-\u27BF]\uFE0F?|\u24C2\uFE0F?|" +
                 "[\uD83C\uDDE6-\uD83C\uDDFF]{1,2}|" +
                 "[\uD83C\uDD70\uD83C\uDD71\uD83C\uDD7E\uD83C\uDD7F\uD83C\uDD8E\uD83C\uDD91-\uD83C\uDD9A]\uFE0F?|" +
@@ -327,7 +359,7 @@ public class EntitiesHelper {
                 "[\u2934\u2935]\uFE0F?|[\u3030\u303D]\uFE0F?|[\u3297\u3299]\uFE0F?|" +
                 "[\uD83C\uDE01\uD83C\uDE02\uD83C\uDE1A\uD83C\uDE2F\uD83C\uDE32-\uD83C\uDE3A\uD83C\uDE50\uD83C\uDE51]\uFE0F?|" +
                 "[\u203C\u2049]\uFE0F?|[\u25AA\u25AB\u25B6\u25C0\u25FB-\u25FE]\uFE0F?|" +
-                "[\u00A9\u00AE]\uFE0F?|[\u2122\u2139]\uFE0F?|\uD83C\uDC04\uFE0F?|" +
+                "[\u00A9\u00AE]\uFE0F?|[\u2122\u2139]\uFE0F?|\uD83C\uDC04\uFE0F?|\uD83C\uDCCF\uFE0F?|" +
                 "[\u231A\u231B\u2328\u23CF\u23E9-\u23F3\u23F8-\u23FA]\uFE0F?)+");
     }
 }

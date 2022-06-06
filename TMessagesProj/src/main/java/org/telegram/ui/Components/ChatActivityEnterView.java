@@ -4924,6 +4924,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
 
         CharSequence[] message = new CharSequence[]{AndroidUtilities.getTrimmedString(messageEditText.getText())};
         ArrayList<TLRPC.MessageEntity> entities = MediaDataController.getInstance(currentAccount).getEntities(message, supportsSendingNewEntities());
+        message[0] = EntitiesHelper.applySyntaxHighlight(message[0], entities);
         if (!TextUtils.equals(message[0], editingMessageObject.messageText) || entities != null && !entities.isEmpty() || (entities == null || entities.isEmpty()) && !editingMessageObject.messageOwner.entities.isEmpty() || editingMessageObject.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage) {
             editingMessageObject.editingMessage = withMarkdown ? message[0]:messageEditText.getText().toString();
             editingMessageObject.editingMessageEntities = withMarkdown ? entities:new ArrayList<>();
