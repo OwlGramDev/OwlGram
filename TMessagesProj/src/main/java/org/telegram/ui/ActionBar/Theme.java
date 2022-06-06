@@ -130,6 +130,7 @@ import java.util.concurrent.CountDownLatch;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.helpers.MonetHelper;
+import it.owlgram.android.entities.syntax_highlight.SyntaxHighlight;
 
 public class Theme {
 
@@ -3739,6 +3740,39 @@ public class Theme {
 
     public static final String key_sheet_scrollUp = "key_sheet_scrollUp";
     public static final String key_sheet_other = "key_sheet_other";
+    
+    // CUSTOM HIGHLIGHTS BASED ON PRISM4
+    public static final String key_code_high_light_annotation = "code_high_light_annotation";
+    public static final String key_code_high_light_atrule = "code_high_light_atrule";
+    public static final String key_code_high_light_attr_name = "code_high_light_attr_name";
+    public static final String key_code_high_light_attr_value = "code_high_light_attr_value";
+    public static final String key_code_high_light_boolean = "code_high_light_boolean";
+    public static final String key_code_high_light_builtin = "code_high_light_builtin";
+    public static final String key_code_high_light_cdata = "code_high_light_cdata";
+    public static final String key_code_high_light_char = "code_high_light_char";
+    public static final String key_code_high_light_class_name = "code_high_light_class_name";
+    public static final String key_code_high_light_comment = "code_high_light_comment";
+    public static final String key_code_high_light_constant = "code_high_light_constant";
+    public static final String key_code_high_light_deleted = "code_high_light_deleted";
+    public static final String key_code_high_light_delimiter = "code_high_light_delimiter";
+    public static final String key_code_high_light_doctype = "code_high_light_doctype";
+    public static final String key_code_high_light_entity = "code_high_light_entity";
+    public static final String key_code_high_light_function = "code_high_light_function";
+    public static final String key_code_high_light_important = "code_high_light_important";
+    public static final String key_code_high_light_inserted = "code_high_light_inserted";
+    public static final String key_code_high_light_keyword = "code_high_light_keyword";
+    public static final String key_code_high_light_number = "code_high_light_number";
+    public static final String key_code_high_light_operator = "code_high_light_operator";
+    public static final String key_code_high_light_prolog = "code_high_light_prolog";
+    public static final String key_code_high_light_property = "code_high_light_property";
+    public static final String key_code_high_light_punctuation = "code_high_light_punctuation";
+    public static final String key_code_high_light_regex = "code_high_light_regex";
+    public static final String key_code_high_light_selector = "code_high_light_selector";
+    public static final String key_code_high_light_string = "code_high_light_string";
+    public static final String key_code_high_light_symbol = "code_high_light_symbol";
+    public static final String key_code_high_light_tag = "code_high_light_tag";
+    public static final String key_code_high_light_url = "code_high_light_url";
+    public static final String key_code_high_light_variable = "code_high_light_variable";
 
     public static final String key_wallet_blackBackground = "wallet_blackBackground";
     public static final String key_wallet_graySettingsBackground = "wallet_graySettingsBackground";
@@ -4554,6 +4588,39 @@ public class Theme {
         defaultColors.put(key_undo_background, 0xea272f38);
         defaultColors.put(key_undo_cancelColor, 0xff85caff);
         defaultColors.put(key_undo_infoColor, 0xffffffff);
+
+        
+        defaultColors.put(key_code_high_light_annotation, 0x00000000);
+        defaultColors.put(key_code_high_light_atrule, 0xFF0077AA);
+        defaultColors.put(key_code_high_light_attr_name, 0xFF669900);
+        defaultColors.put(key_code_high_light_attr_value, 0xFF0077AA);
+        defaultColors.put(key_code_high_light_boolean, 0xFF990055);
+        defaultColors.put(key_code_high_light_builtin, 0xFF669900);
+        defaultColors.put(key_code_high_light_cdata, 0xFF708090);
+        defaultColors.put(key_code_high_light_char, 0xFF669900);
+        defaultColors.put(key_code_high_light_class_name, 0xFFDD4A68);
+        defaultColors.put(key_code_high_light_comment, 0xFF708090);
+        defaultColors.put(key_code_high_light_constant, 0xFF990055);
+        defaultColors.put(key_code_high_light_deleted, 0xFF990055);
+        defaultColors.put(key_code_high_light_delimiter, 0x00000000);
+        defaultColors.put(key_code_high_light_doctype, 0xFF708090);
+        defaultColors.put(key_code_high_light_entity, 0xFF9A6E3A);
+        defaultColors.put(key_code_high_light_function, 0xFFDD4A68);
+        defaultColors.put(key_code_high_light_important, 0xFFEE9900);
+        defaultColors.put(key_code_high_light_inserted, 0xFF669900);
+        defaultColors.put(key_code_high_light_keyword, 0xFF0077AA);
+        defaultColors.put(key_code_high_light_number, 0xFF990055);
+        defaultColors.put(key_code_high_light_operator, 0xFF9A6E3A);
+        defaultColors.put(key_code_high_light_prolog, 0xFF708090);
+        defaultColors.put(key_code_high_light_property, 0xFF990055);
+        defaultColors.put(key_code_high_light_punctuation, 0xFF999999);
+        defaultColors.put(key_code_high_light_regex, 0xFFEE9900);
+        defaultColors.put(key_code_high_light_selector, 0xFF669900);
+        defaultColors.put(key_code_high_light_string, 0xFF669900);
+        defaultColors.put(key_code_high_light_symbol, 0xFF990055);
+        defaultColors.put(key_code_high_light_tag, 0xFF990055);
+        defaultColors.put(key_code_high_light_url, 0xFF9A6E3A);
+        defaultColors.put(key_code_high_light_variable, 0xFFEE9900);
 
         defaultColors.put(key_wallet_blackBackground, 0xff000000);
         defaultColors.put(key_wallet_graySettingsBackground, 0xfff0f0f0);
@@ -6626,6 +6693,7 @@ public class Theme {
         applyDialogsTheme();
         applyProfileTheme();
         applyChatTheme(false, bg);
+        SyntaxHighlight.updateColors();
         boolean checkNavigationBarColor = !hasPreviousTheme;
         AndroidUtilities.runOnUIThread(() -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetNewTheme, false, checkNavigationBarColor));
     }

@@ -54,6 +54,7 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.util.Property;
 import android.util.TypedValue;
 import android.view.ActionMode;
@@ -101,8 +102,6 @@ import androidx.dynamicanimation.animation.SpringForce;
 import androidx.recyclerview.widget.ChatListItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -148,12 +147,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.helpers.EntitiesHelper;
+import it.owlgram.android.entities.EntitiesHelper;
 import it.owlgram.android.helpers.MessageHelper;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
@@ -4992,6 +4992,8 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 if (!withMarkdown) {
                     message[0] = text.toString();
                     entities = new ArrayList<>();
+                } else {
+                    message[0] = EntitiesHelper.applySyntaxHighlight(message[0], entities);
                 }
                 SendMessagesHelper.getInstance(currentAccount).sendMessage(message[0].toString(), dialog_id, replyingMessageObject, getThreadMessage(), messageWebPage, messageWebPageSearch, entities, null, null, notify, scheduleDate, sendAnimationData, withGame);
                 start = end + 1;
@@ -6521,6 +6523,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                             } else if (entity instanceof TLRPC.TL_messageEntityCode || entity instanceof TLRPC.TL_messageEntityPre) {
                                 TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
                                 run.flags |= TextStyleSpan.FLAG_STYLE_MONO;
+                                run.urlEntity = entity;
                                 MediaDataController.addStyleToText(new TextStyleSpan(run), entity.offset, entity.offset + entity.length, stringBuilder, true);
                             } else if (entity instanceof TLRPC.TL_messageEntityBold) {
                                 TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();

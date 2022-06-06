@@ -36,7 +36,7 @@ import java.util.Locale;
 
 import it.owlgram.android.components.TextDetailCellMultiline;
 import it.owlgram.android.helpers.DCHelper;
-import it.owlgram.android.helpers.EntitiesHelper;
+import it.owlgram.android.entities.EntitiesHelper;
 
 public class DetailsActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
     private int rowCount;

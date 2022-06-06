@@ -19,7 +19,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Vibrator;
 import android.text.Editable;
 import android.text.SpannableStringBuilder;
@@ -29,14 +28,11 @@ import android.text.TextWatcher;
 import android.text.style.ImageSpan;
 import android.util.TypedValue;
 import android.view.ActionMode;
-import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.ExtractedText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -56,7 +52,7 @@ import org.telegram.ui.ActionBar.AdjustPanLayoutHelper;
 import org.telegram.ui.ActionBar.FloatingToolbar;
 import org.telegram.ui.ActionBar.Theme;
 
-import it.owlgram.android.helpers.EntitiesHelper;
+import it.owlgram.android.entities.EntitiesHelper;
 
 public class PhotoViewerCaptionEnterView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate, SizeNotifierFrameLayoutPhoto.SizeNotifierFrameLayoutPhotoDelegate {
 

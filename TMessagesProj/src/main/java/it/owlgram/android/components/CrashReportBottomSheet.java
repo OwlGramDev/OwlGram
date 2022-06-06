@@ -80,7 +80,7 @@ public class CrashReportBottomSheet extends BottomSheet {
                     i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 }
                 i.setType("message/rfc822");
-                i.putExtra(Intent.EXTRA_SUBJECT, Crashlytics.getReportMessage());
+                i.putExtra(Intent.EXTRA_SUBJECT, Crashlytics.getCrashReportMessage());
                 i.putExtra(Intent.EXTRA_STREAM, uri);
                 i.setClass(activity, LaunchActivity.class);
                 activity.startActivity(i);

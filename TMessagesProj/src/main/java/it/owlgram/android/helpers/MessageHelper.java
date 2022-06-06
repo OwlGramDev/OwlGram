@@ -42,6 +42,7 @@ import java.util.Locale;
 import java.util.Objects;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.entities.EntitiesHelper;
 
 public class MessageHelper extends BaseController {
 

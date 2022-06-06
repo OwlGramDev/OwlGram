@@ -42,7 +42,7 @@ import it.owlgram.android.camera.CameraXUtilities;
 import it.owlgram.android.components.CameraTypeSelector;
 import it.owlgram.android.components.StickerSizeCell;
 import it.owlgram.android.helpers.AudioEnhance;
-import it.owlgram.android.helpers.EntitiesHelper;
+import it.owlgram.android.entities.EntitiesHelper;
 import it.owlgram.android.helpers.PopupHelper;
 
 public class OwlgramChatSettings extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {

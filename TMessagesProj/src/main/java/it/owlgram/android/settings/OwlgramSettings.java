@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
@@ -33,8 +34,10 @@ import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
+import it.owlgram.android.Crashlytics;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.StoreUtils;
+import it.owlgram.android.ui.DetailsActivity;
 
 public class OwlgramSettings extends BaseFragment {
     private int rowCount;
@@ -53,6 +56,7 @@ public class OwlgramSettings extends BaseFragment {
     private int sourceCodeRow;
     private int supportTranslationRow;
     private int supportDonationRow;
+    private int bugReportRow;
 
     @Override
     public boolean onFragmentCreate() {
@@ -141,6 +145,9 @@ public class OwlgramSettings extends BaseFragment {
                 Browser.openUrl(getParentActivity(), "https://donations.owlgram.org/");
             } else if (position == appearanceSettingsRow) {
                 presentFragment(new OwlgramAppearanceSettings());
+            } else if (position == bugReportRow) {
+                AndroidUtilities.addToClipboard(Crashlytics.getReportMessage() + "\n\n#bug");
+                BulletinFactory.of(OwlgramSettings.this).createCopyBulletin(LocaleController.getString("ReportDetailsCopied", R.string.ReportDetailsCopied)).show();
             }
         });
         return fragmentView;
@@ -166,6 +173,7 @@ public class OwlgramSettings extends BaseFragment {
         sourceCodeRow = rowCount++;
         supportTranslationRow = rowCount++;
         supportDonationRow = rowCount++;
+        bugReportRow = rowCount++;
 
         if (listAdapter != null) {
             listAdapter.notifyDataSetChanged();
@@ -212,8 +220,6 @@ public class OwlgramSettings extends BaseFragment {
                         textCell.setTextAndValueAndIcon(LocaleController.getString("OfficialChannel", R.string.OfficialChannel), "@" + LocaleController.getString("ChannelUsername", R.string.ChannelUsername), R.drawable.msg_channel, true);
                     } else if (position == groupUpdatesRow) {
                         textCell.setTextAndValueAndIcon(LocaleController.getString("OfficialGroup", R.string.OfficialGroup), "@" + LocaleController.getString("GroupUsername", R.string.GroupUsername), R.drawable.menu_groups, true);
-                    } else if (position == sourceCodeRow) {
-                        textCell.setTextAndIcon(LocaleController.getString("SourceCode", R.string.SourceCode), R.drawable.outline_source_white_28, true);
                     } else if (position == experimentalSettingsRow) {
                         textCell.setTextAndIcon(LocaleController.getString("Experimental", R.string.Experimental), R.drawable.outline_science_white, true);
                     } else if (position == appearanceSettingsRow) {
@@ -234,7 +240,12 @@ public class OwlgramSettings extends BaseFragment {
                     if (position == supportTranslationRow) {
                         textDetailCell.setTextAndValueAndIcon(LocaleController.getString("TranslateOwl", R.string.TranslateOwl), LocaleController.getString("TranslateOwlDesc", R.string.TranslateOwlDesc), R.drawable.round_translate_white_28, true);
                     }else if (position == supportDonationRow) {
-                        textDetailCell.setTextAndValueAndIcon(LocaleController.getString("Donate", R.string.Donate), LocaleController.getString("DonateDesc", R.string.DonateDesc), R.drawable.round_favorite_border_white, false);
+                        textDetailCell.setTextAndValueAndIcon(LocaleController.getString("Donate", R.string.Donate), LocaleController.getString("DonateDesc", R.string.DonateDesc), R.drawable.round_favorite_border_white, true);
+                    } else if (position == sourceCodeRow) {
+                        String commitInfo = String.format("%s commit, %s", BuildConfig.GIT_COMMIT_HASH,  LocaleController.formatDateAudio(BuildConfig.GIT_COMMIT_DATE, false));
+                        textDetailCell.setTextAndValueAndIcon(LocaleController.getString("SourceCode", R.string.SourceCode), commitInfo, R.drawable.outline_source_white_28, true);
+                    } else if (position == bugReportRow) {
+                        textDetailCell.setTextAndValueAndIcon(LocaleController.getString("CopyReportDetails", R.string.CopyReportDetails), LocaleController.getString("CopyReportDetailsDesc", R.string.CopyReportDetailsDesc), R.drawable.bug_report, false);
                     }
                     break;
             }
@@ -275,12 +286,12 @@ public class OwlgramSettings extends BaseFragment {
             if (position == divisorInfoRow) {
                 return 1;
             } else if (position == generalSettingsRow || position == chatSettingsRow || position == updateSettingsRow ||
-                    position == channelUpdatesRow || position == sourceCodeRow || position == groupUpdatesRow ||
+                    position == channelUpdatesRow || position == groupUpdatesRow ||
                     position == experimentalSettingsRow || position == appearanceSettingsRow){
                 return 2;
             } else if (position == categoryHeaderRow || position == infoHeaderRow) {
                 return 3;
-            } else if (position == supportTranslationRow || position == supportDonationRow){
+            } else if (position == supportTranslationRow || position == supportDonationRow || position == sourceCodeRow || position == bugReportRow){
                 return 4;
             }
             return 1;

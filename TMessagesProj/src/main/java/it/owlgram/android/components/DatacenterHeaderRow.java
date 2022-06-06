@@ -25,7 +25,7 @@ import org.telegram.ui.Components.StickerImageView;
 
 import java.util.Objects;
 
-import it.owlgram.android.helpers.EntitiesHelper;
+import it.owlgram.android.entities.EntitiesHelper;
 
 public class DatacenterHeaderRow extends LinearLayout {
     public DatacenterHeaderRow(Context context) {

@@ -29,8 +29,8 @@ public class UpdateSignaling {
         }
         UpdateManager.getChangelogs(updateResult -> {
             TLRPC.TL_updateServiceNotification update = new TLRPC.TL_updateServiceNotification();
-            update.message = updateResult.text;
-            update.entities = updateResult.entities;
+            update.message = updateResult.first;
+            update.entities = updateResult.second;
             update.media = new TLRPC.TL_messageMediaEmpty();
             update.type = "update";
             update.popup = false;

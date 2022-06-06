@@ -94,14 +94,37 @@ public class Crashlytics implements Thread.UncaughtExceptionHandler {
         }
     }
 
+    public static String getCrashReportMessage() {
+        return getReportMessage() + "\n" +
+                "Crash Date: " + LocaleController.getInstance().formatterStats.format(System.currentTimeMillis()) +
+                "\n\n#crash";
+    }
+
     public static String getReportMessage() {
-        return  "App Version: " + BuildVars.BUILD_VERSION_STRING + " (" + BuildVars.BUILD_VERSION + ")\n" +
+        String CameraName;
+        switch (OwlConfig.cameraType) {
+            case 0:
+                CameraName = "Tg Camera";
+                break;
+            case 1:
+                CameraName = "CameraX";
+                break;
+            case 2:
+                CameraName = "System Camera";
+                break;
+            default:
+                CameraName = "Unknown";
+        }
+        return  "Steps to reproduce\n" +
+                "Write here the steps to reproduce\n\n" +
+                "Details\n"+
+                "App Version: " + BuildVars.BUILD_VERSION_STRING + " (" + BuildVars.BUILD_VERSION + ")\n" +
                 "Device: " + AndroidUtilities.capitalize(Build.MANUFACTURER) + " " + Build.MODEL + "\n" +
                 "OS Version: " + Build.VERSION.RELEASE + "\n" +
                 "Google Play Services: " + ApplicationLoader.hasPlayServices + "\n" +
                 "Performance Class: " + getPerformanceClassString() + "\n" +
                 "Locale: " + LocaleController.getSystemLocaleStringIso639() + "\n" +
-                "Crash Date: " + LocaleController.getInstance().formatterStats.format(System.currentTimeMillis()) + "\n\n#crash";
+                "Camera: " + CameraName;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

@@ -72,6 +72,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -4858,6 +4859,7 @@ public class MediaDataController extends BaseController {
                 newRun.flags = TextStyleSpan.FLAG_STYLE_ITALIC;
             } else if (entity instanceof TLRPC.TL_messageEntityCode || entity instanceof TLRPC.TL_messageEntityPre) {
                 newRun.flags = TextStyleSpan.FLAG_STYLE_MONO;
+                newRun.urlEntity = entity;
             } else if (entity instanceof TLRPC.TL_messageEntityMentionName) {
                 newRun.flags = TextStyleSpan.FLAG_STYLE_MENTION;
                 newRun.urlEntity = entity;
@@ -4938,15 +4940,17 @@ public class MediaDataController extends BaseController {
         return runs;
     }
 
-    public void addStyle(int flags, int spanStart, int spanEnd, ArrayList<TLRPC.MessageEntity> entities) {
+    public void addStyle(TextStyleSpan.TextStyleRun styleRun, int spanStart, int spanEnd, ArrayList<TLRPC.MessageEntity> entities) {
+        int flags = styleRun.flags;
         if ((flags & TextStyleSpan.FLAG_STYLE_SPOILER) != 0)
             entities.add(setEntityStartEnd(new TLRPC.TL_messageEntitySpoiler(), spanStart, spanEnd));
         if ((flags & TextStyleSpan.FLAG_STYLE_BOLD) != 0)
             entities.add(setEntityStartEnd(new TLRPC.TL_messageEntityBold(), spanStart, spanEnd));
         if ((flags & TextStyleSpan.FLAG_STYLE_ITALIC) != 0)
             entities.add(setEntityStartEnd(new TLRPC.TL_messageEntityItalic(), spanStart, spanEnd));
-        if ((flags & TextStyleSpan.FLAG_STYLE_MONO) != 0)
-            entities.add(setEntityStartEnd(new TLRPC.TL_messageEntityCode(), spanStart, spanEnd));
+        if ((flags & TextStyleSpan.FLAG_STYLE_MONO) != 0) {
+            entities.add(setEntityStartEnd(Objects.requireNonNullElseGet(styleRun.urlEntity, TLRPC.TL_messageEntityCode::new), spanStart, spanEnd));
+        }
         if ((flags & TextStyleSpan.FLAG_STYLE_STRIKE) != 0)
             entities.add(setEntityStartEnd(new TLRPC.TL_messageEntityStrike(), spanStart, spanEnd));
         if ((flags & TextStyleSpan.FLAG_STYLE_UNDERLINE) != 0)
@@ -5056,7 +5060,7 @@ public class MediaDataController extends BaseController {
                     if (entities == null) {
                         entities = new ArrayList<>();
                     }
-                    addStyle(span.getStyleFlags(), spanStart, spanEnd, entities);
+                    addStyle(span.getTextStyleRun(), spanStart, spanEnd, entities);
                 }
             }
 
@@ -5092,7 +5096,7 @@ public class MediaDataController extends BaseController {
                     entities.add(entity);
                     TextStyleSpan.TextStyleRun style = spansUrlReplacement[b].getTextStyleRun();
                     if (style != null) {
-                        addStyle(style.flags, entity.offset, entity.offset + entity.length, entities);
+                        addStyle(style, entity.offset, entity.offset + entity.length, entities);
                     }
                 }
             }

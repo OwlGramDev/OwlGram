@@ -3,8 +3,8 @@ package it.owlgram.android.updates;
 import android.content.pm.PackageInfo;
 
 import androidx.annotation.NonNull;
+import androidx.core.util.Pair;
 
-import com.google.android.exoplayer2.util.Log;
 import com.google.android.play.core.appupdate.AppUpdateInfo;
 import com.google.android.play.core.appupdate.AppUpdateManager;
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
@@ -16,13 +16,16 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.LocaleController;
+import org.telegram.tgnet.TLRPC;
 
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.StoreUtils;
-import it.owlgram.android.helpers.EntitiesHelper;
+import it.owlgram.android.entities.EntitiesHelper;
+import it.owlgram.android.entities.HTMLKeeper;
 import it.owlgram.android.helpers.StandardHTTPRequest;
 
 public class UpdateManager {
@@ -53,12 +56,7 @@ public class UpdateManager {
                     JSONObject obj = new JSONObject(new StandardHTTPRequest(url).request());
                     String changelog_text = obj.getString("changelogs");
                     if (!changelog_text.equals("null")) {
-                        EntitiesHelper.TextWithMention textWithMention = EntitiesHelper.getEntities(
-                                changelog_text,
-                                null,
-                                true
-                        );
-                        AndroidUtilities.runOnUIThread(() -> changelogCallback.onSuccess(textWithMention));
+                        AndroidUtilities.runOnUIThread(() -> changelogCallback.onSuccess(HTMLKeeper.htmlToEntities(changelog_text, null, true)));
                     }
                 } catch (Exception ignored) {}
             }
@@ -200,6 +198,6 @@ public class UpdateManager {
     }
 
     public interface ChangelogCallback {
-        void onSuccess(EntitiesHelper.TextWithMention updateResult);
+        void onSuccess(Pair<String, ArrayList<TLRPC.MessageEntity>> updateResult);
     }
 }
