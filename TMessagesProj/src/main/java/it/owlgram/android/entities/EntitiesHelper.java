@@ -35,6 +35,7 @@ import org.telegram.ui.Components.URLSpanUserMention;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Optional;
 
 import it.owlgram.android.entities.syntax_highlight.Prism4jGrammarLocator;
 import it.owlgram.android.entities.syntax_highlight.SyntaxHighlight;
@@ -326,8 +327,9 @@ public class EntitiesHelper {
         for (TextStyleSpan span:result) {
             if (span.isMono()) {
                 CharSequence language = extractLanguage(messSpan.subSequence(messSpan.getSpanStart(span), messSpan.getSpanEnd(span)));
-                String fixedLanguage = AndroidUtilities.getTrimmedString(language).toString();
-                if (grammarCheck.grammar(fixedLanguage).isPresent()) {
+                String fixedLanguage = AndroidUtilities.getTrimmedString(language).toString().toLowerCase();
+                Optional<Prism4j.Grammar> grammar = grammarCheck.grammar(fixedLanguage);
+                if (grammar.isPresent()) {
                     int start = messSpan.getSpanStart(span);
                     int end = messSpan.getSpanEnd(span);
                     int endCode = language.length() + getLengthSpace(messSpan.subSequence(start + language.length(), end));
@@ -335,7 +337,7 @@ public class EntitiesHelper {
                     TLRPC.TL_messageEntityPre entity = new TLRPC.TL_messageEntityPre();
                     entity.offset = start;
                     entity.length = end - entity.offset;
-                    entity.language = fixedLanguage;
+                    entity.language = grammar.get().name();
                     span.getTextStyleRun().urlEntity = entity;
                     span.getTextStyleRun().end -= endCode;
                 }

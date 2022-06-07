@@ -154,7 +154,7 @@ android {
         }
     }
 
-    defaultConfig.versionCode = 2654
+    defaultConfig.versionCode = 2656
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
@@ -169,7 +169,7 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 32
-        versionName "1.9.0 PBeta 5"
+        versionName "2.0.0"
         buildConfigField "String", "GIT_COMMIT_HASH", "\"${getGitHash()}\""
         buildConfigField "Long", "GIT_COMMIT_DATE", "${getGitDate()}L"
 
