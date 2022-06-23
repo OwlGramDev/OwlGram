@@ -3804,7 +3804,7 @@ public class Theme {
 
     public static final String key_sheet_scrollUp = "key_sheet_scrollUp";
     public static final String key_sheet_other = "key_sheet_other";
-    
+
     // CUSTOM HIGHLIGHTS BASED ON PRISM4
     public static final String key_code_high_light_annotation = "code_high_light_annotation";
     public static final String key_code_high_light_atrule = "code_high_light_atrule";
@@ -4670,7 +4670,7 @@ public class Theme {
         defaultColors.put(key_undo_cancelColor, 0xff85caff);
         defaultColors.put(key_undo_infoColor, 0xffffffff);
 
-        
+
         defaultColors.put(key_code_high_light_annotation, 0x00000000);
         defaultColors.put(key_code_high_light_atrule, 0xFF0077AA);
         defaultColors.put(key_code_high_light_attr_name, 0xFF669900);
@@ -4727,7 +4727,7 @@ public class Theme {
         defaultColors.put(key_chat_inTextSelectionHighlight, 0x5062A9E3);
         defaultColors.put(key_chat_TextSelectionCursor, 0xFF419FE8);
         defaultColors.put(key_chat_outTextSelectionCursor, 0xFF419FE8);
-        defaultColors.put(key_chat_BlurAlpha, 0xAF000000);
+        defaultColors.put(key_chat_BlurAlpha, 0xCF000000);
 
         defaultColors.put(key_statisticChartSignature, 0x7f252529);
         defaultColors.put(key_statisticChartSignatureAlpha, 0x7f252529);
@@ -5302,7 +5302,6 @@ public class Theme {
                 new int[]    {                            45,                           135,                             0,                           180,                             0,                             0,                             0,                             0,                             0,                             0,                             0,                             0,                             0,                             0 },
                 new int[]    {                            34,                            47,                            52,                            48,                            54,                            50,                            37,                            56,                            48,                            49,                            40,                            64,                            38,                            48 }
         );
-        sortAccents(themeInfo);
         themes.add(themeInfo);
         themesDict.put("Amoled", themeInfo);
 

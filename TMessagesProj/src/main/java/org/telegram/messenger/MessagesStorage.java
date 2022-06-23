@@ -2501,7 +2501,7 @@ public class MessagesStorage extends BaseController {
                     state.bindInteger(3, filter.unreadCount);
                     state.bindInteger(4, filter.flags);
                     state.bindString(5, filter.name);
-                    state.bindString(6, filter.emoticon);
+                    state.bindNull(6);
                     state.stepThis().dispose();
                 }
 
