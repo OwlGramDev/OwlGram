@@ -19,6 +19,7 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.R;
+import org.telegram.messenger.UserConfig;
 import org.telegram.ui.ActionBar.ActionBarLayout;
 import org.telegram.ui.LaunchActivity;
 
@@ -152,7 +153,7 @@ public class SettingsManager {
             }
         }
         if (locFile == null) {
-            File f = FileLoader.getPathToMessage(selectedObject.messageOwner);
+            File f = FileLoader.getInstance(UserConfig.selectedAccount).getPathToMessage(selectedObject.messageOwner);
             if (f.exists()) {
                 locFile = f;
             }

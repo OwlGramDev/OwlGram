@@ -26,8 +26,6 @@ import org.telegram.ui.Components.TextStyleSpan;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class HTMLKeeper {
     final private static String[] list_html_params = new String[]{"b", "i", "u", "s", "tt", "a", "q"};
@@ -211,12 +209,17 @@ public class HTMLKeeper {
     // VARIOUS HTML FIXERS
     private static String fixStrangeSpace(String string) {
         for (String list_param : list_html_params) {
-            string = string.replace("< " + list_param + ">", "<" + list_param + ">");
-            string = string.replace("<" + list_param + " >", "<" + list_param + ">");
-            string = string.replace("</ " + list_param + ">", "</" + list_param + ">");
-            string = string.replace("</" + list_param + " >", "</" + list_param + ">");
-            string = string.replace("< /" + list_param + ">", "</" + list_param + ">");
-            string = string.replace("< / " + list_param + ">", "</" + list_param + ">");
+            String fixedStart = String.format("<%s>", list_param);
+            String fixedEnd =  String.format("</%s>", list_param);
+            string = string.replace(String.format("< %s>", list_param), fixedStart);
+            string = string.replace(String.format("<%s >", list_param), fixedStart);
+            string = string.replace(String.format("< %s >", list_param), fixedStart);
+            string = string.replace(String.format("</ %s>", list_param), fixedEnd);
+            string = string.replace(String.format("< / %s>", list_param), fixedEnd);
+            string = string.replace(String.format("< /%s>", list_param), fixedEnd);
+            string = string.replace(String.format("< /%s >", list_param), fixedEnd);
+            string = string.replace(String.format("</%s >", list_param), fixedEnd);
+            string = string.replace(String.format("< / %s >", list_param), fixedEnd);
         }
         return string;
     }
@@ -241,43 +244,92 @@ public class HTMLKeeper {
         return string;
     }
 
+    private static class HTMLTagPosition {
+        private final int start;
+        private final int end;
+        private final String tag;
+
+        public HTMLTagPosition(int start, int end, String tag) {
+            this.start = start;
+            this.end = end;
+            this.tag = tag;
+        }
+
+        public int getStart() {
+            return start;
+        }
+
+        public int getEnd() {
+            return end;
+        }
+
+        public String getTag() {
+            return tag;
+        }
+    }
+
+    private static class HTMLTagStack {
+        private final ArrayList<HTMLTagPosition> stack = new ArrayList<>();
+        private String text;
+
+        public void parse(String string) {
+            stack.clear();
+            int start;
+            int end = 0;
+            while (true) {
+                start = string.indexOf("<", end);
+                if (start == -1) {
+                    break;
+                }
+                end = string.indexOf(">", start);
+                if (end == -1) {
+                    break;
+                }
+                String tag = string.substring(start + 1, end);
+                stack.add(new HTMLTagPosition(start, end + 1, tag));
+            }
+            text = string;
+        }
+
+        public void replace(int start, int end, String string) {
+            text = text.substring(0, start) + string + text.substring(end);
+            parse(text);
+        }
+    }
+
     private static String fixHtmlCorrupted(String string) {
-        Pattern p = Pattern.compile("<(.*?)>");
-        Matcher m = p.matcher(string);
         ArrayList<String> listUnclosedTags = new ArrayList<>();
         ArrayList<String> listUnopenedTags = new ArrayList<>();
-        while(m.find()){
-            String tag = m.group(0);
-            String originalTag = tag;
-            if (tag != null) {
-                tag = tag.replace("<", "").replace(">", "").replace(" ", "");
-                if (!tag.contains("/")) {
-                    listUnclosedTags.add(0, tag);
-                    listUnopenedTags.add(0, originalTag);
-                } else {
-                    tag = tag.replace("/", "");
-                    if (listUnclosedTags.contains(tag)) {
+        HTMLTagStack stack = new HTMLTagStack();
+        stack.parse(string);
+        for (int i = 0; i < stack.stack.size(); i++) {
+            HTMLTagPosition tagPosition = stack.stack.get(i);
+            String tag = tagPosition.getTag();
+            tag = tag.replace("<", "").replace(">", "").replace(" ", "");
+            if (!tag.contains("/")) {
+                listUnclosedTags.add(0, tag);
+                listUnopenedTags.add(0, tag);
+            } else {
+                tag = tag.replace("/", "");
+                if (listUnclosedTags.contains(tag)) {
+                    listUnclosedTags.remove(0);
+                    listUnopenedTags.remove(0);
+                } else if (listUnclosedTags.size() > 0) {
+                    boolean isValidData = new ArrayList<>(Arrays.asList(list_html_params)).contains(tag);
+                    String tagToReplace;
+                    if (listUnclosedTags.size() > 0) {
+                        tagToReplace = "/" + listUnclosedTags.get(0);
                         listUnclosedTags.remove(0);
+                    } else if (listUnopenedTags.size() > 0 && isValidData) {
+                        tagToReplace = listUnopenedTags.get(0);
                         listUnopenedTags.remove(0);
-                    } else if (listUnclosedTags.size() > 0) {
-                        boolean isValidData = new ArrayList<>(Arrays.asList(list_html_params)).contains(tag);
-                        String tagToReplace = isValidData ? listUnopenedTags.get(0):originalTag;
-                        int start = string.indexOf(tagToReplace);
-                        int end = start + tagToReplace.length();
-                        String htmlClosingTag = "<" + (isValidData ? tag:"/" + listUnclosedTags.get(0)) + ">";
-                        string = replaceByPosition(string, start, end, htmlClosingTag);
-                        listUnclosedTags.remove(0);
-                        listUnopenedTags.remove(0);
+                    } else {
+                        continue;
                     }
+                    stack.replace(tagPosition.getStart(), tagPosition.getEnd(), "<" + tagToReplace + ">");
                 }
             }
         }
-        return string;
-    }
-
-    private static String replaceByPosition(String string, int start, int end, String replace) {
-        String firstString = string.substring(0, start);
-        String lastString = string.substring(end);
-        return firstString + replace + lastString;
+        return stack.text;
     }
 }

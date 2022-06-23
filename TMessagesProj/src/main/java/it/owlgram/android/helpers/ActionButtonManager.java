@@ -196,7 +196,7 @@ public class ActionButtonManager {
                     break;
                 case "logout":
                     text = LocaleController.getString("LogOut", R.string.LogOut);
-                    icon = R.drawable.chats_leave;
+                    icon = R.drawable.msg_leave;
                     break;
                 case "send_message":
                     text = LocaleController.getString("Send", R.string.Send);
@@ -208,7 +208,7 @@ public class ActionButtonManager {
                     break;
                 case "call":
                     text = LocaleController.getString("Call", R.string.Call);
-                    icon = R.drawable.payment_phone;
+                    icon = R.drawable.msg_calls;
                     break;
                 case "restart":
                     text = LocaleController.getString("BotRestart", R.string.BotRestart);
@@ -237,11 +237,11 @@ public class ActionButtonManager {
                     break;
                 case "join":
                     text = LocaleController.getString("VoipChatJoin", R.string.VoipChatJoin);
-                    icon = R.drawable.actions_link;
+                    icon = R.drawable.msg_link2;
                     break;
                 case "add_user":
                     text = LocaleController.getString("Add", R.string.Add);
-                    icon = R.drawable.actions_addmember2;
+                    icon = R.drawable.msg_addcontact;
                     break;
                 case "join_call":
                     text = LocaleController.getString("StartVoipChatTitle", R.string.StartVoipChatTitle);
@@ -257,7 +257,7 @@ public class ActionButtonManager {
                     break;
                 case "info":
                     text = LocaleController.getString("Info", R.string.Info);
-                    icon = R.drawable.profile_info;
+                    icon = R.drawable.msg_info;
                     break;
                 case "report":
                     text = LocaleController.getString("ReportChat", R.string.ReportChat);
@@ -273,7 +273,7 @@ public class ActionButtonManager {
                     break;
                 case "leave":
                     text = LocaleController.getString("VoipGroupLeave", R.string.VoipGroupLeave);
-                    icon = R.drawable.chats_leave;
+                    icon = R.drawable.msg_leave;
                     break;
             }
             if (text != null) {

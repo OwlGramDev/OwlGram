@@ -21,21 +21,28 @@ public class BuildVars {
     public static boolean CHECK_UPDATES = false;
     public static boolean IGNORE_VERSION_CHECK = false;
     public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= 29;
-    public static int BUILD_VERSION = 2656;
-    public static String BUILD_VERSION_STRING = "2.0.0";
-    public static int TELEGRAM_BUILD_VERSION = 2636;
-    public static String TELEGRAM_VERSION_STRING = "8.7.4";
+    public static int BUILD_VERSION = 2703;
+    public static String BUILD_VERSION_STRING = "2.1.0";
+    public static int TELEGRAM_BUILD_VERSION = 2702;
+    public static String TELEGRAM_VERSION_STRING = "8.8.2";
     public static int APP_ID = 10029733;
     public static String APP_HASH = "d0d81009d46e774f78c0e0e622f5fa21";
 
     public static String SMS_HASH = isStandaloneApp() ? "w0lkcmTZkKh" : (DEBUG_VERSION ? "O2P2z+/jBpJ" : "oLeq9AcOZkT");
     public static String PLAYSTORE_APP_URL = "https://play.google.com/store/apps/details?id=it.owlgram.android";
 
+    // You can use this flag to disable Google Play Billing (If you're making fork and want it to be in Google Play)
+    public static boolean IS_BILLING_UNAVAILABLE = false;
+
     static {
         if (ApplicationLoader.applicationContext != null) {
             SharedPreferences sharedPreferences = ApplicationLoader.applicationContext.getSharedPreferences("systemConfig", Context.MODE_PRIVATE);
             LOGS_ENABLED = DEBUG_VERSION || sharedPreferences.getBoolean("logsEnabled", DEBUG_VERSION);
         }
+    }
+
+    public static boolean useInvoiceBilling() {
+        return DEBUG_VERSION || isStandaloneApp() || isBetaApp();
     }
 
     private static Boolean standaloneApp;

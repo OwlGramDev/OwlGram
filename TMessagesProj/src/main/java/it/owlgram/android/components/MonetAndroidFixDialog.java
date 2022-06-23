@@ -20,8 +20,6 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.StickerImageView;
 
-import it.owlgram.android.helpers.IconsHelper;
-
 public class MonetAndroidFixDialog extends BottomSheet {
 
     public MonetAndroidFixDialog(BaseFragment fragment) {
@@ -61,7 +59,7 @@ public class MonetAndroidFixDialog extends BottomSheet {
         buttonTextView.setText(LocaleController.getString("Change", R.string.Change));
         buttonTextView.setOnClickListener(view -> {
             dismiss();
-            IconsHelper.switchToMonet();
+            //IconsHelper.switchToMonet(); // TODO NEED IMPLEMENTATION
             AlertDialog progressDialog = new AlertDialog(fragment.getParentActivity(), 3);
             progressDialog.show();
             AndroidUtilities.runOnUIThread(progressDialog::dismiss, 2000);

@@ -116,8 +116,14 @@ public class TranslatorHelper {
         return messageObject;
     }
 
-    private static boolean isSupportHTMLMode() {
-        return OwlConfig.translationProvider == Translator.PROVIDER_GOOGLE;
+    public static boolean isSupportHTMLMode() {
+        return isSupportHTMLMode(OwlConfig.translationProvider);
+    }
+
+    public static boolean isSupportHTMLMode(int provider) {
+        return provider == Translator.PROVIDER_GOOGLE ||
+                provider == Translator.PROVIDER_YANDEX ||
+                provider == Translator.PROVIDER_DEEPL;
     }
 
     private static boolean isSupportedProvider() {
@@ -144,7 +150,7 @@ public class TranslatorHelper {
             }
             if(messageObject.messageOwner.entities != null && additionalObjectTranslation.translation instanceof String && isSupportedProvider()){
                 messageObject.originalEntities = messageObject.messageOwner.entities;
-                if (isSupportHTMLMode()) {
+                if (isSupportHTMLMode() && OwlConfig.keepTranslationMarkdown) {
                     additionalObjectTranslation.translation = HTMLKeeper.entitiesToHtml((String) additionalObjectTranslation.translation, messageObject.originalEntities, false);
                 }
             }

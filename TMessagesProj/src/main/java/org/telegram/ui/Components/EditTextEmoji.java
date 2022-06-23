@@ -247,6 +247,10 @@ public class EditTextEmoji extends FrameLayout implements NotificationCenter.Not
         emojiPadding = 0;
     }
 
+    public EmojiView getEmojiView() {
+        return emojiView;
+    }
+
     public void setDelegate(EditTextEmojiDelegate editTextEmojiDelegate) {
         delegate = editTextEmojiDelegate;
     }
@@ -389,7 +393,7 @@ public class EditTextEmoji extends FrameLayout implements NotificationCenter.Not
         }
     }
 
-    private void showPopup(int show) {
+    protected void showPopup(int show) {
         if (show == 1) {
             boolean emojiWasVisible = emojiView != null && emojiView.getVisibility() == View.VISIBLE;
             if (emojiView == null) {
@@ -483,7 +487,7 @@ public class EditTextEmoji extends FrameLayout implements NotificationCenter.Not
         }
     }
 
-    private void createEmojiView() {
+    protected void createEmojiView() {
         if (emojiView != null) {
             return;
         }

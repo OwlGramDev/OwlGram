@@ -262,7 +262,7 @@ public class AccountProtectionSettings extends BaseFragment {
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
                 case 3:
-                    view = new UserCell(mContext, 16, 1, false, false, false, true);
+                    view = new UserCell(mContext, 16, 1, false, false, null, false, true);
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
                 case 5:

@@ -53,7 +53,6 @@
     <string name="ShapePills">Pills</string>
     <string name="ShapeLinear">Linear</string>
     <string name="ShapeStock">Default</string>
-    <string name="AppIcon">App Icon</string>
     <string name="DefaultIcon">Default</string>
     <string name="AquaIcon">Aqua</string>
     <string name="SunsetIcon">Sunset</string>
@@ -273,4 +272,6 @@
     <string name="CopyReportDetails">Copy report details</string>
     <string name="CopyReportDetailsDesc">Use when submitting a bug report.</string>
     <string name="ReportDetailsCopied">Report details copied to clipboard.</string>
+    <string name="KeepMarkdown">Keep Markdown</string>
+    <string name="KeepMarkdownDesc">When translating a message, keep the markdown formatting.</string>
 </resources>

@@ -88,7 +88,7 @@ public class SendOptionsMenuLayout extends LinearLayout {
                     sendPopupWindow.dismiss();
                 }
             });
-            sendPopupLayout1.setShownFromBotton(false);
+            sendPopupLayout1.setShownFromBottom(false);
 
             ActionBarMenuSubItem showSendersNameView = new ActionBarMenuSubItem(getContext(), true, true, false, resourcesProvider);
             linearLayout2.addView(showSendersNameView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
@@ -197,7 +197,7 @@ public class SendOptionsMenuLayout extends LinearLayout {
                 sendPopupWindow.dismiss();
             }
         });
-        sendPopupLayout2.setShownFromBotton(false);
+        sendPopupLayout2.setShownFromBottom(false);
 
         if (showSchedule) {
             ActionBarMenuSubItem scheduleButton = new ActionBarMenuSubItem(getContext(), true, !showNotify, resourcesProvider);
@@ -229,7 +229,7 @@ public class SendOptionsMenuLayout extends LinearLayout {
             linearLayout.addView(sendWithoutSoundButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
         }
         ActionBarMenuSubItem sendMessage = new ActionBarMenuSubItem(getContext(), !showNotify || !showSchedule, true, resourcesProvider);
-        sendMessage.setTextAndIcon(LocaleController.getString("SendMessage", R.string.SendMessage), R.drawable.msg_forward_send);
+        sendMessage.setTextAndIcon(LocaleController.getString("SendMessage", R.string.SendMessage), R.drawable.msg_forward_check);
         sendMessage.setMinimumWidth(AndroidUtilities.dp(196));
         sendMessage.setOnClickListener(v -> {
             if (sendPopupWindow != null && sendPopupWindow.isShowing()) {

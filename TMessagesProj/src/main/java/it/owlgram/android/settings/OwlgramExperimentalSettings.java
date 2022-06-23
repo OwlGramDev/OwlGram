@@ -31,7 +31,6 @@ import java.util.ArrayList;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.LabsHeader;
-import it.owlgram.android.helpers.IconsHelper;
 import it.owlgram.android.helpers.PopupHelper;
 
 public class OwlgramExperimentalSettings extends BaseFragment {
@@ -118,7 +117,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
             } else if (position == checkBoxExperimentalRow) {
                 if (view instanceof TextCheckCell) {
                     TextCheckCell textCheckCell = (TextCheckCell) view;
-                    if (IconsHelper.isSelectedMonet()) {
+                    /*if (IconsHelper.isSelectedMonet()) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                         builder.setMessage(LocaleController.getString("DisableExperimentalAlert", R.string.DisableExperimentalAlert));
@@ -133,16 +132,16 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                         builder.show();
                     } else {
                         toggleExperimentalMode(textCheckCell);
-                    }
+                    }*/
                 }
             } else if (position == monetIconRow) {
-                IconsHelper.switchToMonet();
+                /*IconsHelper.switchToMonet();
                 AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
                 progressDialog.show();
                 AndroidUtilities.runOnUIThread(progressDialog::dismiss, 2000);
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.useMonetIcon);
-                }
+                }*/
             }
         });
         return fragmentView;

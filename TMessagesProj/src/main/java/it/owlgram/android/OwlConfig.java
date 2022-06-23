@@ -3,13 +3,12 @@ package it.owlgram.android;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
-import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
-import org.telegram.messenger.UserConfig;
+import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.Theme;
 
 import java.util.Calendar;
@@ -86,6 +85,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean autoTranslate;
     public static boolean showNameInActionBar;
     public static boolean showPencilIcon;
+    public static boolean keepTranslationMarkdown;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -144,20 +144,20 @@ public class OwlConfig extends SettingsManager {
             hidePhoneNumber = preferences.getBoolean("hidePhoneNumber", true);
             hideContactNumber = preferences.getBoolean("hideContactNumber", true);
             fullTime = preferences.getBoolean("fullTime", false);
-            roundedNumbers = preferences.getBoolean("roundedNumbers", false);
+            roundedNumbers = preferences.getBoolean("roundedNumbers", true);
             confirmCall = preferences.getBoolean("confirmCall", true);
             mediaFlipByTap = preferences.getBoolean("mediaFlipByTap", true);
             jumpChannel = preferences.getBoolean("jumpChannel", true);
             hideKeyboard = preferences.getBoolean("hideKeyboard", false);
-            gifAsVideo = preferences.getBoolean("gifAsVideo", true);
+            gifAsVideo = preferences.getBoolean("gifAsVideo", false);
             showFolderWhenForward = preferences.getBoolean("showFolderWhenForward", true);
             useRearCamera = preferences.getBoolean("useRearCamera", false);
             sendConfirm = preferences.getBoolean("sendConfirm", false);
             useSystemFont = preferences.getBoolean("useSystemFont", false);
             useSystemEmoji = preferences.getBoolean("useSystemEmoji", false);
             showGreetings = preferences.getBoolean("showGreetings", true);
-            showTranslate = preferences.getBoolean("showTranslate", true);
-            showSaveMessage = preferences.getBoolean("showSaveMessage", true);
+            showTranslate = preferences.getBoolean("showTranslate", false);
+            showSaveMessage = preferences.getBoolean("showSaveMessage", false);
             showRepeat = preferences.getBoolean("showRepeat", false);
             showNoQuoteForward = preferences.getBoolean("showNoQuoteForward", false);
             showMessageDetails = preferences.getBoolean("showMessageDetails", false);
@@ -208,7 +208,7 @@ public class OwlConfig extends SettingsManager {
             openArchiveOnPull = preferences.getBoolean("openArchiveOnPull", false);
             slidingChatTitle = preferences.getBoolean("slidingChatTitle", false);
             confirmStickersGIFs = preferences.getBoolean("confirmStickersGIFs", false);
-            showIDAndDC = preferences.getBoolean("showIDAndDC", true);
+            showIDAndDC = preferences.getBoolean("showIDAndDC", false);
             doNotTranslateLanguages = preferences.getString("doNotTranslateLanguages", "[\"app\"]");
             dcStyleType = preferences.getInt("dcStyleType", 0);
             idType = preferences.getInt("idType", 0);
@@ -217,6 +217,7 @@ public class OwlConfig extends SettingsManager {
             showCopyPhoto = preferences.getBoolean("showCopyPhoto", false);
             showNameInActionBar = preferences.getBoolean("showNameInActionBar", false);
             showPencilIcon = preferences.getBoolean("showPencilIcon", false);
+            keepTranslationMarkdown = preferences.getBoolean("keepTranslationMarkdown", true);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -676,6 +677,14 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showPencilIcon", showPencilIcon);
+        editor.apply();
+    }
+
+    public static void toggleKeepTranslationMarkdown() {
+        keepTranslationMarkdown = !keepTranslationMarkdown;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("keepTranslationMarkdown", keepTranslationMarkdown);
         editor.apply();
     }
 

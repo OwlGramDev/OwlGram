@@ -211,15 +211,15 @@ public class OwlgramSettings extends BaseFragment {
                     TextCell textCell = (TextCell) holder.itemView;
                     textCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                     if (position == generalSettingsRow) {
-                        textCell.setTextAndIcon(LocaleController.getString("General", R.string.General), R.drawable.outline_pack, true);
+                        textCell.setTextAndIcon(LocaleController.getString("General", R.string.General), R.drawable.msg_channel, true); // TODO CHANGE GENERAL ICONS
                     } else if (position == chatSettingsRow){
-                        textCell.setTextAndIcon(LocaleController.getString("Chat", R.string.Chat), R.drawable.menu_chats, true);
+                        textCell.setTextAndIcon(LocaleController.getString("Chat", R.string.Chat), R.drawable.msg_msgbubble3, true);
                     } else if (position == updateSettingsRow){
                         textCell.setTextAndIcon(LocaleController.getString("OwlUpdates", R.string.OwlUpdates), R.drawable.round_update_white_28, false);
                     } else if (position == channelUpdatesRow) {
                         textCell.setTextAndValueAndIcon(LocaleController.getString("OfficialChannel", R.string.OfficialChannel), "@" + LocaleController.getString("ChannelUsername", R.string.ChannelUsername), R.drawable.msg_channel, true);
                     } else if (position == groupUpdatesRow) {
-                        textCell.setTextAndValueAndIcon(LocaleController.getString("OfficialGroup", R.string.OfficialGroup), "@" + LocaleController.getString("GroupUsername", R.string.GroupUsername), R.drawable.menu_groups, true);
+                        textCell.setTextAndValueAndIcon(LocaleController.getString("OfficialGroup", R.string.OfficialGroup), "@" + LocaleController.getString("GroupUsername", R.string.GroupUsername), R.drawable.msg_groups, true);
                     } else if (position == experimentalSettingsRow) {
                         textCell.setTextAndIcon(LocaleController.getString("Experimental", R.string.Experimental), R.drawable.outline_science_white, true);
                     } else if (position == appearanceSettingsRow) {

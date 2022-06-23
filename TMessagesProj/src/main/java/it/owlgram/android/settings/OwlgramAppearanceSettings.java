@@ -30,12 +30,10 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.components.AppIconSelectorCell;
 import it.owlgram.android.components.BlurIntensityCell;
 import it.owlgram.android.components.DrawerProfilePreviewCell;
 import it.owlgram.android.components.DynamicButtonSelector;
 import it.owlgram.android.components.ThemeSelectorDrawerCell;
-import it.owlgram.android.helpers.IconsHelper;
 
 public class OwlgramAppearanceSettings extends BaseFragment {
     private int rowCount;
@@ -76,7 +74,6 @@ public class OwlgramAppearanceSettings extends BaseFragment {
     private int searchIconInActionBarRow;
     private int appearanceDividerRow;
     private int selectIconHeaderRow;
-    private int selectIconRow;
     private int selectIconDividerRow;
     private int showNameInActionBarRow;
     private int showPencilIconRow;
@@ -293,7 +290,6 @@ public class OwlgramAppearanceSettings extends BaseFragment {
         dynamicDividerRow = rowCount++;
 
         selectIconHeaderRow = rowCount++;
-        selectIconRow = rowCount++;
         selectIconDividerRow = rowCount++;
 
         fontsAndEmojiHeaderRow = rowCount++;
@@ -413,7 +409,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                     TextCell textCell = (TextCell) holder.itemView;
                     textCell.setColors(Theme.key_windowBackgroundWhiteBlueText4, Theme.key_windowBackgroundWhiteBlueText4);
                     if (position == menuItemsRow) {
-                        textCell.setTextAndIcon(LocaleController.getString("MenuItems", R.string.MenuItems), R.drawable.menu_newfilter, false);
+                        textCell.setTextAndIcon(LocaleController.getString("MenuItems", R.string.MenuItems), R.drawable.msg_newfilter, false);
                     }
                     break;
             }
@@ -492,19 +488,6 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                     };
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
-                case 9:
-                    view = new AppIconSelectorCell(mContext, IconsHelper.getSelectedIcon()) {
-                        @Override
-                        protected void onSelectedIcon(int iconSelected) {
-                            super.onSelectedIcon(iconSelected);
-                            AlertDialog progressDialog = new AlertDialog(getContext(), 3);
-                            progressDialog.show();
-                            AndroidUtilities.runOnUIThread(progressDialog::dismiss, 2000);
-                            IconsHelper.saveSelectedIcon(iconSelected);
-                        }
-                    };
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-                    break;
                 default:
                     view = new ShadowSectionCell(mContext);
                     break;
@@ -540,8 +523,6 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                 return 7;
             } else if (position  == dynamicButtonRow) {
                 return 8;
-            } else if (position == selectIconRow) {
-                return 9;
             }
             return 1;
         }

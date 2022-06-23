@@ -134,7 +134,7 @@ public class DCHelper {
             case 5:
                 return R.drawable.ic_flora_datacenter;
             default:
-                return R.drawable.menu_secret_hw;
+                return R.drawable.msg_secret_hw;
         }
     }
 
@@ -151,7 +151,7 @@ public class DCHelper {
             case 5:
                 return R.drawable.ic_flora_datacenter_little;
             default:
-                return R.drawable.menu_secret_hw;
+                return R.drawable.msg_secret_hw;
         }
     }
 

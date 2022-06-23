@@ -16,6 +16,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.os.Build;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -27,38 +28,40 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.palette.graphics.Palette;
 
-import com.google.android.exoplayer2.util.Log;
+import androidx.palette.graphics.Palette;
+import androidx.core.content.ContextCompat;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.ImageReceiver;
+import org.telegram.messenger.Emoji;
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
-import org.telegram.messenger.UserObject;
-import org.telegram.messenger.FileLog;
 import org.telegram.messenger.R;
+import org.telegram.ui.Components.AudioPlayerAlert;
+import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
-import org.telegram.ui.Components.AudioPlayerAlert;
-import org.telegram.ui.ActionBar.ActionBarLayout;
-import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.DrawerLayoutContainer;
+import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AvatarDrawable;
 import org.telegram.ui.Components.BackupImageView;
+import org.telegram.ui.Components.ColoredImageSpan;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.LayoutHelper;
-import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.Premium.PremiumGradient;
+import org.telegram.ui.Components.Premium.StarParticlesView;
 import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RLottieImageView;
 import org.telegram.ui.Components.SnowflakesEffect;
 import org.telegram.ui.ThemeActivity;
 import it.owlgram.android.OwlConfig;
 
-public class DrawerProfileCell extends FrameLayout {
+public class DrawerProfileCell extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
 
     private BackupImageView avatarImageView;
     private TextView nameTextView;
@@ -79,6 +82,11 @@ public class DrawerProfileCell extends FrameLayout {
     private boolean accountsShown;
     private int darkThemeBackgroundColor;
     public static boolean switchingTheme;
+    public boolean drawPremium;
+    public float drawPremiumProgress;
+
+    StarParticlesView.Drawable starParticlesDrawable;
+    PremiumGradient.GradientTools gradientTools;
 
     private final ImageReceiver imageReceiver;
     private Bitmap lastBitmap;
@@ -173,7 +181,7 @@ public class DrawerProfileCell extends FrameLayout {
 
         arrowView = new ImageView(context);
         arrowView.setScaleType(ImageView.ScaleType.CENTER);
-        arrowView.setImageResource(R.drawable.menu_expand);
+        arrowView.setImageResource(R.drawable.msg_expand);
         addView(arrowView, LayoutHelper.createFrame(59, 59, Gravity.RIGHT | Gravity.BOTTOM));
         setArrowState(false);
 
@@ -189,13 +197,14 @@ public class DrawerProfileCell extends FrameLayout {
             @Override
             public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
                 super.onInitializeAccessibilityNodeInfo(info);
-                if (sunDrawable.getCustomEndFrame() != 0) {
-                    info.setText(LocaleController.getString("AccDescrSwitchToNightTheme", R.string.AccDescrSwitchToNightTheme));
-                } else {
+                if (Theme.isCurrentThemeDark()) {
                     info.setText(LocaleController.getString("AccDescrSwitchToDayTheme", R.string.AccDescrSwitchToDayTheme));
+                } else {
+                    info.setText(LocaleController.getString("AccDescrSwitchToNightTheme", R.string.AccDescrSwitchToNightTheme));
                 }
             }
         };
+        darkThemeView.setFocusable(true);
         darkThemeView.setBackground(Theme.createCircleSelectorDrawable(Theme.getColor(Theme.key_dialogButtonSelector), 0, 0));
         sunDrawable.beginApplyLayerColors();
         int color = Theme.getColor(Theme.key_chats_menuName);
@@ -275,6 +284,13 @@ public class DrawerProfileCell extends FrameLayout {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         updateColors();
+        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.emojiLoaded);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
     }
 
     @Override
@@ -291,6 +307,22 @@ public class DrawerProfileCell extends FrameLayout {
         }
     }
     @SuppressLint("DrawAllocation")
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        if (drawPremium) {
+            if (starParticlesDrawable == null) {
+                starParticlesDrawable = new StarParticlesView.Drawable(15);
+                starParticlesDrawable.init();
+                starParticlesDrawable.speedScale = 0.8f;
+                starParticlesDrawable.minLifeTime = 3000;
+            }
+            starParticlesDrawable.rect.set(avatarImageView.getLeft(), avatarImageView.getTop(), avatarImageView.getRight(), avatarImageView.getBottom());
+            starParticlesDrawable.rect.inset(-AndroidUtilities.dp(20), -AndroidUtilities.dp(20));
+            starParticlesDrawable.resetPositions();
+        }
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         Drawable backgroundDrawable = Theme.getCachedWallpaper();
@@ -382,16 +414,40 @@ public class DrawerProfileCell extends FrameLayout {
             darkBackColor = Theme.getColor(Theme.key_listSelector);
         }
 
-        if (darkBackColor != 0) {
-            if (darkBackColor != darkThemeBackgroundColor) {
-                backPaint.setColor(darkThemeBackgroundColor = darkBackColor);
-                if (Build.VERSION.SDK_INT >= 21) {
-                    Theme.setSelectorDrawableColor(darkThemeView.getBackground(), darkThemeBackgroundColor = darkBackColor, true);
-                }
+
+//        if (darkBackColor != 0) {
+//            if (darkBackColor != darkThemeBackgroundColor) {
+//                backPaint.setColor(darkThemeBackgroundColor = darkBackColor);
+//                if (Build.VERSION.SDK_INT >= 21) {
+//                    Theme.setSelectorDrawableColor(darkThemeView.getBackground(), darkThemeBackgroundColor = darkBackColor, true);
+//                }
+//            }
+//            if (useImageBackground && backgroundDrawable instanceof BitmapDrawable) {
+//                canvas.drawCircle(darkThemeView.getX() + darkThemeView.getMeasuredWidth() / 2, darkThemeView.getY() + darkThemeView.getMeasuredHeight() / 2, AndroidUtilities.dp(17), backPaint);
+//            }
+//        }
+        if (drawPremium && drawPremiumProgress != 1f) {
+            drawPremiumProgress += 16 / 220f;
+        } else if (!drawPremium && drawPremiumProgress != 0) {
+            drawPremiumProgress -= 16 / 220f;
+        }
+        drawPremiumProgress = Utilities.clamp(drawPremiumProgress, 1f, 0);
+        if (drawPremiumProgress != 0) {
+            if (gradientTools == null) {
+                gradientTools = new PremiumGradient.GradientTools(Theme.key_premiumGradientBottomSheet1, Theme.key_premiumGradientBottomSheet2, Theme.key_premiumGradientBottomSheet3, null);
+                gradientTools.x1 = 0;
+                gradientTools.y1 = 1.1f;
+                gradientTools.x2 = 1.5f;
+                gradientTools.y2 = -0.2f;
+                gradientTools.exactly = true;
             }
-            if (!avatarAsDrawerBackground && useImageBackground && backgroundDrawable instanceof BitmapDrawable) {
-                canvas.drawCircle(darkThemeView.getX() + darkThemeView.getMeasuredWidth() / 2, darkThemeView.getY() + darkThemeView.getMeasuredHeight() / 2, AndroidUtilities.dp(17), backPaint);
+            gradientTools.gradientMatrix(0, 0, getMeasuredWidth(), getMeasuredHeight(), 0, 0);
+            gradientTools.paint.setAlpha((int) (drawPremiumProgress * 255));
+            canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), gradientTools.paint);
+            if (starParticlesDrawable != null) {
+                starParticlesDrawable.onDraw(canvas, drawPremiumProgress);
             }
+            invalidate();
         }
         if (((Theme.getEventType() == 0 && OwlConfig.eventType == 0) || OwlConfig.eventType == 1) && OwlConfig.showSnowFalling) {
             snowflakesEffect.onDraw(this, canvas);
@@ -428,7 +484,19 @@ public class DrawerProfileCell extends FrameLayout {
         }
         accountsShown = accounts;
         setArrowState(false);
-        nameTextView.setText(UserObject.getUserName(user));
+        CharSequence text = UserObject.getUserName(user);
+        try {
+            text = Emoji.replaceEmoji(text, nameTextView.getPaint().getFontMetricsInt(), AndroidUtilities.dp(22), false);
+        } catch (Exception ignore) {}
+
+        drawPremium = false;//user.premium;
+        if (text != null && drawPremium) {
+            SpannableStringBuilder spannableStringBuilder = SpannableStringBuilder.valueOf(text);
+            spannableStringBuilder.append(" d");
+            spannableStringBuilder.setSpan(new ColoredImageSpan(ContextCompat.getDrawable(getContext(), R.drawable.msg_premium_liststar)), spannableStringBuilder.length() - 1, spannableStringBuilder.length(), 0);
+            text = spannableStringBuilder;
+        }
+        nameTextView.setText(text);
         if (!OwlConfig.hidePhoneNumber) {
             phoneTextView.setText(PhoneFormat.getInstance().format("+" + user.phone));
         } else if (!TextUtils.isEmpty(user.username)) {
@@ -458,7 +526,6 @@ public class DrawerProfileCell extends FrameLayout {
             avatarImageView.setVisibility(VISIBLE);
             gradientBackground.setVisibility(INVISIBLE);
         }
-
         applyBackground(true);
     }
 
@@ -489,4 +556,10 @@ public class DrawerProfileCell extends FrameLayout {
         arrowView.setContentDescription(accountsShown ? LocaleController.getString("AccDescrHideAccounts", R.string.AccDescrHideAccounts) : LocaleController.getString("AccDescrShowAccounts", R.string.AccDescrShowAccounts));
     }
 
+    @Override
+    public void didReceivedNotification(int id, int account, Object... args) {
+        if (id == NotificationCenter.emojiLoaded) {
+            nameTextView.invalidate();
+        }
+    }
 }

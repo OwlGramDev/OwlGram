@@ -41,6 +41,7 @@ import it.owlgram.android.helpers.PopupHelper;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.DeepLTranslator;
 import it.owlgram.android.translator.Translator;
+import it.owlgram.android.translator.TranslatorHelper;
 
 public class OwlgramGeneralSettings extends BaseFragment {
     private int rowCount;
@@ -57,6 +58,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
     private int destinationLanguageSelectRow;
     private int doNotTranslateSelectRow;
     private int autoTranslateRow;
+    private int keepMarkdownRow;
     private int divisorTranslationRow;
     private int hintTranslation1;
     private int hintTranslation2;
@@ -154,6 +156,16 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     }
                     listAdapter.notifyItemChanged(hintTranslation2);
                     if (oldProvider != OwlConfig.translationProvider) {
+                        boolean oldProviderSupport = TranslatorHelper.isSupportHTMLMode(oldProvider);
+                        boolean newProviderSupport = TranslatorHelper.isSupportHTMLMode();
+                        if (oldProviderSupport != newProviderSupport) {
+                            if (newProviderSupport) {
+                                listAdapter.notifyItemInserted(autoTranslateRow+1);
+                            } else {
+                                listAdapter.notifyItemRemoved(autoTranslateRow+1);
+                            }
+                            listAdapter.notifyItemChanged(autoTranslateRow);
+                        }
                         if (oldProvider == Translator.PROVIDER_DEEPL) {
                             listAdapter.notifyItemChanged(destinationLanguageSelectRow);
                             listAdapter.notifyItemRemoved(deepLFormalityRow);
@@ -162,6 +174,8 @@ public class OwlgramGeneralSettings extends BaseFragment {
                             updateRowsId(false);
                             listAdapter.notifyItemChanged(destinationLanguageSelectRow);
                             listAdapter.notifyItemInserted(deepLFormalityRow);
+                        } else if (oldProviderSupport != newProviderSupport) {
+                            updateRowsId(false);
                         }
                         listAdapter.notifyItemChanged(doNotTranslateSelectRow);
                     }
@@ -218,6 +232,11 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.autoTranslate);
                 }
+            } else if (position == keepMarkdownRow) {
+                OwlConfig.toggleKeepTranslationMarkdown();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.keepTranslationMarkdown);
+                }
             }
         });
         return fragmentView;
@@ -238,6 +257,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
         doNotTranslateSelectRow = rowCount++;
         deepLFormalityRow = OwlConfig.translationProvider == Translator.PROVIDER_DEEPL ? rowCount++:-1;
         autoTranslateRow = rowCount++;
+        keepMarkdownRow =  TranslatorHelper.isSupportHTMLMode() ? rowCount++:-1;
         divisorTranslationRow = rowCount++;
         hintTranslation1 = rowCount++;
         hintTranslation2 = rowCount++;
@@ -314,7 +334,9 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     } else if (position == notificationAccentRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("AccentAsNotificationColor", R.string.AccentAsNotificationColor), OwlConfig.accentAsNotificationColor, true);
                     } else if (position == autoTranslateRow) {
-                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("AutoTranslate", R.string.AutoTranslate), LocaleController.getString("AutoTranslateDesc", R.string.AutoTranslateDesc), OwlConfig.autoTranslate, true, false);
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("AutoTranslate", R.string.AutoTranslate), LocaleController.getString("AutoTranslateDesc", R.string.AutoTranslateDesc), OwlConfig.autoTranslate, true, keepMarkdownRow != -1);
+                    } else if (position == keepMarkdownRow) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("KeepMarkdown", R.string.KeepMarkdown), LocaleController.getString("KeepMarkdownDesc", R.string.KeepMarkdownDesc), OwlConfig.keepTranslationMarkdown, true, false);
                     }
                     break;
                 case 4:
@@ -494,7 +516,8 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     position == dcIdSettingsHeaderRow || position == notificationHeaderRow) {
                 return 2;
             } else if (position == phoneNumberSwitchRow || position == phoneContactsSwitchRow || position == dcIdRow ||
-                    position == confirmCallSwitchRow || position == notificationAccentRow || position == autoTranslateRow) {
+                    position == confirmCallSwitchRow || position == notificationAccentRow || position == autoTranslateRow ||
+                    position == keepMarkdownRow) {
                 return 3;
             } else if ( position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow ||
                     position == translationStyle || position == doNotTranslateSelectRow || position == idTypeRow) {

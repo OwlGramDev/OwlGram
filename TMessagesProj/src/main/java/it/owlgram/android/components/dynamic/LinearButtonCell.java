@@ -186,7 +186,7 @@ public class LinearButtonCell extends SimpleActionCell {
                 iconId = R.drawable.msg_videocall;
                 break;
             case 2:
-                iconId = R.drawable.payment_phone;
+                iconId = R.drawable.msg_calls;
                 break;
             case 3:
                 iconId = R.drawable.msg_block;

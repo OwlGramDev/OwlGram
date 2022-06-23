@@ -148,11 +148,11 @@ public class ThemeSelectorDrawerCell extends FrameLayout {
                         5,
                         R.raw.cross,
                         new int[] {
-                                R.drawable.profile_ban,
-                                R.drawable.profile_ban,
-                                R.drawable.profile_ban,
-                                R.drawable.profile_ban,
-                                R.drawable.profile_ban,
+                                R.drawable.msg_block,
+                                R.drawable.msg_block,
+                                R.drawable.msg_block,
+                                R.drawable.msg_block,
+                                R.drawable.msg_block,
                         }
                 );
             } else if (position == timedTheme) {
@@ -160,11 +160,11 @@ public class ThemeSelectorDrawerCell extends FrameLayout {
                         0,
                         R.raw.automatic,
                         new int[] {
-                                R.drawable.menu_groups,
-                                R.drawable.menu_contacts,
-                                R.drawable.menu_calls,
-                                R.drawable.menu_saved,
-                                R.drawable.menu_settings,
+                                R.drawable.msg_groups,
+                                R.drawable.msg_contacts,
+                                R.drawable.msg_calls,
+                                R.drawable.msg_saved,
+                                R.drawable.msg_settings,
                         }
                 );
             } else if (position == valentineTheme) {
@@ -172,11 +172,11 @@ public class ThemeSelectorDrawerCell extends FrameLayout {
                         2,
                         R.raw.valentine,
                         new int[] {
-                                R.drawable.menu_groups_14,
-                                R.drawable.menu_contacts_14,
-                                R.drawable.menu_calls_14,
-                                R.drawable.menu_bookmarks_14,
-                                R.drawable.menu_settings_14,
+                                R.drawable.msg_groups_14,
+                                R.drawable.msg_contacts_14,
+                                R.drawable.msg_calls_14,
+                                R.drawable.msg_saved_14,
+                                R.drawable.msg_settings_14,
                         }
                 );
             } else if (position == halloweenTheme) {
@@ -184,11 +184,11 @@ public class ThemeSelectorDrawerCell extends FrameLayout {
                         3,
                         R.raw.halloween,
                         new int[] {
-                                R.drawable.menu_groups_hw,
-                                R.drawable.menu_contacts_hw,
-                                R.drawable.menu_calls_hw,
-                                R.drawable.menu_bookmarks_hw,
-                                R.drawable.menu_settings_hw,
+                                R.drawable.msg_groups_hw,
+                                R.drawable.msg_contacts_hw,
+                                R.drawable.msg_calls_hw,
+                                R.drawable.msg_saved_hw,
+                                R.drawable.msg_settings_hw,
                         }
                 );
             } else if (position == holidayTheme) {
@@ -196,11 +196,11 @@ public class ThemeSelectorDrawerCell extends FrameLayout {
                         1,
                         R.raw.christmas,
                         new int[] {
-                                R.drawable.menu_groups_ny,
-                                R.drawable.menu_contacts_ny,
-                                R.drawable.menu_calls_ny,
-                                R.drawable.menu_bookmarks_ny,
-                                R.drawable.menu_settings_ny,
+                                R.drawable.msg_groups_ny,
+                                R.drawable.msg_contacts_ny,
+                                R.drawable.msg_calls_ny,
+                                R.drawable.msg_saved_ny,
+                                R.drawable.msg_settings_ny,
                         }
                 );
             } else if (position == lunarNewYearTheme) {

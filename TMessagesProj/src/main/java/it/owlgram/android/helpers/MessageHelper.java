@@ -29,6 +29,7 @@ import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
+import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
@@ -61,7 +62,7 @@ public class MessageHelper extends BaseController {
     }
 
     public static void saveStickerToGallery(Activity activity, TLRPC.Document document, Runnable callback) {
-        String path = FileLoader.getPathToAttach(document, true).toString();
+        String path = FileLoader.getInstance(UserConfig.selectedAccount).getPathToAttach(document, true).toString();
         File temp = new File(path);
         if (!temp.exists()) {
             return;
@@ -112,14 +113,14 @@ public class MessageHelper extends BaseController {
             }
         }
         if (TextUtils.isEmpty(path)) {
-            path = FileLoader.getPathToMessage(messageObject.messageOwner).toString();
+            path = FileLoader.getInstance(UserConfig.selectedAccount).getPathToMessage(messageObject.messageOwner).toString();
             File temp = new File(path);
             if (!temp.exists()) {
                 path = null;
             }
         }
         if (TextUtils.isEmpty(path)) {
-            path = FileLoader.getPathToAttach(messageObject.getDocument(), true).toString();
+            path = FileLoader.getInstance(UserConfig.selectedAccount).getPathToAttach(messageObject.getDocument(), true).toString();
             File temp = new File(path);
             if (!temp.exists()) {
                 return null;
@@ -149,7 +150,11 @@ public class MessageHelper extends BaseController {
     }
 
     public boolean isMessageObjectAutoTranslatable(MessageObject messageObject) {
-        if (messageObject.translated || messageObject.translating || messageObject.isOutOwner() || EntitiesHelper.isEmoji(messageObject.messageOwner.message)) {
+        if (messageObject.translated ||
+                messageObject.translating ||
+                messageObject.isOutOwner() ||
+                messageObject.messageOwner.message != null && EntitiesHelper.isEmoji(messageObject.messageOwner.message)
+        ) {
             return false;
         }
         return isMessageTranslatable(messageObject);
