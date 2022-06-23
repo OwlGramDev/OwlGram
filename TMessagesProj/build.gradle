@@ -76,8 +76,6 @@ dependencies {
     // NATIVE LIBS
     implementation 'com.getkeepsafe.relinker:relinker:1.4.4'
 
-    implementation "com.android.billingclient:billing:5.0.0"
-
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 }
 
@@ -175,7 +173,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 32
         versionName "2.1.0"
-        versionCode 2703
+        versionCode 2705
         buildConfigField "String", "GIT_COMMIT_HASH", "\"${getGitHash()}\""
         buildConfigField "Long", "GIT_COMMIT_DATE", "${getGitDate()}L"
 
