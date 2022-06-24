@@ -12,6 +12,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 
+import it.owlgram.android.StoreUtils;
+
 public class BuildVars {
 
     public static boolean DEBUG_VERSION = false;
@@ -32,7 +34,7 @@ public class BuildVars {
     public static String PLAYSTORE_APP_URL = "https://play.google.com/store/apps/details?id=it.owlgram.android";
 
     // You can use this flag to disable Google Play Billing (If you're making fork and want it to be in Google Play)
-    public static boolean IS_BILLING_UNAVAILABLE = false;
+    public static boolean IS_BILLING_UNAVAILABLE = StoreUtils.isFromPlayStore();
 
     static {
         if (ApplicationLoader.applicationContext != null) {
@@ -48,7 +50,7 @@ public class BuildVars {
     private static Boolean standaloneApp;
     public static boolean isStandaloneApp() {
         if (standaloneApp == null) {
-            standaloneApp = ApplicationLoader.applicationContext != null && "it.owlgram.android.web".equals(ApplicationLoader.applicationContext.getPackageName());
+            standaloneApp = ApplicationLoader.applicationContext != null && "it.owlgram.android".equals(ApplicationLoader.applicationContext.getPackageName());
         }
         return standaloneApp;
     }

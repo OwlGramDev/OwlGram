@@ -211,7 +211,7 @@ public class OwlgramSettings extends BaseFragment {
                     TextCell textCell = (TextCell) holder.itemView;
                     textCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                     if (position == generalSettingsRow) {
-                        textCell.setTextAndIcon(LocaleController.getString("General", R.string.General), R.drawable.msg_channel, true); // TODO CHANGE GENERAL ICONS
+                        textCell.setTextAndIcon(LocaleController.getString("General", R.string.General), R.drawable.msg_media, true);
                     } else if (position == chatSettingsRow){
                         textCell.setTextAndIcon(LocaleController.getString("Chat", R.string.Chat), R.drawable.msg_msgbubble3, true);
                     } else if (position == updateSettingsRow){

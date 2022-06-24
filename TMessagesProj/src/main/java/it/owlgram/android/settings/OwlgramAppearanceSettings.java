@@ -19,7 +19,6 @@ import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarLayout;
-import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
@@ -73,8 +72,6 @@ public class OwlgramAppearanceSettings extends BaseFragment {
     private int slidingTitleRow;
     private int searchIconInActionBarRow;
     private int appearanceDividerRow;
-    private int selectIconHeaderRow;
-    private int selectIconDividerRow;
     private int showNameInActionBarRow;
     private int showPencilIconRow;
 
@@ -289,9 +286,6 @@ public class OwlgramAppearanceSettings extends BaseFragment {
         dynamicButtonRow = rowCount++;
         dynamicDividerRow = rowCount++;
 
-        selectIconHeaderRow = rowCount++;
-        selectIconDividerRow = rowCount++;
-
         fontsAndEmojiHeaderRow = rowCount++;
         useSystemFontRow = rowCount++;
         useSystemEmojiRow = rowCount++;
@@ -357,8 +351,6 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                         headerCell.setText(LocaleController.getString("FontsAndEmojis", R.string.FontsAndEmojis));
                     } else if (position == appearanceHeaderRow) {
                         headerCell.setText(LocaleController.getString("Appearance", R.string.Appearance));
-                    } else if (position == selectIconHeaderRow) {
-                        headerCell.setText(LocaleController.getString("AppIcon", R.string.AppIcon));
                     }
                     break;
                 case 3:
@@ -499,11 +491,10 @@ public class OwlgramAppearanceSettings extends BaseFragment {
         @Override
         public int getItemViewType(int position) {
             if (position == drawerDividerRow || position == editBlurDividerRow || position == themeDrawerDividerRow ||
-                    position == dynamicDividerRow || position == fontsAndEmojiDividerRow || position == appearanceDividerRow ||
-                    position == selectIconDividerRow){
+                    position == dynamicDividerRow || position == fontsAndEmojiDividerRow || position == appearanceDividerRow){
                 return 1;
             } else if (position == editBlurHeaderRow || position == themeDrawerHeader || position == dynamicButtonHeaderRow ||
-                    position == fontsAndEmojiHeaderRow || position == appearanceHeaderRow || position == selectIconHeaderRow) {
+                    position == fontsAndEmojiHeaderRow || position == appearanceHeaderRow) {
                 return 2;
             } else if ( position == roundedNumberSwitchRow || position == messageTimeSwitchRow ||
                     position == useSystemFontRow || position == useSystemEmojiRow || position == drawerAvatarAsBackgroundRow ||
