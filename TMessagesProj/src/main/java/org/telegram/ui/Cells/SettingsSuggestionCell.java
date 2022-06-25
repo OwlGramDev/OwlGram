@@ -100,7 +100,8 @@ public class SettingsSuggestionCell extends LinearLayout {
                 TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
                 run.flags |= TextStyleSpan.FLAG_STYLE_SPOILER;
                 TextStyleSpan result = new TextStyleSpan(run);
-                String totalString = phoneNumber.split(" ", 2)[1];
+                String[] splitNumber = phoneNumber.split(" ", 2);
+                String totalString = splitNumber.length > 1 ? splitNumber[1] : splitNumber[0];
                 phoneChars.setSpan(result, phoneText.indexOf(totalString), phoneText.indexOf(totalString) + totalString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
             textView.setText(phoneChars);
