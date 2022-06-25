@@ -170,7 +170,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
             bottomHeaderRow = rowCount++;
             headerExperimental = rowCount++;
             betterAudioCallRow = rowCount++;
-            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
+            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S || Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2) {
                 monetIconRow = rowCount++;
             }
             maxRecentStickersRow = rowCount++;

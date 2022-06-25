@@ -11,7 +11,7 @@ public class MonetIconsHelper {
     }
 
     public static boolean needMonetMigration() {
-        return isSelectedMonet() && Build.VERSION.SDK_INT > Build.VERSION_CODES.S;
+        return isSelectedMonet() && Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2;
     }
 
     public static void switchToMonet() {
