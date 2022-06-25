@@ -90,7 +90,6 @@ public class ActionBarLayout extends FrameLayout {
 
         public LayoutContainer(Context context) {
             super(context);
-            setClickable(true);
             setWillNotDraw(false);
         }
 

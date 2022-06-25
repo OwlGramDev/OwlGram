@@ -276,6 +276,8 @@ public class ContentPreviewViewer {
                             MediaDataController.getInstance(currentAccount).addRecentSticker(MediaDataController.TYPE_IMAGE, parentObject, currentDocument, (int) (System.currentTimeMillis() / 1000), true);
                         } else if (actions.get(which) == 5) {
                             delegate.remove(importingSticker);
+                        } else if (actions.get(which) == 110) {
+                            MessageHelper.saveStickerToGallery(parentActivity, currentDocument, () -> {});
                         }
                         if (popupWindow != null) {
                             popupWindow.dismiss();
@@ -336,8 +338,9 @@ public class ContentPreviewViewer {
                     y += AndroidUtilities.dp(24);
                 }
                 popupWindow.showAtLocation(containerView, 0, (int) ((containerView.getMeasuredWidth() - previewMenu.getMeasuredWidth()) / 2f), y);
-
-                containerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                if (withVibration) {
+                    containerView.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                }
             } else if (delegate != null) {
                 menuVisible = true;
                 ArrayList<CharSequence> items = new ArrayList<>();
@@ -564,7 +567,7 @@ public class ContentPreviewViewer {
             } else {
                 confirmSending();
             }
-        }, 150);
+        }, 300);
     }
 
     public boolean isSendingMode() {
@@ -1066,6 +1069,8 @@ public class ContentPreviewViewer {
         currentQuery = null;
         delegate = null;
         isVisible = false;
+        isShowedRunnable = false;
+        withVibration = true;
         if (unlockPremiumView != null) {
             unlockPremiumView.animate().alpha(0).translationY(AndroidUtilities.dp(56)).setDuration(150).setInterpolator(CubicBezierInterpolator.DEFAULT).start();
         }

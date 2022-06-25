@@ -163,6 +163,10 @@ public class EntitiesHelper {
 
     public static void applySpannableToEditText(EditTextCaption editTextCaption, int startSpan, int endSpan) {
         Editable spannableString = new Editable.Factory().newEditable(editTextCaption.getText());
+        applyTelegramSpannable(editTextCaption.getText(), spannableString, startSpan, endSpan);
+    }
+
+    private static void applyTelegramSpannable(Editable outputSpannable, Editable spannableString, int startSpan, int endSpan) {
         CharacterStyle[] mSpans = spannableString.getSpans(startSpan, endSpan, CharacterStyle.class);
         RawSpannableInfo rawSpannableInfo = null;
         for (CharacterStyle mSpan : mSpans) {
@@ -222,14 +226,14 @@ public class EntitiesHelper {
             } else if ((mSpan instanceof ForegroundColorSpan && ((ForegroundColorSpan)mSpan).getForegroundColor() == Theme.getColor(Theme.key_chat_messagePanelText)) || mSpan instanceof BackgroundColorSpan) {
                 if (mSpan instanceof BackgroundColorSpan) {
                     ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Theme.getColor(Theme.key_chat_messagePanelText));
-                    editTextCaption.getText().removeSpan(mSpan);
-                    editTextCaption.getText().setSpan(foregroundColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    outputSpannable.removeSpan(mSpan);
+                    outputSpannable.setSpan(foregroundColorSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
                 TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
                 run.flags |= TextStyleSpan.FLAG_STYLE_SPOILER;
                 result = new TextStyleSpan(run);
             } else if (mSpan instanceof ForegroundColorSpan){
-                editTextCaption.getText().removeSpan(mSpan);
+                outputSpannable.removeSpan(mSpan);
                 continue;
             }
             if (result != null) {
@@ -238,7 +242,7 @@ public class EntitiesHelper {
                         if (rawSpannableInfo.start == start && rawSpannableInfo.end == end) {
                             rawSpannableInfo.textStyleSpan.getTextStyleRun().merge(((TextStyleSpan) result).getTextStyleRun());
                         } else {
-                            editTextCaption.getText().setSpan(rawSpannableInfo.textStyleSpan, rawSpannableInfo.start, rawSpannableInfo.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            outputSpannable.setSpan(rawSpannableInfo.textStyleSpan, rawSpannableInfo.start, rawSpannableInfo.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             rawSpannableInfo = new RawSpannableInfo((TextStyleSpan) result, start, end);
                         }
                     } else {
@@ -246,15 +250,15 @@ public class EntitiesHelper {
                     }
                 } else {
                     if (rawSpannableInfo != null) {
-                        editTextCaption.getText().setSpan(rawSpannableInfo.textStyleSpan, rawSpannableInfo.start, rawSpannableInfo.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        outputSpannable.setSpan(rawSpannableInfo.textStyleSpan, rawSpannableInfo.start, rawSpannableInfo.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                         rawSpannableInfo = null;
                     }
-                    editTextCaption.getText().setSpan(result, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    outputSpannable.setSpan(result, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             }
         }
         if (rawSpannableInfo != null) {
-            editTextCaption.getText().setSpan(rawSpannableInfo.textStyleSpan, rawSpannableInfo.start, rawSpannableInfo.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            outputSpannable.setSpan(rawSpannableInfo.textStyleSpan, rawSpannableInfo.start, rawSpannableInfo.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
     }
 
@@ -320,8 +324,8 @@ public class EntitiesHelper {
     }
 
     public static CharSequence applySyntaxHighlight(CharSequence text, ArrayList<TLRPC.MessageEntity> entities) {
-        SpannableStringBuilder messSpan = new SpannableStringBuilder(text);
-        MediaDataController.addTextStyleRuns(entities, text, messSpan);
+        Editable messSpan = new SpannableStringBuilder(text);
+        applyTelegramSpannable(messSpan, (Editable) getSpannableString(text.toString(), entities), 0, text.length());
         Prism4j grammarCheck = new Prism4j(new Prism4jGrammarLocator());
         TextStyleSpan[] result = messSpan.getSpans(0, messSpan.length(), TextStyleSpan.class);
         for (TextStyleSpan span:result) {
@@ -345,10 +349,10 @@ public class EntitiesHelper {
         }
         messSpan = (SpannableStringBuilder) AndroidUtilities.getTrimmedString(messSpan);
         CharSequence[] message = new CharSequence[]{messSpan};
-        ArrayList<TLRPC.MessageEntity> entitiesNew = MediaDataController.getInstance(UserConfig.selectedAccount).getEntities(message, false);
+        ArrayList<TLRPC.MessageEntity> entitiesNew = MediaDataController.getInstance(UserConfig.selectedAccount).getEntities(message, true);
         entities.clear();
         entities.addAll(entitiesNew);
-        return messSpan.toString();
+        return messSpan;
     }
 
     public static boolean isEmoji(String message){

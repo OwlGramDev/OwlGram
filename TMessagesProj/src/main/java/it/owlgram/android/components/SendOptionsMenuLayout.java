@@ -229,7 +229,7 @@ public class SendOptionsMenuLayout extends LinearLayout {
             linearLayout.addView(sendWithoutSoundButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
         }
         ActionBarMenuSubItem sendMessage = new ActionBarMenuSubItem(getContext(), !showNotify || !showSchedule, true, resourcesProvider);
-        sendMessage.setTextAndIcon(LocaleController.getString("SendMessage", R.string.SendMessage), R.drawable.msg_forward_check);
+        sendMessage.setTextAndIcon(LocaleController.getString("SendMessage", R.string.SendMessage), R.drawable.msg_send);
         sendMessage.setMinimumWidth(AndroidUtilities.dp(196));
         sendMessage.setOnClickListener(v -> {
             if (sendPopupWindow != null && sendPopupWindow.isShowing()) {

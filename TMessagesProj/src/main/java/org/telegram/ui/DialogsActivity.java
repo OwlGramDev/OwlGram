@@ -397,6 +397,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private ChatActivity mLastChatActivity;
 
     private ArrayList<Long> selectedDialogs = new ArrayList<>();
+    public boolean notify = true;
 
     private int canReadCount;
     private int canPinCount;
@@ -1986,6 +1987,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         getNotificationCenter().addObserver(this, NotificationCenter.onDatabaseMigration);
         getNotificationCenter().addObserver(this, NotificationCenter.onDatabaseOpened);
         getNotificationCenter().addObserver(this, NotificationCenter.didClearDatabase);
+
         loadDialogs(getAccountInstance());
         getMessagesController().loadPinnedDialogs(folderId, 0, null);
         if (databaseMigrationHint != null && !getMessagesStorage().isDatabaseMigrationInProgress()) {
@@ -2019,7 +2021,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
-
         if (searchString == null) {
             getNotificationCenter().removeObserver(this, NotificationCenter.dialogsNeedReload);
             NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
@@ -2449,7 +2450,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     return getMessagesController().dialogFilters.get(tabId).unreadCount;
                 }
 
-                @SuppressLint("ClickableViewAccessibility")
                 @Override
                 public boolean didSelectTab(FilterTabsView.TabView tabView, boolean selected) {
                     if (actionBar.isActionModeShowed()) {
@@ -2479,7 +2479,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         public boolean onTouch(View v, MotionEvent event) {
                             if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
                                 if (scrimPopupWindow != null && scrimPopupWindow.isShowing()) {
-                                    @SuppressLint("ClickableViewAccessibility") View contentView = scrimPopupWindow.getContentView();
+                                    View contentView = scrimPopupWindow.getContentView();
                                     contentView.getLocationInWindow(pos);
                                     rect.set(pos[0], pos[1], pos[0] + contentView.getMeasuredWidth(), pos[1] + contentView.getMeasuredHeight());
                                     if (!rect.contains((int) event.getX(), (int) event.getY())) {
@@ -4313,7 +4313,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         MessagesController.DialogFilter filter = getMessagesController().dialogFilters.get(viewPages[a].selectedType);
         if (filter.isDefault()) {
-            viewPages[a].dialogsType = 0;
+            viewPages[a].dialogsType = initialDialogsType;
             viewPages[a].listView.updatePullState();
         } else {
             if (viewPages[a == 0 ? 1 : 0].dialogsType == 7) {
@@ -4660,10 +4660,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     @Override
     public boolean onBackPressed() {
-        int firstTabId = Integer.MAX_VALUE;
-        if (filterTabsView != null) {
-            firstTabId = OwlConfig.hideAllTab ? filterTabsView.getFirstTabId():Integer.MAX_VALUE;
-        }
         if (scrimPopupWindow != null) {
             scrimPopupWindow.dismiss();
             return false;
@@ -7041,7 +7037,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     private boolean isNextButton = false;
     private AnimatorSet commentViewAnimator;
-    
+
     private void updateSelectedCount() {
         if (commentView != null) {
             if (selectedDialogs.isEmpty()) {
@@ -7228,6 +7224,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (allGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && FilesMigrationService.filesMigrationBottomSheet != null) {
                 FilesMigrationService.filesMigrationBottomSheet.migrateOldFolder();
             }
+
         }
     }
 

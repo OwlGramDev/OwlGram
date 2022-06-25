@@ -375,6 +375,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private TLRPC.UserFull userInfo;
 
     private CharSequence currentBio;
+    private CharSequence originalBio;
 
     private long selectedUser;
     private int onlineCount = -1;
@@ -4331,7 +4332,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             }
             final String[] fromLanguage = new String[1];
             fromLanguage[0] = "und";
-            final boolean translateButtonEnabled = MessagesController.getGlobalMainSettings().getBoolean("translate_button", false);
+            final boolean translateButtonEnabled = MessagesController.getGlobalMainSettings().getBoolean("translate_button2", false);
             final boolean[] withTranslate = new boolean[1];
             withTranslate[0] = position == bioRow || position == channelInfoRow || position == userInfoRow;
             final String toLang = LocaleController.getInstance().getCurrentLocale().getLanguage();
@@ -4340,7 +4341,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     return;
                 }
                 AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity(), resourcesProvider);
-                builder.setItems(withTranslate[0] ? new CharSequence[]{LocaleController.getString("Copy", R.string.Copy), LocaleController.getString("TranslateMessage", R.string.TranslateMessage)} : new CharSequence[]{LocaleController.getString("Copy", R.string.Copy)}, (dialogInterface, i) -> {
+                builder.setItems(withTranslate[0] ? new CharSequence[]{LocaleController.getString("Copy", R.string.Copy), originalBio != null ? LocaleController.getString("UndoTranslate",R.string.UndoTranslate):LocaleController.getString("TranslateMessage",R.string.TranslateMessage)} : new CharSequence[]{LocaleController.getString("Copy", R.string.Copy)}, (dialogInterface, i) -> {
                     try {
                         if (i == 0) {
                             AndroidUtilities.addToClipboard(finalText);
@@ -4350,13 +4351,20 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                 BulletinFactory.of(this).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
                             }
                         } else if (i == 1) {
-                            TranslateAlert.showAlert(fragmentView.getContext(), this, fromLanguage[0], toLang, finalText, false, span -> {
+                            if(originalBio != null){
+                                aboutLinkCell.setTextAndValue((String) originalBio, channelInfoRow != -1 ? null:LocaleController.getString("UserBio", R.string.UserBio), true);
+                                currentBio = originalBio;
+                                originalBio = null;
+                            } else {
+                                translateBio(finalText, aboutLinkCell);
+                            }
+                            /*TranslateAlert.showAlert(fragmentView.getContext(), this, fromLanguage[0], toLang, finalText, false, span -> {
                                 if (span != null) {
                                     openUrl(span.getURL());
                                     return true;
                                 }
                                 return false;
-                            }, null);
+                            }, null);*/
                         }
                     } catch (Exception e) {
                         FileLog.e(e);
@@ -4369,8 +4377,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     LanguageDetector.detectLanguage(finalText, (fromLang) -> {
                         fromLanguage[0] = fromLang;
                         withTranslate[0] = fromLang != null && (!fromLang.equals(toLang) || fromLang.equals("und")) && (
-                                translateButtonEnabled && !RestrictedLanguagesSelectActivity.getRestrictedLanguages().contains(fromLang) ||
-                                        (currentChat != null && (currentChat.has_link || currentChat.username != null)) && ("uk".equals(fromLang) || "ru".equals(fromLang)));
+                                /*translateButtonEnabled && !RestrictedLanguagesSelectActivity.getRestrictedLanguages().contains(fromLang) ||
+                                        (currentChat != null && (currentChat.has_link || currentChat.username != null)) && ("uk".equals(fromLang) || "ru".equals(fromLang)));*/
+                                !DoNotTranslateSettings.getRestrictedLanguages().contains(fromLang));
                         showMenu.run();
                     }, (error) -> {
                         FileLog.e("mlkit: failed to detect language in selection", error);
@@ -4406,9 +4415,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 public void onSuccess(BaseTranslator.Result result) {
                     translatingBio = false;
                     currentBio = (String) result.translation;
-                    // TODO: LAKY FIX
-                    //originalBio = bio;
-                    //aboutLinkCell.setTextAndValue(currentBio, channelInfoRow != -1 ? null:LocaleController.getString("UserBio", R.string.UserBio), true);
+                    originalBio = bio;
+                    aboutLinkCell.setTextAndValue((String) currentBio, channelInfoRow != -1 ? null:LocaleController.getString("UserBio", R.string.UserBio), true);
                 }
 
                 @Override
@@ -4417,24 +4425,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 }
             });
         } else {
-            TranslateAlert.showAlert(getParentActivity(), this, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], bio, false, urlSpan -> {
-                String url = urlSpan.toString();
-                if (url.startsWith("@")) {
-                    getMessagesController().openByUserName(url.substring(1), ProfileActivity.this, 0);
-                    return true;
-                } else if (url.startsWith("#")) {
-                    DialogsActivity fragment = new DialogsActivity(null);
-                    fragment.setSearchString(url);
-                    presentFragment(fragment);
-                    return true;
-                } else if (url.startsWith("/")) {
-                    if (parentLayout.fragmentsStack.size() > 1) {
-                        BaseFragment previousFragment = parentLayout.fragmentsStack.get(parentLayout.fragmentsStack.size() - 2);
-                        if (previousFragment instanceof ChatActivity) {
-                            finishFragment();
-                            ((ChatActivity) previousFragment).chatActivityEnterView.setCommand(null, url, false, false);
-                        }
-                    }
+            TranslateAlert.showAlert(getParentActivity(), this, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], bio, false, span -> {
+                if (span != null) {
+                    openUrl(span.getURL());
                     return true;
                 }
                 return false;
@@ -5516,11 +5509,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (uid == userId) {
                 userInfo = (TLRPC.UserFull) args[1];
                 if (imageUpdater != null) {
-                    // TODO: LAKY FIX
-                    /*if (!TextUtils.equals(userInfo.about, currentBio) && !TextUtils.equals(userInfo.about, originalBio)) {
+                    if (!TextUtils.equals(userInfo.about, currentBio) && !TextUtils.equals(userInfo.about, originalBio)) {
                         originalBio = null;
                         listAdapter.notifyItemChanged(bioRow);
-                    }*/
+                    }
                 } else {
                     if (!openAnimationInProgress && !callItemVisible) {
                         createActionBarMenu(true);
@@ -8351,17 +8343,27 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     if (position == userInfoRow) {
                         TLRPC.User user = userInfo.user != null ? userInfo.user : getMessagesController().getUser(userInfo.id);
                         boolean addlinks = isBot || (user != null && user.premium && userInfo.about != null);
-                        aboutLinkCell.setTextAndValue(userInfo.about, LocaleController.getString("UserBio", R.string.UserBio), addlinks);
+                        String about = userInfo.about;
+                        if(originalBio != null){
+                            about = (String) currentBio;
+                        }
+                        aboutLinkCell.setTextAndValue(about, LocaleController.getString("UserBio", R.string.UserBio), addlinks);
                     } else if (position == channelInfoRow) {
                         String text = chatInfo.about;
                         while (text.contains("\n\n\n")) {
                             text = text.replace("\n\n\n", "\n\n");
                         }
-                        aboutLinkCell.setText(text, ChatObject.isChannel(currentChat) && !currentChat.megagroup);
+                        if(originalBio != null){
+                            text = (String) currentBio;
+                        }
+                        aboutLinkCell.setText(text, true);
                     } else if (position == bioRow) {
                         String value;
                         if (userInfo == null || !TextUtils.isEmpty(userInfo.about)) {
                             value = userInfo == null ? LocaleController.getString("Loading", R.string.Loading) : userInfo.about;
+                            if(originalBio != null){
+                                value = (String) currentBio;
+                            }
                             aboutLinkCell.setTextAndValue(value, LocaleController.getString("UserBio", R.string.UserBio), getUserConfig().isPremium());
                             currentBio = userInfo != null ? userInfo.about : null;
                         } else {
