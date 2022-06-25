@@ -141,7 +141,7 @@ public class EntitiesHelper {
                     }
                 }
                 if ((((TextStyleSpan) mSpan).getStyleFlags() & TextStyleSpan.FLAG_STYLE_MENTION) > 0) {
-                    long id = ((TLRPC.TL_messageEntityMentionName)((TextStyleSpan) mSpan).getTextStyleRun().urlEntity).user_id;
+                    long id = ((TLRPC.TL_inputMessageEntityMentionName)((TextStyleSpan) mSpan).getTextStyleRun().urlEntity).user_id.user_id;
                     spannableString.setSpan(new URLSpan("tg://user?id=" + id), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             } else if (mSpan instanceof URLSpan) {
