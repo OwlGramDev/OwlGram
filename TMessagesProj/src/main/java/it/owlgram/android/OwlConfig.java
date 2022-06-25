@@ -9,12 +9,12 @@ import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.ActionBar.Theme;
 
 import java.util.Calendar;
 import java.util.Date;
 
 import it.owlgram.android.camera.CameraXUtilities;
+import it.owlgram.android.helpers.MonetIconsHelper;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.DeepLTranslator;
 import it.owlgram.android.translator.Translator;
@@ -63,16 +63,12 @@ public class OwlConfig extends SettingsManager {
     public static boolean accentAsNotificationColor;
     public static boolean showDeleteDownloadedFile;
     public static boolean isChineseUser = false;
-    public static boolean hideAllTab;
     public static boolean showSantaHat;
     public static boolean showSnowFalling;
     public static boolean useCameraXOptimizedMode;
     public static boolean disableProximityEvents;
-    public static boolean unlimitedFavoriteStickers;
-    public static boolean unlimitedPinnedDialogs;
     public static boolean devOptEnabled;
     public static boolean verifyLinkTip;
-    public static boolean increaseAudioMessages;
     public static boolean voicesAgc;
     public static boolean turnSoundOnVDKey;
     public static boolean openArchiveOnPull;
@@ -81,7 +77,6 @@ public class OwlConfig extends SettingsManager {
     public static boolean showIDAndDC;
     public static boolean xiaomiBlockedInstaller;
     public static boolean searchIconInActionBar;
-    public static boolean useMonetIcon;
     public static boolean autoTranslate;
     public static boolean showNameInActionBar;
     public static boolean showPencilIcon;
@@ -176,7 +171,6 @@ public class OwlConfig extends SettingsManager {
             disableAppBarShadow = preferences.getBoolean("disableAppBarShadow", false);
             accentAsNotificationColor = preferences.getBoolean("accentAsNotificationColor", false);
             showDeleteDownloadedFile = preferences.getBoolean("showDeleteDownloadedFile", false);
-            hideAllTab = preferences.getBoolean("hideAllTab", false);
             lastUpdateCheck = preferences.getLong("lastUpdateCheck", 0);
             lastUpdateStatus = preferences.getInt("lastUpdateStatus", 0);
             remindedUpdate = preferences.getInt("remindedUpdate", 0);
@@ -202,7 +196,6 @@ public class OwlConfig extends SettingsManager {
             verifyLinkTip = preferences.getBoolean("verifyLinkTip", false);
             languagePackVersioning = preferences.getString("languagePackVersioning", "{}");
             xiaomiBlockedInstaller = preferences.getBoolean("xiaomiBlockedInstaller", false);
-            increaseAudioMessages = preferences.getBoolean("increaseAudioMessages", false);
             voicesAgc = preferences.getBoolean("voicesAgc", false);
             turnSoundOnVDKey = preferences.getBoolean("turnSoundOnVDKey", true);
             openArchiveOnPull = preferences.getBoolean("openArchiveOnPull", false);
@@ -223,11 +216,8 @@ public class OwlConfig extends SettingsManager {
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
 
             String dS = devOptEnabled ? "":"_disabled";
-            unlimitedFavoriteStickers = preferences.getBoolean("unlimitedFavoriteStickers"+dS, false);
-            unlimitedPinnedDialogs = preferences.getBoolean("unlimitedPinnedDialogs"+dS, false);
             maxRecentStickers = preferences.getInt("maxRecentStickers"+dS, 20);
             betterAudioQuality = preferences.getBoolean("betterAudioQuality"+dS, false);
-            useMonetIcon = preferences.getBoolean("useMonetIcon"+dS, false);
             configLoaded = true;
         }
     }
@@ -536,14 +526,6 @@ public class OwlConfig extends SettingsManager {
         editor.apply();
     }
 
-    public static void toggleHideAllTab() {
-        hideAllTab = !hideAllTab;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("hideAllTab", hideAllTab);
-        editor.apply();
-    }
-
     public static void toggleShowSantaHat() {
         showSantaHat = !showSantaHat;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
@@ -573,30 +555,6 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("disableProximityEvents", disableProximityEvents);
-        editor.apply();
-    }
-
-    public static void toggleUnlimitedFavoriteStickers() {
-        unlimitedFavoriteStickers = !unlimitedFavoriteStickers;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("unlimitedFavoriteStickers", unlimitedFavoriteStickers);
-        editor.apply();
-    }
-
-    public static void toggleUnlimitedPinnedDialogs() {
-        unlimitedPinnedDialogs = !unlimitedPinnedDialogs;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("unlimitedPinnedDialogs", unlimitedPinnedDialogs);
-        editor.apply();
-    }
-
-    public static void toggleIncreaseAudioMessages() {
-        increaseAudioMessages = !increaseAudioMessages;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("increaseAudioMessages", increaseAudioMessages);
         editor.apply();
     }
 
@@ -653,14 +611,6 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("searchIconInActionBar", searchIconInActionBar);
-        editor.apply();
-    }
-
-    public static void toggleUseMonetIcon() {
-        useMonetIcon = !useMonetIcon;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("useMonetIcon", useMonetIcon);
         editor.apply();
     }
 
@@ -930,7 +880,7 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static boolean isDevOptEnabled() {
-        return devOptEnabled || betterAudioQuality || unlimitedFavoriteStickers || unlimitedPinnedDialogs || maxRecentStickers != 20 || useMonetIcon;
+        return devOptEnabled || betterAudioQuality || MonetIconsHelper.isSelectedMonet() || maxRecentStickers != 20;
     }
 
     public static boolean canShowFireworks() {

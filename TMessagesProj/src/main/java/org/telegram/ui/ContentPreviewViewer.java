@@ -570,16 +570,12 @@ public class ContentPreviewViewer {
         }, 300);
     }
 
-    public boolean isSendingMode() {
-        return delegate.getClass().getName().contains(EmojiView.class.getName());
-    }
-
     public boolean onTouch(MotionEvent event, final RecyclerListView listView, final int height, final Object listener, ContentPreviewViewerDelegate contentPreviewViewerDelegate, Theme.ResourcesProvider resourcesProvider) {
         delegate = contentPreviewViewerDelegate;
         this.resourcesProvider = resourcesProvider;
         if (openPreviewRunnable != null || isVisible()) {
             if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_POINTER_UP) {
-                if (!OwlConfig.confirmStickersGIFs || !isSendingMode()) {
+                if (!OwlConfig.confirmStickersGIFs) {
                     AndroidUtilities.runOnUIThread(() -> {
                         if (listView != null) {
                             listView.setOnItemClickListener((RecyclerListView.OnItemClickListener) listener);
@@ -588,10 +584,10 @@ public class ContentPreviewViewer {
                 } else {
                     confirmSending();
                 }
-                if (openPreviewRunnable != null && (!OwlConfig.confirmStickersGIFs || !isSendingMode())) {
+                if (openPreviewRunnable != null && !OwlConfig.confirmStickersGIFs) {
                     AndroidUtilities.cancelRunOnUIThread(openPreviewRunnable);
                     openPreviewRunnable = null;
-                } else if (openPreviewRunnable != null && isSendingMode()) {
+                } else if (openPreviewRunnable != null) {
                     return true;
                 } else if (isVisible()) {
                     close();

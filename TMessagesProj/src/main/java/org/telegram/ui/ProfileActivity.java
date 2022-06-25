@@ -4303,17 +4303,13 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 presentFragment(new ChangeBioActivity());
             }
         } else if (position == datacenterRow && (userInfo != null || chatInfo != null)){
-            AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-            builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy)}, (dialogInterface, i) -> {
-                try {
-                    String id = String.valueOf(DCHelper.getTInfo(currentUser, currentChat).tID);
-                    AndroidUtilities.addToClipboard(id);
-                    BulletinFactory.of(this).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
-                } catch (Exception e) {
-                    FileLog.e(e);
-                }
-            });
-            showDialog(builder.create());
+            try {
+                String id = String.valueOf(DCHelper.getTInfo(currentUser, currentChat).tID);
+                AndroidUtilities.addToClipboard(id);
+                BulletinFactory.of(this).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
+            } catch (Exception e) {
+                FileLog.e(e);
+            }
         } else if (position == channelInfoRow || position == userInfoRow || position == locationRow) {
             if (view instanceof AboutLinkCell && ((AboutLinkCell) view).onClick()) {
                 return false;

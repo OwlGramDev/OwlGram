@@ -53,13 +53,8 @@
     <string name="ShapePills">Pills</string>
     <string name="ShapeLinear">Linear</string>
     <string name="ShapeStock">Default</string>
-    <string name="DefaultIcon">Default</string>
-    <string name="AquaIcon">Aqua</string>
-    <string name="SunsetIcon">Sunset</string>
-    <string name="MonoBlackIcon">Mono Black</string>
-    <string name="DeveloperIcon">Developer</string>
-    <string name="ArcticIcon">Arctic</string>
-    <string name="ClassicIcon">Classic</string>
+    <string name="AppIconMonoBlack">Mono Black</string>
+    <string name="AppIconDeveloper">Developer</string>
     <string name="HidePhone">Hide Your Phone Number</string>
     <string name="HidePhoneDesc">It will be hidden from settings and side menu</string>
     <string name="HidePhoneOthers">Hide other people\'s Phone Number</string>
@@ -97,7 +92,6 @@
     <string name="HideChatKeyboard">Hide Keyboard on Chat Scroll</string>
     <string name="ScrollableChatPreview">Scrollable Chat Preview</string>
     <string name="OpenArchiveOnPull">Pull down to Open the Archive</string>
-    <string name="HideAllChatsFolder">Hide "All Chats" Folder</string>
     <string name="FoldersWhenForwarding">Show Folders when Forwarding</string>
     <string name="ContextMenu">Context Menu</string>
     <string name="ClearFromCache">Clear from Cache</string>
@@ -170,7 +164,6 @@
     <string name="MediaSettings">Media</string>
     <string name="VoiceEnhancements">Voice Enhancements</string>
     <string name="VoiceEnhancementsDesc">Noise Suppression and Voice Normalization</string>
-    <string name="IncreaseVoiceMessageQuality">HQ Voice Messages</string>
     <string name="TurnSoundOnVDKey">Turn Sound On by Turning Down the Volume</string>
     <string name="TurnSoundOnVDKeyDesc">Unmute videos by pressing the volume down button</string>
     <string name="SwipeToPiP">Swipe up to Picture-in-Picture</string>

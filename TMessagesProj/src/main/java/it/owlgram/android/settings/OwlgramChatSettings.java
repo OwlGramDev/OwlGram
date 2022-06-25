@@ -78,7 +78,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
     private int rearCameraStartingRow;
     private int confirmSendRow;
     private int showDeleteRow;
-    private int showHideAllTab;
     private int cameraTypeHeaderRow;
     private int cameraTypeSelectorRow;
     private int cameraXOptimizeRow;
@@ -86,7 +85,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
     private int cameraAdviseRow;
     private int proximitySensorRow;
     private int suppressionRow;
-    private int betterAudioMessagesRow;
     private int turnSoundOnVDKeyRow;
     private int openArchiveOnPullRow;
     private int confirmStickersGIFsRow;
@@ -233,12 +231,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                 if (view instanceof TextCheckbox2Cell) {
                     ((TextCheckbox2Cell) view).setChecked(OwlConfig.showCopyPhoto);
                 }
-            } else if (position == showHideAllTab) {
-                OwlConfig.toggleHideAllTab();
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.hideAllTab);
-                }
-                getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
             } else if (position == cameraXOptimizeRow) {
                 OwlConfig.toggleCameraXOptimizedMode();
                 if (view instanceof TextCheckCell) {
@@ -265,11 +257,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                 OwlConfig.toggleVoicesAgc();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.voicesAgc);
-                }
-            } else if (position == betterAudioMessagesRow) {
-                OwlConfig.toggleIncreaseAudioMessages();
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.increaseAudioMessages);
                 }
             } else if (position == turnSoundOnVDKeyRow) {
                 OwlConfig.toggleTurnSoundOnVDKey();
@@ -332,7 +319,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
         if (AudioEnhance.isAvailable()) {
             suppressionRow = rowCount++;
         }
-        betterAudioMessagesRow = rowCount++;
         turnSoundOnVDKeyRow = rowCount++;
         proximitySensorRow = rowCount++;
         rearCameraStartingRow = rowCount++;
@@ -341,7 +327,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
         audioVideoDividerRow = rowCount++;
 
         foldersHeaderRow = rowCount++;
-        showHideAllTab = rowCount++;
         showFolderWhenForwardRow = rowCount++;
         foldersDividerRow = rowCount++;
 
@@ -424,16 +409,12 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                         textCheckCell.setTextAndCheck(LocaleController.getString("ConfirmAVMessages", R.string.ConfirmAVMessages), OwlConfig.sendConfirm, true);
                     } else if (position == scrollableRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ScrollableChatPreview", R.string.ScrollableChatPreview), OwlConfig.scrollableChatPreview, true);
-                    } else if (position == showHideAllTab) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("HideAllChatsFolder", R.string.HideAllChatsFolder), OwlConfig.hideAllTab, true);
                     } else if (position == cameraXOptimizeRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("PerformanceMode", R.string.PerformanceMode), LocaleController.getString("PerformanceModeDesc", R.string.PerformanceModeDesc), OwlConfig.useCameraXOptimizedMode, true, true);
                     } else if (position == proximitySensorRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("DisableProximityEvents", R.string.DisableProximityEvents), OwlConfig.disableProximityEvents, true);
                     } else if (position == suppressionRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("VoiceEnhancements", R.string.VoiceEnhancements), LocaleController.getString("VoiceEnhancementsDesc", R.string.VoiceEnhancementsDesc), OwlConfig.voicesAgc, true, true);
-                    } else if (position == betterAudioMessagesRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("IncreaseVoiceMessageQuality", R.string.IncreaseVoiceMessageQuality), OwlConfig.increaseAudioMessages, true);
                     } else if (position == turnSoundOnVDKeyRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("TurnSoundOnVDKey", R.string.TurnSoundOnVDKey), LocaleController.getString("TurnSoundOnVDKeyDesc", R.string.TurnSoundOnVDKeyDesc), OwlConfig.turnSoundOnVDKey, true, true);
                     } else if (position == openArchiveOnPullRow) {
@@ -582,9 +563,9 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
             } else if (position == mediaSwipeByTapRow || position == jumpChannelRow || position == hideKeyboardRow ||
                     position == playGifAsVideoRow || position == showFolderWhenForwardRow ||
                     position == rearCameraStartingRow || position == confirmSendRow || position == showGreetings ||
-                    position == scrollableRow || position == showHideAllTab || position == cameraXOptimizeRow ||
-                    position == proximitySensorRow || position == suppressionRow || position == betterAudioMessagesRow ||
-                    position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow || position == confirmStickersGIFsRow) {
+                    position == scrollableRow || position == cameraXOptimizeRow || position == proximitySensorRow ||
+                    position == suppressionRow || position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow ||
+                    position == confirmStickersGIFsRow) {
                 return 3;
             } else if (position == stickerSizeRow) {
                 return 4;

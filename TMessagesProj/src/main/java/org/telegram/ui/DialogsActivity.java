@@ -195,6 +195,7 @@ import it.owlgram.android.components.MonetAndroidFixDialog;
 import it.owlgram.android.components.SendOptionsMenuLayout;
 import it.owlgram.android.Crashlytics;
 import it.owlgram.android.helpers.ForwardContext;
+import it.owlgram.android.helpers.MonetIconsHelper;
 import it.owlgram.android.helpers.PasscodeHelper;
 import it.owlgram.android.updates.ApkDownloader;
 import it.owlgram.android.updates.UpdateManager;
@@ -3945,8 +3946,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             FilesMigrationService.checkBottomSheet(this);
         }
         boolean foundCrashReport = Crashlytics.isCrashed();
-        //boolean needMonetMigration = IconsHelper.needMonetMigration();
-        boolean needMonetMigration = false; // TODO: LAKY FIX
+        boolean needMonetMigration = MonetIconsHelper.needMonetMigration();
         if (foundCrashReport) {
             CrashReportBottomSheet.checkBottomSheet(this);
         }else if (needMonetMigration) {
@@ -6129,7 +6129,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             int maxPinnedCount;
             if (containsFilter) {
                 maxPinnedCount = 100 - filter.alwaysShow.size();
-            } else if (OwlConfig.unlimitedPinnedDialogs || folderId != 0 || filter != null) {
+            } else if (folderId != 0 || filter != null) {
                 maxPinnedCount = getMessagesController().maxFolderPinnedDialogsCount;
             } else {
                 maxPinnedCount = getUserConfig().isPremium() ? getMessagesController().dialogFiltersPinnedLimitPremium : getMessagesController().dialogFiltersPinnedLimitDefault;

@@ -161,6 +161,12 @@ public class AppIconsSelectorCell extends RecyclerListView implements Notificati
                 }
             }
         }
+        for (int i = 0; i < availableIcons.size(); i++) {
+            if (availableIcons.get(i).background == -1) {
+                availableIcons.remove(i);
+                i--;
+            }
+        }
         getAdapter().notifyDataSetChanged();
         invalidateItemDecorations();
 

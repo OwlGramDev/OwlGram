@@ -31,6 +31,7 @@ import java.util.ArrayList;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.LabsHeader;
+import it.owlgram.android.helpers.MonetIconsHelper;
 import it.owlgram.android.helpers.PopupHelper;
 
 public class OwlgramExperimentalSettings extends BaseFragment {
@@ -43,8 +44,6 @@ public class OwlgramExperimentalSettings extends BaseFragment {
     private int bottomHeaderRow;
     private int headerExperimental;
     private int betterAudioCallRow;
-    private int unlimitedStickersRow;
-    private int unlimitedPinnedChatsRow;
     private int maxRecentStickersRow;
     private int experimentalMessageAlert;
     private int monetIconRow;
@@ -92,16 +91,6 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.betterAudioQuality);
                 }
-            } else if (position == unlimitedStickersRow) {
-                OwlConfig.toggleUnlimitedFavoriteStickers();
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.unlimitedFavoriteStickers);
-                }
-            } else if (position == unlimitedPinnedChatsRow) {
-                OwlConfig.toggleUnlimitedPinnedDialogs();
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.unlimitedPinnedDialogs);
-                }
             } else if (position == maxRecentStickersRow) {
                 int[] counts = {20, 30, 40, 50, 80, 100, 120, 150, 180, 200};
                 ArrayList<String> types = new ArrayList<>();
@@ -117,12 +106,12 @@ public class OwlgramExperimentalSettings extends BaseFragment {
             } else if (position == checkBoxExperimentalRow) {
                 if (view instanceof TextCheckCell) {
                     TextCheckCell textCheckCell = (TextCheckCell) view;
-                    /*if (IconsHelper.isSelectedMonet()) {
+                    if (MonetIconsHelper.isSelectedMonet()) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
                         builder.setMessage(LocaleController.getString("DisableExperimentalAlert", R.string.DisableExperimentalAlert));
                         builder.setPositiveButton(LocaleController.getString("AutoDeleteConfirm", R.string.AutoDeleteConfirm), (dialogInterface, i) -> {
-                            IconsHelper.switchToMonet();
+                            MonetIconsHelper.switchToMonet();
                             toggleExperimentalMode(textCheckCell);
                             AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
                             progressDialog.show();
@@ -132,16 +121,16 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                         builder.show();
                     } else {
                         toggleExperimentalMode(textCheckCell);
-                    }*/
+                    }
                 }
             } else if (position == monetIconRow) {
-                /*IconsHelper.switchToMonet();
+                MonetIconsHelper.switchToMonet();
                 AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
                 progressDialog.show();
                 AndroidUtilities.runOnUIThread(progressDialog::dismiss, 2000);
                 if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.useMonetIcon);
-                }*/
+                    ((TextCheckCell) view).setChecked(MonetIconsHelper.isSelectedMonet());
+                }
             }
         });
         return fragmentView;
@@ -171,8 +160,6 @@ public class OwlgramExperimentalSettings extends BaseFragment {
         bottomHeaderRow = -1;
         headerExperimental = -1;
         betterAudioCallRow = -1;
-        unlimitedStickersRow = -1;
-        unlimitedPinnedChatsRow = -1;
         maxRecentStickersRow = -1;
         monetIconRow = -1;
         experimentalMessageAlert = -1;
@@ -183,8 +170,6 @@ public class OwlgramExperimentalSettings extends BaseFragment {
             bottomHeaderRow = rowCount++;
             headerExperimental = rowCount++;
             betterAudioCallRow = rowCount++;
-            unlimitedStickersRow = rowCount++;
-            unlimitedPinnedChatsRow = rowCount++;
             if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S) {
                 monetIconRow = rowCount++;
             }
@@ -226,10 +211,6 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
                     if (position == betterAudioCallRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("MediaStreamVoip", R.string.MediaStreamVoip), OwlConfig.betterAudioQuality, true);
-                    } else if (position == unlimitedStickersRow) {
-                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("UnlimitedFavoriteStickers", R.string.UnlimitedFavoriteStickers), LocaleController.getString("UnlimitedFavoriteStickersDesc", R.string.UnlimitedFavoriteStickersDesc), OwlConfig.unlimitedFavoriteStickers, true, true);
-                    } else if (position == unlimitedPinnedChatsRow) {
-                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("UnlimitedPinnedChats", R.string.UnlimitedPinnedChats), LocaleController.getString("UnlimitedPinnedChatsDesc", R.string.UnlimitedPinnedChatsDesc), OwlConfig.unlimitedPinnedDialogs, true, true);
                     } else if (position == checkBoxExperimentalRow) {
                         boolean isEnabled = OwlConfig.isDevOptEnabled();
                         textCheckCell.setDrawCheckRipple(true);
@@ -239,7 +220,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                         textCheckCell.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
                         textCheckCell.setHeight(56);
                     } else if (position == monetIconRow) {
-                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("MonetIcon", R.string.MonetIcon), LocaleController.getString("MonetIconDesc", R.string.MonetIconDesc), OwlConfig.useMonetIcon, true, true);
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("MonetIcon", R.string.MonetIcon), LocaleController.getString("MonetIconDesc", R.string.MonetIconDesc), MonetIconsHelper.isSelectedMonet(), true, true);
                     }
                     break;
                 case 4:
@@ -307,8 +288,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
 
         @Override
         public int getItemViewType(int position) {
-            if (position == unlimitedStickersRow || position == unlimitedPinnedChatsRow || position == betterAudioCallRow ||
-                    position == checkBoxExperimentalRow || position == monetIconRow) {
+            if (position == betterAudioCallRow || position == checkBoxExperimentalRow || position == monetIconRow) {
                 return 2;
             } else if (position == headerImageRow) {
                 return 3;

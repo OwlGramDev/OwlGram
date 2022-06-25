@@ -11586,13 +11586,12 @@ public class  MessagesController extends BaseController implements NotificationC
                 } else {
                     newTaskId = taskId;
                 }
-                if (!OwlConfig.unlimitedPinnedDialogs) {
-                    getConnectionsManager().sendRequest(req, (response, error) -> {
-                        if (newTaskId != 0) {
-                            getMessagesStorage().removePendingTask(newTaskId);
-                        }
-                    });
-                }
+
+                getConnectionsManager().sendRequest(req, (response, error) -> {
+                    if (newTaskId != 0) {
+                        getMessagesStorage().removePendingTask(newTaskId);
+                    }
+                });
             }
         }
         getMessagesStorage().setDialogPinned(dialogId, dialog.pinnedNum);
@@ -11600,9 +11599,6 @@ public class  MessagesController extends BaseController implements NotificationC
     }
 
     public void loadPinnedDialogs(final int folderId, long newDialogId, ArrayList<Long> order) {
-        if (OwlConfig.unlimitedPinnedDialogs) {
-            return;
-        }
         if (loadingPinnedDialogs.indexOfKey(folderId) >= 0 || getUserConfig().isPinnedDialogsLoaded(folderId)) {
             return;
         }
