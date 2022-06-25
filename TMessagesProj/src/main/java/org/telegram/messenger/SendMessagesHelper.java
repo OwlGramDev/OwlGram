@@ -3128,7 +3128,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
             caption = "";
         }
         if (caption != null && entities != null) {
-            caption = (String) EntitiesHelper.applySyntaxHighlight(caption, entities);
+            caption = EntitiesHelper.applySyntaxHighlight(caption, entities).toString();
         }
         String originalPath = null;
         if (params != null && params.containsKey("originalPath")) {
