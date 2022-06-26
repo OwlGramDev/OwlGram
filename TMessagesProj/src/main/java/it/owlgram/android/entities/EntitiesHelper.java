@@ -3,6 +3,7 @@ package it.owlgram.android.entities;
 
 import android.graphics.Typeface;
 import android.text.Editable;
+import android.text.ParcelableSpan;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -142,7 +143,13 @@ public class EntitiesHelper {
                     }
                 }
                 if ((((TextStyleSpan) mSpan).getStyleFlags() & TextStyleSpan.FLAG_STYLE_MENTION) > 0) {
-                    long id = ((TLRPC.TL_inputMessageEntityMentionName)((TextStyleSpan) mSpan).getTextStyleRun().urlEntity).user_id.user_id;
+                    TLRPC.MessageEntity urlEntity = ((TextStyleSpan) mSpan).getTextStyleRun().urlEntity;
+                    long id;
+                    if (urlEntity instanceof TLRPC.TL_inputMessageEntityMentionName) {
+                        id = ((TLRPC.TL_inputMessageEntityMentionName) urlEntity).user_id.user_id;
+                    } else {
+                        id = ((TLRPC.TL_messageEntityMentionName) urlEntity).user_id;
+                    }
                     spannableString.setSpan(new URLSpan("tg://user?id=" + id), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 }
             } else if (mSpan instanceof URLSpan) {

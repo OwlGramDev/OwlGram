@@ -59,7 +59,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
     private int jumpChannelRow;
     private int showGreetings;
     private int hideKeyboardRow;
-    private int scrollableRow;
     private int playGifAsVideoRow;
     private int chatDividerRow;
     private int foldersHeaderRow;
@@ -216,11 +215,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                 if (view instanceof TextCheckbox2Cell) {
                     ((TextCheckbox2Cell) view).setChecked(OwlConfig.showReportMessage);
                 }
-            } else if (position == scrollableRow) {
-                OwlConfig.toggleScrollableChatPreview();
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.scrollableChatPreview);
-                }
             } else if (position == showDeleteRow) {
                 OwlConfig.toggleShowDeleteDownloadedFile();
                 if (view instanceof TextCheckbox2Cell) {
@@ -311,7 +305,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
         showGreetings = rowCount++;
         playGifAsVideoRow = rowCount++;
         hideKeyboardRow = rowCount++;
-        scrollableRow = rowCount++;
         openArchiveOnPullRow = rowCount++;
         chatDividerRow = rowCount++;
 
@@ -407,8 +400,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("UseRearRoundVideos", R.string.UseRearRoundVideos), LocaleController.getString("UseRearRoundVideosDesc", R.string.UseRearRoundVideosDesc), OwlConfig.useRearCamera, true, true);
                     } else if (position == confirmSendRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ConfirmAVMessages", R.string.ConfirmAVMessages), OwlConfig.sendConfirm, true);
-                    } else if (position == scrollableRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("ScrollableChatPreview", R.string.ScrollableChatPreview), OwlConfig.scrollableChatPreview, true);
                     } else if (position == cameraXOptimizeRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("PerformanceMode", R.string.PerformanceMode), LocaleController.getString("PerformanceModeDesc", R.string.PerformanceModeDesc), OwlConfig.useCameraXOptimizedMode, true, true);
                     } else if (position == proximitySensorRow) {
@@ -563,9 +554,8 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
             } else if (position == mediaSwipeByTapRow || position == jumpChannelRow || position == hideKeyboardRow ||
                     position == playGifAsVideoRow || position == showFolderWhenForwardRow ||
                     position == rearCameraStartingRow || position == confirmSendRow || position == showGreetings ||
-                    position == scrollableRow || position == cameraXOptimizeRow || position == proximitySensorRow ||
-                    position == suppressionRow || position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow ||
-                    position == confirmStickersGIFsRow) {
+                    position == cameraXOptimizeRow || position == proximitySensorRow || position == suppressionRow ||
+                    position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow || position == confirmStickersGIFsRow) {
                 return 3;
             } else if (position == stickerSizeRow) {
                 return 4;

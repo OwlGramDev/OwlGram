@@ -57,7 +57,6 @@ public class OwlConfig extends SettingsManager {
     public static boolean showAvatarImage;
     public static boolean owlEasterSound;
     public static boolean pacmanForced;
-    public static boolean scrollableChatPreview;
     public static boolean smartButtons;
     public static boolean disableAppBarShadow;
     public static boolean accentAsNotificationColor;
@@ -166,7 +165,6 @@ public class OwlConfig extends SettingsManager {
             showAvatarImage = preferences.getBoolean("showAvatarImage", true);
             owlEasterSound = preferences.getBoolean("owlEasterSound", true);
             pacmanForced = preferences.getBoolean("pacmanForced", false);
-            scrollableChatPreview = preferences.getBoolean("scrollableChatPreview", true);
             smartButtons = preferences.getBoolean("smartButtons", false);
             disableAppBarShadow = preferences.getBoolean("disableAppBarShadow", false);
             accentAsNotificationColor = preferences.getBoolean("accentAsNotificationColor", false);
@@ -475,14 +473,6 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("smartButtons", smartButtons);
-        editor.apply();
-    }
-
-    public static void toggleScrollableChatPreview() {
-        scrollableChatPreview = !scrollableChatPreview;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("scrollableChatPreview", scrollableChatPreview);
         editor.apply();
     }
 

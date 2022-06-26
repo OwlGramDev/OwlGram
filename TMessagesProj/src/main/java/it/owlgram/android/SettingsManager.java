@@ -104,6 +104,7 @@ public class SettingsManager {
             case "unlimitedPinnedDialogs":
             case "increaseAudioMessages":
             case "useMonetIcon":
+            case "scrollableChatPreview":
                 return false;
             default:
                 return true;

@@ -90,7 +90,6 @@
     <string name="GreetingSticker">Greeting Sticker</string>
     <string name="GIFsAsVideo">Play GIFs as Video</string>
     <string name="HideChatKeyboard">Hide Keyboard on Chat Scroll</string>
-    <string name="ScrollableChatPreview">Scrollable Chat Preview</string>
     <string name="OpenArchiveOnPull">Pull down to Open the Archive</string>
     <string name="FoldersWhenForwarding">Show Folders when Forwarding</string>
     <string name="ContextMenu">Context Menu</string>
