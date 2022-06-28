@@ -3,7 +3,6 @@ package it.owlgram.android.entities;
 
 import android.graphics.Typeface;
 import android.text.Editable;
-import android.text.ParcelableSpan;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -19,8 +18,6 @@ import android.text.style.TypefaceSpan;
 import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.view.View;
-
-import com.google.android.exoplayer2.util.Log;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Emoji;
@@ -138,7 +135,7 @@ public class EntitiesHelper {
                 }
                 if ((((TextStyleSpan) mSpan).getStyleFlags() & TextStyleSpan.FLAG_STYLE_URL) > 0) {
                     String url = ((TextStyleSpan) mSpan).getTextStyleRun().urlEntity.url;
-                    if (url != null || includeLinks) {
+                    if ((url != null && includeLinks) || !spannableString.subSequence(start, end).toString().equals(url)) {
                         spannableString.setSpan(new URLSpan(url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
                 }

@@ -172,8 +172,8 @@ android {
         applicationId "it.owlgram.android"
         minSdkVersion 21
         targetSdkVersion 32
-        versionName "2.1.0 Beta 3"
-        versionCode 2711
+        versionName "2.1.0 Beta 4"
+        versionCode 2712
         buildConfigField "String", "GIT_COMMIT_HASH", "\"${getGitHash()}\""
         buildConfigField "Long", "GIT_COMMIT_DATE", "${getGitDate()}L"
 
