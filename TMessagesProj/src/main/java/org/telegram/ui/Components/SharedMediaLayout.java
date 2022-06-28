@@ -562,6 +562,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             notificationCenter.addObserver(this, NotificationCenter.messagesDeleted);
             notificationCenter.addObserver(this, NotificationCenter.replaceMessagesObjects);
             notificationCenter.addObserver(this, NotificationCenter.chatInfoDidLoad);
+            notificationCenter.addObserver(this, NotificationCenter.fileLoaded);
         }
 
         public void addDelegate(SharedMediaPreloaderDelegate delegate) {
@@ -586,6 +587,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             notificationCenter.removeObserver(this, NotificationCenter.messagesDeleted);
             notificationCenter.removeObserver(this, NotificationCenter.replaceMessagesObjects);
             notificationCenter.removeObserver(this, NotificationCenter.chatInfoDidLoad);
+            notificationCenter.removeObserver(this, NotificationCenter.fileLoaded);
         }
 
         public int[] getLastMediaCount() {
@@ -819,6 +821,17 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
                 if (dialogId < 0 && chatFull.id == -dialogId) {
                     setChatInfo(chatFull);
                 }
+            } else if (id == NotificationCenter.fileLoaded) {
+                ArrayList<MessageObject> allMessages = new ArrayList<>();
+                for (int i = 0 ; i < sharedMediaData.length; i++) {
+                    allMessages.addAll(sharedMediaData[i].messages);
+                }
+                Utilities.globalQueue.postRunnable(new Runnable() {
+                    @Override
+                    public void run() {
+                        FileLoader.getInstance(account).checkMediaExistance(allMessages);
+                    }
+                });
             }
         }
 
@@ -2758,6 +2771,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             sharedMediaData[type].totalCount = mediaData[type].totalCount;
         }
         sharedMediaData[type].messages.addAll(mediaData[type].messages);
+
         sharedMediaData[type].sections.addAll(mediaData[type].sections);
         for (HashMap.Entry<String, ArrayList<MessageObject>> entry : mediaData[type].sectionArrays.entrySet()) {
             sharedMediaData[type].sectionArrays.put(entry.getKey(), new ArrayList<>(entry.getValue()));
