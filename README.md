@@ -5,6 +5,12 @@ OwlGram is an **unofficial** messaging app that uses **Telegram's API**.
 To reproduce the build of OwlGram is only needed ccache, you can install it from
 https://ccache.dev/download.html if you're from Windows
 
+Add the following to your `local.properties` file:
+
+```
+MAPS_API_KEY=<your-api-key>
+```
+
 ## 🔗 Redirect
 🇮🇹 **Italian**  
 ├ [Italian Channel](<https://telegram.dog/OwlGramIT>)  
