@@ -142,6 +142,19 @@ android {
             resValue "string", "BuildAppName", "@string/AppNameBeta"
         }
 
+        pbeta {
+            minifyEnabled true
+            shrinkResources true
+            if (signingProperties.getProperty("storeFile") != null) {
+                signingConfig signingConfigs.sign
+            }
+            jniDebuggable true
+            proguardFiles 'proguard-rules.pro'
+            ndk.debugSymbolLevel 'FULL'
+            applicationIdSuffix ".pbeta"
+            resValue "string", "BuildAppName", "@string/AppNameBeta"
+        }
+
         release {
             minifyEnabled true
             shrinkResources true
