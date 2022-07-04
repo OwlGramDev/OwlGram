@@ -3,6 +3,7 @@
 .cxx/
 build/
 release/
+TMessagesProj/play/
 *.iml
 *.apk
 local.properties

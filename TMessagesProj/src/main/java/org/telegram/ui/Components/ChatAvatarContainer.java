@@ -523,6 +523,7 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
         }
         titleTextView.setText(value);
         titleTextView.setCanHideRightDrawable(false);
+        titleTextView.setScrollNonFitText(scrollable);
         if (scam || fake) {
             if (!(titleTextView.getRightDrawable() instanceof ScamDrawable)) {
                 ScamDrawable drawable = new ScamDrawable(11, scam ? 0 : 1);
