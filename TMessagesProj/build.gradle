@@ -170,7 +170,6 @@ android {
             initWith release
         }
     }
-
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
             def abi = output.getFilter('ABI')
@@ -185,8 +184,8 @@ android {
         applicationId "it.owlgram.android"
         minSdkVersion 21
         targetSdkVersion 32
-        versionName "2.1.1"
-        versionCode 2714
+        versionName "2.1.2"
+        versionCode 2722
         buildConfigField "String", "GIT_COMMIT_HASH", "\"${getGitHash()}\""
         buildConfigField "Long", "GIT_COMMIT_DATE", "${getGitDate()}L"
 
