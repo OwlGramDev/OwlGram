@@ -21430,7 +21430,7 @@ ChatActivity extends BaseFragment implements NotificationCenter.NotificationCent
                         if (messageObject != null && messageObject.contentType == 0 && !(editingMessageObject != null && editingMessageObject.getId() == messageObject.getId()) && (messageTextToTranslate != null && messageTextToTranslate.length() > 0 && !messageObject.isAnimatedEmoji() && !messageObject.isDice()) && OwlConfig.showTranslate) {
                             String currentID = messageObject.getChatId()+"_"+messageObject.getId();
                             if (!TranslatorHelper.isTranslating(currentID)) {
-                                items.add(messageObject.translated ? LocaleController.getString("UndoTranslate", R.string.UndoTranslate) : LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
+                                items.add(messageObject.translated && !messageObject.isVoiceTranscriptionOpen() ? LocaleController.getString("UndoTranslate", R.string.UndoTranslate) : LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
                                 options.add(201);
                                 icons.add(R.drawable.msg_translate);
                             }
@@ -21779,7 +21779,7 @@ ChatActivity extends BaseFragment implements NotificationCenter.NotificationCent
                         if (messageObject != null && messageObject.contentType == 0 && !(editingMessageObject != null && editingMessageObject.getId() == messageObject.getId()) && (messageTextToTranslate != null && messageTextToTranslate.length() > 0 && !messageObject.isAnimatedEmoji() && !messageObject.isDice()) && OwlConfig.showTranslate) {
                             String currentID = messageObject.getChatId()+"_"+messageObject.getId();
                             if (!TranslatorHelper.isTranslating(currentID)) {
-                                items.add(messageObject.translated ? LocaleController.getString("UndoTranslate", R.string.UndoTranslate) : LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
+                                items.add(messageObject.translated && !messageObject.isVoiceTranscriptionOpen() ? LocaleController.getString("UndoTranslate", R.string.UndoTranslate) : LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
                                 options.add(201);
                                 icons.add(R.drawable.msg_translate);
                             }
