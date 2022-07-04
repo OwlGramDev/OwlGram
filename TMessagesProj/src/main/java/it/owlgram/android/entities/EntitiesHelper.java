@@ -19,6 +19,8 @@ import android.text.style.URLSpan;
 import android.text.style.UnderlineSpan;
 import android.view.View;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.MediaDataController;
@@ -135,7 +137,11 @@ public class EntitiesHelper {
                 }
                 if ((((TextStyleSpan) mSpan).getStyleFlags() & TextStyleSpan.FLAG_STYLE_URL) > 0) {
                     String url = ((TextStyleSpan) mSpan).getTextStyleRun().urlEntity.url;
-                    if ((url != null && includeLinks) || !spannableString.subSequence(start, end).toString().equals(url)) {
+                    String urlEntity = spannableString.subSequence(start, end).toString();
+                    if (urlEntity.endsWith("/") && !url.endsWith("/")) {
+                        urlEntity = urlEntity.substring(0, urlEntity.length() - 1);
+                    }
+                    if (url != null && (includeLinks || (!url.equals(urlEntity) && !url.equals(String.format("http://%s", urlEntity)) && !url.equals(String.format("https://%s", urlEntity))))) {
                         spannableString.setSpan(new URLSpan(url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
                 }
@@ -290,16 +296,6 @@ public class EntitiesHelper {
         text = AndroidUtilities.getTrimmedString(text);
         CharSequence[] message = new CharSequence[]{AndroidUtilities.getTrimmedString(text)};
         return MediaDataController.getInstance(UserConfig.selectedAccount).getEntities(message, true, false).size() > 0;
-    }
-
-    public static String entityToString(TLRPC.MessageEntity entity) {
-        return "{ offset: "
-            + entity.offset
-            + ", length: "
-            + entity.length
-            + ", language: "
-            + entity.language
-            + " }";
     }
 
     private static CharSequence extractLanguage(CharSequence lang) {
