@@ -151,7 +151,7 @@ android {
             jniDebuggable true
             proguardFiles 'proguard-rules.pro'
             ndk.debugSymbolLevel 'FULL'
-            applicationIdSuffix ".pbeta"
+            applicationIdSuffix ".beta"
             resValue "string", "BuildAppName", "@string/AppNameBeta"
         }
 

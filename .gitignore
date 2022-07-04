@@ -3,6 +3,7 @@
 .cxx/
 build/
 release/
+pbeta/
 TMessagesProj/play/
 *.iml
 *.apk
