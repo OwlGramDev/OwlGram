@@ -185,7 +185,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 32
         versionName "2.1.2"
-        versionCode 2722
+        versionCode 2723
         buildConfigField "String", "GIT_COMMIT_HASH", "\"${getGitHash()}\""
         buildConfigField "Long", "GIT_COMMIT_DATE", "${getGitDate()}L"
 
