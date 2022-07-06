@@ -22,6 +22,9 @@
     <string name="TranslateOwlDesc">Help us translate OwlGram into your language</string>
     <string name="Donate">Donate</string>
     <string name="DonateDesc">Support the development</string>
+    <string name="CopyReportDetails">Copy Report Details</string>
+    <string name="CopyReportDetailsDesc">Use when submitting a bug report</string>
+    <string name="ReportDetailsCopied">Report details copied to clipboard.</string>
     <string name="ImportSettings">Import Settings</string>
     <string name="ImportSettingsAlert">Are you sure you want to import these settings?</string>
     <string name="ImportingChangesOne">1 change will be applied to the current settings.</string>
@@ -262,9 +265,6 @@
     <string name="DisableAccountProtectionAlert">Are you sure you want to disable the account protection feature?</string>
     <string name="AppCrashed">Something went wrong</string>
     <string name="AppCrashedDesc">OwlGram has stopped working. Please, send logs to the developers so that they can fix this bug as soon as possible.</string>
-    <string name="CopyReportDetails">Copy report details</string>
-    <string name="CopyReportDetailsDesc">Use when submitting a bug report.</string>
-    <string name="ReportDetailsCopied">Report details copied to clipboard.</string>
     <string name="KeepMarkdown">Keep Markdown</string>
     <string name="KeepMarkdownDesc">When translating a message, keep the markdown formatting.</string>
 </resources>
