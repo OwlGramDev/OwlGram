@@ -138,7 +138,7 @@ public class EntitiesHelper {
                 if ((((TextStyleSpan) mSpan).getStyleFlags() & TextStyleSpan.FLAG_STYLE_URL) > 0) {
                     String url = ((TextStyleSpan) mSpan).getTextStyleRun().urlEntity.url;
                     String urlEntity = spannableString.subSequence(start, end).toString();
-                    if (urlEntity.endsWith("/") && !url.endsWith("/")) {
+                    if (url != null && urlEntity.endsWith("/") && !url.endsWith("/")) {
                         urlEntity = urlEntity.substring(0, urlEntity.length() - 1);
                     }
                     if (url != null && (includeLinks || (!url.equals(urlEntity) && !url.equals(String.format("http://%s", urlEntity)) && !url.equals(String.format("https://%s", urlEntity))))) {

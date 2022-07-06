@@ -571,7 +571,9 @@ public class CameraXController {
     @SuppressLint("RestrictedApi")
     public void stopVideoRecording(final boolean abandon) {
         abandonCurrentVideo = abandon;
-        vCapture.stopRecording();
+        if (vCapture != null) {
+            vCapture.stopRecording();
+        }
     }
 
 
