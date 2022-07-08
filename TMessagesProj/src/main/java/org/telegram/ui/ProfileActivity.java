@@ -2077,13 +2077,15 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         presentFragment(new QrActivity(args));
                     }
                 } else if (id == 201) {
-                    Bundle args = new Bundle();
-                    args.putLong("chat_id", chatId);
-                    boolean isChannel = ChatObject.isChannel(currentChat) && !currentChat.megagroup;
-                    args.putInt("type", !isChannel && !currentChat.gigagroup ? ChatUsersActivity.TYPE_KICKED : ChatUsersActivity.TYPE_BANNED);
-                    ChatUsersActivity fragment = new ChatUsersActivity(args);
-                    fragment.setInfo(chatInfo);
-                    presentFragment(fragment);
+                    if (currentChat != null) {
+                        Bundle args = new Bundle();
+                        args.putLong("chat_id", chatId);
+                        boolean isChannel = ChatObject.isChannel(currentChat) && !currentChat.megagroup;
+                        args.putInt("type", !isChannel && !currentChat.gigagroup ? ChatUsersActivity.TYPE_KICKED : ChatUsersActivity.TYPE_BANNED);
+                        ChatUsersActivity fragment = new ChatUsersActivity(args);
+                        fragment.setInfo(chatInfo);
+                        presentFragment(fragment);
+                    }
                 }else if (id == 202) {
                     Bundle args = new Bundle();
                     args.putLong("chat_id", chatId);
