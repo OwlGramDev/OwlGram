@@ -64,18 +64,20 @@ public class GoogleAppTranslator extends BaseTranslator {
     @Override
     protected Result translate(String query, String tl) throws IOException, JSONException {
         ArrayList<String> blocks = new ArrayList<>();
-        while (query.length() > 2500) {
-            String maxBlockStr = query.substring(0, 2500);
-            int n;
-            n = maxBlockStr.lastIndexOf("\n\n");
+        int MAX_BLOCK_SIZE = 2500;
+        while (query.length() > MAX_BLOCK_SIZE) {
+            String maxBlockStr = query.subSequence(0, MAX_BLOCK_SIZE).toString();
+            int n = maxBlockStr.lastIndexOf("\n\n");
             if (n == -1) n = maxBlockStr.lastIndexOf("\n");
             if (n == -1) n = maxBlockStr.lastIndexOf(". ");
+            if (n == -1) n = Math.min(maxBlockStr.length(), MAX_BLOCK_SIZE);
             blocks.add(query.substring(0, n + 1));
             query = query.substring(n + 1);
         }
         if (query.length() > 0) {
             blocks.add(query);
         }
+        if (blocks.size() == 100) throw new IOException("Too many blocks");
         StringBuilder resultString = new StringBuilder();
         String resultLang = "";
         for (int i = 0; i < blocks.size(); i++) {
@@ -110,8 +112,8 @@ public class GoogleAppTranslator extends BaseTranslator {
             resultString.append(stringToAdd);
         }
         return new Result(
-            resultString.toString(),
-            resultLang
+                resultString.toString(),
+                resultLang
         );
     }
 
