@@ -2131,6 +2131,10 @@ public class Theme {
                 return LocaleController.getString("ThemeDay", R.string.ThemeDay);
             } else if ("Night".equals(name)) {
                 return LocaleController.getString("ThemeNight", R.string.ThemeNight);
+            } else if ("Monet Dark".equals(name)) {
+                return LocaleController.getString("ThemeMonetDark", R.string.ThemeMonetDark);
+            } else if ("Monet Light".equals(name)) {
+                return LocaleController.getString("ThemeMonetDark", R.string.ThemeMonetDark);
             }
             return info != null ? info.title : name;
         }

@@ -56,9 +56,13 @@
     <string name="ShapePills">Pills</string>
     <string name="ShapeLinear">Linear</string>
     <string name="ShapeStock">Default</string>
-    <string name="AppIconArctic">Arctic</string>
-    <string name="AppIconMonoBlack">Mono Black</string>
-    <string name="AppIconDeveloper">Developer</string>
+    <string name="DefaultIcon">Default</string>
+    <string name="AquaIcon">Aqua</string>
+    <string name="SunsetIcon">Sunset</string>
+    <string name="AppIconMonoBlack" comment="AppIconMonoBlack">Mono Black</string>
+    <string name="AppIconDeveloper" comment="AppIconDeveloper">Developer</string>
+    <string name="AppIconArctic" comment="AppIconArctic">Arctic</string>
+    <string name="ClassicIcon">Classic</string>
     <string name="HidePhone">Hide Your Phone Number</string>
     <string name="HidePhoneDesc">It will be hidden from settings and side menu</string>
     <string name="HidePhoneOthers">Hide other people\'s Phone Number</string>
@@ -94,7 +98,9 @@
     <string name="GreetingSticker">Greeting Sticker</string>
     <string name="GIFsAsVideo">Play GIFs as Video</string>
     <string name="HideChatKeyboard">Hide Keyboard on Chat Scroll</string>
+    <string name="ScrollableChatPreview">Scrollable Chat Preview</string>
     <string name="OpenArchiveOnPull">Pull down to Open the Archive</string>
+    <string name="HideAllChatsFolder">Hide "All Chats" Folder</string>
     <string name="FoldersWhenForwarding">Show Folders when Forwarding</string>
     <string name="ContextMenu">Context Menu</string>
     <string name="ClearFromCache">Clear from Cache</string>
@@ -113,6 +119,7 @@
     <string name="ProviderGoogleTranslate">Google Translate</string>
     <string name="ProviderYandex">Yandex Translate</string>
     <string name="ProviderDeepLTranslate">DeepL Translate</string>
+    <string name="ProviderNiuTrans">Niu Trans</string>
     <string name="ProviderDuckDuckGo">DuckDuckGo Translate</string>
     <string name="TranslationProviderInfo">%s may have access to the messages you translate.</string>
     <string name="TranslationLanguage">Translation Language</string>
@@ -166,6 +173,7 @@
     <string name="MediaSettings">Media</string>
     <string name="VoiceEnhancements">Voice Enhancements</string>
     <string name="VoiceEnhancementsDesc">Noise Suppression and Voice Normalization</string>
+    <string name="IncreaseVoiceMessageQuality">HQ Voice Messages</string>
     <string name="TurnSoundOnVDKey">Turn Sound On by Turning Down the Volume</string>
     <string name="TurnSoundOnVDKeyDesc">Unmute videos by pressing the volume down button</string>
     <string name="SwipeToPiP">Swipe up to Picture-in-Picture</string>
@@ -264,6 +272,8 @@
     <string name="DisableAccountProtectionAlert">Are you sure you want to disable the account protection feature?</string>
     <string name="AppCrashed">Something went wrong</string>
     <string name="AppCrashedDesc">OwlGram has stopped working. Please, send logs to the developers so that they can fix this bug as soon as possible.</string>
-    <string name="KeepMarkdown">Keep Markdown</string>
-    <string name="KeepMarkdownDesc">When translating a message, keep the markdown formatting.</string>
+    <string name="KeepMarkdown" comment="KeepMarkdown">Keep Markdown</string>
+    <string name="KeepMarkdownDesc" comment="KeepMarkdownDesc">When translating a message, keep the markdown formatting.</string>
+    <string name="ThemeMonetLight">Monet Light</string>
+    <string name="ThemeMonetDark">Monet Dark</string>
 </resources>
