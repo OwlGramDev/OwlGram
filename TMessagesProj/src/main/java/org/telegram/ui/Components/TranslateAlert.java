@@ -1102,7 +1102,11 @@ public class TranslateAlert extends Dialog {
             TranslatorHelper.translate(new TranslatorHelper.TranslatorContext(String.valueOf(Math.random()), text.toString()), new TranslatorHelper.TranslateCallback() {
                 @Override
                 public void onTranslate(BaseTranslator.Result result) {
-                    onSuccess.run((String) result.translation, result.sourceLanguage);
+                    AndroidUtilities.runOnUIThread(() -> {
+                        if (onSuccess != null) {
+                            onSuccess.run((String) result.translation, result.sourceLanguage);
+                        }
+                    });
                 }
 
                 @Override
@@ -1111,7 +1115,11 @@ public class TranslateAlert extends Dialog {
 
                 @Override
                 public void onError(Exception error) {
-                    onFail.run(error instanceof BaseTranslator.Http429Exception);
+                    AndroidUtilities.runOnUIThread(() -> {
+                        if (onFail != null) {
+                            onFail.run(error instanceof BaseTranslator.Http429Exception);
+                        }
+                    });
                 }
             });
         });
