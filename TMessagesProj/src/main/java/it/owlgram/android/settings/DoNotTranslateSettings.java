@@ -2,7 +2,6 @@ package it.owlgram.android.settings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;

@@ -96,7 +96,7 @@ public class TranslatorHelper {
                 messageObject.messageOwner.entities = new ArrayList<>(messageObject.originalEntities);
             }
             if(messageObject.originalReplyMarkupRows != null){
-                ((MessageHelper.ReplyMarkupButtonsTexts) messageObject.originalReplyMarkupRows).applyTextToKeyboard(messageObject.messageOwner.reply_markup.rows);
+                messageObject.originalReplyMarkupRows.applyTextToKeyboard(messageObject.messageOwner.reply_markup.rows);
             }
         } else if (messageObject.originalMessage instanceof TLRPC.TL_poll) {
             ((TLRPC.TL_messageMediaPoll) messageObject.messageOwner.media).poll = (TLRPC.TL_poll) messageObject.originalMessage;

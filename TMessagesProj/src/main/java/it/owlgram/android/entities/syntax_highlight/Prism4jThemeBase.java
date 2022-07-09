@@ -44,7 +44,7 @@ public abstract class Prism4jThemeBase implements Prism4jTheme {
     protected abstract ColorHashMap init();
 
     @ColorInt
-    protected int color(@NonNull String language, @NonNull String type, @Nullable String alias) {
+    protected int color(@NonNull String type, @Nullable String alias) {
 
         Color color = colorHashMap.get(type);
         if (color == null
@@ -68,7 +68,7 @@ public abstract class Prism4jThemeBase implements Prism4jTheme {
         final String type = syntax.type();
         final String alias = syntax.alias();
 
-        final int color = color(language, type, alias);
+        final int color = color(type, alias);
         if (color != 0) {
             applyColor(language, type, alias, color, spannable, start, end);
         }

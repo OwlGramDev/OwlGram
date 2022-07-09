@@ -7,7 +7,6 @@
  */
 package it.owlgram.android.camera;
 
-import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapRegionDecoder;
@@ -17,15 +16,16 @@ import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.util.Log;
 import android.util.Size;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.camera.core.ImageProxy;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
 
-@TargetApi(21)
 public final class JpegImageUtils {
     private static final String TAG = "JpegImageUtils";
     static final int FLIP_NORMAL = 0;

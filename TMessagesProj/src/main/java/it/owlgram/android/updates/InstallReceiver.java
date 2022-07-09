@@ -5,9 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInstaller;
 import android.net.Uri;
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;

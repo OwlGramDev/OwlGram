@@ -88,7 +88,7 @@ public class RawDeepLTranslator {
             _body.put("params", params);
             _body.put("id", this.id.get());
             String body = (this.id.get() + 3L) % 13L != 0L && (this.id.get() + 5L) % 29L != 0L ? _body.toString().replace("hod\":\"", "hod\": \"") : _body.toString().replace("hod\":\"", "hod\" : \"");
-            JSONObject result = (new JSONObject((String) Objects.requireNonNull(this.request(body)))).getJSONObject("result");
+            JSONObject result = (new JSONObject(Objects.requireNonNull(this.request(body)))).getJSONObject("result");
             return new String[]{result.getString("lang"), ((JSONObject)result.getJSONArray("texts").get(0)).getString("text")};
         }
     }
@@ -167,7 +167,7 @@ public class RawDeepLTranslator {
             if (cookie == null) {
                 synchronized(this) {
                     if (cookie == null) {
-                        cookie = (String)(Objects.requireNonNull(map.get("Set-Cookie"))).get(0);
+                        cookie = (Objects.requireNonNull(map.get("Set-Cookie"))).get(0);
                         cookie = cookie.substring(0, cookie.indexOf(";"));
                     }
                 }

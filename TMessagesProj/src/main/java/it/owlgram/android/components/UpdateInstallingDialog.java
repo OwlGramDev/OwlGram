@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.core.widget.NestedScrollView;
 
 import org.telegram.messenger.AndroidUtilities;
@@ -135,7 +136,7 @@ public class UpdateInstallingDialog extends BottomSheet {
 
             @SuppressLint("ClickableViewAccessibility")
             @Override
-            public boolean onTouchEvent(MotionEvent ev) {
+            public boolean onTouchEvent(@NonNull MotionEvent ev) {
                 return false;
             }
         };

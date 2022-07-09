@@ -4,8 +4,6 @@ import android.os.Build;
 
 import androidx.annotation.NonNull;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;

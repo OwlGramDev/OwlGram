@@ -20,7 +20,6 @@ import it.owlgram.android.helpers.StandardHTTPRequest;
 
 public class DuckDuckGoTranslator extends BaseTranslator {
 
-    private static DuckDuckGoTranslator instance;
     private final List<String> targetLanguages = Arrays.asList(
             "af", "sq", "ar", "am", "hy", "as", "az", "bn", "bs", "bg", "yue", "ca", "cs",
             "zh-Hans", "zh-Hant", "ko", "ht", "hr", "ku", "kmr", "da", "he", "et", "sw",
@@ -31,15 +30,12 @@ public class DuckDuckGoTranslator extends BaseTranslator {
             "th", "ta", "de", "te", "ti", "to", "tr", "uk", "hu", "ur", "vi"
     );
 
+    private static final class InstanceHolder {
+        private static final DuckDuckGoTranslator instance = new DuckDuckGoTranslator();
+    }
+
     static DuckDuckGoTranslator getInstance() {
-        if (instance == null) {
-            synchronized (DuckDuckGoTranslator.class) {
-                if (instance == null) {
-                    instance = new DuckDuckGoTranslator();
-                }
-            }
-        }
-        return instance;
+        return InstanceHolder.instance;
     }
 
     @Override

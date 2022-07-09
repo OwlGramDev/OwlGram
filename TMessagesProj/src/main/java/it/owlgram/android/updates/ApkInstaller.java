@@ -9,8 +9,6 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInstaller;
 import android.os.Build;
 
-import androidx.annotation.RequiresApi;
-
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.FileLog;

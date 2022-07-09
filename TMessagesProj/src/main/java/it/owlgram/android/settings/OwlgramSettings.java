@@ -37,7 +37,6 @@ import org.telegram.ui.Components.RecyclerListView;
 import it.owlgram.android.Crashlytics;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.StoreUtils;
-import it.owlgram.android.ui.DetailsActivity;
 
 public class OwlgramSettings extends BaseFragment {
     private int rowCount;

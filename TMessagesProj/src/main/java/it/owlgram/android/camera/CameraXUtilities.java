@@ -12,7 +12,6 @@ import static android.hardware.camera2.CameraMetadata.LENS_FACING_BACK;
 
 import android.annotation.SuppressLint;
 import android.hardware.camera2.CameraCharacteristics;
-import android.os.Build;
 
 import androidx.camera.camera2.interop.Camera2CameraInfo;
 import androidx.camera.core.CameraInfo;
