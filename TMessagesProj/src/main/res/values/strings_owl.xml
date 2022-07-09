@@ -113,7 +113,6 @@
     <string name="ProviderGoogleTranslate">Google Translate</string>
     <string name="ProviderYandex">Yandex Translate</string>
     <string name="ProviderDeepLTranslate">DeepL Translate</string>
-    <string name="ProviderNiuTrans">Niu Trans</string>
     <string name="ProviderDuckDuckGo">DuckDuckGo Translate</string>
     <string name="TranslationProviderInfo">%s may have access to the messages you translate.</string>
     <string name="TranslationLanguage">Translation Language</string>

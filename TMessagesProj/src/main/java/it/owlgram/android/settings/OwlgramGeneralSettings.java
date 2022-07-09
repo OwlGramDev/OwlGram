@@ -351,10 +351,9 @@ public class OwlgramGeneralSettings extends BaseFragment {
                         }
                         int index = types.indexOf(OwlConfig.translationProvider);
                         if (index < 0) {
-                            textSettingsCell.setTextAndValue(LocaleController.getString("TranslationProviderShort", R.string.TranslationProviderShort), "", true);
+                            textSettingsCell.setTextAndValue(LocaleController.getString("TranslationProviderShort", R.string.TranslationProviderShort), names.get(Translator.PROVIDER_GOOGLE), true);
                         } else {
-                            String value = names.get(index);
-                            textSettingsCell.setTextAndValue(LocaleController.getString("TranslationProviderShort", R.string.TranslationProviderShort), value, true);
+                            textSettingsCell.setTextAndValue(LocaleController.getString("TranslationProviderShort", R.string.TranslationProviderShort), names.get(index), true);
                         }
                     } else if (position == destinationLanguageSelectRow) {
                         String language = OwlConfig.translationTarget;
@@ -447,6 +446,9 @@ public class OwlgramGeneralSettings extends BaseFragment {
                             return;
                         }
                         int index = types.indexOf(OwlConfig.translationProvider);
+                        if (index < 0) {
+                            index = types.indexOf(Translator.PROVIDER_GOOGLE);
+                        }
                         textInfoPrivacyCell.setTopPadding(0);
                         textInfoPrivacyCell.setText(LocaleController.formatString("TranslationProviderInfo", R.string.TranslationProviderInfo, names.get(index)));
                     } else if (position == hintIdRow) {

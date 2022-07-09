@@ -124,8 +124,6 @@ public class Translator {
         types.add(Translator.PROVIDER_GOOGLE);
         names.add(LocaleController.getString("ProviderDuckDuckGo", R.string.ProviderDuckDuckGo));
         types.add(Translator.PROVIDER_DUCKDUCKGO);
-        names.add(LocaleController.getString("ProviderNiuTrans", R.string.ProviderNiuTrans));
-        types.add(Translator.PROVIDER_NIU);
         names.add(LocaleController.getString("ProviderYandex", R.string.ProviderYandex));
         types.add(Translator.PROVIDER_YANDEX);
         return new Pair<>(names, types);
@@ -173,7 +171,11 @@ public class Translator {
         if (names == null || types == null) {
             return;
         }
-        PopupHelper.show(names, LocaleController.getString("TranslationProvider", R.string.TranslationProvider), types.indexOf(OwlConfig.translationProvider), context, i -> {
+        int index = types.indexOf(OwlConfig.translationProvider);
+        if (index == -1) {
+            index = types.indexOf(Translator.PROVIDER_GOOGLE);
+        }
+        PopupHelper.show(names, LocaleController.getString("TranslationProvider", R.string.TranslationProvider), index, context, i -> {
             BaseTranslator translator = getTranslator(types.get(i));
             String targetLanguage = translator.getTargetLanguage(OwlConfig.translationTarget);
 
@@ -214,8 +216,6 @@ public class Translator {
                 return YandexTranslator.getInstance();
             case PROVIDER_DEEPL:
                 return DeepLTranslator.getInstance();
-            case PROVIDER_NIU:
-                return NiuTranslator.getInstance();
             case PROVIDER_DUCKDUCKGO:
                 return DuckDuckGoTranslator.getInstance();
             case PROVIDER_GOOGLE:

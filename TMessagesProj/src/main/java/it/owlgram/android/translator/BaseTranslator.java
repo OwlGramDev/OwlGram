@@ -4,12 +4,9 @@ import androidx.annotation.Nullable;
 import androidx.collection.LruCache;
 import androidx.core.util.Pair;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
-import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 
 import java.io.IOException;
@@ -34,6 +31,40 @@ abstract public class BaseTranslator {
 
     public String convertLanguageCode(String language, String country) {
         return language;
+    }
+
+    public ArrayList<String> getStringBlocks(String query, int maxBlockSize) throws IOException {
+        ArrayList<String> blocks = new ArrayList<>();
+        while (query.length() > maxBlockSize) {
+            String maxBlockStr = query.subSequence(0, maxBlockSize).toString();
+            int n = maxBlockStr.lastIndexOf("\n\n");
+            if (n == -1) n = maxBlockStr.lastIndexOf("\n");
+            if (n == -1) n = maxBlockStr.lastIndexOf(". ");
+            if (n == -1) n = Math.min(maxBlockStr.length(), maxBlockSize);
+            blocks.add(query.substring(0, n + 1));
+            query = query.substring(n + 1);
+        }
+        if (query.length() > 0) {
+            blocks.add(query);
+        }
+        if (blocks.size() == 100) throw new IOException("Too many blocks");
+        return blocks;
+    }
+
+    public String buildTranslatedString(String original, String translated) {
+        if (translated.length() > 2) {
+            if (original.startsWith("\n\n") && !translated.startsWith("\n\n")) {
+                translated = "\n\n" + translated;
+            } else if (original.startsWith("\n") && !translated.startsWith("\n")) {
+                translated = "\n" + translated;
+            }
+            if (original.endsWith("\n\n") && !translated.endsWith("\n\n")) {
+                translated += "\n\n";
+            } else if (original.endsWith("\n") && !translated.endsWith("\n")) {
+                translated += "\n";
+            }
+        }
+        return translated;
     }
 
     public void startTask(Object query, String toLang, Translator.TranslateCallBack translateCallBack) {

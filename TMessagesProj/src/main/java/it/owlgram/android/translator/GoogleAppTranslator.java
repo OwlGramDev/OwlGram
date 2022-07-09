@@ -63,26 +63,12 @@ public class GoogleAppTranslator extends BaseTranslator {
 
     @Override
     protected Result translate(String query, String tl) throws IOException, JSONException {
-        ArrayList<String> blocks = new ArrayList<>();
-        int MAX_BLOCK_SIZE = 2500;
-        while (query.length() > MAX_BLOCK_SIZE) {
-            String maxBlockStr = query.subSequence(0, MAX_BLOCK_SIZE).toString();
-            int n = maxBlockStr.lastIndexOf("\n\n");
-            if (n == -1) n = maxBlockStr.lastIndexOf("\n");
-            if (n == -1) n = maxBlockStr.lastIndexOf(". ");
-            if (n == -1) n = Math.min(maxBlockStr.length(), MAX_BLOCK_SIZE);
-            blocks.add(query.substring(0, n + 1));
-            query = query.substring(n + 1);
-        }
-        if (query.length() > 0) {
-            blocks.add(query);
-        }
-        if (blocks.size() == 100) throw new IOException("Too many blocks");
+        ArrayList<String> blocks = getStringBlocks(query, 2500);
         StringBuilder resultString = new StringBuilder();
         String resultLang = "";
-        for (int i = 0; i < blocks.size(); i++) {
+        for (String block : blocks) {
             String url = "https://translate.googleapis.com/translate_a/single?dj=1" +
-                    "&q=" + URLEncoder.encode(blocks.get(i), "UTF-8") +
+                    "&q=" + URLEncoder.encode(block, "UTF-8") +
                     "&sl=auto" +
                     "&tl=" + tl +
                     "&ie=UTF-8&oe=UTF-8&client=at&dt=t&otf=2";
@@ -96,20 +82,7 @@ public class GoogleAppTranslator extends BaseTranslator {
             if (TextUtils.isEmpty(resultLang)) {
                 resultLang = result.sourceLanguage;
             }
-            String stringToAdd = ((String) result.translation);
-            if (((String) result.translation).length() > 2) {
-                if (blocks.get(i).startsWith("\n\n") && !stringToAdd.startsWith("\n\n")) {
-                    stringToAdd = "\n\n" + stringToAdd;
-                } else if (blocks.get(i).startsWith("\n") && !stringToAdd.startsWith("\n")) {
-                    stringToAdd = "\n" + stringToAdd;
-                }
-                if (blocks.get(i).endsWith("\n\n") && !stringToAdd.endsWith("\n\n")) {
-                    stringToAdd += "\n\n";
-                } else if (blocks.get(i).endsWith("\n") && !stringToAdd.endsWith("\n")) {
-                    stringToAdd += "\n";
-                }
-            }
-            resultString.append(stringToAdd);
+            resultString.append(buildTranslatedString(block, ((String) result.translation)));
         }
         return new Result(
                 resultString.toString(),

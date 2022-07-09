@@ -2,11 +2,15 @@ package it.owlgram.android.translator;
 
 import android.text.TextUtils;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -40,6 +44,9 @@ public class DuckDuckGoTranslator extends BaseTranslator {
 
     @Override
     protected Result translate(String query, String tl) throws IOException, JSONException {
+        ArrayList<String> blocks = getStringBlocks(query, 999);
+        StringBuilder resultString = new StringBuilder();
+        String resultLang = "";
         String urlAuth = "https://duckduckgo.com/?q=translate&ia=web";
         String userAgent = "Mozilla/5.0 (Linux; Android 12; SM-G980F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.98 Mobile Safari/537.36";
         String responseAuth = new StandardHTTPRequest(urlAuth)
@@ -59,16 +66,26 @@ public class DuckDuckGoTranslator extends BaseTranslator {
                     "vqd=" + URLEncoder.encode(uid, "UTF-8") +
                     "&query=translate" +
                     "&to=" + tl;
-            String response = new StandardHTTPRequest(url)
-                    .header("User-Agent", userAgent)
-                    .data(query)
-                    .request();
-            if (TextUtils.isEmpty(response)) {
-                return null;
+            for (String block : blocks) {
+                String response = new StandardHTTPRequest(url)
+                        .header("User-Agent", userAgent)
+                        .header("Content-Length", String.valueOf(block.getBytes(Charset.defaultCharset()).length))
+                        .data(block)
+                        .request();
+                if (TextUtils.isEmpty(response)) {
+                    return null;
+                }
+                Result result = getResult(response);
+                if (TextUtils.isEmpty(resultLang)) {
+                    resultLang = result.sourceLanguage;
+                }
+                resultString.append(buildTranslatedString(block, ((String) result.translation)));
             }
-            return getResult(response);
         }
-        return null;
+        return new Result(
+                resultString.toString(),
+                resultLang
+        );
     }
 
     @Override

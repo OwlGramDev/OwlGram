@@ -184,7 +184,7 @@ public class OwlConfig extends SettingsManager {
             blurIntensity = preferences.getInt("blurIntensity", 75);
             oldBuildVersion = preferences.getString("oldBuildVersion", null);
             stickerSizeStack = preferences.getInt("stickerSizeStack", 14);
-            translationProvider = preferences.getInt("translationProvider", isChineseUser ? Translator.PROVIDER_NIU : Translator.PROVIDER_GOOGLE);
+            translationProvider = preferences.getInt("translationProvider", Translator.PROVIDER_GOOGLE);
             showSantaHat = preferences.getBoolean("showSantaHat", true);
             showSnowFalling = preferences.getBoolean("showSnowFalling", true);
             cameraType = preferences.getInt("cameraType", CameraXUtilities.getDefault());
@@ -217,6 +217,13 @@ public class OwlConfig extends SettingsManager {
             maxRecentStickers = preferences.getInt("maxRecentStickers"+dS, 20);
             betterAudioQuality = preferences.getBoolean("betterAudioQuality"+dS, false);
             configLoaded = true;
+            migrate();
+        }
+    }
+
+    private static void migrate() {
+        if (translationProvider == Translator.PROVIDER_NIU) {
+            setTranslationProvider(Translator.PROVIDER_GOOGLE);
         }
     }
 

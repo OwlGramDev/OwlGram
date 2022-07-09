@@ -23252,7 +23252,7 @@ ChatActivity extends BaseFragment implements NotificationCenter.NotificationCent
 
             @Override
             public void onError(Exception error) {
-                ChatActivity.this.getMessageHelper().setTranslating(dialog_id, messageObject, false);
+                ChatActivity.this.getMessageHelper().resetMessageContent(dialog_id, messageObject, false, true);
                 if (isAutoTranslate) return;
                 Translator.handleTranslationError(ChatActivity.this.getParentActivity(), error, () -> translateMessage(messageObject, false), themeDelegate);
             }
