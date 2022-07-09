@@ -9,8 +9,10 @@ import android.os.PatternMatcher;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 
 import java.util.HashMap;
@@ -87,6 +89,10 @@ public class MonetHelper {
         ids.put("n2_800", android.R.color.system_neutral2_800);
         ids.put("n2_900", android.R.color.system_neutral2_900);
         ids.put("n2_1000", android.R.color.system_neutral2_1000);
+        ids.put("monetRedDark", R.color.monetRedDark);
+        ids.put("monetRedLight", R.color.monetRedLight);
+        ids.put("monetRedCall", R.color.colorCallRed);
+        ids.put("monetGreenCall", R.color.colorCallGreen);
     }
 
     public static int getColor(String color) {

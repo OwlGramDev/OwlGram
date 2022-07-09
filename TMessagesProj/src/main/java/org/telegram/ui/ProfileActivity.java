@@ -8051,12 +8051,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     try {
                         PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
                         String abi = "";
-                        if (!StoreUtils.isDownloadedFromAnyStore()) {
+                        if (BuildVars.isBetaApp()) {
+                            abi = "pbeta ";
+                        }else if (!StoreUtils.isDownloadedFromAnyStore()) {
                             abi = "direct ";
                         } else if (StoreUtils.isFromHuaweiStore()) {
                             abi = "huawei ";
-                        } else if (BuildVars.isBetaApp()) {
-                            abi = "pbeta ";
                         }
                         switch (pInfo.versionCode % 10) {
                             case 1:

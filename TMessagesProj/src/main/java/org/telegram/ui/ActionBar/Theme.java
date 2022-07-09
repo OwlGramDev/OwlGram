@@ -8519,7 +8519,7 @@ public class Theme {
                                     } catch (Exception ignore) {
                                         value = Utilities.parseInt(param.trim());
                                     }
-                                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && (param.startsWith("a") || param.startsWith("n"))) {
+                                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && (param.startsWith("a") || param.startsWith("n") || param.startsWith("monet"))) {
                                     value = MonetHelper.getColor(param.trim());
                                 } else {
                                     value = Utilities.parseInt(param.trim());

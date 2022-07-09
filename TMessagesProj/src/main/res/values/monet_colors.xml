@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="monetRedLight">@color/m3_sys_color_light_error</color>
+    <color name="monetRedDark">@color/m3_sys_color_dark_error</color>
+    <color name="colorCallGreen">#4CAF50</color>
+    <color name="colorCallRed">#EF5350</color>
+</resources>
