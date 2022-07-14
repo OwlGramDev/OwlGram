@@ -35,11 +35,11 @@ public class LauncherIconController {
 
     public enum LauncherIcon {
         DEFAULT("DefaultIcon", R.drawable.icon_background_sa, R.drawable.icon_launcher_foreground, R.string.AppIconDefault),
-        VINTAGE("VintageIcon", R.drawable.icon_6_background_sa, -1, R.string.AppIconVintage),
+        DEVELOPER("DeveloperIcon", R.drawable.iconc_1_background_sa, R.drawable.icon_launcher_foreground, R.string.AppIconDeveloper),
         AQUA("AquaIcon", R.drawable.icon_4_background_sa, R.drawable.icon_launcher_foreground, R.string.AppIconAqua),
         MONO_BLACK("MonoBlackIcon", R.drawable.iconc_2_background_sa, R.drawable.icon_launcher_foreground, R.string.AppIconMonoBlack),
-        DEVELOPER("DeveloperIcon", R.drawable.iconc_1_background_sa, R.drawable.icon_launcher_foreground, R.string.AppIconDeveloper),
         ARCTIC("ArcticIcon", R.drawable.iconc_3_background_sa, R.drawable.iconc_3_launcher_foreground, R.string.AppIconArctic),
+        VINTAGE("VintageIcon", R.drawable.icon_6_background_sa, -1, R.string.AppIconVintage),
         MONET("MonetIcon", -1, -1, R.string.MonetIcon),
         PREMIUM("PremiumIcon", R.drawable.icon_3_background_sa, R.mipmap.icon_3_foreground, R.string.AppIconPremium, true),
         TURBO("TurboIcon", R.drawable.icon_5_background_sa, R.drawable.icon_5_launcher_foreground, R.string.AppIconTurbo, true),
