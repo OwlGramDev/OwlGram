@@ -87,6 +87,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -4351,6 +4353,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         } else if (i == 1) {
                             if(originalBio != null){
                                 aboutLinkCell.setTextAndValue((String) originalBio, channelInfoRow != -1 ? null:LocaleController.getString("UserBio", R.string.UserBio), true);
+                                if (userInfoRow != -1) {
+                                    listAdapter.notifyItemChanged(userInfoRow);
+                                } else if (channelInfoRow != -1) {
+                                    listAdapter.notifyItemChanged(channelInfoRow);
+                                }
                                 currentBio = originalBio;
                                 originalBio = null;
                             } else {
@@ -4415,6 +4422,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     currentBio = (String) result.translation;
                     originalBio = bio;
                     aboutLinkCell.setTextAndValue((String) currentBio, channelInfoRow != -1 ? null:LocaleController.getString("UserBio", R.string.UserBio), true);
+                    if (userInfoRow != -1) {
+                        listAdapter.notifyItemChanged(userInfoRow);
+                    } else if (channelInfoRow != -1) {
+                        listAdapter.notifyItemChanged(channelInfoRow);
+                    }
                 }
 
                 @Override
