@@ -1949,7 +1949,7 @@ public class LocaleController {
             }
             DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance(Locale.US);
             formatter.applyPattern("#,###");
-            return formatter.format(number).replace(",",".");
+            return formatter.format(number);
         }
         StringBuilder K = new StringBuilder();
         int lastDec = 0;
