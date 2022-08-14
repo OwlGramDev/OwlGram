@@ -357,7 +357,7 @@ public class MessageHelper extends BaseController {
         try {
             Context context = ApplicationLoader.applicationContext;
             ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-            Uri uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file);
+            Uri uri = FileProvider.getUriForFile(context, ApplicationLoader.getApplicationId() + ".provider", file);
             ClipData clip = ClipData.newUri(context.getContentResolver(), "label", uri);
             clipboard.setPrimaryClip(clip);
             callback.run();

@@ -10,6 +10,7 @@ import android.content.pm.PackageInstaller;
 import android.os.Build;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
@@ -178,7 +179,7 @@ public class ApkInstaller {
     }
 
     private static InstallReceiver register(Context context, Runnable onSuccess) {
-        InstallReceiver receiver = new InstallReceiver(context, BuildConfig.APPLICATION_ID, onSuccess);
+        InstallReceiver receiver = new InstallReceiver(context, ApplicationLoader.getApplicationId(), onSuccess);
         IntentFilter filter = new IntentFilter(Intent.ACTION_PACKAGE_ADDED);
         filter.addDataScheme("package");
         context.registerReceiver(receiver, filter);

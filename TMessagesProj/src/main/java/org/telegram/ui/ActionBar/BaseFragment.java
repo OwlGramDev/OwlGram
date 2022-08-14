@@ -418,6 +418,10 @@ public abstract class BaseFragment {
         return null;
     }
 
+    public Context getContext() {
+        return getParentActivity();
+    }
+
     protected void setParentActivityTitle(CharSequence title) {
         Activity activity = getParentActivity();
         if (activity != null) {

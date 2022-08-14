@@ -61,16 +61,6 @@ public class EntitiesHelper {
         return messSpan;
     }
 
-    public static Spanned getSpannableFromSpanEntities(CharSequence sequence) {
-        Editable messSpan = new SpannableStringBuilder(sequence);
-        applySpansToSpannable(-1, -1, messSpan, 0, sequence.length(), false);
-        return messSpan;
-    }
-
-    public static void applySpansToEditable(int rS, int rE, EditTextCaption editTextCaption, int startSpan, int endSpan) {
-        applySpansToSpannable(rS, rE, editTextCaption.getText(), startSpan, endSpan, false);
-    }
-
     public static void applySpansToSpannable(int rS, int rE, Editable spannableString, int startSpan, int endSpan, boolean includeLinks) {
         if (endSpan - startSpan <= 0) {
             return;
@@ -168,11 +158,6 @@ public class EntitiesHelper {
             this.start = start;
             this.end = end;
         }
-    }
-
-    public static void applySpannableToEditText(EditTextCaption editTextCaption, int startSpan, int endSpan) {
-        Editable spannableString = new Editable.Factory().newEditable(editTextCaption.getText());
-        applyTelegramSpannable(editTextCaption.getText(), spannableString, startSpan, endSpan);
     }
 
     private static void applyTelegramSpannable(Editable outputSpannable, Editable spannableString, int startSpan, int endSpan) {

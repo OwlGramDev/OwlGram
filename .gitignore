@@ -14,3 +14,4 @@ signing.properties
 *.zip
 *.pepk
 google-services.json
+agconnect-services.json
