@@ -35,6 +35,7 @@ import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.utils.BitmapsCache;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.ActionBar.Theme;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -764,7 +765,19 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
         }
 
         if (renderingBitmap != null) {
-            if (applyTransformation) {
+            float scaleX = this.scaleX;
+            float scaleY = this.scaleY;
+            if (drawInBackground) {
+                int bitmapW = renderingBitmap.getWidth();
+                int bitmapH = renderingBitmap.getHeight();
+                if (metaData[2] == 90 || metaData[2] == 270) {
+                    int temp = bitmapW;
+                    bitmapW = bitmapH;
+                    bitmapH = temp;
+                }
+                scaleX = rect.width() / bitmapW;
+                scaleY = rect.height() / bitmapH;
+            } else if (applyTransformation) {
                 int bitmapW = renderingBitmap.getWidth();
                 int bitmapH = renderingBitmap.getHeight();
                 if (metaData[2] == 90 || metaData[2] == 270) {
@@ -773,8 +786,8 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
                     bitmapH = temp;
                 }
                 rect.set(getBounds());
-                scaleX = rect.width() / bitmapW;
-                scaleY = rect.height() / bitmapH;
+                this.scaleX = scaleX = rect.width() / bitmapW;
+                this.scaleY = scaleY = rect.height() / bitmapH;
                 applyTransformation = false;
             }
             if (hasRoundRadius()) {
@@ -991,7 +1004,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
             generatingCacheBitmap = Bitmap.createBitmap(metaData[0], metaData[1], Bitmap.Config.ARGB_8888);
         }
         getVideoFrame(cacheGenerateNativePtr, generatingCacheBitmap, metaData, generatingCacheBitmap.getRowBytes(), false, startTime, endTime);
-        if (cacheGenerateTimestamp != 0 && metaData[3] == 0) {
+        if (cacheGenerateTimestamp != 0 && metaData[3] == 0 || cacheGenerateTimestamp > metaData[3]) {
             return 0;
         }
         bitmap.eraseColor(Color.TRANSPARENT);

@@ -12046,6 +12046,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 boolean allowPlayEffect =  ((messageObject.messageOwner.media != null && !messageObject.messageOwner.media.nopremium) || (messageObject.isAnimatedEmojiStickerSingle() && dialog_id > 0));
                 if ((chatListItemAnimator == null || !chatListItemAnimator.isRunning()) && (!messageObject.isOutOwner() || messageObject.forcePlayEffect) && allowPlayEffect && !messageObject.messageOwner.premiumEffectWasPlayed && (messageObject.isPremiumSticker() || messageObject.isAnimatedEmojiStickerSingle()) && emojiAnimationsOverlay.isIdle() && emojiAnimationsOverlay.checkPosition(messageCell, chatListViewPaddingTop, chatListView.getMeasuredHeight() - blurredViewBottomOffset)) {
                     emojiAnimationsOverlay.onTapItem(messageCell, ChatActivity.this, false);
+                } else if (messageObject.isAnimatedAnimatedEmoji()) {
+                    emojiAnimationsOverlay.preloadAnimation(messageCell);
                 }
             } else if (view instanceof ChatActionCell) {
                 ChatActionCell cell = (ChatActionCell) view;
@@ -23066,7 +23068,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public void restartSticker(ChatMessageCell cell) {
+    public void setupStickerVibrationAndSound(ChatMessageCell cell) {
         MessageObject message = cell.getMessageObject();
         TLRPC.Document document = message.getDocument();
         boolean isEmoji;
@@ -23076,6 +23078,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             if (drawable != null) {
                 if (isEmoji) {
                     String emoji = message.getStickerEmoji();
+                    emoji = EmojiAnimationsOverlay.unwrapEmoji(emoji);
                     if (EmojiData.isHeartEmoji(emoji)) {
                         HashMap<Integer, Integer> pattern = new HashMap<>();
                         pattern.put(1, 1);
@@ -23095,6 +23098,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         pattern.put(36, 0);
                         drawable.setVibrationPattern(pattern);
                     }
+                    if (message.isAnimatedAnimatedEmoji()) {
+                        drawable.resetVibrationAfterRestart(true);
+                    }
                     if (!drawable.isRunning() && emoji != null) {
                         MessagesController.EmojiSound sound = getMessagesController().emojiSounds.get(emoji.replace("\uFE0F", ""));
                         if (sound != null) {
@@ -23102,6 +23108,20 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         }
                     }
                 }
+            }
+        }
+    }
+
+    public void restartSticker(ChatMessageCell cell) {
+        MessageObject message = cell.getMessageObject();
+        TLRPC.Document document = message.getDocument();
+        if (!message.isAnimatedAnimatedEmoji()) {
+            setupStickerVibrationAndSound(cell);
+        }
+        if ((message.isAnimatedEmoji()) || MessageObject.isAnimatedStickerDocument(document, currentEncryptedChat == null || message.isOut()) && !SharedConfig.loopStickers) {
+            ImageReceiver imageReceiver = cell.getPhotoImage();
+            RLottieDrawable drawable = imageReceiver.getLottieAnimation();
+            if (drawable != null) {
                 drawable.restart();
             }
         }
