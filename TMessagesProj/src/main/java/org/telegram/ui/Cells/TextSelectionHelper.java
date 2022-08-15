@@ -1453,6 +1453,7 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
         if (str == null) {
             return;
         }
+        AndroidUtilities.addToClipboard(str);
         hideActions();
         clear(true);
         if (TextSelectionHelper.this.callback != null) {
