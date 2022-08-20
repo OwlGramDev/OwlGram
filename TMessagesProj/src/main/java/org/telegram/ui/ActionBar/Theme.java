@@ -2135,7 +2135,7 @@ public class Theme {
             } else if ("Monet Dark".equals(name)) {
                 return LocaleController.getString("ThemeMonetDark", R.string.ThemeMonetDark);
             } else if ("Monet Light".equals(name)) {
-                return LocaleController.getString("ThemeMonetDark", R.string.ThemeMonetDark);
+                return LocaleController.getString("ThemeMonetLight", R.string.ThemeMonetLight);
             }
             return info != null ? info.title : name;
         }
