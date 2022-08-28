@@ -296,6 +296,7 @@ import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.ImportSettingsDialog;
 import it.owlgram.android.entities.EntitiesHelper;
 import it.owlgram.android.helpers.ForwardContext;
+import it.owlgram.android.helpers.PermissionHelper;
 import it.owlgram.android.settings.DoNotTranslateSettings;
 import it.owlgram.android.translator.AutoTranslateConfig;
 import it.owlgram.android.translator.BaseTranslator;
@@ -10758,12 +10759,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 FileLog.e(e);
             }
         } else if (which == attach_gallery) {
-            if (Build.VERSION.SDK_INT >= 23 && getParentActivity().checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                try {
-                    getParentActivity().requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, BasePermissionsActivity.REQUEST_CODE_EXTERNAL_STORAGE);
-                } catch (Throwable ignore) {
-
-                }
+            if (!PermissionHelper.isImagesAndVideoPermissionGranted()) {
+                PermissionHelper.requestImagesAndVideoPermission(getParentActivity());
                 return;
             }
             boolean allowGifs;
@@ -24054,7 +24051,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (longClick || isThreadChat() || getMessagesController().isChatNoForwards(currentChat)) {
             MessageObject messageObject = getMessageHelper().getMessageForRepeat(selectedObject, selectedObjectGroup);
             if (messageObject != null) {
-                if (messageObject.isAnyKindOfSticker() && !messageObject.isAnimatedEmoji() && !messageObject.isDice()) {
+                if (messageObject.isAnyKindOfSticker() && !messageObject.isAnimatedEmojiStickers() && !messageObject.isAnimatedEmoji() && !messageObject.isDice()) {
                     getSendMessagesHelper().sendSticker(
                             selectedObject.getDocument(), null, dialog_id, longClick ? messageObject : threadMessageObject,
                             threadMessageObject, null, null, true, 0);

@@ -38,7 +38,6 @@ dependencies {
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
     implementation 'androidx.sharetarget:sharetarget:1.2.0-rc02'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.google.android.material:material:1.6.1' // TELEGRAM MONET LIBRARY
 
     compileOnly 'org.checkerframework:checker-qual:3.22.0'
     compileOnly 'org.checkerframework:checker-compat-qual:2.5.5'
@@ -63,11 +62,11 @@ dependencies {
     implementation 'org.apache.commons:commons-text:1.9'
 
     // CameraX Implementation
-    implementation "androidx.camera:camera-core:1.1.0-rc01"
-    implementation "androidx.camera:camera-camera2:1.1.0-rc01"
-    implementation "androidx.camera:camera-lifecycle:1.1.0-rc01"
-    implementation "androidx.camera:camera-view:1.1.0-rc01"
-    implementation "androidx.camera:camera-extensions:1.1.0-rc01"
+    implementation "androidx.camera:camera-core:1.2.0-beta01"
+    implementation "androidx.camera:camera-camera2:1.2.0-beta01"
+    implementation "androidx.camera:camera-lifecycle:1.2.0-beta01"
+    implementation "androidx.camera:camera-view:1.2.0-beta01"
+    implementation "androidx.camera:camera-extensions:1.2.0-beta01"
     implementation 'androidx.interpolator:interpolator:1.0.0'
 
     // GOOGLE PLAY UPDATE CHECKER
@@ -81,8 +80,8 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 32
-    buildToolsVersion '32.1.0-rc1'
+    compileSdkVersion 33
+    buildToolsVersion '33.0.0'
     ndkVersion '21.4.7075529'
     namespace 'org.telegram.messenger'
 
@@ -136,7 +135,7 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 32
+        targetSdkVersion 33
         buildConfigField "String", "GIT_COMMIT_HASH", "\"${getGitHash()}\""
         buildConfigField "Long", "GIT_COMMIT_DATE", "${getGitDate()}L"
 
