@@ -25,7 +25,6 @@ import org.telegram.messenger.MediaDataController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Components.EditTextCaption;
 import org.telegram.ui.Components.TextStyleSpan;
 import org.telegram.ui.Components.URLSpanMono;
 import org.telegram.ui.Components.URLSpanNoUnderline;
@@ -160,8 +159,8 @@ public class EntitiesHelper {
         }
     }
 
-    private static void applyTelegramSpannable(Editable outputSpannable, Editable spannableString, int startSpan, int endSpan) {
-        CharacterStyle[] mSpans = spannableString.getSpans(startSpan, endSpan, CharacterStyle.class);
+    private static void applyTelegramSpannable(Editable outputSpannable, Editable spannableString, int endSpan) {
+        CharacterStyle[] mSpans = spannableString.getSpans(0, endSpan, CharacterStyle.class);
         RawSpannableInfo rawSpannableInfo = null;
         for (CharacterStyle mSpan : mSpans) {
             int start = spannableString.getSpanStart(mSpan);
@@ -309,7 +308,7 @@ public class EntitiesHelper {
 
     public static CharSequence applySyntaxHighlight(CharSequence text, ArrayList<TLRPC.MessageEntity> entities) {
         Editable messSpan = new SpannableStringBuilder(text);
-        applyTelegramSpannable(messSpan, (Editable) getSpannableString(text.toString(), entities), 0, text.length());
+        applyTelegramSpannable(messSpan, (Editable) getSpannableString(text.toString(), entities), text.length());
         Prism4j grammarCheck = new Prism4j(new Prism4jGrammarLocator());
         TextStyleSpan[] result = messSpan.getSpans(0, messSpan.length(), TextStyleSpan.class);
         for (TextStyleSpan span:result) {
