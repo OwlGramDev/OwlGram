@@ -710,7 +710,8 @@ public class PrivacyControlActivity extends BaseFragment implements Notification
         everybodyRow = rowCount++;
         myContactsRow = rowCount++;
         if (rulesType != PRIVACY_RULES_TYPE_LASTSEEN && rulesType != PRIVACY_RULES_TYPE_CALLS && rulesType != PRIVACY_RULES_TYPE_P2P &&
-                rulesType != PRIVACY_RULES_TYPE_FORWARDS && rulesType != PRIVACY_RULES_TYPE_PHONE && rulesType != PRIVACY_RULES_TYPE_VOICE_MESSAGES) {
+                rulesType != PRIVACY_RULES_TYPE_FORWARDS && rulesType != PRIVACY_RULES_TYPE_PHONE && rulesType != PRIVACY_RULES_TYPE_VOICE_MESSAGES &&
+                rulesType != PRIVACY_RULES_TYPE_INVITE && rulesType != PRIVACY_RULES_TYPE_PHOTO) {
             nobodyRow = -1;
         } else {
             nobodyRow = rowCount++;
