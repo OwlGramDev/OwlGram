@@ -276,4 +276,9 @@
     <string name="KeepMarkdownDesc" comment="KeepMarkdownDesc">When translating a message, keep the markdown formatting.</string>
     <string name="ThemeMonetLight">Monet Light</string>
     <string name="ThemeMonetDark">Monet Dark</string>
+    <string name="DownloadSpeed">Download Speed</string>
+    <string name="DownloadSpeedDefault">Default</string>
+    <string name="DownloadSpeedFast">Fast</string>
+    <string name="DownloadSpeedExtreme">Extreme</string>
+    <string name="FasterUploadSpeed">Faster Upload Speed</string>
 </resources>

@@ -83,6 +83,9 @@ public class SettingsManager {
             case "TAB_TYPE_TEXT":
             case "TAB_TYPE_ICON":
             case "TAB_TYPE_MIX":
+            case "DOWNLOAD_BOOST_DEFAULT":
+            case "DOWNLOAD_BOOST_FAST":
+            case "DOWNLOAD_BOOST_EXTREME":
                 return false;
             default:
                 return true;
@@ -200,6 +203,7 @@ public class SettingsManager {
                 case "tabMode":
                 case "cameraType":
                 case "dcStyleType":
+                case "downloadSpeedBoost":
                     return integerValue >= 0 && integerValue <= 2;
                 case "translationProvider":
                     return integerValue == Translator.PROVIDER_GOOGLE ||

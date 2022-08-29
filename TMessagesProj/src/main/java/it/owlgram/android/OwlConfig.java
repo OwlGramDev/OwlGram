@@ -24,6 +24,10 @@ public class OwlConfig extends SettingsManager {
     public static final int TAB_TYPE_MIX = 1;
     public static final int TAB_TYPE_ICON = 2;
 
+    public static final int DOWNLOAD_BOOST_DEFAULT = 0;
+    public static final int DOWNLOAD_BOOST_FAST = 1;
+    public static final int DOWNLOAD_BOOST_EXTREME = 2;
+
     private static final Object sync = new Object();
     public static boolean hidePhoneNumber;
     public static boolean hideContactNumber;
@@ -80,6 +84,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean showNameInActionBar;
     public static boolean showPencilIcon;
     public static boolean keepTranslationMarkdown;
+    public static boolean uploadSpeedBoost;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -104,6 +109,7 @@ public class OwlConfig extends SettingsManager {
     public static int dcStyleType;
     public static int idType;
     public static long lastUpdateCheck = 0;
+    public static int downloadSpeedBoost;
 
     static {
         loadConfig(true);
@@ -216,6 +222,8 @@ public class OwlConfig extends SettingsManager {
             String dS = devOptEnabled ? "":"_disabled";
             maxRecentStickers = preferences.getInt("maxRecentStickers"+dS, 20);
             betterAudioQuality = preferences.getBoolean("betterAudioQuality"+dS, false);
+            downloadSpeedBoost = preferences.getInt("downloadSpeedBoost"+dS, 0);
+            uploadSpeedBoost = preferences.getBoolean("uploadSpeedBoost"+dS, false);
             configLoaded = true;
             migrate();
         }
@@ -635,6 +643,14 @@ public class OwlConfig extends SettingsManager {
         editor.apply();
     }
 
+    public static void toggleUploadSpeedBoost() {
+        uploadSpeedBoost = !uploadSpeedBoost;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("uploadSpeedBoost", uploadSpeedBoost);
+        editor.apply();
+    }
+
     public static void setXiaomiBlockedInstaller() {
         xiaomiBlockedInstaller = true;
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
@@ -844,6 +860,14 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("doNotTranslateLanguages", doNotTranslateLanguages);
+        editor.apply();
+    }
+
+    public static void setDownloadSpeedBoost(int boost) {
+        downloadSpeedBoost = boost;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("downloadSpeedBoost", downloadSpeedBoost);
         editor.apply();
     }
 
