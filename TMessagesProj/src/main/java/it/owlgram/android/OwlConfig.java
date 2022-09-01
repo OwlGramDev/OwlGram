@@ -85,6 +85,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean showPencilIcon;
     public static boolean keepTranslationMarkdown;
     public static boolean uploadSpeedBoost;
+    public static boolean hideTimeOnSticker;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -215,6 +216,7 @@ public class OwlConfig extends SettingsManager {
             showNameInActionBar = preferences.getBoolean("showNameInActionBar", false);
             showPencilIcon = preferences.getBoolean("showPencilIcon", false);
             keepTranslationMarkdown = preferences.getBoolean("keepTranslationMarkdown", true);
+            hideTimeOnSticker = preferences.getBoolean("hideTimeOnSticker", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -648,6 +650,14 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("uploadSpeedBoost", uploadSpeedBoost);
+        editor.apply();
+    }
+
+    public static void toggleHideTimeOnSticker() {
+        hideTimeOnSticker = !hideTimeOnSticker;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("hideTimeOnSticker", hideTimeOnSticker);
         editor.apply();
     }
 

@@ -281,4 +281,5 @@
     <string name="DownloadSpeedFast">Fast</string>
     <string name="DownloadSpeedExtreme">Extreme</string>
     <string name="FasterUploadSpeed">Faster Upload Speed</string>
+    <string name="HideTimeOnSticker">Hide time on stickers</string>
 </resources>

@@ -87,6 +87,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
     private int turnSoundOnVDKeyRow;
     private int openArchiveOnPullRow;
     private int confirmStickersGIFsRow;
+    private int hideTimeOnStickerRow;
 
     private UndoView restartTooltip;
 
@@ -267,6 +268,11 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.confirmStickersGIFs);
                 }
+            } else if (position == hideTimeOnStickerRow) {
+                OwlConfig.toggleHideTimeOnSticker();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.hideTimeOnSticker);
+                }
             }
         });
         restartTooltip = new UndoView(context);
@@ -317,6 +323,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
         rearCameraStartingRow = rowCount++;
         confirmSendRow = rowCount++;
         confirmStickersGIFsRow = rowCount++;
+        hideTimeOnStickerRow = rowCount++;
         audioVideoDividerRow = rowCount++;
 
         foldersHeaderRow = rowCount++;
@@ -412,6 +419,8 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                         textCheckCell.setTextAndCheck(LocaleController.getString("OpenArchiveOnPull", R.string.OpenArchiveOnPull), OwlConfig.openArchiveOnPull, true);
                     } else if (position == confirmStickersGIFsRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ConfirmStickersGIFs", R.string.ConfirmStickersGIFs), OwlConfig.confirmStickersGIFs, true);
+                    } else if (position == hideTimeOnStickerRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("HideTimeOnSticker", R.string.HideTimeOnSticker), OwlConfig.hideTimeOnSticker, false);
                     }
                     break;
                 case 6:
@@ -555,7 +564,8 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                     position == playGifAsVideoRow || position == showFolderWhenForwardRow ||
                     position == rearCameraStartingRow || position == confirmSendRow || position == showGreetings ||
                     position == cameraXOptimizeRow || position == proximitySensorRow || position == suppressionRow ||
-                    position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow || position == confirmStickersGIFsRow) {
+                    position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow || position == confirmStickersGIFsRow ||
+                    position == hideTimeOnStickerRow) {
                 return 3;
             } else if (position == stickerSizeRow) {
                 return 4;
