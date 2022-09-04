@@ -34,6 +34,7 @@ import java.io.File;
 import java.util.Date;
 import java.util.Locale;
 
+import it.owlgram.android.components.DetailsPreviewMessagesCell;
 import it.owlgram.android.components.TextDetailCellMultiline;
 import it.owlgram.android.helpers.DCHelper;
 import it.owlgram.android.entities.EntitiesHelper;
@@ -42,6 +43,9 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
     private int rowCount;
     private ListAdapter listAdapter;
     private RecyclerListView listView;
+
+    private int detailsPreviewMessagesRow;
+    private int detailsPreviewDividerRow;
 
     private int aboutInfoHeaderRow;
     private int nameUserHeaderRow;
@@ -269,6 +273,8 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
         fileEmojiRow = -1;
         fileDividerRow = -1;
 
+        detailsPreviewMessagesRow = rowCount++;
+        detailsPreviewDividerRow = rowCount++;
         if ((fromChat != null && fromUser != null && fromChat.id != fromUser.id) || (fromChat != null && fromUser == null)) {
             groupHeaderRow = rowCount++;
             groupNameRow = rowCount++;
@@ -298,7 +304,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
         }
         messageHeaderRow = rowCount++;
         messageIdRow = rowCount++;
-        if (messageObject.messageOwner.fwd_from == null && !TextUtils.isEmpty(messageObject.messageText)){
+        if (messageObject.messageOwner.fwd_from == null && !TextUtils.isEmpty(messageObject.messageOwner.message)){
             messageTextRow = rowCount++;
         }
         if (messageObject.messageOwner.forwards > 0) {
@@ -489,9 +495,9 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == messageIdRow) {
                         textDetailCell.setTextAndValue(String.valueOf(messageObject.getId()), "ID", true);
                     } else if (position == messageTextRow) {
-                        CharSequence message = messageObject.messageText;
+                        CharSequence message = messageObject.messageOwner.message;
                         message = EntitiesHelper.getSpannableString(message.toString(), messageObject.messageOwner.entities, true);
-                        textDetailCell.setTextWithEmojiAndValue(EntitiesHelper.getUrlNoUnderlineText(message), LocaleController.getString("MessageText", R.string.MessageText),true);
+                        textDetailCell.setTextWithAnimatedEmojiAndValue(EntitiesHelper.getUrlNoUnderlineText(message),  messageObject.messageOwner.entities, LocaleController.getString("MessageText", R.string.MessageText),true);
                     } else if (position == messageDateRow) {
                         long date = (long) messageObject.messageOwner.date * 1000;
                         String title = messageObject.scheduled ?  LocaleController.getString("MessageScheduledDate", R.string.MessageScheduledDate) : LocaleController.getString("MessageDate", R.string.MessageDate);
@@ -513,7 +519,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == repliedMessageTextRow) {
                         CharSequence message = messageObject.messageOwner.replyMessage.message;
                         message = EntitiesHelper.getSpannableString(message.toString(), messageObject.messageOwner.replyMessage.entities, true);
-                        textDetailCell.setTextWithEmojiAndValue(EntitiesHelper.getUrlNoUnderlineText(message), LocaleController.getString("MessageText", R.string.MessageText),true);
+                        textDetailCell.setTextWithAnimatedEmojiAndValue(EntitiesHelper.getUrlNoUnderlineText(message), messageObject.messageOwner.replyMessage.entities, LocaleController.getString("MessageText", R.string.MessageText),true);
                     } else if (position == repliedMessageIdRow) {
                         textDetailCell.setTextAndValue(String.valueOf(messageObject.messageOwner.replyMessage.id), "ID", true);
                     } else if (position == repliedMessageDateRow) {
@@ -580,6 +586,10 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                         textDetailCell.setTextAndValue(fromUserInfo.longDcName, LocaleController.getString("Datacenter", R.string.FileDC), true);
                     }
                     break;
+                case 4:
+                    DetailsPreviewMessagesCell previewMessagesCell = (DetailsPreviewMessagesCell) holder.itemView;
+                    previewMessagesCell.setMessages(messageObject);
+                    break;
             }
         }
 
@@ -602,6 +612,9 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     view = new TextDetailCellMultiline(mContext);
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
+                case 4:
+                    view = new DetailsPreviewMessagesCell(mContext, parentLayout);
+                    break;
                 default:
                     view = new ShadowSectionCell(mContext);
                     break;
@@ -612,7 +625,8 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
         @Override
         public int getItemViewType(int position) {
             if (position == aboutDividerRow || position == messageDividerRow || position == forwardDividerRow ||
-                    position == repliedDividerRow || position == groupDividerRow || position == fileDividerRow){
+                    position == repliedDividerRow || position == groupDividerRow || position == fileDividerRow ||
+                    position == detailsPreviewDividerRow){
                 return 1;
             } else if (position == aboutInfoHeaderRow || position == messageHeaderRow || position == forwardMessageHeaderRow ||
                     position == forwardUserHeaderRow || position == repliedMessageHeaderRow || position == repliedUserHeaderRow ||
@@ -629,6 +643,8 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     position == fileEmojiRow || position == fileMimeType || position == groupDatacenterRow ||
                     position == repliedUserDatacenterRow || position == forwardUserDatacenterRow || position == dcRow) {
                 return 3;
+            } else if (position == detailsPreviewMessagesRow) {
+                return 4;
             }
             return 1;
         }

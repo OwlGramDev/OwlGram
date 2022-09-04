@@ -294,7 +294,6 @@ import java.util.regex.Pattern;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.ImportSettingsDialog;
-import it.owlgram.android.entities.EntitiesHelper;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.PermissionHelper;
 import it.owlgram.android.settings.DoNotTranslateSettings;

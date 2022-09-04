@@ -6,7 +6,6 @@ import android.graphics.Canvas;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -14,14 +13,18 @@ import android.widget.TextView;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MessageObject;
+import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
-import org.telegram.ui.Components.spoilers.SpoilersTextView;
+
+import java.util.ArrayList;
 
 @SuppressLint("ViewConstructor")
 public class TextDetailCellMultiline extends LinearLayout {
 
-    private final SpoilersTextView spoilersTextView;
+    private final SimpleTextView spoilersTextView;
     private final TextView valueTextView;
     private boolean needDivider;
     private boolean contentDescriptionValueFirst;
@@ -31,7 +34,7 @@ public class TextDetailCellMultiline extends LinearLayout {
         super(context);
 
         setOrientation(VERTICAL);
-        spoilersTextView = new SpoilersTextView(context);
+        spoilersTextView = new SimpleTextView(context);
         spoilersTextView.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
         spoilersTextView.setTextSize(16);
         spoilersTextView.setMaxLines(Integer.MAX_VALUE);
@@ -53,12 +56,12 @@ public class TextDetailCellMultiline extends LinearLayout {
     }
 
     public boolean haveSpoilers() {
-        return !spoilersTextView.isSpoilersRevealed && spoilersTextView.spoilers.size() > 0;
+        return spoilersTextView.haveSpoilers();
     }
 
     @SuppressLint("Recycle")
     public void revealSpoilers() {
-        spoilersTextView.dispatchTouchEvent(MotionEvent.obtain(0, 0, MotionEvent.ACTION_DOWN, Math.round(getWidth() / 2.0), Math.round(getHeight() / 2.0), 0));
+        spoilersTextView.revealSpoilers();
     }
 
     public void setTextAndValue(CharSequence text, String value, boolean divider) {
@@ -67,6 +70,11 @@ public class TextDetailCellMultiline extends LinearLayout {
         valueTextView.setText(value);
         needDivider = divider;
         setWillNotDraw(!needDivider);
+    }
+
+    public void setTextWithAnimatedEmojiAndValue(CharSequence text, ArrayList<TLRPC.MessageEntity> entities, CharSequence value, boolean divider) {
+        text = MessageObject.replaceAnimatedEmoji(text, entities, spoilersTextView.getPaint().getFontMetricsInt());
+        setTextWithEmojiAndValue(text, value, divider);
     }
 
     public void setTextWithEmojiAndValue(CharSequence text, CharSequence value, boolean divider) {
