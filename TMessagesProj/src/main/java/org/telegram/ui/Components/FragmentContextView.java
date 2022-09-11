@@ -568,7 +568,6 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         muteButton.setVisibility(GONE);
         addView(muteButton, LayoutHelper.createFrame(36, 36, Gravity.RIGHT | Gravity.TOP, 0, 0, 2, 0));
         muteButton.setOnClickListener(v -> {
-            if (fragment != null && fragment.isInPreviewMode()) return;
             VoIPService voIPService = VoIPService.getSharedInstance();
             if (voIPService == null) {
                 return;
@@ -645,7 +644,6 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         });
 
         setOnClickListener(v -> {
-            if (isInPreviewMode()) return;
             if (currentStyle == STYLE_AUDIO_PLAYER) {
                 MessageObject messageObject = MediaController.getInstance().getPlayingMessageObject();
                 if (fragment != null && messageObject != null) {
@@ -701,7 +699,6 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                     fragment.showDialog(new SharingLocationsAlert(getContext(), this::openSharingLocation, resourcesProvider));
                 }
             } else if (currentStyle == STYLE_ACTIVE_GROUP_CALL) {
-                if (fragment != null && fragment.isInPreviewMode()) return;
                 if (VoIPService.getSharedInstance() != null && getContext() instanceof LaunchActivity) {
                     GroupCallActivity.create((LaunchActivity) getContext(), AccountInstance.getInstance(VoIPService.getSharedInstance().getAccount()), null, null, false, null);
                 }
@@ -726,10 +723,6 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
                 checkImport(false);
             }
         });
-    }
-
-    public boolean isInPreviewMode() {
-        return false;
     }
 
     public void setSupportsCalls(boolean value) {

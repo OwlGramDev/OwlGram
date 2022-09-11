@@ -5561,6 +5561,10 @@ public class MediaDataController extends BaseController {
     }
 
     public ArrayList<TLRPC.MessageEntity> getEntities(CharSequence[] message, boolean allowStrike, boolean allowSpannable) {
+        return getEntities(message, allowStrike, allowSpannable, true);
+    }
+
+    public ArrayList<TLRPC.MessageEntity> getEntities(CharSequence[] message, boolean allowStrike, boolean allowSpannable, boolean allowParsePatterns) {
         if (message == null || message[0] == null) {
             return null;
         }
@@ -5571,7 +5575,8 @@ public class MediaDataController extends BaseController {
         boolean isPre = false;
         final String mono = "`";
         final String pre = "```";
-        while ((index = TextUtils.indexOf(message[0], !isPre ? mono : pre, lastIndex)) != -1) {
+        if (allowParsePatterns) {
+            while ((index = TextUtils.indexOf(message[0], !isPre ? mono : pre, lastIndex)) != -1) {
                 if (start == -1) {
                     isPre = message[0].length() - index > 2 && message[0].charAt(index + 1) == '`' && message[0].charAt(index + 2) == '`';
                     start = index;
@@ -5626,15 +5631,16 @@ public class MediaDataController extends BaseController {
                     isPre = false;
                 }
             }
-        if (start != -1 && isPre) {
-            message[0] = AndroidUtilities.concat(substring(message[0], 0, start), substring(message[0], start + 2, message[0].length()));
-            if (entities == null) {
-                entities = new ArrayList<>();
+            if (start != -1 && isPre) {
+                message[0] = AndroidUtilities.concat(substring(message[0], 0, start), substring(message[0], start + 2, message[0].length()));
+                if (entities == null) {
+                    entities = new ArrayList<>();
+                }
+                TLRPC.TL_messageEntityCode entity = new TLRPC.TL_messageEntityCode();
+                entity.offset = start;
+                entity.length = 1;
+                entities.add(entity);
             }
-            TLRPC.TL_messageEntityCode entity = new TLRPC.TL_messageEntityCode();
-            entity.offset = start;
-            entity.length = 1;
-            entities.add(entity);
         }
 
         if (message[0] instanceof Spanned && allowSpannable) {
@@ -5737,11 +5743,13 @@ public class MediaDataController extends BaseController {
 
         CharSequence cs = message[0];
         if (entities == null) entities = new ArrayList<>();
-        cs = parsePattern(cs, BOLD_PATTERN, entities, obj -> new TLRPC.TL_messageEntityBold());
-        cs = parsePattern(cs, ITALIC_PATTERN, entities, obj -> new TLRPC.TL_messageEntityItalic());
-        cs = parsePattern(cs, SPOILER_PATTERN, entities, obj -> new TLRPC.TL_messageEntitySpoiler());
-        if (allowStrike) {
-            cs = parsePattern(cs, STRIKE_PATTERN, entities, obj -> new TLRPC.TL_messageEntityStrike());
+        if (allowParsePatterns) {
+            cs = parsePattern(cs, BOLD_PATTERN, entities, obj -> new TLRPC.TL_messageEntityBold());
+            cs = parsePattern(cs, ITALIC_PATTERN, entities, obj -> new TLRPC.TL_messageEntityItalic());
+            cs = parsePattern(cs, SPOILER_PATTERN, entities, obj -> new TLRPC.TL_messageEntitySpoiler());
+            if (allowStrike) {
+                cs = parsePattern(cs, STRIKE_PATTERN, entities, obj -> new TLRPC.TL_messageEntityStrike());
+            }
         }
         message[0] = cs;
 

@@ -582,7 +582,7 @@ public class ContentPreviewViewer {
         }
         if (openPreviewRunnable != null || isVisible()) {
             if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_POINTER_UP) {
-                if (!OwlConfig.confirmStickersGIFs) {
+                if (!OwlConfig.confirmStickersGIFs || !delegate.needSend()) {
                     AndroidUtilities.runOnUIThread(() -> {
                         if (listView != null) {
                             listView.setOnItemClickListener((RecyclerListView.OnItemClickListener) listener);
@@ -591,7 +591,7 @@ public class ContentPreviewViewer {
                 } else {
                     confirmSending();
                 }
-                if (openPreviewRunnable != null && !OwlConfig.confirmStickersGIFs) {
+                if (openPreviewRunnable != null && (!OwlConfig.confirmStickersGIFs || !delegate.needSend())) {
                     AndroidUtilities.cancelRunOnUIThread(openPreviewRunnable);
                     openPreviewRunnable = null;
                 } else if (openPreviewRunnable != null) {

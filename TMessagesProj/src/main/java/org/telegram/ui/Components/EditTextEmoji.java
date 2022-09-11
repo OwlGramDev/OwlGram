@@ -147,11 +147,6 @@ public class EditTextEmoji extends FrameLayout implements NotificationCenter.Not
             }
 
             @Override
-            public boolean onTextContextMenuItem(int id) {
-                return super.onTextContextMenuItem(id);
-            }
-
-            @Override
             protected void onLineCountChanged(int oldLineCount, int newLineCount) {
                 EditTextEmoji.this.onLineCountChanged(oldLineCount, newLineCount);
             }

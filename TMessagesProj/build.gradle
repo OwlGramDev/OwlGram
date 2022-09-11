@@ -39,11 +39,11 @@ dependencies {
     implementation 'androidx.sharetarget:sharetarget:1.2.0-rc02'
     implementation 'androidx.cardview:cardview:1.0.0'
 
-    compileOnly 'org.checkerframework:checker-qual:3.22.0'
+    compileOnly 'org.checkerframework:checker-qual:3.25.0'
     compileOnly 'org.checkerframework:checker-compat-qual:2.5.5'
 
-    implementation 'com.google.firebase:firebase-messaging:23.0.7'
-    implementation 'com.google.firebase:firebase-config:21.1.1'
+    implementation 'com.google.firebase:firebase-messaging:23.0.8'
+    implementation 'com.google.firebase:firebase-config:21.1.2'
     implementation 'com.google.firebase:firebase-datatransport:18.1.6'
 
     implementation 'com.google.firebase:firebase-appindexing:20.0.0'
@@ -73,7 +73,7 @@ dependencies {
     implementation 'com.google.android.play:core:1.10.3'
 
     // NATIVE LIBS
-    implementation 'com.getkeepsafe.relinker:relinker:1.4.4'
+    implementation 'com.getkeepsafe.relinker:relinker:1.4.5'
 
     //noinspection GradleDependency
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.6' // NEEDED TESTS OF THE NEW R8 VERSION

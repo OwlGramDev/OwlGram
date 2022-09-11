@@ -25,6 +25,7 @@ import org.telegram.messenger.MediaDataController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.Components.TextStyleSpan;
 import org.telegram.ui.Components.URLSpanMono;
 import org.telegram.ui.Components.URLSpanNoUnderline;
@@ -55,7 +56,8 @@ public class EntitiesHelper {
 
     public static Spanned getSpannableString(String text, ArrayList<TLRPC.MessageEntity> entities, boolean includeLinks) {
         Editable messSpan = new SpannableStringBuilder(text);
-        MediaDataController.addTextStyleRuns(entities, text, messSpan);
+        MediaDataController.addTextStyleRuns(entities, messSpan, messSpan, -1);
+        MediaDataController.addAnimatedEmojiSpans(entities, messSpan, null);
         applySpansToSpannable(-1, -1, messSpan, 0, text.length(), includeLinks);
         return messSpan;
     }
@@ -225,9 +227,11 @@ public class EntitiesHelper {
                 TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
                 run.flags |= TextStyleSpan.FLAG_STYLE_SPOILER;
                 result = new TextStyleSpan(run);
-            } else if (mSpan instanceof ForegroundColorSpan){
+            } else if (mSpan instanceof ForegroundColorSpan) {
                 outputSpannable.removeSpan(mSpan);
                 continue;
+            } else if (mSpan instanceof AnimatedEmojiSpan) {
+                result = mSpan;
             }
             if (result != null) {
                 if (result instanceof TextStyleSpan) {
@@ -332,10 +336,10 @@ public class EntitiesHelper {
         }
         messSpan = (SpannableStringBuilder) AndroidUtilities.getTrimmedString(messSpan);
         CharSequence[] message = new CharSequence[]{messSpan};
-        ArrayList<TLRPC.MessageEntity> entitiesNew = MediaDataController.getInstance(UserConfig.selectedAccount).getEntities(message, true);
+        ArrayList<TLRPC.MessageEntity> entitiesNew = MediaDataController.getInstance(UserConfig.selectedAccount).getEntities(message, true, true, false);
         entities.clear();
         entities.addAll(entitiesNew);
-        return messSpan;
+        return message[0];
     }
 
     public static boolean isEmoji(String message){

@@ -125,12 +125,6 @@ public class EditTextCaption extends EditTextBoldCursor {
         delegate = editTextCaptionDelegate;
     }
 
-    public void onSpansChanged() {
-        if (delegate != null) {
-            delegate.onSpansChanged();
-        }
-    }
-
     public void setAllowTextEntitiesIntersection(boolean value) {
         allowTextEntitiesIntersection = value;
     }

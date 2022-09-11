@@ -197,27 +197,7 @@ public class TextSettingsCell extends FrameLayout {
         requestLayout();
     }
 
-    public void setTextAndValueAndIcon(String text, String value, int resId, boolean divider) {
-        textView.setText(text);
-        valueImageView.setVisibility(INVISIBLE);
-        if (value != null) {
-            valueTextView.setText(value);
-            valueTextView.setVisibility(VISIBLE);
-        } else {
-            valueTextView.setVisibility(INVISIBLE);
-        }
-        if (resId != 0) {
-            valueImageView.setVisibility(VISIBLE);
-            valueImageView.setImageResource(resId);
-        } else {
-            valueImageView.setVisibility(INVISIBLE);
-        }
-        needDivider = divider;
-        setWillNotDraw(!divider);
-        requestLayout();
-    }
-
-    public void setTextAndIcon(String text, int resId, boolean divider) {
+    public void setTextAndIcon(CharSequence text, int resId, boolean divider) {
         textView.setText(text);
         valueTextView.setVisibility(INVISIBLE);
         if (resId != 0) {
@@ -228,7 +208,6 @@ public class TextSettingsCell extends FrameLayout {
         }
         needDivider = divider;
         setWillNotDraw(!divider);
-        requestLayout();
     }
 
     public void setIcon(int resId) {
