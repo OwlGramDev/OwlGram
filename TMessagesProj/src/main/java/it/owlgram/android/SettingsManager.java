@@ -13,7 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.telegram.messenger.ApplicationLoader;
-import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
@@ -183,9 +182,10 @@ public class SettingsManager {
                             if (!object.has(subKey)) {
                                 boolean foundValid = false;
                                 for (String item : MenuOrderManager.list_items) {
-                                    if (item.equals(subKey)) {
+                                    if (item.equals(subKey) || subKey.equals(MenuOrderManager.DIVIDER_ITEM)) {
                                         object.put(subKey, true);
                                         foundValid = true;
+                                        break;
                                     }
                                 }
                                 if (!foundValid) return false;
