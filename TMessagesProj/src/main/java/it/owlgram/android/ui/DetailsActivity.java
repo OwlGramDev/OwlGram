@@ -56,6 +56,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
     private int messageHeaderRow;
     private int messageIdRow;
     private int messageTextRow;
+    private int messageTextLengthRow;
     private int messageForwardsRow;
     private int messageDateRow;
     private int messageDateEditedRow;
@@ -74,6 +75,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
     private int repliedMessageHeaderRow;
     private int repliedMessageIdRow;
     private int repliedMessageTextRow;
+    private int repliedMessageTextLengthRow;
     private int repliedMessageDateRow;
     private int repliedDividerRow;
 
@@ -231,6 +233,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
         messageHeaderRow = -1;
         messageIdRow = -1;
         messageTextRow = -1;
+        messageTextLengthRow = -1;
         messageForwardsRow = -1;
         messageDateEditedRow = -1;
         messageDateRow = -1;
@@ -248,6 +251,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
         repliedMessageHeaderRow = -1;
         repliedMessageIdRow = -1;
         repliedMessageTextRow = -1;
+        repliedMessageTextLengthRow = -1;
         repliedMessageDateRow = -1;
         repliedDividerRow = -1;
         repliedUserHeaderRow = -1;
@@ -306,6 +310,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
         messageIdRow = rowCount++;
         if (messageObject.messageOwner.fwd_from == null && !TextUtils.isEmpty(messageObject.messageOwner.message)){
             messageTextRow = rowCount++;
+            messageTextLengthRow = rowCount++;
         }
         if (messageObject.messageOwner.forwards > 0) {
             messageForwardsRow = rowCount++;
@@ -321,6 +326,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
             forwardMessageHeaderRow = rowCount++;
             if (!TextUtils.isEmpty(messageObject.messageText)){
                 messageTextRow = rowCount++;
+                messageTextLengthRow = rowCount++;
             }
             forwardMessageDateRow = rowCount++;
             if (fromForwardedUser != null){
@@ -346,6 +352,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
             repliedMessageIdRow = rowCount++;
             if (!TextUtils.isEmpty(messageObject.messageOwner.replyMessage.message)){
                 repliedMessageTextRow = rowCount++;
+                repliedMessageTextLengthRow = rowCount++;
             }
             repliedMessageDateRow = rowCount++;
             repliedDividerRow = rowCount++;
@@ -497,7 +504,9 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == messageTextRow) {
                         CharSequence message = messageObject.messageOwner.message;
                         message = EntitiesHelper.getSpannableString(message.toString(), messageObject.messageOwner.entities, true);
-                        textDetailCell.setTextWithAnimatedEmojiAndValue(EntitiesHelper.getUrlNoUnderlineText(message),  messageObject.messageOwner.entities, LocaleController.getString("MessageText", R.string.MessageText),true);
+                        textDetailCell.setTextWithAnimatedEmojiAndValue(EntitiesHelper.getUrlNoUnderlineText(message), messageObject.messageOwner.entities, LocaleController.getString("MessageText", R.string.MessageText), true);
+                    } else if (position == messageTextLengthRow) {
+                        textDetailCell.setTextAndValue(String.valueOf(messageObject.messageOwner.message.length()), LocaleController.getString("MessageTextLength", R.string.MessageTextLength), true);
                     } else if (position == messageDateRow) {
                         long date = (long) messageObject.messageOwner.date * 1000;
                         String title = messageObject.scheduled ?  LocaleController.getString("MessageScheduledDate", R.string.MessageScheduledDate) : LocaleController.getString("MessageDate", R.string.MessageDate);
@@ -520,6 +529,8 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                         CharSequence message = messageObject.messageOwner.replyMessage.message;
                         message = EntitiesHelper.getSpannableString(message.toString(), messageObject.messageOwner.replyMessage.entities, true);
                         textDetailCell.setTextWithAnimatedEmojiAndValue(EntitiesHelper.getUrlNoUnderlineText(message), messageObject.messageOwner.replyMessage.entities, LocaleController.getString("MessageText", R.string.MessageText),true);
+                    } else if (position == repliedMessageTextLengthRow) {
+                        textDetailCell.setTextAndValue(String.valueOf(messageObject.messageOwner.replyMessage.message.length()), LocaleController.getString("MessageTextLength", R.string.MessageTextLength), true);
                     } else if (position == repliedMessageIdRow) {
                         textDetailCell.setTextAndValue(String.valueOf(messageObject.messageOwner.replyMessage.id), "ID", true);
                     } else if (position == repliedMessageDateRow) {
@@ -641,7 +652,8 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     position == fileNameRow || position == filePathRow || position == fileSizeRow || position == fileDCRow ||
                     position == messageForwardsRow || position == messageDateEditedRow || position == fileDuration ||
                     position == fileEmojiRow || position == fileMimeType || position == groupDatacenterRow ||
-                    position == repliedUserDatacenterRow || position == forwardUserDatacenterRow || position == dcRow) {
+                    position == repliedUserDatacenterRow || position == forwardUserDatacenterRow || position == dcRow ||
+                    position == messageTextLengthRow || position == repliedMessageTextLengthRow){
                 return 3;
             } else if (position == detailsPreviewMessagesRow) {
                 return 4;

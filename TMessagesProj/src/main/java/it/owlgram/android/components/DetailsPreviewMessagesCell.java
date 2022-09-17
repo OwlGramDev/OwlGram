@@ -8,7 +8,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
-import android.view.MotionEvent;
 import android.widget.LinearLayout;
 
 import org.telegram.messenger.AndroidUtilities;
@@ -65,7 +64,17 @@ public class DetailsPreviewMessagesCell extends LinearLayout {
 
         for (MessageObject obj : messageObjects) {
             ChatMessageCell cell = new ChatMessageCell(getContext());
-            cell.setDelegate(new ChatMessageCell.ChatMessageCellDelegate() {});
+            cell.setDelegate(new ChatMessageCell.ChatMessageCellDelegate() {
+                @Override
+                public boolean canPerformActions() {
+                    return true;
+                }
+
+                @Override
+                public void didLongPress(ChatMessageCell cell, float x, float y) {
+                    cell.resetPressedLink(-1);
+                }
+            });
             cell.isChat = true;
             cell.setFullyDraw(true);
             cell.setMessageObject(obj, null, false, false);
@@ -186,23 +195,7 @@ public class DetailsPreviewMessagesCell extends LinearLayout {
     }
 
     @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        return false;
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        return false;
-    }
-
-    @Override
     protected void dispatchSetPressed(boolean pressed) {
 
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        return false;
     }
 }

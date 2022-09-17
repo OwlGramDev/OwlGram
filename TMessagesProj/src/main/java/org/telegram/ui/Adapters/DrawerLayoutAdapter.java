@@ -291,7 +291,7 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
             savedIcon = R.drawable.msg_saved_14;
             settingsIcon = R.drawable.msg_settings_14;
             inviteIcon = R.drawable.msg_secret_ny;
-            helpIcon = R.drawable.msg_help;
+            helpIcon = R.drawable.msg_help_14;
             peopleNearbyIcon = R.drawable.msg_secret_14;
         } else if (eventType == 2) {
             newGroupIcon = R.drawable.msg_groups_hw;
@@ -303,7 +303,7 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
             settingsIcon = R.drawable.msg_settings_hw;
             inviteIcon = R.drawable.msg_invite_hw;
             helpIcon = R.drawable.msg_help_hw;
-            peopleNearbyIcon = R.drawable.msg_secret_hw;
+            peopleNearbyIcon = R.drawable.msg_nearby_hw;
         } else if (eventType == 3) {
             newGroupIcon = R.drawable.menu_groups_cn;
             newSecretIcon = R.drawable.menu_secret_cn;
@@ -328,38 +328,10 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
             peopleNearbyIcon = R.drawable.msg_nearby;
         }
         UserConfig me = UserConfig.getInstance(UserConfig.selectedAccount);
-        if (me != null && me.isPremium()) {
-            if (me.getEmojiStatus() != null) {
-                items.add(new Item(15, LocaleController.getString("ChangeEmojiStatus", R.string.ChangeEmojiStatus), 0, R.raw.emoji_status_change_to_set));
-            } else {
-                items.add(new Item(15, LocaleController.getString("SetEmojiStatus", R.string.SetEmojiStatus), 0, R.raw.emoji_status_set_to_change));
-            }
-            items.add(null); // divider
-        }
         int item_size = MenuOrderManager.sizeAvailable();
         for(int i = 0; i < item_size; i++) {
             MenuOrderManager.EditableMenuItem data = MenuOrderManager.getSingleAvailableMenuItem(i);
             if (data != null) {
-                boolean can_add_divider = false;
-                if(data.id.equals("telegram_features") || data.id.equals("invite_friends")) {
-                    MenuOrderManager.EditableMenuItem previousData = MenuOrderManager.getSingleAvailableMenuItem(i - 1);
-                    if (i + 1 < item_size) {
-                        MenuOrderManager.EditableMenuItem next_item = MenuOrderManager.getSingleAvailableMenuItem(i + 1);
-                        if (next_item != null) {
-                            if (next_item.id.equals("telegram_features") || next_item.id.equals("invite_friends")) {
-                                can_add_divider = true;
-                            }
-                        }
-                    } else if (i == item_size - 1) {
-                        if (previousData != null && !(previousData.id.equals("telegram_features") || previousData.id.equals("invite_friends"))) {
-                            can_add_divider = true;
-                        }
-                    }
-                    if (can_add_divider) {
-                        items.add(null); // divider
-                    }
-                }
-
                 switch (data.id) {
                     case "new_group":
                         items.add(new Item(2, data.text, newGroupIcon));
@@ -404,6 +376,18 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
                         break;
                     case "qr_login":
                         items.add(new Item(204, LocaleController.getString("AuthAnotherClient", R.string.AuthAnotherClient), R.drawable.msg_qrcode));
+                        break;
+                    case "set_status":
+                        if (me != null && me.isPremium()) {
+                            if (me.getEmojiStatus() != null) {
+                                items.add(new Item(15, LocaleController.getString("ChangeEmojiStatus", R.string.ChangeEmojiStatus), 0, R.raw.emoji_status_change_to_set));
+                            } else {
+                                items.add(new Item(15, LocaleController.getString("SetEmojiStatus", R.string.SetEmojiStatus), 0, R.raw.emoji_status_set_to_change));
+                            }
+                        }
+                        break;
+                    case "divider":
+                        items.add(null);
                         break;
                 }
             }

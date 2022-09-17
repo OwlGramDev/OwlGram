@@ -28,6 +28,8 @@ import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 
+import java.util.Objects;
+
 import it.owlgram.android.components.AddItemCell;
 import it.owlgram.android.components.HintHeaderCell;
 import it.owlgram.android.components.SwapOrderCell;
@@ -72,9 +74,19 @@ public class DrawerOrderSettings extends BaseFragment {
                 if (id == -1) {
                     finishFragment();
                 } else if (id == 1) {
+                    MenuOrderManager.addItem(MenuOrderManager.DIVIDER_ITEM);
+                    updateRowsId(false);
+                    listAdapter.notifyItemInserted(menuItemsStartRow);
+                    if (MenuOrderManager.IsDefaultPosition()) {
+                        menuItem.hideSubItem(2);
+                    } else {
+                        menuItem.showSubItem(2);
+                    }
+                    getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                } else if (id == 2) {
                     MenuOrderManager.resetToDefaultPosition();
                     updateRowsId(true);
-                    menuItem.setVisibility(View.GONE);
+                    menuItem.hideSubItem(2);
                     getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
                 }
             }
@@ -83,8 +95,13 @@ public class DrawerOrderSettings extends BaseFragment {
         ActionBarMenu menu = actionBar.createMenu();
         menuItem = menu.addItem(0, R.drawable.ic_ab_other);
         menuItem.setContentDescription(LocaleController.getString("AccDescrMoreOptions", R.string.AccDescrMoreOptions));
-        menuItem.addSubItem(1, R.drawable.msg_reset, LocaleController.getString("ResetItemsOrder", R.string.ResetItemsOrder));
-        menuItem.setVisibility(MenuOrderManager.IsDefaultPosition() ? View.GONE : View.VISIBLE);
+        menuItem.addSubItem(1, R.drawable.msg_newfilter, LocaleController.getString("AddDivider", R.string.AddDivider));
+        menuItem.addSubItem(2, R.drawable.msg_reset, LocaleController.getString("ResetItemsOrder", R.string.ResetItemsOrder));
+        if (MenuOrderManager.IsDefaultPosition()) {
+            menuItem.hideSubItem(2);
+        } else {
+            menuItem.showSubItem(2);
+        }
 
         listAdapter = new ListAdapter(context);
         fragmentView = new FrameLayout(context);
@@ -214,15 +231,18 @@ public class DrawerOrderSettings extends BaseFragment {
                         return false;
                     });
                     swapOrderCell.setOnDeleteClick(v -> {
-                        if(MenuOrderManager.isAvailable(swapOrderCell.menuId)) {
-                            int index = MenuOrderManager.getPositionOf(swapOrderCell.menuId);
-                            if (index != -1) {
-                                index += menuItemsStartRow;
-                                MenuOrderManager.removeItem(swapOrderCell.menuId);
-                                int index2 = MenuOrderManager.getPositionOf(swapOrderCell.menuId);
+                        int index = listView.getChildViewHolder(swapOrderCell).getAdapterPosition();
+                        int position = index - menuItemsStartRow;
+                        if(MenuOrderManager.isAvailable(swapOrderCell.menuId, position)) {
+                            int prevRecommendedHeaderRow = 0, index2 = 0;
+                            MenuOrderManager.removeItem(position);
+                            if (!Objects.equals(swapOrderCell.menuId, MenuOrderManager.DIVIDER_ITEM)) {
+                                index2 = MenuOrderManager.getPositionOf(swapOrderCell.menuId);
                                 index2 += menuHintsStartRow;
-                                int prevRecommendedHeaderRow = headerSuggestedOptionsRow;
-                                updateRowsId(false);
+                                prevRecommendedHeaderRow = headerSuggestedOptionsRow;
+                            }
+                            updateRowsId(false);
+                            if (!Objects.equals(swapOrderCell.menuId, MenuOrderManager.DIVIDER_ITEM)) {
                                 if (prevRecommendedHeaderRow == -1 && headerSuggestedOptionsRow != -1) {
                                     int itemsCount = hintsDividerRow - headerSuggestedOptionsRow + 1;
                                     index += itemsCount;
@@ -231,11 +251,13 @@ public class DrawerOrderSettings extends BaseFragment {
                                     index += 1;
                                     listAdapter.notifyItemInserted(index2);
                                 }
-                                listAdapter.notifyItemRemoved(index);
-                            } else {
-                                updateRowsId(true);
                             }
-                            menuItem.setVisibility(MenuOrderManager.IsDefaultPosition() ? View.GONE : View.VISIBLE);
+                            listAdapter.notifyItemRemoved(index);
+                            if (MenuOrderManager.IsDefaultPosition()) {
+                                menuItem.hideSubItem(2);
+                            } else {
+                                menuItem.showSubItem(2);
+                            }
                             getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
                         }
                     });
@@ -262,7 +284,11 @@ public class DrawerOrderSettings extends BaseFragment {
                             } else {
                                 updateRowsId(true);
                             }
-                            menuItem.setVisibility(MenuOrderManager.IsDefaultPosition() ? View.GONE : View.VISIBLE);
+                            if (MenuOrderManager.IsDefaultPosition()) {
+                                menuItem.hideSubItem(2);
+                            } else {
+                                menuItem.showSubItem(2);
+                            }
                             getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
                         }
                     });
@@ -301,7 +327,11 @@ public class DrawerOrderSettings extends BaseFragment {
             }
             MenuOrderManager.changePosition(idx1, idx2);
             notifyItemMoved(fromIndex, toIndex);
-            menuItem.setVisibility(MenuOrderManager.IsDefaultPosition() ? View.GONE : View.VISIBLE);
+            if (MenuOrderManager.IsDefaultPosition()) {
+                menuItem.hideSubItem(2);
+            } else {
+                menuItem.showSubItem(2);
+            }
             getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
         }
     }
