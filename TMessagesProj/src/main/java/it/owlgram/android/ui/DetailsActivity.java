@@ -324,7 +324,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
         if (messageObject.messageOwner.fwd_from != null){
             messageDividerRow = rowCount++;
             forwardMessageHeaderRow = rowCount++;
-            if (!TextUtils.isEmpty(messageObject.messageText)){
+            if (!TextUtils.isEmpty(messageObject.messageOwner.message)){
                 messageTextRow = rowCount++;
                 messageTextLengthRow = rowCount++;
             }
