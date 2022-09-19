@@ -77,6 +77,8 @@ import it.owlgram.android.OwlConfig;
 
 import java.util.ArrayList;
 
+import java.util.ArrayList;
+
 public class DrawerProfileCell extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
 
     private BackupImageView avatarImageView;
@@ -327,6 +329,7 @@ public class DrawerProfileCell extends FrameLayout implements NotificationCenter
             this.effectsSize = effectsSize;
             this.renderedEffectsSize = effectsSize;
         }
+
         public AnimatedStatusView(Context context, int stateSize, int effectsSize, int renderedEffectsSize) {
             super(context);
             this.stateSize = stateSize;

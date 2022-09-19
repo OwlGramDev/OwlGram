@@ -5780,6 +5780,7 @@ public class MessagesStorage extends BaseController {
                         long key = inbox.keyAt(b);
                         int messageId = inbox.get(key);
                         int stillUnread = stillUnreadMessagesCount == null ? -2 : stillUnreadMessagesCount.get(key, -2);
+
                         if (stillUnread >= 0) {
                             dialogsToUpdate.put(key, stillUnread);
                             if (BuildVars.DEBUG_VERSION) {
