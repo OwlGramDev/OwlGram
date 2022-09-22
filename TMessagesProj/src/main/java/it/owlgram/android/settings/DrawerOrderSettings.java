@@ -188,14 +188,14 @@ public class DrawerOrderSettings extends BaseFragment {
                     SwapOrderCell swapOrderCell = (SwapOrderCell) holder.itemView;
                     MenuOrderManager.EditableMenuItem data = MenuOrderManager.getSingleAvailableMenuItem(position - menuItemsStartRow);
                     if(data != null) {
-                        swapOrderCell.setData(data.text, data.isDefault, data.id, true);
+                        swapOrderCell.setData(data.text, data.isDefault, data.isPremium, data.id,true);
                     }
                     break;
                 case 5:
                     AddItemCell addItemCell = (AddItemCell) holder.itemView;
                     MenuOrderManager.EditableMenuItem notData = MenuOrderManager.getSingleNotAvailableMenuItem(position - menuHintsStartRow);
                     if(notData != null) {
-                        addItemCell.setData(notData.text, notData.id,true);
+                        addItemCell.setData(notData.text, notData.id, notData.isPremium,true);
                     }
                     break;
             }

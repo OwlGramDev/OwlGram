@@ -387,7 +387,16 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
                         }
                         break;
                     case "divider":
-                        items.add(null);
+                        boolean foundPreviousDivider = false;
+                        if (i > 0) {
+                            MenuOrderManager.EditableMenuItem previousData = MenuOrderManager.getSingleAvailableMenuItem(i - 1);
+                            if (previousData != null && previousData.id.equals("divider")) {
+                                foundPreviousDivider = true;
+                            }
+                        }
+                        if ((items.size() != 0 || i == 0) && !foundPreviousDivider) {
+                            items.add(null);
+                        }
                         break;
                 }
             }

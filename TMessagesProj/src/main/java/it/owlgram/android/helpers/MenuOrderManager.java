@@ -234,7 +234,8 @@ public class MenuOrderManager {
                 new EditableMenuItem(
                         list_items[14],
                         LocaleController.getString("SetEmojiStatus", R.string.SetEmojiStatus),
-                        false
+                        false,
+                        true
                 )
         );
         list.add(
@@ -391,10 +392,17 @@ public class MenuOrderManager {
         public final String id;
         public final String text;
         public final boolean isDefault;
+        public final boolean isPremium;
+
         public EditableMenuItem(String menu_id, String menu_text, boolean menu_default) {
+            this(menu_id, menu_text, menu_default, false);
+        }
+
+        public EditableMenuItem(String menu_id, String menu_text, boolean menu_default, boolean is_premium) {
             id = menu_id;
             text = menu_text;
             isDefault = menu_default;
+            isPremium = is_premium;
         }
     }
 
