@@ -370,6 +370,12 @@ public class MessageObject {
                 }
             }
         }
+        isSpoilersRevealed = old.isSpoilersRevealed;
+        if (isSpoilersRevealed && textLayoutBlocks != null) {
+            for (TextLayoutBlock block : textLayoutBlocks) {
+                block.spoilers.clear();
+            }
+        }
     }
 
     public ArrayList<ReactionsLayoutInBubble.VisibleReaction> getChoosenReactions() {

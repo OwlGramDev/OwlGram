@@ -79,6 +79,8 @@ import java.util.ArrayList;
 
 import java.util.ArrayList;
 
+import java.util.ArrayList;
+
 public class DrawerProfileCell extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
 
     private BackupImageView avatarImageView;

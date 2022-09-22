@@ -320,6 +320,10 @@ public class PhotoViewerWebView extends FrameLayout {
 
         youtubeStoryboards.clear();
 
+        if (duration <= 15) {
+            return;
+        }
+
         String[] specParts = url.split("\\|");
         String baseUrl = specParts[0].split("\\$")[0] + "2/";
         String sgpPart = specParts[0].split("\\$N")[1];
@@ -333,13 +337,17 @@ public class PhotoViewerWebView extends FrameLayout {
             sighPart = specParts[3].split("M#")[1];
         }
 
-        int boardsCount = 0;
+        int boardsCount;
 
-        if (duration < 250) {
+        if (duration <= 100) {
+            boardsCount = (int) Math.ceil(duration / 25f);
+        } else if (duration <= 250) {
             boardsCount = (int) Math.ceil((duration / 2f) / 25);
-        } else if (duration >= 250 && duration < 1000) {
+        } else if (duration <= 500) {
             boardsCount = (int) Math.ceil((duration / 4f) / 25);
-        } else if (duration >= 1000) {
+        } else if (duration <= 1000) {
+            boardsCount = (int) Math.ceil((duration / 5f) / 25);
+        } else {
             boardsCount = (int) Math.ceil((duration / 10f) / 25);
         }
 
@@ -385,12 +393,16 @@ public class PhotoViewerWebView extends FrameLayout {
     public int getYoutubeStoryboardImageIndex(int position) {
         int duration = getVideoDuration() / 1000;
 
-        int i = -1;
-        if (duration < 250) {
+        int i;
+        if (duration <= 100) {
+            i = (int) Math.ceil(position) % 25;
+        } else if (duration <= 250) {
             i = (int) Math.ceil(position / 2f) % 25;
-        } else if (duration >= 250 && duration < 1000) {
+        } else if (duration <= 500) {
             i = (int) Math.ceil(position / 4f) % 25;
-        } else if (duration >= 1000) {
+        } else if (duration <= 1000) {
+            i = (int) Math.ceil(position / 5f) % 25;
+        } else {
             i = (int) Math.ceil(position / 10f) % 25;
         }
         return i;
@@ -676,6 +688,8 @@ public class PhotoViewerWebView extends FrameLayout {
         webView.stopLoading();
         webView.loadUrl("about:blank");
         webView.destroy();
+        videoDuration = 0;
+        currentPosition = 0;
         AndroidUtilities.cancelRunOnUIThread(progressRunnable);
     }
 }

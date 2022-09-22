@@ -118,10 +118,12 @@ android {
     buildTypes {
         debug {
             resValue "string", "BuildAppName", "@string/AppNameBeta"
+            buildConfigField "boolean", "DEBUG_PRIVATE_VERSION", "true"
         }
 
         pbeta {
             resValue "string", "BuildAppName", "@string/AppNameBeta"
+            buildConfigField "boolean", "DEBUG_PRIVATE_VERSION", "true"
         }
 
         release {
@@ -138,6 +140,7 @@ android {
         targetSdkVersion 33
         buildConfigField "String", "GIT_COMMIT_HASH", "\"${getGitHash()}\""
         buildConfigField "Long", "GIT_COMMIT_DATE", "${getGitDate()}L"
+        buildConfigField "boolean", "DEBUG_PRIVATE_VERSION", "false"
 
         externalNativeBuild {
             cmake {

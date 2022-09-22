@@ -19,17 +19,17 @@ import java.util.Objects;
 
 public class BuildVars {
 
-    public static boolean DEBUG_VERSION = true;
+    public static boolean DEBUG_VERSION = BuildConfig.DEBUG_PRIVATE_VERSION;
     public static boolean LOGS_ENABLED = true;
-    public static boolean DEBUG_PRIVATE_VERSION = false;
+    public static boolean DEBUG_PRIVATE_VERSION = BuildConfig.DEBUG_PRIVATE_VERSION;
     public static boolean USE_CLOUD_STRINGS = true;
     public static boolean CHECK_UPDATES = false;
     public static boolean IGNORE_VERSION_CHECK = false;
     public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q;
-    public static int BUILD_VERSION = 2803;
-    public static String BUILD_VERSION_STRING = "2.3.0 Beta 2";
-    public static int TELEGRAM_BUILD_VERSION = 2800;
-    public static String TELEGRAM_VERSION_STRING = "9.0.1";
+    public static int BUILD_VERSION = 2809;
+    public static String BUILD_VERSION_STRING = "2.3.0 Beta 3";
+    public static int TELEGRAM_BUILD_VERSION = 2808;
+    public static String TELEGRAM_VERSION_STRING = "9.0.2";
     public static int APP_ID = 10029733;
     public static String APP_HASH = "d0d81009d46e774f78c0e0e622f5fa21";
 

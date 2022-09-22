@@ -33,8 +33,6 @@ import androidx.annotation.Keep;
 
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
-import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.AnimatedFileDrawable;
 import org.telegram.ui.Components.LoadingStickerDrawable;
 import org.telegram.ui.Components.RLottieDrawable;
@@ -711,6 +709,10 @@ public class ImageReceiver implements NotificationCenter.NotificationCenterDeleg
 
     public void setLayerNum(int value) {
         currentLayerNum = value;
+        if (attachedToWindow) {
+            currentOpenedLayerFlags = NotificationCenter.getGlobalInstance().getCurrentHeavyOperationFlags();
+            currentOpenedLayerFlags &= ~currentLayerNum;
+        }
     }
 
     public void setImageBitmap(Bitmap bitmap) {
