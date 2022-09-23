@@ -2048,13 +2048,6 @@ public class LocaleController {
                 user.status.expires = -102;
             }
         }
-        String additional_status = "";
-        if(user != null){
-            additional_status = ", ID: " + user.id;
-            if(user.photo != null){
-                additional_status += ", DC: " + user.photo.dc_id;
-            }
-        }
         if (user != null && user.status != null && user.status.expires <= 0) {
             if (MessagesController.getInstance(currentAccount).onlinePrivacy.containsKey(user.id)) {
                 if (isOnline != null) {

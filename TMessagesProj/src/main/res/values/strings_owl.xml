@@ -285,4 +285,6 @@
     <string name="MessageTextLength">Text Length</string>
     <string name="Divider">Divider</string>
     <string name="AddDivider">Add Divider</string>
+    <string name="OnlineStatus">Show Online Status</string>
+    <string name="OnlineStatusDesc">Show the online status of other people next to their profile photo in groups</string>
 </resources>

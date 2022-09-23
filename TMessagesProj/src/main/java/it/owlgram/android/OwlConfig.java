@@ -86,6 +86,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean keepTranslationMarkdown;
     public static boolean uploadSpeedBoost;
     public static boolean hideTimeOnSticker;
+    public static boolean showStatusInChat;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -217,6 +218,7 @@ public class OwlConfig extends SettingsManager {
             showPencilIcon = preferences.getBoolean("showPencilIcon", false);
             keepTranslationMarkdown = preferences.getBoolean("keepTranslationMarkdown", true);
             hideTimeOnSticker = preferences.getBoolean("hideTimeOnSticker", false);
+            showStatusInChat = preferences.getBoolean("showStatusInChat", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -658,6 +660,14 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("hideTimeOnSticker", hideTimeOnSticker);
+        editor.apply();
+    }
+
+    public static void toggleShowStatusInChat() {
+        showStatusInChat = !showStatusInChat;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showStatusInChat", showStatusInChat);
         editor.apply();
     }
 

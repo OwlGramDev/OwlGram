@@ -88,6 +88,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
     private int openArchiveOnPullRow;
     private int confirmStickersGIFsRow;
     private int hideTimeOnStickerRow;
+    private int onlineStatusRow;
 
     private UndoView restartTooltip;
 
@@ -273,6 +274,11 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.hideTimeOnSticker);
                 }
+            } else if (position == onlineStatusRow) {
+                OwlConfig.toggleShowStatusInChat();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.showStatusInChat);
+                }
             }
         });
         restartTooltip = new UndoView(context);
@@ -324,6 +330,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
         confirmSendRow = rowCount++;
         confirmStickersGIFsRow = rowCount++;
         hideTimeOnStickerRow = rowCount++;
+        onlineStatusRow = rowCount++;
         audioVideoDividerRow = rowCount++;
 
         foldersHeaderRow = rowCount++;
@@ -420,7 +427,9 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                     } else if (position == confirmStickersGIFsRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ConfirmStickersGIFs", R.string.ConfirmStickersGIFs), OwlConfig.confirmStickersGIFs, true);
                     } else if (position == hideTimeOnStickerRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("HideTimeOnSticker", R.string.HideTimeOnSticker), OwlConfig.hideTimeOnSticker, false);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("HideTimeOnSticker", R.string.HideTimeOnSticker), OwlConfig.hideTimeOnSticker, true);
+                    } else if (position == onlineStatusRow) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("OnlineStatus", R.string.OnlineStatus), LocaleController.getString("OnlineStatusDesc", R.string.OnlineStatusDesc), OwlConfig.showStatusInChat, true, false);
                     }
                     break;
                 case 6:
@@ -565,7 +574,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                     position == rearCameraStartingRow || position == confirmSendRow || position == showGreetings ||
                     position == cameraXOptimizeRow || position == proximitySensorRow || position == suppressionRow ||
                     position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow || position == confirmStickersGIFsRow ||
-                    position == hideTimeOnStickerRow) {
+                    position == hideTimeOnStickerRow || position == onlineStatusRow) {
                 return 3;
             } else if (position == stickerSizeRow) {
                 return 4;
