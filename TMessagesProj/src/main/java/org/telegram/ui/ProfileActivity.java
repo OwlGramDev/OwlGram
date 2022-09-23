@@ -8452,7 +8452,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     try {
                         PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
                         String abi = "";
-                        if (BuildVars.isBetaApp()) {
+                        if (BuildVars.DEBUG_PRIVATE_VERSION) {
                             abi = "pbeta ";
                         }else if (!StoreUtils.isDownloadedFromAnyStore()) {
                             abi = "direct ";
