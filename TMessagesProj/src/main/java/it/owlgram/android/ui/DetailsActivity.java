@@ -191,7 +191,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     textDetailCell.revealSpoilers();
                 } else if (!getMessagesController().isChatNoForwards(fromChat)) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-                    builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy)}, (dialogInterface, i) -> {
+                    builder.setItems(new CharSequence[]{LocaleController.getString("Copy", R.string.Copy)}, new int[] {R.drawable.msg_copy}, (dialogInterface, i) -> {
                         if (i == 0) {
                             AndroidUtilities.addToClipboard(textDetailCell.getText());
                             BulletinFactory.of(DetailsActivity.this).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
