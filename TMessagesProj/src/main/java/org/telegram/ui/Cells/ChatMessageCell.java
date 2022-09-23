@@ -8729,7 +8729,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     textX -= AndroidUtilities.dp(4);
                 }
             } else {
-                textY = AndroidUtilities.dp(10) + namesOffset;
+                textY = AndroidUtilities.dp(8) + namesOffset;
             }
             unmovedTextX = textX;
             if (currentMessageObject.textXOffset != 0 && replyNameLayout != null) {

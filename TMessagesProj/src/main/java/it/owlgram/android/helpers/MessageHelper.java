@@ -299,7 +299,7 @@ public class MessageHelper extends BaseController {
                 TLRPC.TL_pollAnswer answer = poll.answers.get(a);
                 plainText.append("\n").append("\uD83D\uDD18").append(" ").append(answer.text);
             }
-        } else {
+        } else if (messageObject.messageOwner.message != null) {
             plainText = new StringBuilder(messageObject.messageOwner.message);
             if (messageObject.messageOwner.reply_markup != null) {
                 plainText.append("\n");
@@ -311,6 +311,8 @@ public class MessageHelper extends BaseController {
                     }
                 }
             }
+        } else {
+            return null;
         }
         return plainText.toString();
     }

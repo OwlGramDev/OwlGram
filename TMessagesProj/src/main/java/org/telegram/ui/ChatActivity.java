@@ -2850,6 +2850,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             editTextItem.addSubItem(text_underline, stringBuilder);
         }
         editTextItem.addSubItem(text_link, LocaleController.getString("CreateLink", R.string.CreateLink));
+        editTextItem.addSubItem(text_mention,  LocaleController.getString("CreateMention", R.string.CreateMention));
         editTextItem.addSubItem(text_regular, LocaleController.getString("Regular", R.string.Regular));
 
         if (chatMode == 0 && threadMessageId == 0 && !UserObject.isReplyUser(currentUser) && reportType < 0) {
@@ -23595,7 +23596,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         ArrayList<MessageObject> selectedMessagesObject = new ArrayList<>();
         for (int a = 1; a >= 0; a--) {
             for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
-                selectedMessagesObject.add(selectedMessagesIds[a].valueAt(b));
+                MessageObject mObj = selectedMessagesIds[a].valueAt(b);
+                if (getMessageHelper().getPlainText(mObj) != null) selectedMessagesObject.add(mObj);
             }
         }
         CountDownLatch doneSignal = new CountDownLatch(selectedMessagesObject.size());
@@ -26338,10 +26340,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     @Override
                     public void didLongPressBotButton(ChatMessageCell cell, TLRPC.KeyboardButton button) {
                         if (getParentActivity() == null || bottomOverlayChat.getVisibility() == View.VISIBLE &&
-                                !(button instanceof TLRPC.TL_keyboardButtonSwitchInline) && !(button instanceof TLRPC.TL_keyboardButtonCallback) &&
-                                !(button instanceof TLRPC.TL_keyboardButtonGame) && !(button instanceof TLRPC.TL_keyboardButtonUrl) &&
-                                !(button instanceof TLRPC.TL_keyboardButtonBuy) && !(button instanceof TLRPC.TL_keyboardButtonUrlAuth) &&
-                                !(button instanceof TLRPC.TL_keyboardButtonUserProfile)) {
+                            !(button instanceof TLRPC.TL_keyboardButtonSwitchInline) && !(button instanceof TLRPC.TL_keyboardButtonCallback) &&
+                            !(button instanceof TLRPC.TL_keyboardButtonGame) && !(button instanceof TLRPC.TL_keyboardButtonUrl) &&
+                            !(button instanceof TLRPC.TL_keyboardButtonBuy) && !(button instanceof TLRPC.TL_keyboardButtonUrlAuth) &&
+                            !(button instanceof TLRPC.TL_keyboardButtonUserProfile)) {
                             return;
                         }
                         try {

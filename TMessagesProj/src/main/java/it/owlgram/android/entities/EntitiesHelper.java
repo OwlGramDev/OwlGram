@@ -231,6 +231,10 @@ public class EntitiesHelper {
                 outputSpannable.removeSpan(mSpan);
                 continue;
             } else if (mSpan instanceof AnimatedEmojiSpan) {
+                AnimatedEmojiSpan[] spans = outputSpannable.getSpans(start, end, AnimatedEmojiSpan.class);
+                if (spans != null && spans.length > 0) {
+                    continue;
+                }
                 result = mSpan;
             }
             if (result != null) {
