@@ -247,7 +247,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                     } else if (position == monetIconRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("MonetIcon", R.string.MonetIcon), LocaleController.getString("MonetIconDesc", R.string.MonetIconDesc), MonetIconsHelper.isSelectedMonet(), true, true);
                     }  else if (position == uploadSpeedBoostRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("UploadSpeed", R.string.FasterUploadSpeed), OwlConfig.uploadSpeedBoost, false);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("FasterUploadSpeed", R.string.FasterUploadSpeed), OwlConfig.uploadSpeedBoost, false);
                     }
                     break;
                 case 4:

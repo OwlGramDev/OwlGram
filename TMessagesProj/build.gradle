@@ -141,6 +141,8 @@ android {
         buildConfigField "String", "GIT_COMMIT_HASH", "\"${getGitHash()}\""
         buildConfigField "Long", "GIT_COMMIT_DATE", "${getGitDate()}L"
         buildConfigField "boolean", "DEBUG_PRIVATE_VERSION", "false"
+        buildConfigField "int", "BUILD_VERSION", "${APP_VERSION_CODE}"
+        buildConfigField "String", "BUILD_VERSION_STRING", "\"${APP_VERSION_NAME}\""
 
         externalNativeBuild {
             cmake {

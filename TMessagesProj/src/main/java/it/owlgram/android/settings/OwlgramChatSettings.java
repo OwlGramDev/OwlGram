@@ -318,6 +318,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
         playGifAsVideoRow = rowCount++;
         hideKeyboardRow = rowCount++;
         openArchiveOnPullRow = rowCount++;
+        onlineStatusRow = rowCount++;
         chatDividerRow = rowCount++;
 
         audioVideoHeaderRow = rowCount++;
@@ -330,7 +331,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
         confirmSendRow = rowCount++;
         confirmStickersGIFsRow = rowCount++;
         hideTimeOnStickerRow = rowCount++;
-        onlineStatusRow = rowCount++;
         audioVideoDividerRow = rowCount++;
 
         foldersHeaderRow = rowCount++;
@@ -427,7 +427,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                     } else if (position == confirmStickersGIFsRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ConfirmStickersGIFs", R.string.ConfirmStickersGIFs), OwlConfig.confirmStickersGIFs, true);
                     } else if (position == hideTimeOnStickerRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("HideTimeOnSticker", R.string.HideTimeOnSticker), OwlConfig.hideTimeOnSticker, true);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("HideTimeOnSticker", R.string.HideTimeOnSticker), OwlConfig.hideTimeOnSticker, false);
                     } else if (position == onlineStatusRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("OnlineStatus", R.string.OnlineStatus), LocaleController.getString("OnlineStatusDesc", R.string.OnlineStatusDesc), OwlConfig.showStatusInChat, true, false);
                     }
