@@ -74,6 +74,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import it.owlgram.android.OwlConfig;
 import it.owlgram.android.helpers.MessageHelper;
 import it.owlgram.android.entities.syntax_highlight.SyntaxHighlight;
 
@@ -4511,7 +4512,7 @@ public class MessageObject {
     }
 
     public void replaceEmojiToLottieFrame(CharSequence text, int[] emojiOnly) {
-        if (!(text instanceof Spannable)) {
+        if (!(text instanceof Spannable) || OwlConfig.useSystemEmoji) {
             return;
         }
         Spannable spannable = (Spannable) text;
