@@ -10,6 +10,7 @@ package org.telegram.ui.Cells;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
@@ -283,12 +284,14 @@ public class SessionCell extends FrameLayout {
 
     public static Drawable createDrawable(TLRPC.TL_authorization session) {
         String platform = session.platform.toLowerCase();
+        String app_name = session.app_name.toLowerCase();
         if (platform.isEmpty()) {
             platform = session.system_version.toLowerCase();
         }
         String deviceModel = session.device_model.toLowerCase();
         int iconId;
-        String colorKey;
+        String colorKey = null;
+        int colorValue = 0;
         if (deviceModel.contains("safari")) {
             iconId = R.drawable.device_web_safari;
             colorKey = Theme.key_avatar_backgroundPink;
@@ -318,7 +321,12 @@ public class SessionCell extends FrameLayout {
             colorKey = Theme.key_avatar_backgroundCyan;
         } else if (platform.contains("android")) {
             iconId = deviceModel.contains("tab") ? R.drawable.device_tablet_android : R.drawable.device_phone_android;
-            colorKey = Theme.key_avatar_backgroundGreen;
+            if (app_name.toLowerCase().contains("owlgram")) {
+                colorValue = Color.parseColor("#4285F4");
+                iconId = R.drawable.device_phone_owlgram;
+            } else {
+                colorKey = Theme.key_avatar_backgroundGreen;
+            }
         } else {
             if (session.app_name.toLowerCase().contains("desktop")) {
                 iconId = R.drawable.device_desktop_other;
@@ -330,7 +338,10 @@ public class SessionCell extends FrameLayout {
         }
         Drawable iconDrawable = ContextCompat.getDrawable(ApplicationLoader.applicationContext, iconId).mutate();
         iconDrawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_avatar_text), PorterDuff.Mode.SRC_IN));
-        CombinedDrawable combinedDrawable = new CombinedDrawable(Theme.createCircleDrawable(AndroidUtilities.dp(42), Theme.getColor(colorKey)), iconDrawable);
+        if (colorValue == 0) {
+            colorValue = Theme.getColor(colorKey);
+        }
+        CombinedDrawable combinedDrawable = new CombinedDrawable(Theme.createCircleDrawable(AndroidUtilities.dp(42), colorValue), iconDrawable);
         return combinedDrawable;
     }
 

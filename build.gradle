@@ -5,7 +5,8 @@ buildscript {
         maven { url 'https://developer.huawei.com/repo/' }
     }
     dependencies {
-        classpath group: 'com.android.tools', name: 'r8', version: '3.3.75'
+        //noinspection GradleDependency
+        classpath group: 'com.android.tools', name: 'r8', version: '3.1.66'
         classpath group: 'com.huawei.agconnect', name: 'agcp', version: '1.6.0.300'
     }
 }
