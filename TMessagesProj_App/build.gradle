@@ -11,7 +11,7 @@ configurations.all {
 dependencies {
     implementation project(':TMessagesProj')
     //noinspection GradleDependency
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.6' // NEEDED TESTS OF THE NEW R8 VERSION
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2' // NEEDED TESTS OF THE NEW R8 VERSION
     implementation files('../TMessagesProj/libs/libgsaverification-client.aar')
 }
 
