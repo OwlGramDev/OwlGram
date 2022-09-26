@@ -30,6 +30,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.helpers.CustomEmojiHelper;
+
 import org.telegram.ui.Components.AnimatedEmojiSpan;
 
 import java.io.InputStream;
@@ -277,6 +279,7 @@ public class Emoji {
             if (OwlConfig.useSystemEmoji) {
                 String emoji = fixEmoji(EmojiData.data[info.page][info.emojiIndex]);
                 textPaint.setTextSize(b.height() * 0.8f);
+                textPaint.setTypeface(CustomEmojiHelper.getSystemEmojiTypeface());
                 canvas.drawText(emoji,  0, emoji.length(), b.left, b.bottom - b.height() * 0.225f, textPaint);
                 return;
             }
