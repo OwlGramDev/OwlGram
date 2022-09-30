@@ -87,6 +87,8 @@ public class OwlConfig extends SettingsManager {
     public static boolean uploadSpeedBoost;
     public static boolean hideTimeOnSticker;
     public static boolean showStatusInChat;
+    public static int unlockedSecretIcon;
+    public static boolean showPatpat;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -219,6 +221,8 @@ public class OwlConfig extends SettingsManager {
             keepTranslationMarkdown = preferences.getBoolean("keepTranslationMarkdown", true);
             hideTimeOnSticker = preferences.getBoolean("hideTimeOnSticker", false);
             showStatusInChat = preferences.getBoolean("showStatusInChat", false);
+            unlockedSecretIcon = preferences.getInt("unlockedSecretIcon", 0);
+            showPatpat = preferences.getBoolean("showPatpat", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -668,6 +672,22 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showStatusInChat", showStatusInChat);
+        editor.apply();
+    }
+
+    public static void toggleShowPatpat() {
+        showPatpat = !showPatpat;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("showPatpat", showPatpat);
+        editor.apply();
+    }
+
+    public static void setUnlockedSecretIcon(int value) {
+        unlockedSecretIcon = value;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt("unlockedSecretIcon", unlockedSecretIcon);
         editor.apply();
     }
 

@@ -37,10 +37,12 @@ public class LauncherIconController {
         DEFAULT("DefaultIcon", R.drawable.icon_background_sa, R.drawable.icon_launcher_foreground, R.string.AppIconDefault),
         DEVELOPER("DeveloperIcon", R.drawable.iconc_1_background_sa, R.drawable.icon_launcher_foreground, R.string.AppIconDeveloper),
         AQUA("AquaIcon", R.drawable.icon_4_background_sa, R.drawable.icon_launcher_foreground, R.string.AppIconAqua),
+        FOXGRAM("FoxgramIcon", R.drawable.icon_7_launcher_background, R.drawable.icon_7_launcher_foreground, R.string.AppIconFoxgram, false, true),
+        RAINBOW("RainbowIcon", R.drawable.icon_8_launcher_background, R.drawable.icon_8_launcher_foreground, R.string.AppIconRainbow),
         MONO_BLACK("MonoBlackIcon", R.drawable.iconc_2_background_sa, R.drawable.icon_launcher_foreground, R.string.AppIconMonoBlack),
         ARCTIC("ArcticIcon", R.drawable.iconc_3_background_sa, R.drawable.iconc_3_launcher_foreground, R.string.AppIconArctic),
         VINTAGE("VintageIcon", R.drawable.icon_6_background_sa, -1, R.string.AppIconVintage),
-        MONET("MonetIcon", -1, -1, R.string.MonetIcon),
+        MONET("MonetIcon", -1, -1, R.string.MonetIcon, false, true),
         PREMIUM("PremiumIcon", R.drawable.icon_3_background_sa, R.mipmap.icon_3_foreground, R.string.AppIconPremium, true),
         TURBO("TurboIcon", R.drawable.icon_5_background_sa, R.drawable.icon_5_launcher_foreground, R.string.AppIconTurbo, true),
         NOX("NoxIcon", R.drawable.icon_2_background_sa, R.drawable.icon_launcher_foreground, R.string.AppIconNox, true);
@@ -50,6 +52,7 @@ public class LauncherIconController {
         public final int foreground;
         public final int title;
         public final boolean premium;
+        public final boolean hidden;
 
         private ComponentName componentName;
 
@@ -65,11 +68,16 @@ public class LauncherIconController {
         }
 
         LauncherIcon(String key, int background, int foreground, int title, boolean premium) {
+            this(key, background, foreground, title, premium, false);
+        }
+
+        LauncherIcon(String key, int background, int foreground, int title, boolean premium, boolean hidden) {
             this.key = key;
             this.background = background;
             this.foreground = foreground;
             this.title = title;
             this.premium = premium;
+            this.hidden = hidden;
         }
     }
 }

@@ -225,6 +225,8 @@ public class SettingsManager {
                     return integerValue >= 20 && integerValue <= 200;
                 case "stickerSizeStack":
                     return integerValue >= 2 && integerValue <= 20;
+                case "unlockedSecretIcon":
+                    return integerValue >= -1 && integerValue <= 4;
             }
         }
         return value instanceof Boolean;

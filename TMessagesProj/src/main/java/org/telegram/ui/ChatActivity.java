@@ -181,6 +181,7 @@ import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.Components.AnimatedFileDrawable;
 import org.telegram.ui.Components.AnimationProperties;
+import org.telegram.ui.Components.AppIconBulletinLayout;
 import org.telegram.ui.Components.AttachBotIntroTopView;
 import org.telegram.ui.Components.AutoDeletePopupWrapper;
 import org.telegram.ui.Components.BackButtonMenu;
@@ -22043,6 +22044,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 }
                             }
                         }
+                        if (chatMode != MODE_SCHEDULED) {
+                            if (OwlConfig.showPatpat && allowChatActions && selectedObject.isFromUser()) {
+                                items.add(LocaleController.getString("Patpat", R.string.Patpat));
+                                options.add(210);
+                                icons.add(R.drawable.msg_paw);
+                            }
+                        }
                         if (message.messageOwner.forwards > 0 && ChatObject.hasAdminRights(getCurrentChat()) && ChatObject.isChannel(currentChat) && !currentChat.megagroup) {
                             items.add(LocaleController.getString("ViewStats", R.string.ViewStats));
                             options.add(28);
@@ -24351,6 +24359,31 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 });
                 break;
             }
+            case 210:
+                if (checkSlowMode(chatActivityEnterView.getSendButton())) {
+                    return;
+                }
+                TLRPC.User user = getMessagesController().getUser(selectedObject.messageOwner.from_id.user_id);
+                if (user.username != null) {
+                    getSendMessagesHelper().sendMessage("/patpat@" + user.username, dialog_id, selectedObject, threadMessageObject, null, false, null, null, null, true, 0, null, false);
+                } else {
+                    SpannableString spannableString = new SpannableString("/patpat@" + user.first_name);
+                    spannableString.setSpan(new URLSpan("tg://user?id=" + user.id), 8, spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    CharSequence[] cs = new CharSequence[]{spannableString};
+                    ArrayList<TLRPC.MessageEntity> entities = getMediaDataController().getEntities(cs, true);
+                    getSendMessagesHelper().sendMessage(spannableString.toString(), dialog_id, selectedObject, threadMessageObject, null, false, entities, null, null, true, 0, null, false);
+                }
+                if (OwlConfig.unlockedSecretIcon >= 4) {
+                    AppIconBulletinLayout layout = new AppIconBulletinLayout(getContext(), LauncherIconController.LauncherIcon.FOXGRAM, null);
+                    layout.textView.setText(LocaleController.getString("UnlockedHiddenFoxIcon", R.string.UnlockedHiddenFoxIcon));
+                    fireworksOverlay.start();
+                    fragmentView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+                    Bulletin.make(ChatActivity.this, layout, Bulletin.DURATION_SHORT).show();
+                    OwlConfig.setUnlockedSecretIcon(-1);
+                } else if (OwlConfig.unlockedSecretIcon >= 0) {
+                    OwlConfig.setUnlockedSecretIcon(OwlConfig.unlockedSecretIcon + 1);
+                }
+                break;
             case OPTION_SEND_NOW: {
                 if (!checkSlowMode(chatActivityEnterView.getSendButton())) {
                     if (getMediaController().isPlayingMessage(selectedObject)) {

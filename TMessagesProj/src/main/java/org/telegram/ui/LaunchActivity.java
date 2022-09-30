@@ -2431,7 +2431,7 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                                         layout.titleTextView.setSingleLine(false);
                                         Bulletin bulletin = Bulletin.make(fragment, layout, Bulletin.DURATION_LONG);
                                         bulletin.show();
-                                    } else if (url.startsWith("tg:laky") || url.startsWith("tg://laky") || url.startsWith("tg:fox") || url.startsWith("tg://fox")) {
+                                    } else if (url.startsWith("tg:laky") || url.startsWith("tg://laky")) {
                                         BaseFragment fragment = mainFragmentsStack.get(mainFragmentsStack.size() - 1);
                                         new StickersHelper().getStickerAsync(currentAccount, "ArcticFox", 7, document -> {
                                             StickerSetBulletinLayout layout = new StickerSetBulletinLayout(fragment.getParentActivity(), null, StickerSetBulletinLayout.TYPE_EMPTY, document, fragment.getResourceProvider());

@@ -72,6 +72,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
     private int showReportRow;
     private int showMessageDetailsRow;
     private int showCopyPhotoRow;
+    private int showPatpatRow;
     private int audioVideoDividerRow;
     private int audioVideoHeaderRow;
     private int rearCameraStartingRow;
@@ -227,6 +228,11 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                 if (view instanceof TextCheckbox2Cell) {
                     ((TextCheckbox2Cell) view).setChecked(OwlConfig.showCopyPhoto);
                 }
+            } else if (position == showPatpatRow) {
+                OwlConfig.toggleShowPatpat();
+                if (view instanceof TextCheckbox2Cell) {
+                    ((TextCheckbox2Cell) view).setChecked(OwlConfig.showPatpat);
+                }
             } else if (position == cameraXOptimizeRow) {
                 OwlConfig.toggleCameraXOptimizedMode();
                 if (view instanceof TextCheckCell) {
@@ -343,6 +349,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
         showNoQuoteForwardRow = rowCount++;
         showAddToSMRow = rowCount++;
         showRepeatRow = rowCount++;
+        showPatpatRow = rowCount++;
         showTranslateRow = rowCount++;
         showReportRow = rowCount++;
         showMessageDetailsRow = rowCount++;
@@ -482,6 +489,8 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                         textCheckbox2Cell.setTextAndCheck(LocaleController.getString("MessageDetails", R.string.MessageDetails), OwlConfig.showMessageDetails, false);
                     } else if (position == showCopyPhotoRow) {
                         textCheckbox2Cell.setTextAndCheck(LocaleController.getString("CopyPhoto", R.string.CopyPhoto), OwlConfig.showCopyPhoto, true);
+                    } else if (position == showPatpatRow) {
+                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("Patpat", R.string.Patpat), OwlConfig.showPatpat, true);
                     }
                     break;
             }
@@ -586,7 +595,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                 return 7;
             } else if (position == showDeleteRow || position == showNoQuoteForwardRow || position == showAddToSMRow ||
                     position == showRepeatRow || position == showTranslateRow || position == showReportRow ||
-                    position == showMessageDetailsRow || position == showCopyPhotoRow) {
+                    position == showMessageDetailsRow || position == showCopyPhotoRow || position == showPatpatRow) {
                 return 8;
             }
             return 1;

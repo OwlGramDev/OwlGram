@@ -48,6 +48,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import it.owlgram.android.OwlConfig;
+
 public class AppIconsSelectorCell extends RecyclerListView implements NotificationCenter.NotificationCenterDelegate {
     public final static float ICONS_ROUND_RADIUS = 18;
 
@@ -162,7 +164,11 @@ public class AppIconsSelectorCell extends RecyclerListView implements Notificati
             }
         }
         for (int i = 0; i < availableIcons.size(); i++) {
-            if (availableIcons.get(i).background == -1) {
+            LauncherIconController.LauncherIcon icon = availableIcons.get(i);
+            if (icon.hidden) {
+                if (icon == LauncherIconController.LauncherIcon.FOXGRAM && (OwlConfig.unlockedSecretIcon == -1 || LauncherIconController.isEnabled(icon))) {
+                    continue;
+                }
                 availableIcons.remove(i);
                 i--;
             }
