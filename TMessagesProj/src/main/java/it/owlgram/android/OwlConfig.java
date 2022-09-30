@@ -87,8 +87,8 @@ public class OwlConfig extends SettingsManager {
     public static boolean uploadSpeedBoost;
     public static boolean hideTimeOnSticker;
     public static boolean showStatusInChat;
-    public static int unlockedSecretIcon;
     public static boolean showPatpat;
+    public static boolean unlockedChupa;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -114,6 +114,7 @@ public class OwlConfig extends SettingsManager {
     public static int idType;
     public static long lastUpdateCheck = 0;
     public static int downloadSpeedBoost;
+    public static int unlockedSecretIcon;
 
     static {
         loadConfig(true);
@@ -223,6 +224,7 @@ public class OwlConfig extends SettingsManager {
             showStatusInChat = preferences.getBoolean("showStatusInChat", false);
             unlockedSecretIcon = preferences.getInt("unlockedSecretIcon", 0);
             showPatpat = preferences.getBoolean("showPatpat", false);
+            unlockedChupa = preferences.getBoolean("unlockedChupa", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -680,6 +682,14 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showPatpat", showPatpat);
+        editor.apply();
+    }
+
+    public static void unlockChupa() {
+        unlockedChupa = true;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("unlockedChupa", unlockedChupa);
         editor.apply();
     }
 

@@ -55,6 +55,7 @@ import android.util.SparseIntArray;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Gravity;
+import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MotionEvent;
@@ -2447,6 +2448,16 @@ public class LaunchActivity extends BasePermissionsActivity implements ActionBar
                                             Bulletin bulletin = Bulletin.make(fragment, layout, Bulletin.DURATION_LONG);
                                             bulletin.show();
                                         });
+                                    } else if (url.startsWith("tg:chupagram") || url.startsWith("tg://chupagram")) {
+                                        if (!OwlConfig.unlockedChupa) {
+                                            BaseFragment fragment = mainFragmentsStack.get(mainFragmentsStack.size() - 1);
+                                            AppIconBulletinLayout layout = new AppIconBulletinLayout(fragment.getParentActivity(), LauncherIconController.LauncherIcon.CHUPA, null);
+                                            layout.textView.setText(LocaleController.getString("UnlockedHiddenChupaIcon", R.string.UnlockedHiddenChupaIcon));
+                                            fireworksOverlay.start();
+                                            layout.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+                                            Bulletin.make(fragment, layout, Bulletin.DURATION_SHORT).show();
+                                            OwlConfig.unlockChupa();
+                                        }
                                     } else if (url.startsWith("tg:experimental") || url.startsWith("tg://experimental")) {
                                         AndroidUtilities.runOnUIThread(() -> presentFragment(new OwlgramExperimentalSettings(), false, false));
                                         if (AndroidUtilities.isTablet()) {

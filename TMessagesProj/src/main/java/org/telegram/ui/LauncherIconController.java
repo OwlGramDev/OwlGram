@@ -41,6 +41,7 @@ public class LauncherIconController {
         RAINBOW("RainbowIcon", R.drawable.icon_8_launcher_background, R.drawable.icon_8_launcher_foreground, R.string.AppIconRainbow),
         MONO_BLACK("MonoBlackIcon", R.drawable.iconc_2_background_sa, R.drawable.icon_launcher_foreground, R.string.AppIconMonoBlack),
         ARCTIC("ArcticIcon", R.drawable.iconc_3_background_sa, R.drawable.iconc_3_launcher_foreground, R.string.AppIconArctic),
+        CHUPA("ChupaIcon", R.drawable.iconc_3_background_sa, R.mipmap.icon_9_launcher_foreground, R.string.AppIconChupa, false, true),
         VINTAGE("VintageIcon", R.drawable.icon_6_background_sa, -1, R.string.AppIconVintage),
         MONET("MonetIcon", -1, -1, R.string.MonetIcon, false, true),
         PREMIUM("PremiumIcon", R.drawable.icon_3_background_sa, R.mipmap.icon_3_foreground, R.string.AppIconPremium, true),

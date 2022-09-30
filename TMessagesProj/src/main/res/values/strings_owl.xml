@@ -64,6 +64,7 @@
     <string name="AppIconArctic" comment="AppIconArctic">Arctic</string>
     <string name="AppIconFoxgram" comment="AppIconFoxgram">Shy Fox</string>
     <string name="AppIconRainbow" comment="AppIconRainbow">Rainbow</string>
+    <string name="AppIconChupa" comment="AppIconChupa">Chupa</string>
     <string name="ClassicIcon">Classic</string>
     <string name="HidePhone">Hide Your Phone Number</string>
     <string name="HidePhoneDesc">It will be hidden from settings and side menu</string>
@@ -291,4 +292,5 @@
     <string name="OnlineStatusDesc">Show the online status of other people next to their profile photo in groups</string>
     <string name="Patpat">Patpat</string>
     <string name="UnlockedHiddenFoxIcon">Oh… Congratulations! You unlocked the little shy fox icon!</string>
+    <string name="UnlockedHiddenChupaIcon">You were chuped! Chupa\'s icon is now available in settings.</string>
 </resources>
