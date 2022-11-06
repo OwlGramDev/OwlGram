@@ -20,6 +20,7 @@ import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.ui.ActionBar.ActionBarLayout;
+import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.LaunchActivity;
 
 import java.io.BufferedWriter;
@@ -396,12 +397,12 @@ public class SettingsManager {
         return currentTotal;
     }
 
-    public static void doRebuildUIWithDiff(int difference, ActionBarLayout parentLayout) {
+    public static void doRebuildUIWithDiff(int difference, INavigationLayout parentLayout) {
         if ((difference & OwlConfig.NEED_RECREATE_FORMATTERS) > 0) {
             LocaleController.getInstance().recreateFormatters();
         }
         if ((difference & OwlConfig.NEED_RECREATE_SHADOW) > 0) {
-            ActionBarLayout.headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : parentLayout.getResources().getDrawable(R.drawable.header_shadow).mutate();
+            ActionBarLayout.headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : parentLayout.getView().getResources().getDrawable(R.drawable.header_shadow).mutate();
         }
         if ((difference & OwlConfig.NEED_FRAGMENT_REBASE) > 0) {
             parentLayout.rebuildAllFragmentViews(false, false);

@@ -1612,11 +1612,6 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
             } else if (afterme) {
                 nextViews.add(typeEditContainer.getChildAt(i));
             }
-            int reacts = Math.min(getMediaDataController().getEnabledReactionsList().size(), count);
-            finalString = reacts == 0 ? LocaleController.getString("ReactionsOff", R.string.ReactionsOff) :
-                    LocaleController.formatString("ReactionsCount", R.string.ReactionsCount, reacts, getMediaDataController().getEnabledReactionsList().size());
-        } else {
-            finalString = LocaleController.getString("ReactionsAll", R.string.ReactionsAll);
         }
         afterme = false;
         for (int i = 0; i < linearLayout.getChildCount(); ++i) {

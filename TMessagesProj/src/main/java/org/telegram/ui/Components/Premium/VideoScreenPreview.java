@@ -41,6 +41,7 @@ import org.telegram.ui.Components.voip.CellFlickerDrawable;
 import org.telegram.ui.PremiumPreviewFragment;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URLEncoder;
 
 public class VideoScreenPreview extends FrameLayout implements PagerHeaderView, NotificationCenter.NotificationCenterDelegate {
@@ -56,21 +57,26 @@ public class VideoScreenPreview extends FrameLayout implements PagerHeaderView, 
     ImageReceiver imageReceiver = new ImageReceiver(this);
 
     private void checkVideo() {
-        if (file != null && file.exists() || SharedConfig.streamMedia) {
-            if (file != null && file.exists()) {
-                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                retriever.setDataSource(ApplicationLoader.applicationContext, Uri.fromFile(file));
-                int width = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
-                int height = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
-                retriever.release();
-                aspectRatio = width / (float) height;
-            } else {
-                aspectRatio = 0.671f;
-            }
+        try {
+            if (file != null && file.exists() || SharedConfig.streamMedia) {
 
-            if (allowPlay) {
-                runVideoPlayer();
+                if (file != null && file.exists()) {
+                    MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                    retriever.setDataSource(ApplicationLoader.applicationContext, Uri.fromFile(file));
+                    int width = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+                    int height = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+                    retriever.release();
+                    aspectRatio = width / (float) height;
+                } else {
+                    aspectRatio = 0.671f;
+                }
+
+                if (allowPlay) {
+                    runVideoPlayer();
+                }
             }
+        } catch (IOException e) {
+            FileLog.e(e);
         }
     }
 

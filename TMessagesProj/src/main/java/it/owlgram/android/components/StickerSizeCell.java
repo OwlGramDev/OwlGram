@@ -13,6 +13,7 @@ import android.widget.FrameLayout;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.ui.ActionBar.ActionBarLayout;
+import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.SeekBarView;
@@ -30,7 +31,7 @@ public class StickerSizeCell extends FrameLayout {
     int startStickerSize = 2;
     int endStickerSize = 20;
 
-    public StickerSizeCell(Context context, ActionBarLayout parentLayout) {
+    public StickerSizeCell(Context context, INavigationLayout parentLayout) {
         super(context);
 
         setWillNotDraw(false);

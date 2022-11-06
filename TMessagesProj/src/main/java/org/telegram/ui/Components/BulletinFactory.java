@@ -137,11 +137,11 @@ public final class BulletinFactory {
         this.resourcesProvider = resourcesProvider;
     }
 
-    public Bulletin createSimpleBulletin(int iconRawId, String text) {
+    public Bulletin createSimpleBulletin(int iconRawId, CharSequence text) {
         return createSimpleBulletin(iconRawId, text, false);
     }
 
-    public Bulletin createSimpleBulletin(int iconRawId, String text, boolean multiLine) {
+    public Bulletin createSimpleBulletin(int iconRawId, CharSequence text, boolean multiLine) {
         final Bulletin.LottieLayout layout = new Bulletin.LottieLayout(getContext(), resourcesProvider);
         layout.setAnimation(iconRawId, 36, 36);
         layout.textView.setText(text);

@@ -18,6 +18,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -312,30 +313,6 @@ public class DrawerProfileCell extends FrameLayout implements NotificationCenter
 
         snowflakesEffect = new SnowflakesEffect(0);
         snowflakesEffect.setColorKey(Theme.key_chats_menuName);
-
-        status = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this, AndroidUtilities.dp(20));
-        nameTextView.setRightDrawable(status);
-        animatedStatus = new AnimatedStatusView(context, 20, 60);
-        addView(animatedStatus, LayoutHelper.createFrame(20, 20, Gravity.LEFT | Gravity.TOP));
-    }
-
-    protected void onPremiumClick() {
-
-    }
-
-    public static class AnimatedStatusView extends View {
-        private int stateSize;
-        private int effectsSize;
-        private int renderedEffectsSize;
-
-        private int animationUniq;
-        private ArrayList<Object> animations = new ArrayList<>();
-        public AnimatedStatusView(Context context, int stateSize, int effectsSize) {
-            super(context);
-            this.stateSize = stateSize;
-            this.effectsSize = effectsSize;
-            this.renderedEffectsSize = effectsSize;
-        }
 
         status = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this, AndroidUtilities.dp(20));
         nameTextView.setRightDrawable(status);

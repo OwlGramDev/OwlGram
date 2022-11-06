@@ -80,7 +80,7 @@ public class FileSettingsNameDialog {
                 if (s.length() > 40) {
                     ignoreTextChange = true;
                     s.delete(40, s.length());
-                    AndroidUtilities.shakeView(editText, 2, 0);
+                    AndroidUtilities.shakeView(editText);
                     editText.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
                     ignoreTextChange = false;
                 }

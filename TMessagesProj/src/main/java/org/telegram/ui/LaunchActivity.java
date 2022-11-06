@@ -1634,6 +1634,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         boolean pushOpened = false;
         long push_user_id = 0;
         long push_chat_id = 0;
+        long profile_user_id = 0;
         int push_topic_id = 0;
         int push_enc_id = 0;
         int push_msg_id = 0;

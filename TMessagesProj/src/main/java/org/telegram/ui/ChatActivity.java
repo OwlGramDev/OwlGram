@@ -714,6 +714,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private int startFromVideoTimestamp = -1;
     private int startFromVideoMessageId;
     private boolean needSelectFromMessageId;
+    private int returnToMessageId;
     private final Stack<Integer> returnToMessageIdStack = new Stack<>();
     private int returnToLoadIndex;
     private int createUnreadMessageAfterId;
@@ -1456,7 +1457,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             scrollToMessageId(returnToMessageIdStack.pop(), 0, true, returnToLoadIndex, true, 0);
         } else {
             if (clearStack) returnToMessageIdStack.clear();
-            scrollToLastMessage(false);
+            scrollToLastMessage(false, true);
             if (!pinnedMessageIds.isEmpty()) {
                 forceScrollToFirst = true;
                 forceNextPinnedMessageId = pinnedMessageIds.get(0);

@@ -15,6 +15,7 @@ import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBarLayout;
+import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.ChatMessageCell;
 import org.telegram.ui.Components.BackgroundGradientDrawable;
@@ -33,9 +34,9 @@ public class DetailsPreviewMessagesCell extends LinearLayout {
     private final ArrayList<ChatMessageCell> cells;
     private final ArrayList<MessageObject> messageObjects;
     private final Drawable shadowDrawable;
-    private final ActionBarLayout parentLayout;
+    private final INavigationLayout parentLayout;
 
-    public DetailsPreviewMessagesCell(Context context, ActionBarLayout layout) {
+    public DetailsPreviewMessagesCell(Context context, INavigationLayout layout) {
         super(context);
 
         parentLayout = layout;

@@ -188,7 +188,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                 }
             } else if (position == appBarShadowRow) {
                 OwlConfig.toggleAppBarShadow();
-                ActionBarLayout.headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : parentLayout.getResources().getDrawable(R.drawable.header_shadow).mutate();
+                ActionBarLayout.headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : parentLayout.getView().getResources().getDrawable(R.drawable.header_shadow).mutate();
                 Parcelable recyclerViewState = null;
                 if (listView.getLayoutManager() != null) {
                     recyclerViewState = listView.getLayoutManager().onSaveInstanceState();
