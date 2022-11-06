@@ -8,15 +8,17 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.view.View;
+import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.LinearLayout;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ImageReceiver;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.R;
-import org.telegram.ui.ActionBar.ActionBarLayout;
 import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Cells.ChatActionCell;
 import org.telegram.ui.Cells.ChatMessageCell;
 import org.telegram.ui.Components.BackgroundGradientDrawable;
 import org.telegram.ui.Components.LayoutHelper;
@@ -31,7 +33,7 @@ public class DetailsPreviewMessagesCell extends LinearLayout {
 
     private Drawable backgroundDrawable;
     private Drawable oldBackgroundDrawable;
-    private final ArrayList<ChatMessageCell> cells;
+    private final ArrayList<View> cells;
     private final ArrayList<MessageObject> messageObjects;
     private final Drawable shadowDrawable;
     private final INavigationLayout parentLayout;
@@ -64,23 +66,42 @@ public class DetailsPreviewMessagesCell extends LinearLayout {
         removeAllViews();
 
         for (MessageObject obj : messageObjects) {
-            ChatMessageCell cell = new ChatMessageCell(getContext());
-            cell.setDelegate(new ChatMessageCell.ChatMessageCellDelegate() {
-                @Override
-                public boolean canPerformActions() {
-                    return true;
-                }
+            if (obj.type == 10 || obj.type == MessageObject.TYPE_ACTION_PHOTO || obj.type == MessageObject.TYPE_PHONE_CALL) {
+                ChatActionCell cell = new ChatActionCell(getContext()) {
+                    @Override
+                    public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
+                        super.onInitializeAccessibilityNodeInfo(info);
+                        info.setVisibleToUser(true);
+                    }
+                };
+                cell.setDelegate(new ChatActionCell.ChatActionCellDelegate() {
+                    @Override
+                    public long getDialogId() {
+                        return obj.getDialogId();
+                    }
+                });
+                cell.setMessageObject(obj);
+                addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+                cells.add(cell);
+            } else {
+                ChatMessageCell cell = new ChatMessageCell(getContext());
+                cell.setDelegate(new ChatMessageCell.ChatMessageCellDelegate() {
+                    @Override
+                    public boolean canPerformActions() {
+                        return true;
+                    }
 
-                @Override
-                public void didLongPress(ChatMessageCell cell, float x, float y) {
-                    cell.resetPressedLink(-1);
-                }
-            });
-            cell.isChat = true;
-            cell.setFullyDraw(true);
-            cell.setMessageObject(obj, null, false, false);
-            addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-            cells.add(cell);
+                    @Override
+                    public void didLongPress(ChatMessageCell cell, float x, float y) {
+                        cell.resetPressedLink(-1);
+                    }
+                });
+                cell.isChat = true;
+                cell.setFullyDraw(true);
+                cell.setMessageObject(obj, null, false, false);
+                addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+                cells.add(cell);
+            }
         }
     }
 
@@ -89,8 +110,13 @@ public class DetailsPreviewMessagesCell extends LinearLayout {
     public void invalidate() {
         super.invalidate();
         for (int a = 0; a < cells.size(); a++) {
-            cells.get(a).setMessageObject(messageObjects.get(a), null, false, false);
-            cells.get(a).invalidate();
+            View cell = cells.get(a);
+            if (cell instanceof ChatMessageCell) {
+                ((ChatMessageCell) cell).setMessageObject(messageObjects.get(a), null, false, false);
+            } else if (cell instanceof ChatActionCell) {
+                ((ChatActionCell) cell).setMessageObject(messageObjects.get(a), true);
+            }
+            cell.invalidate();
         }
     }
 
@@ -160,23 +186,26 @@ public class DetailsPreviewMessagesCell extends LinearLayout {
         }
         shadowDrawable.setBounds(0, 0, getMeasuredWidth(), getMeasuredHeight());
         shadowDrawable.draw(canvas);
-        for (ChatMessageCell cell : cells) {
-            ImageReceiver imageReceiver = cell.getAvatarImage();
-            if (imageReceiver != null) {
-                int top = cell.getTop();
-                float tx = cell.getTranslationX();
-                int y = cell.getTop() + cell.getLayoutHeight();
-                if (y - AndroidUtilities.dp(48) < top) {
-                    y = top + AndroidUtilities.dp(48);
-                }
-                if (tx != 0) {
-                    canvas.save();
-                    canvas.translate(tx, 0);
-                }
-                imageReceiver.setImageY(y - AndroidUtilities.dp(44));
-                imageReceiver.draw(canvas);
-                if (tx != 0) {
-                    canvas.restore();
+        for (View view : cells) {
+            if (view instanceof ChatMessageCell) {
+                ChatMessageCell cell = (ChatMessageCell) view;
+                ImageReceiver imageReceiver = cell.getAvatarImage();
+                if (imageReceiver != null) {
+                    int top = cell.getTop();
+                    float tx = cell.getTranslationX();
+                    int y = cell.getTop() + cell.getLayoutHeight();
+                    if (y - AndroidUtilities.dp(48) < top) {
+                        y = top + AndroidUtilities.dp(48);
+                    }
+                    if (tx != 0) {
+                        canvas.save();
+                        canvas.translate(tx, 0);
+                    }
+                    imageReceiver.setImageY(y - AndroidUtilities.dp(44));
+                    imageReceiver.draw(canvas);
+                    if (tx != 0) {
+                        canvas.restore();
+                    }
                 }
             }
         }

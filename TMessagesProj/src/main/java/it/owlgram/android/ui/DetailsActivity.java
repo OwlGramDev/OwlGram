@@ -36,8 +36,8 @@ import java.util.Locale;
 
 import it.owlgram.android.components.DetailsPreviewMessagesCell;
 import it.owlgram.android.components.TextDetailCellMultiline;
-import it.owlgram.android.helpers.DCHelper;
 import it.owlgram.android.entities.EntitiesHelper;
+import it.owlgram.android.helpers.DCHelper;
 
 public class DetailsActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
     private int rowCount;
@@ -135,8 +135,8 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
             fromForwardedUser = new TLRPC.User() {};
             fromForwardedUser.first_name = messageObject.messageOwner.fwd_from.from_name;
         }
-        if (messageObject.messageOwner.replyMessage != null && messageObject.messageOwner.replyMessage.from_id instanceof TLRPC.TL_peerUser){
-            fromRepliedUser = getMessagesController().getUser(messageObject.messageOwner.replyMessage.from_id.user_id);
+        if (messageObject.replyMessageObject != null && messageObject.replyMessageObject.messageOwner.from_id instanceof TLRPC.TL_peerUser){
+            fromRepliedUser = getMessagesController().getUser(messageObject.replyMessageObject.messageOwner.from_id.user_id);
             fromRepliedUserInfo = DCHelper.getTInfo(fromRepliedUser);
         }
     }
@@ -350,7 +350,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
             messageDividerRow = rowCount++;
             repliedMessageHeaderRow = rowCount++;
             repliedMessageIdRow = rowCount++;
-            if (!TextUtils.isEmpty(messageObject.messageOwner.replyMessage.message)){
+            if (!TextUtils.isEmpty(messageObject.replyMessageObject.messageOwner.message)) {
                 repliedMessageTextRow = rowCount++;
                 repliedMessageTextLengthRow = rowCount++;
             }
@@ -526,17 +526,17 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == forwardUserIdRow) {
                         textDetailCell.setTextAndValue(String.valueOf(fromForwardedUserInfo.tID), "ID", false);
                     } else if (position == repliedMessageTextRow) {
-                        CharSequence message = messageObject.messageOwner.replyMessage.message;
-                        message = EntitiesHelper.getSpannableString(message.toString(), messageObject.messageOwner.replyMessage.entities, true);
-                        textDetailCell.setTextWithAnimatedEmojiAndValue(EntitiesHelper.getUrlNoUnderlineText(message), messageObject.messageOwner.replyMessage.entities, LocaleController.getString("MessageText", R.string.MessageText),true);
+                        CharSequence message = messageObject.replyMessageObject.messageOwner.message;
+                        message = EntitiesHelper.getSpannableString(message.toString(), messageObject.replyMessageObject.messageOwner.entities, true);
+                        textDetailCell.setTextWithAnimatedEmojiAndValue(EntitiesHelper.getUrlNoUnderlineText(message), messageObject.replyMessageObject.messageOwner.entities, LocaleController.getString("MessageText", R.string.MessageText),true);
                     } else if (position == repliedMessageTextLengthRow) {
-                        textDetailCell.setTextAndValue(String.valueOf(messageObject.messageOwner.replyMessage.message.length()), LocaleController.getString("MessageTextLength", R.string.MessageTextLength), true);
+                        textDetailCell.setTextAndValue(String.valueOf(messageObject.replyMessageObject.messageOwner.message.length()), LocaleController.getString("MessageTextLength", R.string.MessageTextLength), true);
                     } else if (position == repliedMessageIdRow) {
-                        textDetailCell.setTextAndValue(String.valueOf(messageObject.messageOwner.replyMessage.id), "ID", true);
+                        textDetailCell.setTextAndValue(String.valueOf(messageObject.replyMessageObject.messageOwner.id), "ID", true);
                     } else if (position == repliedMessageDateRow) {
-                        long date = (long) messageObject.messageOwner.replyMessage.date * 1000;
+                        long date = (long) messageObject.replyMessageObject.messageOwner.date * 1000;
                         String title = messageObject.scheduled ?  LocaleController.getString("MessageScheduledDate", R.string.MessageScheduledDate) : LocaleController.getString("MessageDate", R.string.MessageDate);
-                        textDetailCell.setTextAndValue(messageObject.messageOwner.replyMessage.date == 0x7ffffffe ? LocaleController.getString("MessageScheduledWhenOnline", R.string.MessageScheduledWhenOnline) : LocaleController.formatString("formatDateAtTime", R.string.formatDateAtTime, LocaleController.getInstance().formatterYear.format(new Date(date)), LocaleController.getInstance().formatterDayWithSeconds.format(new Date(date))), title, false);
+                        textDetailCell.setTextAndValue(messageObject.replyMessageObject.messageOwner.date == 0x7ffffffe ? LocaleController.getString("MessageScheduledWhenOnline", R.string.MessageScheduledWhenOnline) : LocaleController.formatString("formatDateAtTime", R.string.formatDateAtTime, LocaleController.getInstance().formatterYear.format(new Date(date)), LocaleController.getInstance().formatterDayWithSeconds.format(new Date(date))), title, false);
                     } else if (position == repliedUserIdRow) {
                         textDetailCell.setTextAndValue(String.valueOf(fromRepliedUserInfo.tID), "ID",false);
                     } else if (position == repliedUserNameRow) {
