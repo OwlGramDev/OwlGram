@@ -102,7 +102,7 @@ public class ImportSettingsDialog extends BottomSheet {
         if (difference > 0) {
             show();
         } else {
-            BulletinFactory.of(fragment).createSimpleBulletin(R.raw.error, LocaleController.getString("SameSettings", R.string.SameSettings), true).show();
+            AndroidUtilities.runOnUIThread(() -> BulletinFactory.of(fragment).createSimpleBulletin(R.raw.error, LocaleController.getString("SameSettings", R.string.SameSettings), true).show());
         }
     }
 }

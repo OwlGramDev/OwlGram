@@ -25077,7 +25077,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
                 getMessageHelper().saveStickerToGallery(getParentActivity(), selectedObject, () -> {
                     if (BulletinFactory.canShowBulletin(ChatActivity.this)) {
-                        BulletinFactory.of(this).createDownloadBulletin(BulletinFactory.FileType.STICKER, themeDelegate).show();
+                        AndroidUtilities.runOnUIThread(() -> BulletinFactory.of(this).createDownloadBulletin(BulletinFactory.FileType.STICKER, themeDelegate).show());
                     }
                 });
                 break;
@@ -25155,14 +25155,14 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (statusConf == OwlConfig.VALID_CONFIGURATION) {
                     new ImportSettingsDialog(ChatActivity.this, selectedObject).checkCanShowDialog();
                 } else {
-                    BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.gigagroup_convert, LocaleController.getString("UpdateToImport", R.string.UpdateToImport), true).show();
+                    AndroidUtilities.runOnUIThread(() -> BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.gigagroup_convert, LocaleController.getString("UpdateToImport", R.string.UpdateToImport), true).show());
                 }
                 break;
             }
             case 209: {
                 getMessageHelper().addMessageToClipboard(selectedObject, () -> {
                     if (BulletinFactory.canShowBulletin(ChatActivity.this)) {
-                        BulletinFactory.of(this).createCopyBulletin(LocaleController.getString("PhotoCopied", R.string.PhotoCopied)).show();
+                        AndroidUtilities.runOnUIThread(() -> BulletinFactory.of(this).createCopyBulletin(LocaleController.getString("PhotoCopied", R.string.PhotoCopied)).show());
                     }
                 });
                 break;
@@ -25182,11 +25182,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     getSendMessagesHelper().sendMessage(spannableString.toString(), dialog_id, selectedObject, threadMessageObject, null, false, entities, null, null, true, 0, null, false);
                 }
                 if (OwlConfig.unlockedSecretIcon >= 4) {
-                    AppIconBulletinLayout layout = new AppIconBulletinLayout(getContext(), LauncherIconController.LauncherIcon.FOXGRAM, null);
+                    AppIconBulletinLayout layout = new AppIconBulletinLayout(getParentActivity(), LauncherIconController.LauncherIcon.FOXGRAM, getResourceProvider());
                     layout.textView.setText(LocaleController.getString("UnlockedHiddenFoxIcon", R.string.UnlockedHiddenFoxIcon));
                     fireworksOverlay.start();
                     fragmentView.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
-                    Bulletin.make(ChatActivity.this, layout, Bulletin.DURATION_SHORT).show();
+                    AndroidUtilities.runOnUIThread(() -> Bulletin.make(this, layout, Bulletin.DURATION_SHORT).show());
                     OwlConfig.setUnlockedSecretIcon(-1);
                 } else if (OwlConfig.unlockedSecretIcon >= 0) {
                     OwlConfig.setUnlockedSecretIcon(OwlConfig.unlockedSecretIcon + 1);
