@@ -1262,7 +1262,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     editItem.setScaleX(1f - value);
                     editItem.setScaleY(1f - value);
                     editItem.setAlpha(1f - value);
-                    if (ActionButtonManager.canShowShortcuts(currentChat)) {
+                    if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
                         adminItem.setScaleX(1f - value);
                         adminItem.setScaleY(1f - value);
                         adminItem.setAlpha(1f - value);
@@ -1302,7 +1302,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         }
                         if (editItemVisible) {
                             editItem.setVisibility(GONE);
-                            if (ActionButtonManager.canShowShortcuts(currentChat)) {
+                            if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
                                 adminItem.setVisibility(GONE);
                                 if (permissionItemVisible) {
                                     permissionItem.setVisibility(GONE);
@@ -1328,12 +1328,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     if (searchItem != null && !expanded) {
                         searchItem.setClickable(true);
                     }
-                    boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible);
+                    boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
                     if (editItemVisible) {
                         if (canShowTopAction) {
                             editItem.setVisibility(VISIBLE);
                         }
-                        if (ActionButtonManager.canShowShortcuts(currentChat)) {
+                        if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
                             adminItem.setVisibility(VISIBLE);
                             if (permissionItemVisible) {
                                 permissionItem.setVisibility(VISIBLE);
@@ -1475,12 +1475,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
 
         private ActionBarMenuItem getSecondaryMenuItem() {
-            boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible);
+            boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
             if (callItemVisible && ActionButtonManager.canShowCall(currentChat) && OwlConfig.buttonStyleType == 5) {
                 return callItem;
             } else if (editItemVisible && canShowTopAction) {
                 return editItem;
-            } else if (editItemVisible && ActionButtonManager.canShowShortcuts(currentChat)) {
+            } else if (editItemVisible && ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
                 return permissionItem;
             } else if (searchItem != null) {
                 return searchItem;
@@ -2649,14 +2649,14 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 avatarContainer2.setPivotY(avatarContainer.getPivotY() + avatarContainer.getMeasuredHeight() / 2f);
                 avatarContainer2.setPivotX(avatarContainer2.getMeasuredWidth() / 2f);
                 AndroidUtilities.updateViewVisibilityAnimated(avatarContainer2, !expanded, 0.95f, true);
-                boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible);
+                boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
                 callItem.setVisibility(expanded || !(callItemVisible && OwlConfig.buttonStyleType == 5) ? GONE : INVISIBLE);
                 videoCallItem.setVisibility(expanded ||!(videoCallItemVisible && canShowTopAction) ? GONE : INVISIBLE);
                 editItem.setVisibility(expanded || !(editItemVisible && canShowTopAction) ? GONE : INVISIBLE);
                 otherItem.setVisibility(expanded ? GONE : INVISIBLE);
-                adminItem.setVisibility(expanded || !(editItemVisible && ActionButtonManager.canShowShortcuts(currentChat)) ? GONE : INVISIBLE);
-                permissionItem.setVisibility(expanded || !(editItemVisible && permissionItemVisible && ActionButtonManager.canShowShortcuts(currentChat)) ? GONE : INVISIBLE);
-                groupLogItem.setVisibility(expanded || !(editItemVisible && logItemVisible && ActionButtonManager.canShowShortcuts(currentChat)) ? GONE : INVISIBLE);
+                adminItem.setVisibility(expanded || !(editItemVisible && ActionButtonManager.canShowShortcuts(currentChat, isTopic)) ? GONE : INVISIBLE);
+                permissionItem.setVisibility(expanded || !(editItemVisible && permissionItemVisible && ActionButtonManager.canShowShortcuts(currentChat, isTopic)) ? GONE : INVISIBLE);
+                groupLogItem.setVisibility(expanded || !(editItemVisible && logItemVisible && ActionButtonManager.canShowShortcuts(currentChat, isTopic)) ? GONE : INVISIBLE);
                 if (qrItem != null) {
                     qrItem.setVisibility(expanded ? GONE : INVISIBLE);
                 }
@@ -5163,7 +5163,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
             updateEmojiStatusDrawableColor();
 
-            if (avatarsViewPagerIndicatorView.getSecondaryMenuItem() != null && ((videoCallItemVisible && ActionButtonManager.canShowTopActions(currentChat, editItemVisible)) || editItemVisible || (callItemVisible && !ActionButtonManager.canShowCall(currentChat) && OwlConfig.buttonStyleType == 5))) {
+            if (avatarsViewPagerIndicatorView.getSecondaryMenuItem() != null && ((videoCallItemVisible && ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic)) || editItemVisible || (callItemVisible && !ActionButtonManager.canShowCall(currentChat) && OwlConfig.buttonStyleType == 5))) {
                 needLayoutText(Math.min(1f, extraHeight / AndroidUtilities.dp(88f)));
             }
         }
@@ -5187,7 +5187,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
         ActionBarMenuItem mediaSearchItem = sharedMediaLayout.getSearchItem();
         if (!mediaHeaderVisible) {
-            boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible);
+            boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
             if (callItemVisible && !ActionButtonManager.canShowCall(currentChat) && OwlConfig.buttonStyleType == 5) {
                 callItem.setVisibility(View.VISIBLE);
             }
@@ -5198,7 +5198,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (canShowTopAction) {
                     editItem.setVisibility(View.VISIBLE);
                 }
-                if (ActionButtonManager.canShowShortcuts(currentChat)) {
+                if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
                     adminItem.setVisibility(View.VISIBLE);
                     if (permissionItemVisible) {
                         permissionItem.setVisibility(View.VISIBLE);
@@ -5259,7 +5259,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             public void onAnimationEnd(Animator animation) {
                 if (headerAnimatorSet != null) {
                     if (mediaHeaderVisible) {
-                        boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible);
+                        boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
                         if (callItemVisible && !ActionButtonManager.canShowCall(currentChat) && OwlConfig.buttonStyleType == 5) {
                             callItem.setVisibility(View.GONE);
                         }
@@ -5270,7 +5270,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             if (canShowTopAction) {
                                 editItem.setVisibility(View.GONE);
                             }
-                            if (ActionButtonManager.canShowShortcuts(currentChat)) {
+                            if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
                                 adminItem.setVisibility(View.GONE);
                                 if (permissionItemVisible) {
                                     permissionItem.setVisibility(View.GONE);
@@ -5916,12 +5916,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         int viewWidth = AndroidUtilities.isTablet() ? AndroidUtilities.dp(490) : AndroidUtilities.displaySize.x;
         ActionBarMenuItem item = avatarsViewPagerIndicatorView.getSecondaryMenuItem();
         int extra = 0;
-        boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible);
+        boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
         if (editItemVisible) {
             if (canShowTopAction) {
                 extra += 48;
             }
-            if (ActionButtonManager.canShowShortcuts(currentChat)) {
+            if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
                 extra += 48;
                 if (permissionItemVisible) {
                     extra += 48;
@@ -6595,7 +6595,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (editItemVisible) {
                     editItem.setAlpha(0.0f);
                     animators.add(ObjectAnimator.ofFloat(editItem, View.ALPHA, 1.0f));
-                    if (ActionButtonManager.canShowShortcuts(currentChat)) {
+                    if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
                         adminItem.setAlpha(0.0f);
                         animators.add(ObjectAnimator.ofFloat(adminItem, View.ALPHA, 1.0f));
                         if (permissionItemVisible) {
@@ -6670,7 +6670,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (editItemVisible) {
                     editItem.setAlpha(1.0f);
                     animators.add(ObjectAnimator.ofFloat(editItem, View.ALPHA, 0.0f));
-                    if (ActionButtonManager.canShowShortcuts(currentChat)) {
+                    if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
                         adminItem.setAlpha(1.0f);
                         animators.add(ObjectAnimator.ofFloat(adminItem, View.ALPHA, 0.0f));
                         if (permissionItemVisible) {
@@ -7884,7 +7884,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         editItemVisible = true;
                     }
                 }*/
-                editItemVisible = !ChatObject.isChannelAndNotMegaGroup(chat) || ChatObject.canChangeChatInfo(chat) || ChatObject.hasAdminRights(chat);
+                editItemVisible = ((!ChatObject.isChannelAndNotMegaGroup(chat) || ChatObject.canChangeChatInfo(chat) || ChatObject.hasAdminRights(chat)) && !isTopic || isTopic && ChatObject.canManageTopic(currentAccount, chat, topicId));
                 if (chatInfo != null) {
                     if (ChatObject.canManageCalls(chat) && chatInfo.call == null) {
                         if (!actionButtonManager.hasItem("join_call")) {
@@ -7897,7 +7897,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                     ChatObject.Call call = getMessagesController().getGroupCall(chatId, false);
                     callItemVisible = call != null;
-                    if (callItemVisible && !ActionButtonManager.canShowTopActions(currentChat, editItemVisible) && !actionButtonManager.hasItem("join_call") && (!ActionButtonManager.canShowCall(currentChat) || callItem.getVisibility() != View.VISIBLE)) {
+                    if (callItemVisible && !ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic) && !actionButtonManager.hasItem("join_call") && (!ActionButtonManager.canShowCall(currentChat) || callItem.getVisibility() != View.VISIBLE)) {
                         if (ChatObject.isChannelOrGiga(currentChat)) {
                             otherItem.addSubItem(call_item, R.drawable.msg_voicechat, LocaleController.getString("VoipChannelVoiceChat", R.string.VoipChannelVoiceChat));
                         } else {
@@ -7905,7 +7905,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         }
                     }
                 }
-                if (!ActionButtonManager.canShowTopActions(currentChat, editItemVisible) && OwlConfig.buttonStyleType == 5 && editItemVisible) {
+                if (!ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic) && OwlConfig.buttonStyleType == 5 && editItemVisible) {
                     if (ChatObject.hasAdminRights(currentChat) || currentChat.megagroup && ChatObject.canChangeChatInfo(currentChat)) {
                         if (!actionButtonManager.hasItem("edit")) {
                             otherItem.addSubItem(edit_channel, R.drawable.msg_edit, LocaleController.getString("Edit", R.string.Edit));
@@ -7961,7 +7961,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                     ChatObject.Call call = getMessagesController().getGroupCall(chatId, false);
                     callItemVisible = call != null;
-                    if (callItemVisible && !ActionButtonManager.canShowTopActions(currentChat, ChatObject.canChangeChatInfo(chat)) && !actionButtonManager.hasItem("join_call") && (!ActionButtonManager.canShowCall(currentChat) || callItem.getVisibility() != View.VISIBLE)) {
+                    if (callItemVisible && !ActionButtonManager.canShowTopActions(currentChat, ChatObject.canChangeChatInfo(chat), isTopic) && !actionButtonManager.hasItem("join_call") && (!ActionButtonManager.canShowCall(currentChat) || callItem.getVisibility() != View.VISIBLE)) {
                         if (ChatObject.isChannelOrGiga(currentChat)) {
                             otherItem.addSubItem(call_item, R.drawable.msg_voicechat, LocaleController.getString("VoipChannelVoiceChat", R.string.VoipChannelVoiceChat));
                         } else {
@@ -7972,7 +7972,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 //if (ChatObject.canChangeChatInfo(chat)) {
                 editItemVisible = true;
                 //}
-                if (!ActionButtonManager.canShowTopActions(currentChat,true)) {
+                if (!ActionButtonManager.canShowTopActions(currentChat,true, isTopic)) {
                     if (!actionButtonManager.hasItem("edit")) {
                         otherItem.addSubItem(edit_channel, R.drawable.msg_edit, LocaleController.getString("Edit", R.string.Edit));
                     }
@@ -8018,7 +8018,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             otherItem.hideSubItem(delete_avatar);
         }
         if (!mediaHeaderVisible) {
-            boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible);
+            boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
             if (callItemVisible && OwlConfig.buttonStyleType == 5) {
                 if (callItem.getVisibility() != View.VISIBLE) {
                     callItem.setVisibility(View.VISIBLE);
@@ -8058,7 +8058,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     editItem.setVisibility(View.GONE);
                 }
             }
-            if (editItemVisible && ActionButtonManager.canShowShortcuts(currentChat)) {
+            if (editItemVisible && ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
                 if (adminItem.getVisibility() != View.VISIBLE) {
                     adminItem.setVisibility(View.VISIBLE);
                     if (animated) {
@@ -8106,7 +8106,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     editItem.setVisibility(View.GONE);
                     editItem.animate().cancel();
                     editItem.setAlpha(1f);
-                    if (ActionButtonManager.canShowShortcuts(currentChat)) {
+                    if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
                         adminItem.setVisibility(View.GONE);
                         adminItem.animate().cancel();
                         adminItem.setAlpha(1f);

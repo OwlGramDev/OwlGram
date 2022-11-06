@@ -283,8 +283,8 @@ public class ActionButtonManager {
         return null;
     }
 
-    public static boolean canShowTopActions(TLRPC.Chat currentChat, boolean editItemVisible) {
-        return (!canShowShortcuts(currentChat) || !editItemVisible) && OwlConfig.buttonStyleType == 5;
+    public static boolean canShowTopActions(TLRPC.Chat currentChat, boolean editItemVisible, boolean isTopic) {
+        return (!canShowShortcuts(currentChat, isTopic) || !editItemVisible) && (OwlConfig.buttonStyleType == 5 || isTopic);
     }
 
     public static boolean canShowCall(TLRPC.Chat currentChat) {
@@ -294,11 +294,11 @@ public class ActionButtonManager {
         } else {
             canEdit = true;
         }
-        return canShowShortcuts(currentChat) && canEdit;
+        return canShowShortcuts(currentChat, false) && canEdit;
     }
 
-    public static boolean canShowShortcuts(TLRPC.Chat currentChat) {
-        return OwlConfig.smartButtons && (ChatObject.hasAdminRights(currentChat) || currentChat != null && currentChat.megagroup && ChatObject.canChangeChatInfo(currentChat));
+    public static boolean canShowShortcuts(TLRPC.Chat currentChat, boolean isTopic) {
+        return (OwlConfig.smartButtons && (ChatObject.hasAdminRights(currentChat) || currentChat != null && currentChat.megagroup && ChatObject.canChangeChatInfo(currentChat))) && !isTopic;
     }
 
     public static class ActionButtonInfo {
