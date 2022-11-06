@@ -293,4 +293,6 @@
     <string name="Patpat">Patpat</string>
     <string name="UnlockedHiddenFoxIcon">Oh… Congratulations! You unlocked the little shy fox icon!</string>
     <string name="UnlockedHiddenChupaIcon">You were chuped! Chupa\'s icon is now available in settings.</string>
+    <string name="PrivacyPolicyLogin">By logging in,\nyou agree to the *Privacy Policy*.</string>
+    <string name="OwlPrivacyPolicy">OwlGram Privacy Policy</string>
 </resources>
