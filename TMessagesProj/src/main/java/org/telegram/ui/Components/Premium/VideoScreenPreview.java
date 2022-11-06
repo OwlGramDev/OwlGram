@@ -56,9 +56,28 @@ public class VideoScreenPreview extends FrameLayout implements PagerHeaderView, 
     String attachFileName;
     ImageReceiver imageReceiver = new ImageReceiver(this);
 
+    Runnable nextCheck;
+
     private void checkVideo() {
-        try {
-            if (file != null && file.exists() || SharedConfig.streamMedia) {
+        if (file != null && file.exists() || SharedConfig.streamMedia) {
+            if (file != null && file.exists()) {
+                if ((NotificationCenter.getGlobalInstance().getCurrentHeavyOperationFlags() & 512) != 0) {
+                    if (nextCheck != null) {
+                        AndroidUtilities.cancelRunOnUIThread(nextCheck);
+                    }
+                    AndroidUtilities.runOnUIThread(nextCheck = this::checkVideo, 300);
+                    return;
+                }
+
+                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                retriever.setDataSource(ApplicationLoader.applicationContext, Uri.fromFile(file));
+                int width = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
+                int height = Integer.valueOf(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+                retriever.release();
+                aspectRatio = width / (float) height;
+            } else {
+                aspectRatio = 0.671f;
+            }
 
                 if (file != null && file.exists()) {
                     MediaMetadataRetriever retriever = new MediaMetadataRetriever();
@@ -78,6 +97,7 @@ public class VideoScreenPreview extends FrameLayout implements PagerHeaderView, 
         } catch (IOException e) {
             FileLog.e(e);
         }
+        nextCheck = null;
     }
 
     int currentAccount;
