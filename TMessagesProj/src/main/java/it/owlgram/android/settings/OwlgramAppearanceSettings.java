@@ -165,12 +165,10 @@ public class OwlgramAppearanceSettings extends BaseFragment {
             } else if (position == useSystemFontRow) {
                 OwlConfig.toggleUseSystemFont();
                 AndroidUtilities.clearTypefaceCache();
-                Parcelable recyclerViewState = null;
-                if (listView.getLayoutManager() != null) {
-                    recyclerViewState = listView.getLayoutManager().onSaveInstanceState();
-                }
                 parentLayout.rebuildAllFragmentViews(true, true);
-                listView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.useSystemFont);
+                }
             } else if (position == useSystemEmojiRow) {
                 OwlConfig.toggleUseSystemEmoji();
                 if (view instanceof TextCheckCell) {
@@ -189,12 +187,10 @@ public class OwlgramAppearanceSettings extends BaseFragment {
             } else if (position == appBarShadowRow) {
                 OwlConfig.toggleAppBarShadow();
                 ActionBarLayout.headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : parentLayout.getView().getResources().getDrawable(R.drawable.header_shadow).mutate();
-                Parcelable recyclerViewState = null;
-                if (listView.getLayoutManager() != null) {
-                    recyclerViewState = listView.getLayoutManager().onSaveInstanceState();
-                }
                 parentLayout.rebuildAllFragmentViews(true, true);
-                listView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.disableAppBarShadow);
+                }
             } else if (position == showSantaHatRow) {
                 OwlConfig.toggleShowSantaHat();
                 if (view instanceof TextCheckCell) {
