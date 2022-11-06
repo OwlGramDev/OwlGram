@@ -75,22 +75,40 @@ public class BitmapsCache {
     public void createCache() {
         try {
             long time = System.currentTimeMillis();
-            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
             if (file.exists()) {
+                RandomAccessFile randomAccessFile = null;
                 try {
+                    randomAccessFile = new RandomAccessFile(file, "r");
                     cacheCreated = randomAccessFile.readBoolean();
+                    int framesCount = randomAccessFile.readInt();
+                    if (framesCount == 0) {
+                        cacheCreated = false;
+                    }
                     if (cacheCreated) {
                         randomAccessFile.close();
                         return;
                     } else {
                         file.delete();
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
+                    try {
+                        file.delete();
+                    } catch (Throwable e2) {
 
+                    }
+                } finally {
+                    if (randomAccessFile != null) {
+                        try {
+                            randomAccessFile.close();
+                        } catch (Throwable e2) {
+
+                        }
+                    }
                 }
             }
-            randomAccessFile.close();
-            randomAccessFile = new RandomAccessFile(file, "rw");
+
+            RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw");
+
 
             Bitmap[] bitmap = new Bitmap[N];
             ByteArrayOutputStream[] byteArrayOutputStream = new ByteArrayOutputStream[N];
@@ -268,10 +286,15 @@ public class BitmapsCache {
             return cacheCreated;
         }
         RandomAccessFile randomAccessFile = null;
+        int framesCount;
         try {
             synchronized (mutex) {
                 randomAccessFile = new RandomAccessFile(file, "r");
                 cacheCreated = randomAccessFile.readBoolean();
+                framesCount = randomAccessFile.readInt();
+                if (framesCount <= 0) {
+                    cacheCreated = false;
+                }
             }
         } catch (Exception e) {
 
@@ -284,7 +307,7 @@ public class BitmapsCache {
                 }
             }
         }
-        checkCache = false;
+        checkCache = true;
         return cacheCreated;
     }
 
@@ -347,7 +370,7 @@ public class BitmapsCache {
         } catch (FileNotFoundException e) {
 
         } catch (Throwable e) {
-            FileLog.e(e);
+            FileLog.e(e, false);
         }
 
         if (randomAccessFile != null) {

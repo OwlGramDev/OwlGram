@@ -4769,7 +4769,7 @@ public class LoginActivity extends BaseFragment {
             signInWithGoogleView.setMaxLines(2);
 
             SpannableStringBuilder str = new SpannableStringBuilder("d ");
-            Drawable dr = ContextCompat.getDrawable(context, com.google.firebase.messaging.R.drawable.googleg_standard_color_18);
+            Drawable dr = ContextCompat.getDrawable(context, R.drawable.googleg_standard_color_18);
             dr.setBounds(0, AndroidUtilities.dp(9), AndroidUtilities.dp(18), AndroidUtilities.dp(18 + 9));
             str.setSpan(new ImageSpan(dr, ImageSpan.ALIGN_BOTTOM), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             str.setSpan(new ReplacementSpan() {
@@ -5100,7 +5100,7 @@ public class LoginActivity extends BaseFragment {
             signInWithGoogleView.setMaxLines(2);
 
             SpannableStringBuilder str = new SpannableStringBuilder("d ");
-            Drawable dr = ContextCompat.getDrawable(context, com.google.firebase.messaging.R.drawable.googleg_standard_color_18);
+            Drawable dr = ContextCompat.getDrawable(context, R.drawable.googleg_standard_color_18);
             dr.setBounds(0, AndroidUtilities.dp(9), AndroidUtilities.dp(18), AndroidUtilities.dp(18 + 9));
             str.setSpan(new ImageSpan(dr, ImageSpan.ALIGN_BOTTOM), 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             str.setSpan(new ReplacementSpan() {
@@ -6117,7 +6117,7 @@ public class LoginActivity extends BaseFragment {
             try {
                 codeField[num].performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
             } catch (Exception ignore) {}
-            AndroidUtilities.shakeView(codeField[num], 2, 0);
+            AndroidUtilities.shakeView(codeField[num]);
         }
 
         @Override
@@ -6917,8 +6917,12 @@ public class LoginActivity extends BaseFragment {
     }
 
     @Override
-    protected AnimatorSet onCustomTransitionAnimation(boolean isOpen, Runnable callback) {
+    public AnimatorSet onCustomTransitionAnimation(boolean isOpen, Runnable callback) {
         if (isOpen && introView != null) {
+            if (fragmentView.getParent() instanceof View) {
+                ((View) fragmentView.getParent()).setTranslationX(0);
+            }
+
             TransformableLoginButtonView transformButton = new TransformableLoginButtonView(fragmentView.getContext());
             transformButton.setButtonText(startMessagingButton.getPaint(), startMessagingButton.getText().toString());
 
@@ -6936,9 +6940,9 @@ public class LoginActivity extends BaseFragment {
             transformButton.setTranslationX(fromX);
             transformButton.setTranslationY(fromY);
 
-            int toX = getParentLayout().getWidth() - floatingButtonIcon.getLayoutParams().width - ((ViewGroup.MarginLayoutParams)floatingButtonContainer.getLayoutParams()).rightMargin - getParentLayout().getPaddingLeft() - getParentLayout().getPaddingRight(),
-                    toY = getParentLayout().getHeight() - floatingButtonIcon.getLayoutParams().height - ((ViewGroup.MarginLayoutParams)floatingButtonContainer.getLayoutParams()).bottomMargin -
-                            (isCustomKeyboardVisible() ? AndroidUtilities.dp(CustomPhoneKeyboardView.KEYBOARD_HEIGHT_DP) : 0) - getParentLayout().getPaddingTop() - getParentLayout().getPaddingBottom();
+            int toX = getParentLayout().getView().getWidth() - floatingButtonIcon.getLayoutParams().width - ((ViewGroup.MarginLayoutParams)floatingButtonContainer.getLayoutParams()).rightMargin - getParentLayout().getView().getPaddingLeft() - getParentLayout().getView().getPaddingRight(),
+                    toY = getParentLayout().getView().getHeight() - floatingButtonIcon.getLayoutParams().height - ((ViewGroup.MarginLayoutParams)floatingButtonContainer.getLayoutParams()).bottomMargin -
+                            (isCustomKeyboardVisible() ? AndroidUtilities.dp(CustomPhoneKeyboardView.KEYBOARD_HEIGHT_DP) : 0) - getParentLayout().getView().getPaddingTop() - getParentLayout().getView().getPaddingBottom();
 
             ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
             animator.addListener(new AnimatorListenerAdapter() {
@@ -7247,6 +7251,7 @@ public class LoginActivity extends BaseFragment {
                     Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
                     Canvas canvas = new Canvas(bitmap);
                     canvas.scale(1.0f / scaleFactor, 1.0f / scaleFactor);
+                    canvas.drawColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     fragmentView.draw(canvas);
                     Utilities.stackBlurBitmap(bitmap, Math.max(8, Math.max(w, h) / 150));
                     blurredView.setBackground(new BitmapDrawable(getContext().getResources(), bitmap));

@@ -60,6 +60,7 @@ public class DoubledLimitsBottomSheet extends BottomSheetWithRecyclerListView im
         this.baseFragment = fragment;
 
         clipToActionBar = true;
+
         titleLayout = new FrameLayout(getContext());
         titleView = new TextView(getContext());
         titleView.setText(LocaleController.getString("DoubledLimits", R.string.DoubledLimits));

@@ -64,6 +64,7 @@ dependencies {
     implementation 'com.google.mlkit:language-id:17.0.4'
     implementation 'com.android.billingclient:billing:5.0.0'
     implementation 'org.apache.commons:commons-text:1.9'
+    implementation 'com.google.code.gson:gson:2.10'
 
     // CameraX Implementation
     implementation "androidx.camera:camera-core:1.2.0-beta02"
@@ -83,6 +84,7 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.6' // NEEDED TESTS OF THE NEW R8 VERSION
 }
 
+def isWindows = String.valueOf(DefaultNativePlatform.currentOperatingSystem.toFamilyName() == OperatingSystemFamily.WINDOWS)
 android {
     compileSdkVersion 33
     buildToolsVersion '33.0.0'

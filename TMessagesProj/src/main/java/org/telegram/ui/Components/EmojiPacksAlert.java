@@ -13,7 +13,6 @@ import android.graphics.Path;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.SystemClock;
 import android.text.Editable;
@@ -1106,7 +1105,7 @@ public class EmojiPacksAlert extends BottomSheet implements NotificationCenter.N
             }
             ShareAlert alert = new ShareAlert(context, null, stickersUrl, false, stickersUrl, false, resourcesProvider) {
                 @Override
-                protected void onSend(androidx.collection.LongSparseArray<TLRPC.Dialog> dids, int count) {
+                protected void onSend(androidx.collection.LongSparseArray<TLRPC.Dialog> dids, int count, TLRPC.TL_forumTopic topic) {
                     AndroidUtilities.runOnUIThread(() -> {
                         UndoView undoView;
                         if (fragment instanceof ChatActivity) {

@@ -1242,7 +1242,7 @@ public class RLottieDrawable extends BitmapDrawable implements Animatable, Bitma
     @Override
     public void prepareForGenerateCache() {
         generateCacheNativePtr = create(args.file.toString(), args.json, width, height, new int[3], false, args.colorReplacement, false, args.fitzModifier);
-        if (generateCacheNativePtr == 0) {
+        if (generateCacheNativePtr == 0 && file != null) {
             file.delete();
         }
     }
