@@ -24376,7 +24376,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     private void handleAutoTranslate(MessageObject messageObject) {
-        if (AutoTranslateConfig.isAutoTranslateEnabled(dialog_id)) {
+        if (AutoTranslateConfig.isAutoTranslateEnabled(dialog_id, getTopicId())) {
             if (!messageObject.translated && !messageObject.translating && !messageObject.canceledTranslation && getMessageHelper().isMessageObjectAutoTranslatable(messageObject)) {
                 LanguageDetector.detectLanguage(
                         messageObject.messageOwner.message,
@@ -25258,7 +25258,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     public boolean processRepeatMessage(boolean longClick) {
-        if (longClick || isThreadChat() || getMessagesController().isChatNoForwards(currentChat)) {
+        if (longClick || getMessagesController().isChatNoForwards(currentChat)) {
             MessageObject messageObject = getMessageHelper().getMessageForRepeat(selectedObject, selectedObjectGroup);
             if (messageObject != null) {
                 if (messageObject.isAnyKindOfSticker() && !messageObject.isAnimatedEmojiStickers() && !messageObject.isAnimatedEmoji() && !messageObject.isDice()) {

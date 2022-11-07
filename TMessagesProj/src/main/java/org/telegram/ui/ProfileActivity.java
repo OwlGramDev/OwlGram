@@ -7878,7 +7878,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (topicId == 0 && ChatObject.canUserDoAdminAction(chat, ChatObject.ACTION_DELETE_MESSAGES)) {
                 createAutoDeleteItem(context);
             }
-            createAutoTranslateItem(context, -chatId);
+            createAutoTranslateItem(context, -chatId, topicId);
             if (ChatObject.isChannel(chat)) {
                 /*if (isTopic) {
                     if (ChatObject.canManageTopic(currentAccount, chat, topicId)) {
@@ -8172,7 +8172,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     }
 
     private void createAutoTranslateItem(Context context, long dialogId) {
-        AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, getResourceProvider());
+        createAutoTranslateItem(context, dialogId, 0);
+    }
+    private void createAutoTranslateItem(Context context, long dialogId, int topicId) {
+        AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, topicId, getResourceProvider());
         otherItem.addSwipeBackItem(R.drawable.msg_translate, null, LocaleController.getString("AutoTranslate", R.string.AutoTranslate), autoTranslatePopupWrapper.windowLayout);
         otherItem.addColoredGap();
     }
