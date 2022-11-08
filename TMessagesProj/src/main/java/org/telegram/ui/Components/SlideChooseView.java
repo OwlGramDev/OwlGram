@@ -21,6 +21,7 @@ import androidx.core.graphics.ColorUtils;
 import androidx.core.math.MathUtils;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.LocaleController;
 import org.telegram.ui.ActionBar.Theme;
 
 public class SlideChooseView extends View {
@@ -58,6 +59,12 @@ public class SlideChooseView extends View {
     private final Theme.ResourcesProvider resourcesProvider;
 
     private boolean touchWasClose = false;
+
+    private boolean needDivider;
+
+    public void setDivider(boolean divider) {
+        needDivider = divider;
+    }
 
     public SlideChooseView(Context context) {
         this(context, null);
@@ -247,6 +254,10 @@ public class SlideChooseView extends View {
         canvas.drawCircle(cx, cy, AndroidUtilities.dp(12 * movingAnimated), paint);
         paint.setColor(getThemedColor(Theme.key_switchTrackChecked));
         canvas.drawCircle(cx, cy, AndroidUtilities.dp(6), paint);
+
+        if (needDivider) {
+            canvas.drawLine(LocaleController.isRTL ? 0 : AndroidUtilities.dp(20), getMeasuredHeight() - 1, getMeasuredWidth() - (LocaleController.isRTL ? AndroidUtilities.dp(20) : 0), getMeasuredHeight() - 1, Theme.dividerPaint);
+        }
     }
 
     @Override

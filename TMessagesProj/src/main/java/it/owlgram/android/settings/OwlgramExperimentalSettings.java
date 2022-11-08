@@ -26,6 +26,7 @@ import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
+import org.telegram.ui.Components.SlideChooseView;
 
 import java.util.ArrayList;
 
@@ -33,7 +34,6 @@ import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.LabsHeader;
 import it.owlgram.android.helpers.MonetIconsHelper;
 import it.owlgram.android.helpers.PopupHelper;
-import it.owlgram.android.translator.DeepLTranslator;
 
 public class OwlgramExperimentalSettings extends BaseFragment {
 
@@ -48,6 +48,8 @@ public class OwlgramExperimentalSettings extends BaseFragment {
     private int maxRecentStickersRow;
     private int experimentalMessageAlert;
     private int monetIconRow;
+    private int downloadDividersRow;
+    private int headerDownloadSpeed;
     private int downloadSpeedBoostRow;
     private int uploadSpeedBoostRow;
 
@@ -134,19 +136,6 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(MonetIconsHelper.isSelectedMonet());
                 }
-            } else if (position == downloadSpeedBoostRow) {
-                ArrayList<String> arrayList = new ArrayList<>();
-                ArrayList<Integer> types = new ArrayList<>();
-                arrayList.add(LocaleController.getString("DownloadSpeedDefault", R.string.DownloadSpeedDefault));
-                types.add(OwlConfig.DOWNLOAD_BOOST_DEFAULT);
-                arrayList.add(LocaleController.getString("DownloadSpeedFast", R.string.DownloadSpeedFast));
-                types.add(OwlConfig.DOWNLOAD_BOOST_FAST);
-                arrayList.add(LocaleController.getString("DownloadSpeedExtreme", R.string.DownloadSpeedExtreme));
-                types.add(OwlConfig.DOWNLOAD_BOOST_EXTREME);
-                PopupHelper.show(arrayList, LocaleController.getString("DownloadSpeed", R.string.DownloadSpeed), types.indexOf(OwlConfig.downloadSpeedBoost), context, i -> {
-                    OwlConfig.setDownloadSpeedBoost(types.get(i));
-                    listAdapter.notifyItemChanged(downloadSpeedBoostRow);
-                });
             } else if (position == uploadSpeedBoostRow) {
                 OwlConfig.toggleUploadSpeedBoost();
                 if (view instanceof TextCheckCell) {
@@ -183,6 +172,8 @@ public class OwlgramExperimentalSettings extends BaseFragment {
         betterAudioCallRow = -1;
         maxRecentStickersRow = -1;
         monetIconRow = -1;
+        downloadDividersRow = -1;
+        headerDownloadSpeed = -1;
         downloadSpeedBoostRow = -1;
         uploadSpeedBoostRow = -1;
         experimentalMessageAlert = -1;
@@ -197,6 +188,8 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                 monetIconRow = rowCount++;
             }
             maxRecentStickersRow = rowCount++;
+            downloadDividersRow = rowCount++;
+            headerDownloadSpeed = rowCount++;
             downloadSpeedBoostRow = rowCount++;
             uploadSpeedBoostRow = rowCount++;
         } else {
@@ -262,6 +255,8 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == headerExperimental) {
                         headerCell.setText(LocaleController.getString("General", R.string.General));
+                    } else if (position == headerDownloadSpeed) {
+                        headerCell.setText(LocaleController.getString("DownloadSpeed", R.string.DownloadSpeed));
                     }
                     break;
                 case 6:
@@ -269,20 +264,6 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                     textCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                     if (position == maxRecentStickersRow) {
                         textCell.setTextAndValue(LocaleController.getString("MaxRecentStickers", R.string.MaxRecentStickers), String.valueOf(OwlConfig.maxRecentStickers), true);
-                    } else if (position == downloadSpeedBoostRow) {
-                        String value;
-                        switch (OwlConfig.downloadSpeedBoost) {
-                            case OwlConfig.DOWNLOAD_BOOST_FAST:
-                                value = LocaleController.getString("DownloadSpeedFast", R.string.DownloadSpeedFast);
-                                break;
-                            case OwlConfig.DOWNLOAD_BOOST_EXTREME:
-                                value = LocaleController.getString("DownloadSpeedExtreme", R.string.DownloadSpeedExtreme);
-                                break;
-                            default:
-                                value = LocaleController.getString("DownloadSpeedDefault", R.string.DownloadSpeedDefault);
-                                break;
-                        }
-                        textCell.setTextAndValue(LocaleController.getString("DownloadSpeed", R.string.DownloadSpeed), value, true);
                     }
                     break;
             }
@@ -319,6 +300,22 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                     view = new TextSettingsCell(mContext);
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
+                case 7:
+                    SlideChooseView slideChooseView = new SlideChooseView(mContext);
+                    view = slideChooseView;
+                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    ArrayList<String> arrayList = new ArrayList<>();
+                    ArrayList<Integer> types = new ArrayList<>();
+                    arrayList.add(LocaleController.getString("DownloadSpeedDefault", R.string.DownloadSpeedDefault));
+                    types.add(OwlConfig.DOWNLOAD_BOOST_DEFAULT);
+                    arrayList.add(LocaleController.getString("DownloadSpeedFast", R.string.DownloadSpeedFast));
+                    types.add(OwlConfig.DOWNLOAD_BOOST_FAST);
+                    arrayList.add(LocaleController.getString("DownloadSpeedExtreme", R.string.DownloadSpeedExtreme));
+                    types.add(OwlConfig.DOWNLOAD_BOOST_EXTREME);
+                    slideChooseView.setCallback(index -> OwlConfig.setDownloadSpeedBoost(types.get(index)));
+                    slideChooseView.setOptions(types.indexOf(OwlConfig.downloadSpeedBoost), arrayList.toArray(new String[0]));
+                    slideChooseView.setDivider(true);
+                    break;
                 default:
                     view = new ShadowSectionCell(mContext);
                     break;
@@ -336,10 +333,14 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                 return 3;
             } else if (position == bottomHeaderRow || position == experimentalMessageAlert) {
                 return 4;
-            } else if (position == headerExperimental) {
+            } else if (position == headerExperimental || position == headerDownloadSpeed) {
                 return 5;
-            } else if (position == maxRecentStickersRow || position == downloadSpeedBoostRow) {
+            } else if (position == maxRecentStickersRow) {
                 return 6;
+            } else if (position == downloadSpeedBoostRow) {
+                return 7;
+            } else if (position == downloadDividersRow) {
+                return 1;
             }
             return 1;
         }
