@@ -24,7 +24,6 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.OneUIUtilities;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.BaseFragment;
-import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.StickerImageView;
@@ -34,7 +33,7 @@ import java.util.Map;
 import it.owlgram.android.OwlConfig;
 
 @RequiresApi(api = Build.VERSION_CODES.S)
-public class AppLinkVerifyBottomSheet extends BottomSheet {
+public class AppLinkVerifyBottomSheet extends OnceBottomSheet {
 
     @Override
     protected boolean canDismissWithSwipe() {

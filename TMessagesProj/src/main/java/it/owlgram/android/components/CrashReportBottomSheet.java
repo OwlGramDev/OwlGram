@@ -16,11 +16,9 @@ import androidx.core.graphics.ColorUtils;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
-import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.BaseFragment;
-import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.StickerImageView;
@@ -31,7 +29,7 @@ import java.io.IOException;
 
 import it.owlgram.android.Crashlytics;
 
-public class CrashReportBottomSheet extends BottomSheet {
+public class CrashReportBottomSheet extends OnceBottomSheet {
     public CrashReportBottomSheet(BaseFragment fragment) {
         super(fragment.getParentActivity(), false);
         Activity activity = fragment.getParentActivity();

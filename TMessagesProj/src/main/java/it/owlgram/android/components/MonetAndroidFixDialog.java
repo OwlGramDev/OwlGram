@@ -15,14 +15,13 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
-import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.StickerImageView;
 
 import it.owlgram.android.helpers.MonetIconsHelper;
 
-public class MonetAndroidFixDialog extends BottomSheet {
+public class MonetAndroidFixDialog extends OnceBottomSheet {
 
     public MonetAndroidFixDialog(BaseFragment fragment) {
         super(fragment.getParentActivity(), false);
