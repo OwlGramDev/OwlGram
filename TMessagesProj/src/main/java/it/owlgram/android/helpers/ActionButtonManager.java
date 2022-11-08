@@ -287,14 +287,18 @@ public class ActionButtonManager {
         return (!canShowShortcuts(currentChat, isTopic) || !editItemVisible) && (OwlConfig.buttonStyleType == 5 || isTopic);
     }
 
-    public static boolean canShowCall(TLRPC.Chat currentChat) {
+    public static boolean canShowCall(TLRPC.Chat currentChat, boolean isTopic) {
         boolean canEdit;
         if (ChatObject.isChannel(currentChat)) {
             canEdit = !ChatObject.isChannelAndNotMegaGroup(currentChat) || ChatObject.hasAdminRights(currentChat);
         } else {
             canEdit = true;
         }
-        return canShowShortcuts(currentChat, false) && canEdit;
+        return canShowShortcuts(currentChat, isTopic) && canEdit;
+    }
+
+    public static boolean canShowButtons(boolean isTopic) {
+        return OwlConfig.buttonStyleType == 5 || isTopic;
     }
 
     public static boolean canShowShortcuts(TLRPC.Chat currentChat, boolean isTopic) {
