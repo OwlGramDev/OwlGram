@@ -448,6 +448,8 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
     private CharSequence draftMessage;
     private boolean draftSearchWebpage;
 
+    private boolean isPaste;
+
     private boolean destroyed;
 
     private MessageObject editingMessageObject;
@@ -2028,6 +2030,10 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
 
             @Override
             public boolean onTextContextMenuItem(int id) {
+                if (id == android.R.id.paste) {
+                    isPaste = true;
+                }
+
                 ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clipData = clipboard.getPrimaryClip();
                 if (clipData != null) {
@@ -2283,9 +2289,10 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 if (innerTextChange == 1) {
                     return;
                 }
-                if (sendByEnter && editingMessageObject == null && count > before && charSequence.length() > 0 && charSequence.length() == start + count && charSequence.charAt(charSequence.length() - 1) == '\n') {
+                if (sendByEnter && !isPaste && editingMessageObject == null && count > before && charSequence.length() > 0 && charSequence.length() == start + count && charSequence.charAt(charSequence.length() - 1) == '\n') {
                     nextChangeIsSend = true;
                 }
+                isPaste = false;
                 checkSendButton(true);
                 CharSequence message = AndroidUtilities.getTrimmedString(charSequence.toString());
                 if (delegate != null) {
@@ -4842,6 +4849,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                     messageEditText.setTranslationX(0);
                     messageEditText.requestFocus();
                     recordedAudioPanel.setVisibility(GONE);
+
                 }
             });
         }
@@ -6811,6 +6819,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             emojiButton.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
         }
+
     }
 
     private void updateRecordedDeleteIconColors() {
