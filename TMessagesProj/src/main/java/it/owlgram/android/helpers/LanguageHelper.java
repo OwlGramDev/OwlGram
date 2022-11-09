@@ -2,6 +2,7 @@ package it.owlgram.android.helpers;
 
 import android.util.Xml;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -50,25 +51,23 @@ public class LanguageHelper {
                                 }
                             }
                         }
+                        loadRemoteLanguage(langCode);
                         versioning.put(langCode, remoteMD5);
                         OwlConfig.setLanguagePackVersioning(versioning.toString());
-                        loadRemoteLanguage(langCode);
                     }
                 } catch (Exception ignored) {}
             }
         }.start();
     }
 
-    private static void loadRemoteLanguage(String langCode) {
-        try {
-            String url = String.format("https://app.owlgram.org/language_pack?lang=%s", langCode);
-            JSONObject obj = new JSONObject(new StandardHTTPRequest(url).request());
-            if (!obj.has("error")) {
-                saveInternalFile(langCode, obj);
-                LocaleController.addLocaleValue(getLocaleFileStrings(getFileFromLang(langCode)));
-                AndroidUtilities.runOnUIThread(() -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface));
-            }
-        } catch (Exception ignored) {}
+    private static void loadRemoteLanguage(String langCode) throws IOException, JSONException {
+        String url = String.format("https://app.owlgram.org/language_pack?lang=%s", langCode);
+        JSONObject obj = new JSONObject(new StandardHTTPRequest(url).request());
+        if (!obj.has("error")) {
+            saveInternalFile(langCode, obj);
+            LocaleController.addLocaleValue(getLocaleFileStrings(getFileFromLang(langCode)));
+            AndroidUtilities.runOnUIThread(() -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface));
+        }
     }
 
     private static void saveInternalFile(String langCode, JSONObject object) throws IOException {
