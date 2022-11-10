@@ -19,6 +19,7 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
+import org.telegram.messenger.UserObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -499,7 +500,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                         }
                         textDetailCell.setTextWithEmojiAndValue(full_name, LocaleController.getString("FullName", R.string.FullName), true);
                     } else if (position == usernameRow) {
-                        textDetailCell.setTextAndValue("@" + fromUser.username, LocaleController.getString("Username", R.string.Username), true);
+                        textDetailCell.setTextAndValue("@" + UserObject.getPublicUsername(fromUser), LocaleController.getString("Username", R.string.Username), true);
                     } else if (position == messageIdRow) {
                         textDetailCell.setTextAndValue(String.valueOf(messageObject.getId()), "ID", true);
                     } else if (position == messageTextRow) {
@@ -523,7 +524,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                         }
                         textDetailCell.setTextWithEmojiAndValue(full_name, LocaleController.getString("FullName", R.string.FullName), fromForwardedUser.id != 0);
                     } else if (position == forwardUserUsernameRow) {
-                        textDetailCell.setTextAndValue("@" + fromForwardedUser.username, LocaleController.getString("Username", R.string.Username), true);
+                        textDetailCell.setTextAndValue("@" + UserObject.getPublicUsername(fromForwardedUser), LocaleController.getString("Username", R.string.Username), true);
                     } else if (position == forwardUserIdRow) {
                         textDetailCell.setTextAndValue(String.valueOf(fromForwardedUserInfo.tID), "ID", false);
                     } else if (position == repliedMessageTextRow) {
@@ -547,7 +548,7 @@ public class DetailsActivity extends BaseFragment implements NotificationCenter.
                         }
                         textDetailCell.setTextWithEmojiAndValue(full_name, LocaleController.getString("FullName", R.string.FullName), true);
                     } else if (position == repliedUserUsernameRow) {
-                        textDetailCell.setTextAndValue("@" + fromRepliedUser.username, LocaleController.getString("Username", R.string.Username), true);
+                        textDetailCell.setTextAndValue("@" + UserObject.getPublicUsername(fromRepliedUser), LocaleController.getString("Username", R.string.Username), true);
                     } else if (position == groupNameRow) {
                         if (fromChat.broadcast) {
                             textDetailCell.setTextWithEmojiAndValue(fromChat.title, LocaleController.getString("EnterChannelName", R.string.EnterChannelName), true);
