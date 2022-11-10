@@ -116,6 +116,7 @@ public class CrashReportBottomSheet extends OnceBottomSheet {
             CrashReportBottomSheet dialog = new CrashReportBottomSheet(fragment);
             dialog.setCancelable(false);
             dialog.show();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 }

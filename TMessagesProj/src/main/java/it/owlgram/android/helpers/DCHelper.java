@@ -33,28 +33,28 @@ public class DCHelper {
         int currentAccount = UserConfig.selectedAccount;
         int myDC = AccountInstance.getInstance(currentAccount).getConnectionsManager().getCurrentDatacenterId();
         long id = 0;
-        if(user != null){
+        if (user != null) {
             if (UserObject.isUserSelf(user) && myDC != -1) {
                 DC = myDC;
             } else {
-                DC = user.photo != null ? user.photo.dc_id:-1;
+                DC = user.photo != null ? user.photo.dc_id : -1;
             }
             id = user.id;
-        }else if(chat != null){
-            DC = chat.photo != null ? chat.photo.dc_id:-1;
+        } else if (chat != null) {
+            DC = chat.photo != null ? chat.photo.dc_id : -1;
             if (OwlConfig.idType == 0) {
-                if(ChatObject.isChannel(chat)){
+                if (ChatObject.isChannel(chat)) {
                     id = -1000000000000L - chat.id;
-                }else{
+                } else {
                     id = -chat.id;
                 }
             } else {
                 id = chat.id;
             }
         }
-        DC = DC != 0 ? DC:-1;
+        DC = DC != 0 ? DC : -1;
         String DC_NAME = DCHelper.getDcName(DC);
-        if (DC != -1){
+        if (DC != -1) {
             DC_NAME = String.format(Locale.ENGLISH, "%s - DC%d", DC_NAME, DC);
         }
         return new TInfo(DC, id, DC_NAME);
@@ -73,7 +73,7 @@ public class DCHelper {
     }
 
     public static int getDCColor(int dc_id) {
-        switch (dc_id){
+        switch (dc_id) {
             case 1:
                 return 0xFF329AFE;
             case 2:
@@ -90,7 +90,7 @@ public class DCHelper {
     }
 
     public static String getDCIp(int dc_id) {
-        switch (dc_id){
+        switch (dc_id) {
             case 1:
                 return "149.154.175.50";
             case 2:
@@ -107,7 +107,7 @@ public class DCHelper {
     }
 
     public static String getDcName(int dc_id) {
-        switch (dc_id){
+        switch (dc_id) {
             case 1:
             case 3:
                 return "MIA, Miami FL, USA";
@@ -122,7 +122,7 @@ public class DCHelper {
     }
 
     public static int getDcIcon(int dc_id) {
-        switch (dc_id){
+        switch (dc_id) {
             case 1:
                 return R.drawable.ic_pluto_datacenter;
             case 2:
@@ -139,7 +139,7 @@ public class DCHelper {
     }
 
     public static int getDcIconLittle(int dc_id) {
-        switch (dc_id){
+        switch (dc_id) {
             case 1:
                 return R.drawable.ic_pluto_datacenter_little;
             case 2:

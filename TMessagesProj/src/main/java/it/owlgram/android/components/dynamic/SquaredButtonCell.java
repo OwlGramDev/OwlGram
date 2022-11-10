@@ -37,7 +37,7 @@ public class SquaredButtonCell extends SimpleActionCell {
     @SuppressLint("ClickableViewAccessibility")
     public SquaredButtonCell(Context context, String text, int iconId, String color, int myId) {
         super(context);
-        colors = new String[] {
+        colors = new String[]{
                 color,
                 Theme.key_windowBackgroundWhiteBlackText,
         };
@@ -76,7 +76,7 @@ public class SquaredButtonCell extends SimpleActionCell {
 
         iv = new RLottieImageView(context);
         LinearLayout.LayoutParams layoutParams2 = new LinearLayout.LayoutParams(AndroidUtilities.dp(26), AndroidUtilities.dp(26));
-        layoutParams2.setMargins(0,0,0,AndroidUtilities.dp(5));
+        layoutParams2.setMargins(0, 0, 0, AndroidUtilities.dp(5));
         iv.setLayoutParams(layoutParams2);
         if (iconId == R.raw.camera_outline) {
             cameraDrawable = new RLottieDrawable(R.raw.camera_outline, String.valueOf(R.raw.camera_outline), AndroidUtilities.dp(26 * 2), AndroidUtilities.dp(26 * 2), false, null);
@@ -140,7 +140,7 @@ public class SquaredButtonCell extends SimpleActionCell {
         RectF rectF = new RectF(x, y, x + w, y + w);
         int rad1 = Math.round((w * 14.77F) / 100F);
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(AndroidUtilities.getTransparentColor(color,0.5f));
+        p.setColor(AndroidUtilities.getTransparentColor(color, 0.5f));
         canvas.drawRoundRect(rectF, rad1, rad1, p);
 
         int marginBottomText = Math.round((w * 12F) / 100F);
@@ -149,7 +149,7 @@ public class SquaredButtonCell extends SimpleActionCell {
         int xText = x + (w >> 1) - (textWidth >> 1);
         int yText = y + w - marginBottomText - textHeight;
         RectF rectText = new RectF(xText, yText, xText + textWidth, yText + textHeight);
-        p.setColor(AndroidUtilities.getTransparentColor(color,0.75f));
+        p.setColor(AndroidUtilities.getTransparentColor(color, 0.75f));
         canvas.drawRoundRect(rectText, textHeight >> 1, textHeight >> 1, p);
     }
 
@@ -160,5 +160,6 @@ public class SquaredButtonCell extends SimpleActionCell {
         );
     }
 
-    protected void onItemClick(int id) {}
+    protected void onItemClick(int id) {
+    }
 }

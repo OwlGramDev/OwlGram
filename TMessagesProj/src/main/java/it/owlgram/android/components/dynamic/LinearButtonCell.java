@@ -41,7 +41,7 @@ public class LinearButtonCell extends SimpleActionCell {
     @SuppressLint("ClickableViewAccessibility")
     public LinearButtonCell(Context context, String text, int iconId, String color, int myId) {
         super(context);
-        colors = new String[] {
+        colors = new String[]{
                 color,
                 Theme.key_windowBackgroundWhiteBlackText,
         };
@@ -74,7 +74,7 @@ public class LinearButtonCell extends SimpleActionCell {
 
         iv = new RLottieImageView(context);
         RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(AndroidUtilities.dp(27), AndroidUtilities.dp(27));
-        layoutParams2.setMargins(0, 0,0,0);
+        layoutParams2.setMargins(0, 0, 0, 0);
         layoutParams2.addRule(RelativeLayout.CENTER_IN_PARENT);
         iv.setLayoutParams(layoutParams2);
         if (iconId == R.raw.camera_outline) {
@@ -89,7 +89,7 @@ public class LinearButtonCell extends SimpleActionCell {
 
         tv = new TextView(context);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(0,AndroidUtilities.dp(5),0,0);
+        layoutParams.setMargins(0, AndroidUtilities.dp(5), 0, 0);
         tv.setLayoutParams(layoutParams);
         tv.setTextColor(Theme.getColor(colors[0]));
         tv.setText(text);
@@ -125,7 +125,7 @@ public class LinearButtonCell extends SimpleActionCell {
 
         ImageView iv = new ImageView(context);
         RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(AndroidUtilities.dp(27), AndroidUtilities.dp(27));
-        layoutParams2.setMargins(0, 0,0,0);
+        layoutParams2.setMargins(0, 0, 0, 0);
         layoutParams2.addRule(RelativeLayout.CENTER_IN_PARENT);
         iv.setLayoutParams(layoutParams2);
         int iconId;
@@ -206,7 +206,7 @@ public class LinearButtonCell extends SimpleActionCell {
             d.setAlpha(255);
         }
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(AndroidUtilities.getTransparentColor(color,0.5f));
+        p.setColor(AndroidUtilities.getTransparentColor(color, 0.5f));
         RectF rectText = new RectF(xText, yText, xText + textWidth, yText + textHeight);
         canvas.drawRoundRect(rectText, textHeight >> 1, textHeight >> 1, p);
     }
@@ -218,5 +218,6 @@ public class LinearButtonCell extends SimpleActionCell {
         );
     }
 
-    protected void onItemClick(int id) {}
+    protected void onItemClick(int id) {
+    }
 }

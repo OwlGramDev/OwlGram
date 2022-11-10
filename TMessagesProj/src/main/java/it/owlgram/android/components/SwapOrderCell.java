@@ -67,7 +67,7 @@ public class SwapOrderCell extends FrameLayout {
         textView.setText(text);
         needDivider = divider;
         menuId = id;
-        optionsImageView.setVisibility(isDefault ? GONE:VISIBLE);
+        optionsImageView.setVisibility(isDefault ? GONE : VISIBLE);
         if (isPremium) {
             Drawable drawable = getContext().getDrawable(R.drawable.msg_premium_liststar).mutate();
             drawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_chats_menuPhoneCats), PorterDuff.Mode.MULTIPLY));

@@ -160,9 +160,9 @@ public class OwlgramGeneralSettings extends BaseFragment {
                         boolean newProviderSupport = TranslatorHelper.isSupportHTMLMode();
                         if (oldProviderSupport != newProviderSupport) {
                             if (newProviderSupport) {
-                                listAdapter.notifyItemInserted(autoTranslateRow+1);
+                                listAdapter.notifyItemInserted(autoTranslateRow + 1);
                             } else {
-                                listAdapter.notifyItemRemoved(autoTranslateRow+1);
+                                listAdapter.notifyItemRemoved(autoTranslateRow + 1);
                             }
                             listAdapter.notifyItemChanged(autoTranslateRow);
                         }
@@ -255,9 +255,9 @@ public class OwlgramGeneralSettings extends BaseFragment {
         translationProviderSelectRow = rowCount++;
         destinationLanguageSelectRow = rowCount++;
         doNotTranslateSelectRow = rowCount++;
-        deepLFormalityRow = OwlConfig.translationProvider == Translator.PROVIDER_DEEPL ? rowCount++:-1;
+        deepLFormalityRow = OwlConfig.translationProvider == Translator.PROVIDER_DEEPL ? rowCount++ : -1;
         autoTranslateRow = rowCount++;
-        keepMarkdownRow =  TranslatorHelper.isSupportHTMLMode() ? rowCount++:-1;
+        keepMarkdownRow = TranslatorHelper.isSupportHTMLMode() ? rowCount++ : -1;
         divisorTranslationRow = rowCount++;
         hintTranslation1 = rowCount++;
         hintTranslation2 = rowCount++;
@@ -323,8 +323,8 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 case 3:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
                     textCheckCell.setEnabled(true, null);
-                    if(position == phoneNumberSwitchRow) {
-                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("HidePhone", R.string.HidePhone), LocaleController.getString("HidePhoneDesc", R.string.HidePhoneDesc), OwlConfig.hidePhoneNumber,true, true);
+                    if (position == phoneNumberSwitchRow) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("HidePhone", R.string.HidePhone), LocaleController.getString("HidePhoneDesc", R.string.HidePhoneDesc), OwlConfig.hidePhoneNumber, true, true);
                     } else if (position == phoneContactsSwitchRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("HidePhoneOthers", R.string.HidePhoneOthers), LocaleController.getString("HidePhoneOthersDesc", R.string.HidePhoneOthersDesc), OwlConfig.hideContactNumber, true, true);
                     } else if (position == dcIdRow) {
@@ -342,7 +342,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 case 4:
                     TextSettingsCell textSettingsCell = (TextSettingsCell) holder.itemView;
                     textSettingsCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-                    if(position == translationProviderSelectRow) {
+                    if (position == translationProviderSelectRow) {
                         Pair<ArrayList<String>, ArrayList<Integer>> providers = Translator.getProviders();
                         ArrayList<String> names = providers.first;
                         ArrayList<Integer> types = providers.second;
@@ -385,7 +385,8 @@ public class OwlgramGeneralSettings extends BaseFragment {
                                         doNotTranslateCellValue = AndroidUtilities.capitalize(locale.getDisplayName());
                                     }
                                 }
-                            } catch (Exception ignored) {}
+                            } catch (Exception ignored) {
+                            }
                         } else if (langCodes.size() == 0) {
                             doNotTranslateCellValue = LocaleController.getString("EmptyExceptions", R.string.EmptyExceptions);
                         }
@@ -509,6 +510,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
             view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
             return new RecyclerListView.Holder(view);
         }
+
         @Override
         public int getItemViewType(int position) {
             if (position == divisorPrivacyRow || position == divisorTranslationRow || position == divisorDCIdRow ||
@@ -521,7 +523,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     position == confirmCallSwitchRow || position == notificationAccentRow || position == autoTranslateRow ||
                     position == keepMarkdownRow) {
                 return 3;
-            } else if ( position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow ||
+            } else if (position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow ||
                     position == translationStyle || position == doNotTranslateSelectRow || position == idTypeRow) {
                 return 4;
             } else if (position == hintTranslation1 || position == hintTranslation2 || position == hintIdRow) {

@@ -4,7 +4,7 @@ import java.util.NoSuchElementException;
 import java.util.function.Supplier;
 
 public class NoSuchGrammarException
-    extends NoSuchElementException {
+        extends NoSuchElementException {
 
     public NoSuchGrammarException(String grammarName) {
         super("No such grammar " + grammarName);

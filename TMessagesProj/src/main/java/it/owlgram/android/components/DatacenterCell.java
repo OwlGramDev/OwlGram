@@ -162,7 +162,7 @@ public class DatacenterCell extends LinearLayout {
 
         CardView tv2 = new CardView(context);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(AndroidUtilities.dp(100), AndroidUtilities.dp(14));
-        layoutParams.setMargins(0,AndroidUtilities.dp(10),0,0);
+        layoutParams.setMargins(0, AndroidUtilities.dp(10), 0, 0);
         tv2.setLayoutParams(layoutParams);
         tv2.setCardElevation(0);
         tv2.setRadius(AndroidUtilities.dp(3));

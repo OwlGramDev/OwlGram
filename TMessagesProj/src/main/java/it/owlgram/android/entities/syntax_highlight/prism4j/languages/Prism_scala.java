@@ -2,14 +2,13 @@ package it.owlgram.android.entities.syntax_highlight.prism4j.languages;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.compile;
-import static  it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.pattern;
-import static  it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.token;
+import static it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.pattern;
+import static it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.token;
 
 import androidx.annotation.NonNull;
 
-import  it.owlgram.android.entities.syntax_highlight.prism4j.GrammarUtils;
-import it.owlgram.android.entities.syntax_highlight.prism4j.NoSuchGrammarException;
-import  it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j;
+import it.owlgram.android.entities.syntax_highlight.prism4j.GrammarUtils;
+import it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j;
 
 public class Prism_scala {
 

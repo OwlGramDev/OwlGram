@@ -55,7 +55,8 @@ public class Translator {
             public void onSuccess(BaseTranslator.Result result) {
                 try {
                     progressDialog.dismiss();
-                } catch (Exception ignore) {}
+                } catch (Exception ignore) {
+                }
                 TextView messageTextView = new TextView(context);
                 messageTextView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack, resourcesProvider));
                 messageTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
@@ -130,7 +131,7 @@ public class Translator {
     }
 
     public static void showTranslationTargetSelector(Context context, Runnable callback, Theme.ResourcesProvider resourcesProvider) {
-        showTranslationTargetSelector(context, false,  callback, resourcesProvider);
+        showTranslationTargetSelector(context, false, callback, resourcesProvider);
     }
 
     public static void showTranslationTargetSelector(Context context, boolean isKeyboard, Runnable callback, Theme.ResourcesProvider resourcesProvider) {
@@ -150,7 +151,7 @@ public class Translator {
         targetLanguages.add(0, "app");
         names.add(0, LocaleController.getString("Default", R.string.Default));
 
-        PopupHelper.show(names, LocaleController.getString("TranslationLanguage", R.string.TranslationLanguage), targetLanguages.indexOf(isKeyboard ? OwlConfig.translationKeyboardTarget:OwlConfig.translationTarget), context, i -> {
+        PopupHelper.show(names, LocaleController.getString("TranslationLanguage", R.string.TranslationLanguage), targetLanguages.indexOf(isKeyboard ? OwlConfig.translationKeyboardTarget : OwlConfig.translationTarget), context, i -> {
             if (isKeyboard) {
                 OwlConfig.setTranslationKeyboardTarget(targetLanguages.get(i));
             } else {
@@ -230,7 +231,7 @@ public class Translator {
 
     public static void translate(Object query, boolean isKeyboard, TranslateCallBack translateCallBack) {
         BaseTranslator translator = getCurrentTranslator();
-        String language = isKeyboard ? translator.getCurrentTargetKeyboardLanguage():translator.getCurrentTargetLanguage();
+        String language = isKeyboard ? translator.getCurrentTargetKeyboardLanguage() : translator.getCurrentTargetLanguage();
         if (!translator.supportLanguage(language)) {
             translateCallBack.onError(new UnsupportedTargetLanguageException());
         } else {
@@ -243,7 +244,6 @@ public class Translator {
 
         void onError(Exception e);
     }
-
 
 
     private static class UnsupportedTargetLanguageException extends IllegalArgumentException {

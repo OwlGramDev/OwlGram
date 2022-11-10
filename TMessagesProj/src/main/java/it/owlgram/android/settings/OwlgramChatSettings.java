@@ -41,8 +41,8 @@ import it.owlgram.android.OwlConfig;
 import it.owlgram.android.camera.CameraXUtilities;
 import it.owlgram.android.components.CameraTypeSelector;
 import it.owlgram.android.components.StickerSizeCell;
-import it.owlgram.android.helpers.AudioEnhance;
 import it.owlgram.android.entities.EntitiesHelper;
+import it.owlgram.android.helpers.AudioEnhance;
 import it.owlgram.android.helpers.PopupHelper;
 
 public class OwlgramChatSettings extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
@@ -458,7 +458,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                         Spannable htmlParsed;
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             htmlParsed = new SpannableString(Html.fromHtml(advise, Html.FROM_HTML_MODE_LEGACY));
-                        }else{
+                        } else {
                             htmlParsed = new SpannableString(Html.fromHtml(advise));
                         }
                         textInfoPrivacyCell.setText(EntitiesHelper.getUrlNoUnderlineText(htmlParsed));
@@ -572,7 +572,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
 
         @Override
         public int getItemViewType(int position) {
-            if(position == chatDividerRow || position == foldersDividerRow || position == audioVideoDividerRow ||
+            if (position == chatDividerRow || position == foldersDividerRow || position == audioVideoDividerRow ||
                     position == stickerSizeDividerRow) {
                 return 1;
             } else if (position == chatHeaderRow || position == foldersHeaderRow || position == audioVideoHeaderRow ||

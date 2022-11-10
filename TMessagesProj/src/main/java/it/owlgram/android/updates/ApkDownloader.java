@@ -33,19 +33,21 @@ public class ApkDownloader {
         try {
             PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
             code = pInfo.versionCode / 10;
-        } catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
         boolean isCorrupted = true;
         try {
             String data = OwlConfig.updateData;
             if (data.length() > 0) {
                 UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(new JSONObject(data));
-                if(update.file_size == apkFile().length()) {
+                if (update.file_size == apkFile().length()) {
                     isCorrupted = false;
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         boolean isAvailableFile = apkFile().exists() && downloadThread == null && !isCorrupted;
-        if((code >= OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
+        if ((code >= OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
             OwlConfig.setUpdateData("");
             return false;
         }
@@ -53,7 +55,7 @@ public class ApkDownloader {
     }
 
     public static File apkFile() {
-        return new File(AndroidUtilities.getCacheDir().getAbsolutePath()+"/update.apk");
+        return new File(AndroidUtilities.getCacheDir().getAbsolutePath() + "/update.apk");
     }
 
     public static void installUpdate(Activity activity) {
@@ -62,9 +64,9 @@ public class ApkDownloader {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void downloadAPK(Context context, String link, int version) {
-        if(downloadThread != null) return;
+        if (downloadThread != null) return;
         File output = apkFile();
-        if(output.exists())
+        if (output.exists())
             output.delete();
         OwlConfig.saveOldVersion(version);
         downloadThread = new DownloadThread(context, output);
@@ -72,7 +74,7 @@ public class ApkDownloader {
     }
 
     public static void cancel() {
-        if(downloadThread != null){
+        if (downloadThread != null) {
             downloadThread.cancel();
         }
     }
@@ -94,21 +96,21 @@ public class ApkDownloader {
     }
 
     public static long downloadedBytes() {
-        if(downloadThread != null){
+        if (downloadThread != null) {
             return downloadThread.total;
         }
         return 0;
     }
 
     public static long totalBytes() {
-        if(downloadThread != null){
+        if (downloadThread != null) {
             return downloadThread.fileLength;
         }
         return 0;
     }
 
     public static int percentage() {
-        if(downloadThread != null){
+        if (downloadThread != null) {
             return downloadThread.percentage;
         }
         return 0;
@@ -150,7 +152,7 @@ public class ApkDownloader {
                         }
                         fileLength = connection.getContentLength();
                         input = connection.getInputStream();
-                        output = new FileOutputStream(mTargetFile,false);
+                        output = new FileOutputStream(mTargetFile, false);
 
                         byte[] data = new byte[4096];
                         total = 0;
@@ -195,13 +197,13 @@ public class ApkDownloader {
 
         private void onProgressUpdate(int percentage, long downBytes, long totBytes) {
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoadProgressChanged);
-            if(updateManager != null) {
+            if (updateManager != null) {
                 updateManager.onProgressChange(percentage, downBytes, totBytes);
             }
-            if(updateMainManager != null) {
+            if (updateMainManager != null) {
                 updateMainManager.onProgressChange(percentage, downBytes, totBytes);
             }
-            if(updateDialogsManager != null) {
+            if (updateDialogsManager != null) {
                 updateDialogsManager.onProgressChange(percentage, downBytes, totBytes);
             }
         }
@@ -210,14 +212,14 @@ public class ApkDownloader {
             PowerManager pm = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     getClass().getName());
-            mWakeLock.acquire(10*60*1000L);
-            if(updateManager != null) {
+            mWakeLock.acquire(10 * 60 * 1000L);
+            if (updateManager != null) {
                 updateManager.onPreStart();
             }
-            if(updateMainManager != null) {
+            if (updateMainManager != null) {
                 updateMainManager.onPreStart();
             }
-            if(updateDialogsManager != null) {
+            if (updateDialogsManager != null) {
                 updateDialogsManager.onPreStart();
             }
         }
@@ -228,13 +230,13 @@ public class ApkDownloader {
                 deleteUpdate();
             }
             downloadThread = null;
-            if(updateManager != null) {
+            if (updateManager != null) {
                 updateManager.onFinished();
             }
-            if(updateMainManager != null) {
+            if (updateMainManager != null) {
                 updateMainManager.onFinished();
             }
-            if(updateDialogsManager != null) {
+            if (updateDialogsManager != null) {
                 updateDialogsManager.onFinished();
             }
         }
@@ -243,14 +245,16 @@ public class ApkDownloader {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void deleteUpdate() {
         File file = apkFile();
-        if(file.exists())
+        if (file.exists())
             file.delete();
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoadFailed);
     }
 
     public interface UpdateListener {
         void onPreStart();
+
         void onProgressChange(int percentage, long downBytes, long totBytes);
+
         void onFinished();
     }
 }

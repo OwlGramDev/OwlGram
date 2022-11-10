@@ -30,7 +30,7 @@ public class AccountSelectList extends ScrollView {
                     }
                 };
                 item.setAccount(a);
-                linearLayout.addView(item, UserConfig.selectedAccount == a ? 0:-1);
+                linearLayout.addView(item, UserConfig.selectedAccount == a ? 0 : -1);
             }
         }
         for (int a = 0; a < linearLayout.getChildCount(); a++) {
@@ -44,5 +44,6 @@ public class AccountSelectList extends ScrollView {
         }
     }
 
-    public void onItemClick(long accountId) {}
+    public void onItemClick(long accountId) {
+    }
 }

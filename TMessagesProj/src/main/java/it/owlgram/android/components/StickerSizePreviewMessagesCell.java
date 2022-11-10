@@ -18,7 +18,6 @@ import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLRPC;
-import org.telegram.ui.ActionBar.ActionBarLayout;
 import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.ChatMessageCell;
@@ -108,7 +107,8 @@ public class StickerSizePreviewMessagesCell extends LinearLayout {
 
         for (int a = 0; a < cells.length; a++) {
             cells[a] = new ChatMessageCell(context);
-            cells[a].setDelegate(new ChatMessageCell.ChatMessageCellDelegate() {});
+            cells[a].setDelegate(new ChatMessageCell.ChatMessageCellDelegate() {
+            });
             cells[a].isChat = false;
             cells[a].setFullyDraw(true);
             cells[a].setMessageObject(messageObjects[a], null, false, false);

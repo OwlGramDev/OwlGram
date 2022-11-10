@@ -19,6 +19,7 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.tgnet.TLRPC;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -28,7 +29,6 @@ import it.owlgram.android.entities.HTMLKeeper;
 import it.owlgram.android.helpers.StandardHTTPRequest;
 
 public class UpdateManager {
-
 
 
     public static void isDownloadedUpdate(UpdateUICallback updateUICallback) {
@@ -57,7 +57,8 @@ public class UpdateManager {
                     if (!changelog_text.equals("null")) {
                         AndroidUtilities.runOnUIThread(() -> changelogCallback.onSuccess(HTMLKeeper.htmlToEntities(changelog_text, null, true)));
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }.start();
     }
@@ -112,13 +113,13 @@ public class UpdateManager {
                             abi = "universal";
                             break;
                     }
-                    String url = String.format(locale,"https://app.owlgram.org/version?lang=%s&beta=%s&abi=%s", locale.getLanguage(), betaMode,  URLEncoder.encode(abi, "utf-8"));
+                    String url = String.format(locale, "https://app.owlgram.org/version?lang=%s&beta=%s&abi=%s", locale.getLanguage(), betaMode, URLEncoder.encode(abi, StandardCharsets.UTF_8.toString()));
                     JSONObject obj = new JSONObject(new StandardHTTPRequest(url).request());
                     String update_status = obj.getString("status");
                     if (update_status.equals("no_updates")) {
                         AndroidUtilities.runOnUIThread(() -> updateCallback.onSuccess(new UpdateNotAvailable()));
                     } else {
-                        int remoteVersion = BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE:(psVersionCode <= 0 ? obj.getInt("version"):psVersionCode);
+                        int remoteVersion = BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE : (psVersionCode <= 0 ? obj.getInt("version") : psVersionCode);
                         if (remoteVersion > code) {
                             UpdateAvailable updateAvailable = loadUpdate(obj);
                             AndroidUtilities.runOnUIThread(() -> updateCallback.onSuccess(updateAvailable));
@@ -133,7 +134,8 @@ public class UpdateManager {
         }.start();
     }
 
-    public static class UpdateNotAvailable {}
+    public static class UpdateNotAvailable {
+    }
 
     public static class UpdateAvailable {
         public String title;
@@ -149,7 +151,7 @@ public class UpdateManager {
             this.desc = desc;
             this.note = note;
             this.banner = banner;
-            this.version = BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE:version;
+            this.version = BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE : version;
             this.link_file = link_file;
             this.file_size = file_size;
         }
@@ -181,7 +183,7 @@ public class UpdateManager {
         try {
             PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
             return (pInfo.versionCode / 10);
-        } catch (Exception e){
+        } catch (Exception e) {
             return 0;
         }
     }

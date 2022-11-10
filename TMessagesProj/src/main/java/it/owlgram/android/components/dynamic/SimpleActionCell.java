@@ -17,13 +17,17 @@ public class SimpleActionCell extends LinearLayout {
         super(context);
     }
 
-    public ThemeInfo getTheme() {return null;}
+    public ThemeInfo getTheme() {
+        return null;
+    }
 
-    public void updateColors() {}
+    public void updateColors() {
+    }
 
     public static class ThemeInfo {
         public final int radius;
         public final boolean withBackground;
+
         public ThemeInfo(boolean withBackground, int radius) {
             this.withBackground = withBackground;
             this.radius = radius;
@@ -49,12 +53,13 @@ public class SimpleActionCell extends LinearLayout {
                 if (Math.round(contrast) <= 112) { // 112 IS CONTRAST OF 0.07f ALPHA
                     break;
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         return alphaColor;
     }
 
     public static int getBackColor() {
-        return ColorUtils.calculateLuminance(Theme.getColor(Theme.key_windowBackgroundWhite)) > 0.5f ? 0xFF000000:0xFFFFFFFF;
+        return ColorUtils.calculateLuminance(Theme.getColor(Theme.key_windowBackgroundWhite)) > 0.5f ? 0xFF000000 : 0xFFFFFFFF;
     }
 }

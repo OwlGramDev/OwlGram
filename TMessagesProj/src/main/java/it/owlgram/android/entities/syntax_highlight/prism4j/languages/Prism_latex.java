@@ -3,15 +3,15 @@ package it.owlgram.android.entities.syntax_highlight.prism4j.languages;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.MULTILINE;
 import static java.util.regex.Pattern.compile;
-import static  it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.grammar;
-import static  it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.pattern;
-import static  it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.token;
+import static it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.grammar;
+import static it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.pattern;
+import static it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.token;
 
 import androidx.annotation.NonNull;
 
 import java.util.regex.Pattern;
 
-import  it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j;
+import it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j;
 
 public class Prism_latex {
 
@@ -27,8 +27,8 @@ public class Prism_latex {
         return grammar("latex",
                 token("comment", pattern(compile("%.*", MULTILINE))),
                 token("cdata", pattern(
-                        compile("(\\\\begin\\{((?:verbatim|lstlisting)\\*?)\\})[\\s\\S]*?(?=\\\\end\\{\\2\\})"),
-                        true
+                                compile("(\\\\begin\\{((?:verbatim|lstlisting)\\*?)\\})[\\s\\S]*?(?=\\\\end\\{\\2\\})"),
+                                true
                         )
                 ),
                 token("equation",

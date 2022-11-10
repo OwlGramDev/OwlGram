@@ -61,7 +61,7 @@ public class UpdateCheckCell extends RelativeLayout {
         layoutTransition.enableTransitionType(LayoutTransition.CHANGING);
         layoutTransition.setDuration(LayoutTransition.CHANGING, 100);
         layoutRight.setLayoutTransition(layoutTransition);
-        layoutRight.setGravity(LocaleController.isRTL ? Gravity.LEFT:Gravity.RIGHT);
+        layoutRight.setGravity(LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT);
 
         checkUpdateButton = new TextView(context);
         checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
@@ -83,8 +83,8 @@ public class UpdateCheckCell extends RelativeLayout {
         checkUpdateButton.setPadding(AndroidUtilities.dp(14), 0, AndroidUtilities.dp(14), 0);
         layoutRight.addView(checkUpdateButton, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 32));
 
-        addView(layout, LayoutHelper.createRelative(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 0, LocaleController.isRTL ? RelativeLayout.ALIGN_PARENT_RIGHT:RelativeLayout.ALIGN_PARENT_LEFT));
-        addView(layoutRight, LayoutHelper.createRelative(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, LocaleController.isRTL ? 22:0, 0, LocaleController.isRTL ? 0:22,0,RelativeLayout.CENTER_VERTICAL | (LocaleController.isRTL ? RelativeLayout.ALIGN_PARENT_LEFT:RelativeLayout.ALIGN_PARENT_RIGHT)));
+        addView(layout, LayoutHelper.createRelative(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 0, 0, 0, LocaleController.isRTL ? RelativeLayout.ALIGN_PARENT_RIGHT : RelativeLayout.ALIGN_PARENT_LEFT));
+        addView(layoutRight, LayoutHelper.createRelative(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, LocaleController.isRTL ? 22 : 0, 0, LocaleController.isRTL ? 0 : 22, 0, RelativeLayout.CENTER_VERTICAL | (LocaleController.isRTL ? RelativeLayout.ALIGN_PARENT_LEFT : RelativeLayout.ALIGN_PARENT_RIGHT)));
     }
 
     @Override
@@ -115,7 +115,7 @@ public class UpdateCheckCell extends RelativeLayout {
 
     private void setTime(long date) {
         String dateString;
-        if (date != 0){
+        if (date != 0) {
             dateString = LocaleController.formatString("formatDateAtTime", R.string.formatDateAtTime, LocaleController.getInstance().formatterYear.format(new Date(date)), LocaleController.getInstance().formatterDay.format(new Date(date)));
         } else {
             dateString = LocaleController.getString("LastCheckNever", R.string.LastCheckNever);
@@ -146,15 +146,15 @@ public class UpdateCheckCell extends RelativeLayout {
 
     public void setCanCheckForUpdate(boolean canCheckForUpdate) {
         this.canCheckForUpdate = canCheckForUpdate;
-        checkUpdateButton.setAlpha(canCheckForUpdate ? 1.0f:0.5f);
-        titleTextView.setAlpha(canCheckForUpdate ? 1.0f:0.5f);
-        valueTextView.setAlpha(canCheckForUpdate ? 1.0f:0.5f);
+        checkUpdateButton.setAlpha(canCheckForUpdate ? 1.0f : 0.5f);
+        titleTextView.setAlpha(canCheckForUpdate ? 1.0f : 0.5f);
+        valueTextView.setAlpha(canCheckForUpdate ? 1.0f : 0.5f);
     }
 
     public void loadLastStatus() {
         switch (OwlConfig.lastUpdateStatus) {
             case 1:
-                if(OwlConfig.updateData.length() > 0){
+                if (OwlConfig.updateData.length() > 0) {
                     setUpdateAvailableStatus();
                 } else {
                     setCheckTime();
@@ -169,5 +169,6 @@ public class UpdateCheckCell extends RelativeLayout {
         }
     }
 
-    protected void onCheckUpdate() {}
+    protected void onCheckUpdate() {
+    }
 }

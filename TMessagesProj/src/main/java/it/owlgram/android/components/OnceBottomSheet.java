@@ -2,7 +2,6 @@ package it.owlgram.android.components;
 
 import android.content.Context;
 
-import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.BottomSheet;
 
 public class OnceBottomSheet extends BottomSheet {

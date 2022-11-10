@@ -154,6 +154,7 @@ public class EntitiesHelper {
         public final TextStyleSpan textStyleSpan;
         public final int start;
         public final int end;
+
         public RawSpannableInfo(TextStyleSpan textStyleSpan, int start, int end) {
             this.textStyleSpan = textStyleSpan;
             this.start = start;
@@ -173,7 +174,7 @@ public class EntitiesHelper {
                 if (urlSpan.getURL() != null) {
                     if (urlSpan.getURL().startsWith("tg://user?id=")) {
                         String id = urlSpan.getURL().replace("tg://user?id=", "");
-                        result = new URLSpanUserMention(id,1);
+                        result = new URLSpanUserMention(id, 1);
                     } else {
                         result = new URLSpanReplacement(urlSpan.getURL());
                     }
@@ -218,7 +219,7 @@ public class EntitiesHelper {
                 TextStyleSpan.TextStyleRun run = new TextStyleSpan.TextStyleRun();
                 run.flags |= TextStyleSpan.FLAG_STYLE_STRIKE;
                 result = new TextStyleSpan(run);
-            } else if ((mSpan instanceof ForegroundColorSpan && ((ForegroundColorSpan)mSpan).getForegroundColor() == Theme.getColor(Theme.key_chat_messagePanelText)) || mSpan instanceof BackgroundColorSpan) {
+            } else if ((mSpan instanceof ForegroundColorSpan && ((ForegroundColorSpan) mSpan).getForegroundColor() == Theme.getColor(Theme.key_chat_messagePanelText)) || mSpan instanceof BackgroundColorSpan) {
                 if (mSpan instanceof BackgroundColorSpan) {
                     ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Theme.getColor(Theme.key_chat_messagePanelText));
                     outputSpannable.removeSpan(mSpan);
@@ -319,7 +320,7 @@ public class EntitiesHelper {
         applyTelegramSpannable(messSpan, (Editable) getSpannableString(text.toString(), entities), text.length());
         Prism4j grammarCheck = new Prism4j(new Prism4jGrammarLocator());
         TextStyleSpan[] result = messSpan.getSpans(0, messSpan.length(), TextStyleSpan.class);
-        for (TextStyleSpan span:result) {
+        for (TextStyleSpan span : result) {
             if (span.isMono()) {
                 CharSequence language = extractLanguage(messSpan.subSequence(messSpan.getSpanStart(span), messSpan.getSpanEnd(span)));
                 String fixedLanguage = AndroidUtilities.getTrimmedString(language).toString().toLowerCase();
@@ -346,7 +347,7 @@ public class EntitiesHelper {
         return message[0];
     }
 
-    public static boolean isEmoji(String message){
+    public static boolean isEmoji(String message) {
         return Emoji.fullyConsistsOfEmojis(message);
     }
 }

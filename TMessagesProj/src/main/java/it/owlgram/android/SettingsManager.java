@@ -257,7 +257,7 @@ public class SettingsManager {
                         }
                     }
                 }
-                for (Iterator<String> data = jsonObject.keys(); data.hasNext();) {
+                for (Iterator<String> data = jsonObject.keys(); data.hasNext(); ) {
                     String key = data.next();
                     boolean foundValid = false;
                     for (Field field : fields) {
@@ -422,7 +422,7 @@ public class SettingsManager {
             if (!isRestore) {
                 internalResetSettings();
             }
-            for (Iterator<String> data = jsonObject.keys(); data.hasNext();) {
+            for (Iterator<String> data = jsonObject.keys(); data.hasNext(); ) {
                 String key = data.next();
                 if (isNotDeprecatedConfig(key) && (isRestore || isBackupAvailable(key))) {
                     SharedPreferences.Editor editor = preferences.edit();

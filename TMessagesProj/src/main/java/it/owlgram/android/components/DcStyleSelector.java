@@ -38,7 +38,7 @@ public class DcStyleSelector extends LinearLayout {
         pickerDividersPaint.setStrokeCap(Paint.Cap.ROUND);
         pickerDividersPaint.setStrokeWidth(AndroidUtilities.dp(2));
         int colorIcon = Theme.getColor(Theme.key_switchTrack);
-        int color = AndroidUtilities.getTransparentColor(colorIcon,0.5f);
+        int color = AndroidUtilities.getTransparentColor(colorIcon, 0.5f);
         ImageView imageView = new ImageView(context) {
             @Override
             @SuppressLint("DrawAllocation")
@@ -129,11 +129,11 @@ public class DcStyleSelector extends LinearLayout {
 
         canvas.save();
         if (OwlConfig.dcStyleType == 0) {
-            canvas.rotate(-rotation,maxW >> 1,maxH >> 1);
+            canvas.rotate(-rotation, maxW >> 1, maxH >> 1);
             Path clipPath = new Path();
             clipPath.addRect(0, 0, maxW, (strokeWidth * 2) + (maxH >> 1), Path.Direction.CW);
             canvas.clipPath(clipPath, Region.Op.DIFFERENCE);
-            canvas.rotate(rotation,maxW >> 1,maxH >> 1);
+            canvas.rotate(rotation, maxW >> 1, maxH >> 1);
         }
 
         if (OwlConfig.dcStyleType == 1 || OwlConfig.dcStyleType == 0) {
@@ -153,11 +153,11 @@ public class DcStyleSelector extends LinearLayout {
         canvas.save();
         if (OwlConfig.dcStyleType == 0) {
             canvas.drawLine(x, y + h, x + w, y, p2);
-            canvas.rotate(-rotation,maxW >> 1,maxH >> 1);
+            canvas.rotate(-rotation, maxW >> 1, maxH >> 1);
             Path clipPath = new Path();
             clipPath.addRect(0, (maxH >> 1) - (strokeWidth * 2), maxW, maxH, Path.Direction.CW);
             canvas.clipPath(clipPath, Region.Op.DIFFERENCE);
-            canvas.rotate(rotation,maxW >> 1,maxH >> 1);
+            canvas.rotate(rotation, maxW >> 1, maxH >> 1);
         }
         if (OwlConfig.dcStyleType == 2 || OwlConfig.dcStyleType == 0) {
             int iconHeight = (h * 75) / 100;
@@ -206,5 +206,6 @@ public class DcStyleSelector extends LinearLayout {
         canvas.drawLine(AndroidUtilities.dp(8), getMeasuredHeight() - 1, getMeasuredWidth() - AndroidUtilities.dp(8), getMeasuredHeight() - 1, Theme.dividerPaint);
     }
 
-    protected void onSelectedStyle() {}
+    protected void onSelectedStyle() {
+    }
 }

@@ -2,20 +2,18 @@ package it.owlgram.android.entities.syntax_highlight.prism4j.languages;
 
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.regex.Pattern.compile;
-import static  it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.grammar;
-import static  it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.pattern;
-import static  it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.token;
+import static it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.grammar;
+import static it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.pattern;
+import static it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j.token;
 
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import  it.owlgram.android.entities.syntax_highlight.prism4j.GrammarUtils;
-import it.owlgram.android.entities.syntax_highlight.prism4j.NoSuchGrammarException;
-import  it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j;
+import it.owlgram.android.entities.syntax_highlight.prism4j.GrammarUtils;
+import it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j;
 
 public class Prism_javascript {
 
@@ -23,12 +21,12 @@ public class Prism_javascript {
     public static Prism4j.Grammar create(@NonNull Prism4j prism4j) {
 
         final Prism4j.Grammar js = GrammarUtils.extend(
-            GrammarUtils.require(prism4j, "clike"),
-            "javascript",
-            token("keyword", pattern(compile("\\b(?:as|async|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|get|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|set|static|super|switch|this|throw|try|typeof|var|void|while|with|yield)\\b"))),
-            token("number", pattern(compile("\\b(?:0[xX][\\dA-Fa-f]+|0[bB][01]+|0[oO][0-7]+|NaN|Infinity)\\b|(?:\\b\\d+\\.?\\d*|\\B\\.\\d+)(?:[Ee][+-]?\\d+)?"))),
-            token("function", pattern(compile("[_$a-z\\xA0-\\uFFFF][$\\w\\xA0-\\uFFFF]*(?=\\s*\\()", CASE_INSENSITIVE))),
-            token("operator", pattern(compile("-[-=]?|\\+[+=]?|!=?=?|<<?=?|>>?>?=?|=(?:==?|>)?|&[&=]?|\\|[|=]?|\\*\\*?=?|\\/=?|~|\\^=?|%=?|\\?|\\.{3}")))
+                GrammarUtils.require(prism4j, "clike"),
+                "javascript",
+                token("keyword", pattern(compile("\\b(?:as|async|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|get|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|set|static|super|switch|this|throw|try|typeof|var|void|while|with|yield)\\b"))),
+                token("number", pattern(compile("\\b(?:0[xX][\\dA-Fa-f]+|0[bB][01]+|0[oO][0-7]+|NaN|Infinity)\\b|(?:\\b\\d+\\.?\\d*|\\B\\.\\d+)(?:[Ee][+-]?\\d+)?"))),
+                token("function", pattern(compile("[_$a-z\\xA0-\\uFFFF][$\\w\\xA0-\\uFFFF]*(?=\\s*\\()", CASE_INSENSITIVE))),
+                token("operator", pattern(compile("-[-=]?|\\+[+=]?|!=?=?|<<?=?|>>?>?=?|=(?:==?|>)?|&[&=]?|\\|[|=]?|\\*\\*?=?|\\/=?|~|\\^=?|%=?|\\?|\\.{3}")))
         );
 
         GrammarUtils.insertBeforeToken(js, "keyword",

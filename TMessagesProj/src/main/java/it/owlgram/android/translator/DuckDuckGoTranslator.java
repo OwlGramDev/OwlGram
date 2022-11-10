@@ -2,14 +2,13 @@ package it.owlgram.android.translator;
 
 import android.text.TextUtils;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,10 +55,10 @@ public class DuckDuckGoTranslator extends BaseTranslator {
         String uidRaw = responseAuth.substring(start + "vqd=".length(), end);
         Pattern p = Pattern.compile("[0-9-]+");
         Matcher m = p.matcher(uidRaw);
-        if(m.find()) {
+        if (m.find()) {
             String uid = m.group(0);
             String url = "https://duckduckgo.com/translation.js?" +
-                    "vqd=" + URLEncoder.encode(uid, "UTF-8") +
+                    "vqd=" + URLEncoder.encode(uid, StandardCharsets.UTF_8.toString()) +
                     "&query=translate" +
                     "&to=" + tl;
             for (String block : blocks) {

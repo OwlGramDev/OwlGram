@@ -46,7 +46,7 @@ public class TranslatorHelper {
             String src_lang = result.sourceLanguage.toUpperCase();
             String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage().toUpperCase();
             if (result.translation instanceof String) {
-                if(messageObject.originalEntities != null){
+                if (messageObject.originalEntities != null) {
                     Pair<String, ArrayList<TLRPC.MessageEntity>> entitiesResult = HTMLKeeper.htmlToEntities((String) result.translation, messageObject.originalEntities, !isSupportHTMLMode());
                     if (autoTranslate && (entitiesResult.first.equalsIgnoreCase(messageObject.originalMessage.toString()) || DoNotTranslateSettings.getRestrictedLanguages().contains(src_lang.toLowerCase()))) {
                         messageObject.translating = false;
@@ -79,7 +79,7 @@ public class TranslatorHelper {
             messageObject.translatedLanguage = null;
         }
         if (fragment != null) {
-            AndroidUtilities.runOnUIThread(() ->  fragment.getMessageHelper().resetMessageContent(dialog_id, messageObject, messageObject.translated, messageObject.canceledTranslation));
+            AndroidUtilities.runOnUIThread(() -> fragment.getMessageHelper().resetMessageContent(dialog_id, messageObject, messageObject.translated, messageObject.canceledTranslation));
         }
         return messageObject;
     }
@@ -92,10 +92,10 @@ public class TranslatorHelper {
         if (messageObject.originalMessage instanceof String) {
             messageObject.messageOwner.message = (String) messageObject.originalMessage;
             messageObject.messageText = messageObject.messageOwner.message;
-            if(messageObject.originalEntities != null){
+            if (messageObject.originalEntities != null) {
                 messageObject.messageOwner.entities = new ArrayList<>(messageObject.originalEntities);
             }
-            if(messageObject.originalReplyMarkupRows != null){
+            if (messageObject.originalReplyMarkupRows != null) {
                 messageObject.originalReplyMarkupRows.applyTextToKeyboard(messageObject.messageOwner.reply_markup.rows);
             }
         } else if (messageObject.originalMessage instanceof TLRPC.TL_poll) {
@@ -140,7 +140,7 @@ public class TranslatorHelper {
         }
 
         public TranslatorContext(MessageObject messageObject) {
-            UID = messageObject.getChatId()+"_"+messageObject.getId();
+            UID = messageObject.getChatId() + "_" + messageObject.getId();
             BaseTranslator.AdditionalObjectTranslation additionalObjectTranslation = new BaseTranslator.AdditionalObjectTranslation();
             additionalObjectTranslation.translation = messageObject.type == MessageObject.TYPE_POLL ? ((TLRPC.TL_messageMediaPoll) messageObject.messageOwner.media).poll : messageObject.messageOwner.message;
             messageObject.originalMessage = additionalObjectTranslation.translation;
@@ -148,7 +148,7 @@ public class TranslatorHelper {
                 messageObject.originalReplyMarkupRows = new MessageHelper.ReplyMarkupButtonsTexts(messageObject.messageOwner.reply_markup.rows);
                 additionalObjectTranslation.additionalInfo = new MessageHelper.ReplyMarkupButtonsTexts(messageObject.messageOwner.reply_markup.rows);
             }
-            if(messageObject.messageOwner.entities != null && additionalObjectTranslation.translation instanceof String && isSupportedProvider()){
+            if (messageObject.messageOwner.entities != null && additionalObjectTranslation.translation instanceof String && isSupportedProvider()) {
                 messageObject.originalEntities = messageObject.messageOwner.entities;
                 if (isSupportHTMLMode() && OwlConfig.keepTranslationMarkdown) {
                     additionalObjectTranslation.translation = HTMLKeeper.entitiesToHtml((String) additionalObjectTranslation.translation, messageObject.originalEntities, false);
@@ -160,7 +160,9 @@ public class TranslatorHelper {
 
     public interface TranslateCallback {
         void onTranslate(BaseTranslator.Result result);
+
         void onPreTranslate();
+
         void onError(Exception error);
     }
 }

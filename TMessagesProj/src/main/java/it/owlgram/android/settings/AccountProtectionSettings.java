@@ -83,62 +83,63 @@ public class AccountProtectionSettings extends BaseFragment {
         listView.setVerticalScrollBarEnabled(false);
         listView.setAdapter(listAdapter);
         listView.setOnItemClickListener((view, position) -> {
-           if (position == disableAccountProtectionRow) {
-               AlertDialog alertDialog = new AlertDialog.Builder(getParentActivity())
-                       .setTitle(LocaleController.getString("DisableAccountProtection", R.string.DisableAccountProtection))
-                       .setMessage(LocaleController.getString("DisableAccountProtectionAlert", R.string.DisableAccountProtectionAlert))
-                       .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
-                       .setPositiveButton(LocaleController.getString(R.string.DisablePasscodeTurnOff), (dialog, which) -> {
-                           PasscodeHelper.disableAccountProtection();
-                           NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetPasscode);
-                           NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.mainUserInfoChanged);
-                           finishFragment();
-                       }).create();
-               alertDialog.show();
-               ((TextView)alertDialog.getButton(Dialog.BUTTON_POSITIVE)).setTextColor(Theme.getColor(Theme.key_dialogTextRed));
-           } else if (position >= accountsStartRow && position < accountsEndRow) {
-               TLRPC.User user = accounts.get(position - accountsStartRow);
-               if (PasscodeHelper.isProtectedAccount(user.id)) {
-                   final ArrayList<String> items = new ArrayList<>();
-                   final ArrayList<Integer> icons = new ArrayList<>();
-                   final ArrayList<Integer> actions = new ArrayList<>();
+            if (position == disableAccountProtectionRow) {
+                AlertDialog alertDialog = new AlertDialog.Builder(getParentActivity())
+                        .setTitle(LocaleController.getString("DisableAccountProtection", R.string.DisableAccountProtection))
+                        .setMessage(LocaleController.getString("DisableAccountProtectionAlert", R.string.DisableAccountProtectionAlert))
+                        .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
+                        .setPositiveButton(LocaleController.getString(R.string.DisablePasscodeTurnOff), (dialog, which) -> {
+                            PasscodeHelper.disableAccountProtection();
+                            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetPasscode);
+                            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.mainUserInfoChanged);
+                            finishFragment();
+                        }).create();
+                alertDialog.show();
+                ((TextView) alertDialog.getButton(Dialog.BUTTON_POSITIVE)).setTextColor(Theme.getColor(Theme.key_dialogTextRed));
+            } else if (position >= accountsStartRow && position < accountsEndRow) {
+                TLRPC.User user = accounts.get(position - accountsStartRow);
+                if (PasscodeHelper.isProtectedAccount(user.id)) {
+                    final ArrayList<String> items = new ArrayList<>();
+                    final ArrayList<Integer> icons = new ArrayList<>();
+                    final ArrayList<Integer> actions = new ArrayList<>();
 
-                   items.add(LocaleController.getString("ChangePasscode", R.string.ChangePasscode));
-                   icons.add(R.drawable.edit_passcode);
-                   actions.add(0);
-                   items.add(LocaleController.getString("DisablePasscode", R.string.DisablePasscode));
-                   icons.add(R.drawable.msg_disable);
-                   actions.add(1);
+                    items.add(LocaleController.getString("ChangePasscode", R.string.ChangePasscode));
+                    icons.add(R.drawable.edit_passcode);
+                    actions.add(0);
+                    items.add(LocaleController.getString("DisablePasscode", R.string.DisablePasscode));
+                    icons.add(R.drawable.msg_disable);
+                    actions.add(1);
 
-                   AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-                   builder.setItems(items.toArray(new CharSequence[actions.size()]), AndroidUtilities.toIntArray(icons), (dialogInterface, i) -> {
-                       if (actions.get(i) == 0) {
-                           presentFragment(new PasscodeActivity(PasscodeActivity.TYPE_SETUP_CODE, user.id));
-                       } else if (actions.get(i) == 1) {
-                           AlertDialog alertDialog = new AlertDialog.Builder(getParentActivity())
-                                   .setTitle(LocaleController.getString("DisablePasscode", R.string.DisablePasscode))
-                                   .setMessage(LocaleController.getString("DisablePasscodeConfirmMessage", R.string.DisablePasscodeConfirmMessage))
-                                   .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
-                                   .setPositiveButton(LocaleController.getString(R.string.DisablePasscodeTurnOff), (dialog, which) -> {
-                                       PasscodeHelper.removePasscodeForAccount(user.id);
-                                       NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetPasscode);
-                                       NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.mainUserInfoChanged);
-                                       updateRowsId();
-                                       if (!PasscodeHelper.existAtLeastOnePasscode()) finishFragment();
-                                   }).create();
-                           alertDialog.show();
-                           ((TextView)alertDialog.getButton(Dialog.BUTTON_POSITIVE)).setTextColor(Theme.getColor(Theme.key_dialogTextRed));
-                       }
-                   });
-                   AlertDialog alertDialog = builder.create();
-                   showDialog(alertDialog);
-                   alertDialog.setItemColor(items.size() - 1, Theme.getColor(Theme.key_dialogTextRed2), Theme.getColor(Theme.key_dialogRedIcon));
-               } else {
-                   presentFragment(new PasscodeActivity(PasscodeActivity.TYPE_SETUP_CODE, user.id));
-               }
-           }
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+                    builder.setItems(items.toArray(new CharSequence[actions.size()]), AndroidUtilities.toIntArray(icons), (dialogInterface, i) -> {
+                        if (actions.get(i) == 0) {
+                            presentFragment(new PasscodeActivity(PasscodeActivity.TYPE_SETUP_CODE, user.id));
+                        } else if (actions.get(i) == 1) {
+                            AlertDialog alertDialog = new AlertDialog.Builder(getParentActivity())
+                                    .setTitle(LocaleController.getString("DisablePasscode", R.string.DisablePasscode))
+                                    .setMessage(LocaleController.getString("DisablePasscodeConfirmMessage", R.string.DisablePasscodeConfirmMessage))
+                                    .setNegativeButton(LocaleController.getString(R.string.Cancel), null)
+                                    .setPositiveButton(LocaleController.getString(R.string.DisablePasscodeTurnOff), (dialog, which) -> {
+                                        PasscodeHelper.removePasscodeForAccount(user.id);
+                                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetPasscode);
+                                        NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.mainUserInfoChanged);
+                                        updateRowsId();
+                                        if (!PasscodeHelper.existAtLeastOnePasscode())
+                                            finishFragment();
+                                    }).create();
+                            alertDialog.show();
+                            ((TextView) alertDialog.getButton(Dialog.BUTTON_POSITIVE)).setTextColor(Theme.getColor(Theme.key_dialogTextRed));
+                        }
+                    });
+                    AlertDialog alertDialog = builder.create();
+                    showDialog(alertDialog);
+                    alertDialog.setItemColor(items.size() - 1, Theme.getColor(Theme.key_dialogTextRed2), Theme.getColor(Theme.key_dialogRedIcon));
+                } else {
+                    presentFragment(new PasscodeActivity(PasscodeActivity.TYPE_SETUP_CODE, user.id));
+                }
+            }
         });
-        if(listView.getItemAnimator() != null){
+        if (listView.getItemAnimator() != null) {
             ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));

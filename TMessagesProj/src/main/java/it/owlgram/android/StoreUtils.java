@@ -1,7 +1,6 @@
 package it.owlgram.android;
 
 import org.telegram.messenger.ApplicationLoader;
-import org.telegram.messenger.BuildConfig;
 
 public class StoreUtils {
     public static boolean isDownloadedFromAnyStore() {

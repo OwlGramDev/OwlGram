@@ -2,7 +2,6 @@ package it.owlgram.android.settings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Parcelable;
 import android.transition.TransitionManager;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +80,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
         updateRowsId(true);
         return true;
     }
+
     @Override
     public View createView(Context context) {
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
@@ -106,7 +106,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
         listView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         listView.setVerticalScrollBarEnabled(false);
         listView.setAdapter(listAdapter);
-        if(listView.getItemAnimator() != null){
+        if (listView.getItemAnimator() != null) {
             ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
@@ -139,7 +139,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                 }
                 getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
                 listAdapter.notifyItemChanged(drawerRow, new Object());
-                if(OwlConfig.avatarBackgroundBlur) {
+                if (OwlConfig.avatarBackgroundBlur) {
                     listAdapter.notifyItemRangeInserted(drawerDividerRow, 3);
                 } else {
                     listAdapter.notifyItemRangeRemoved(drawerDividerRow, 3);
@@ -155,9 +155,9 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                 listAdapter.notifyItemChanged(drawerRow, new Object());
                 if (OwlConfig.avatarAsDrawerBackground) {
                     updateRowsId(false);
-                    listAdapter.notifyItemRangeInserted(showGradientRow, 4 + (OwlConfig.avatarBackgroundBlur ? 3:0));
+                    listAdapter.notifyItemRangeInserted(showGradientRow, 4 + (OwlConfig.avatarBackgroundBlur ? 3 : 0));
                 } else {
-                    listAdapter.notifyItemRangeRemoved(showGradientRow, 4 + (OwlConfig.avatarBackgroundBlur ? 3:0));
+                    listAdapter.notifyItemRangeRemoved(showGradientRow, 4 + (OwlConfig.avatarBackgroundBlur ? 3 : 0));
                     updateRowsId(false);
                 }
             } else if (position == menuItemsRow) {
@@ -487,16 +487,16 @@ public class OwlgramAppearanceSettings extends BaseFragment {
         @Override
         public int getItemViewType(int position) {
             if (position == drawerDividerRow || position == editBlurDividerRow || position == themeDrawerDividerRow ||
-                    position == dynamicDividerRow || position == fontsAndEmojiDividerRow || position == appearanceDividerRow){
+                    position == dynamicDividerRow || position == fontsAndEmojiDividerRow || position == appearanceDividerRow) {
                 return 1;
             } else if (position == editBlurHeaderRow || position == themeDrawerHeader || position == dynamicButtonHeaderRow ||
                     position == fontsAndEmojiHeaderRow || position == appearanceHeaderRow) {
                 return 2;
-            } else if ( position == roundedNumberSwitchRow || position == messageTimeSwitchRow ||
+            } else if (position == roundedNumberSwitchRow || position == messageTimeSwitchRow ||
                     position == useSystemFontRow || position == useSystemEmojiRow || position == drawerAvatarAsBackgroundRow ||
                     position == drawerDarkenBackgroundRow || position == drawerBlurBackgroundRow || position == showGradientRow ||
                     position == showAvatarRow || position == forcePacmanRow || position == smartButtonsRow ||
-                    position == appBarShadowRow|| position == showSantaHatRow || position == showFallingSnowRow ||
+                    position == appBarShadowRow || position == showSantaHatRow || position == showFallingSnowRow ||
                     position == slidingTitleRow || position == searchIconInActionBarRow || position == showNameInActionBarRow ||
                     position == showPencilIconRow) {
                 return 3;
@@ -508,7 +508,7 @@ public class OwlgramAppearanceSettings extends BaseFragment {
                 return 6;
             } else if (position == themeDrawerRow) {
                 return 7;
-            } else if (position  == dynamicButtonRow) {
+            } else if (position == dynamicButtonRow) {
                 return 8;
             }
             return 1;

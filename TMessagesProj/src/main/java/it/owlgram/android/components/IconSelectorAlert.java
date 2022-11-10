@@ -161,7 +161,7 @@ public class IconSelectorAlert extends BottomSheet {
                 LayoutHelper.MATCH_PARENT,
                 LayoutHelper.WRAP_CONTENT,
                 Gravity.FILL_HORIZONTAL | Gravity.TOP,
-                22, 22,22, 0
+                22, 22, 22, 0
         ));
 
         GridAdapter gridAdapter = new GridAdapter();
@@ -194,7 +194,8 @@ public class IconSelectorAlert extends BottomSheet {
         container.addView(shadow, frameLayoutParams);
     }
 
-    protected void onItemClick(String emoticon) {}
+    protected void onItemClick(String emoticon) {
+    }
 
     private static class GridAdapter extends RecyclerListView.SelectionAdapter {
         private final String[] icons = FolderIconHelper.folderIcons.keySet().toArray(new String[0]);

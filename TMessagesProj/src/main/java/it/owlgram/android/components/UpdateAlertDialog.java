@@ -89,13 +89,13 @@ public class UpdateAlertDialog extends BottomSheet {
 
         LinearLayout linearLayout2 = new LinearLayout(activity);
         RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams3.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75),0);
+        layoutParams3.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75), 0);
         linearLayout2.setLayoutParams(layoutParams3);
         linearLayout2.setOrientation(LinearLayout.VERTICAL);
 
         TextView updateTitle = new TextView(activity);
         LinearLayout.LayoutParams layoutParams4 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams4.setMargins(0, AndroidUtilities.dp(25), 0,0);
+        layoutParams4.setMargins(0, AndroidUtilities.dp(25), 0, 0);
         updateTitle.setLayoutParams(layoutParams4);
         updateTitle.setTextColor(colorText);
         updateTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 23);
@@ -104,7 +104,7 @@ public class UpdateAlertDialog extends BottomSheet {
 
         TextView descMessage = new TextView(activity);
         LinearLayout.LayoutParams layoutParams5 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams5.setMargins(0, AndroidUtilities.dp(10), 0,0);
+        layoutParams5.setMargins(0, AndroidUtilities.dp(10), 0, 0);
         descMessage.setLayoutParams(layoutParams5);
         descMessage.setTextColor(colorText);
         descMessage.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
@@ -117,7 +117,7 @@ public class UpdateAlertDialog extends BottomSheet {
 
         TextView note = new TextView(activity);
         LinearLayout.LayoutParams layoutParams6 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams6.setMargins(0, AndroidUtilities.dp(20), 0,0);
+        layoutParams6.setMargins(0, AndroidUtilities.dp(20), 0, 0);
         note.setLayoutParams(layoutParams6);
         note.setTextColor(colorText);
         note.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
@@ -125,7 +125,7 @@ public class UpdateAlertDialog extends BottomSheet {
         note.setMovementMethod(new AndroidUtilities.LinkMovementMethodMy());
         note.setGravity(Gravity.LEFT | Gravity.TOP);
         note.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
-        setTextEntities(note, "<b>"+ LocaleController.getString("UpdateNote", R.string.UpdateNote) + "</b> " + updateAvailable.note);
+        setTextEntities(note, "<b>" + LocaleController.getString("UpdateNote", R.string.UpdateNote) + "</b> " + updateAvailable.note);
         linearLayout2.addView(note);
 
         linearLayout.addView(linearLayout2);
@@ -133,14 +133,14 @@ public class UpdateAlertDialog extends BottomSheet {
         BottomSheetCell doneButton = new BottomSheetCell(activity, false);
         doneButton.setText(LocaleController.formatString("AppUpdateDownloadNow", R.string.AppUpdateDownloadNow), false);
         doneButton.background.setOnClickListener(v -> {
-            if(!StoreUtils.isDownloadedFromAnyStore()){
+            if (!StoreUtils.isDownloadedFromAnyStore()) {
                 ApkDownloader.downloadAPK(activity, updateAvailable.link_file, updateAvailable.version);
             } else if (StoreUtils.isFromPlayStore()) {
                 Browser.openUrl(getContext(), BuildVars.PLAYSTORE_APP_URL);
             }
             dismiss();
         });
-        linearLayout.addView(doneButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50, 0,AndroidUtilities.dp(8), 0, 0));
+        linearLayout.addView(doneButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50, 0, AndroidUtilities.dp(8), 0, 0));
 
         BottomSheetCell scheduleButton = new BottomSheetCell(activity, true);
         scheduleButton.setText(LocaleController.getString("AppUpdateRemindMeLater", R.string.AppUpdateRemindMeLater), false);
@@ -160,9 +160,9 @@ public class UpdateAlertDialog extends BottomSheet {
 
     private void setTextEntities(TextView tv, String text) {
         text = text.replace("\n", "<br>");
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             tv.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
-        }else{
+        } else {
             tv.setText(Html.fromHtml(text));
         }
     }

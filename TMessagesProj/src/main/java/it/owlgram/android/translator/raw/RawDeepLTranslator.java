@@ -31,7 +31,8 @@ public class RawDeepLTranslator {
     private static final Pattern iPattern = Pattern.compile("[i]");
     private static final String xInstance = UUID.randomUUID().toString();
 
-    public RawDeepLTranslator() {}
+    public RawDeepLTranslator() {
+    }
 
     public void setParams(int retry_429, int retry_timeout, long sleepTime_429) throws Exception {
         if (retry_429 >= 0 && retry_timeout >= 0) {
@@ -80,7 +81,8 @@ public class RawDeepLTranslator {
             int iCounter = 1;
 
             //noinspection StatementWithEmptyBody
-            for(Matcher iMatcher = iPattern.matcher(text); iMatcher.find(); ++iCounter) {}
+            for (Matcher iMatcher = iPattern.matcher(text); iMatcher.find(); ++iCounter) {
+            }
 
             params.put("timestamp", this.getTimestamp(iCounter));
             _body.put("jsonrpc", "2.0");
@@ -89,7 +91,7 @@ public class RawDeepLTranslator {
             _body.put("id", this.id.get());
             String body = (this.id.get() + 3L) % 13L != 0L && (this.id.get() + 5L) % 29L != 0L ? _body.toString().replace("hod\":\"", "hod\": \"") : _body.toString().replace("hod\":\"", "hod\" : \"");
             JSONObject result = (new JSONObject(Objects.requireNonNull(this.request(body)))).getJSONObject("result");
-            return new String[]{result.getString("lang"), ((JSONObject)result.getJSONArray("texts").get(0)).getString("text")};
+            return new String[]{result.getString("lang"), ((JSONObject) result.getJSONArray("texts").get(0)).getString("text")};
         }
     }
 
@@ -123,7 +125,7 @@ public class RawDeepLTranslator {
                     }
                 }
             }
-        } while(flag);
+        } while (flag);
 
         return null;
     }
@@ -131,7 +133,7 @@ public class RawDeepLTranslator {
     private String rawRequest(String body) throws IOException {
         boolean errorOccurred = false;
         URL downloadUrl = new URL("https://www2.deepl.com/jsonrpc");
-        HttpURLConnection httpConnection = (HttpURLConnection)downloadUrl.openConnection();
+        HttpURLConnection httpConnection = (HttpURLConnection) downloadUrl.openConnection();
         httpConnection.setConnectTimeout(10000);
         httpConnection.setRequestProperty("referer", "https://www.deepl.com/");
         httpConnection.setRequestProperty("x-instance", xInstance);
@@ -165,7 +167,7 @@ public class RawDeepLTranslator {
         if (!errorOccurred) {
             Map<String, List<String>> map = httpConnection.getHeaderFields();
             if (cookie == null) {
-                synchronized(this) {
+                synchronized (this) {
                     if (cookie == null) {
                         cookie = (Objects.requireNonNull(map.get("Set-Cookie"))).get(0);
                         cookie = cookie.substring(0, cookie.indexOf(";"));
@@ -176,7 +178,7 @@ public class RawDeepLTranslator {
 
         ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
         byte[] data = new byte['耀'];
-        while(true) {
+        while (true) {
             int read = httpConnectionStream.read(data);
             if (read <= 0) {
                 String result = outBuf.toString();
@@ -194,6 +196,6 @@ public class RawDeepLTranslator {
 
     private Long getTimestamp(int iNumber) {
         long now = System.currentTimeMillis();
-        return now + (long)iNumber - now % (long)iNumber;
+        return now + (long) iNumber - now % (long) iNumber;
     }
 }

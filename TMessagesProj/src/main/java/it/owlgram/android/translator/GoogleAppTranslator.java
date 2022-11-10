@@ -9,6 +9,7 @@ import org.telegram.messenger.FileLog;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +65,7 @@ public class GoogleAppTranslator extends BaseTranslator {
         String resultLang = "";
         for (String block : blocks) {
             String url = "https://translate.googleapis.com/translate_a/single?dj=1" +
-                    "&q=" + URLEncoder.encode(block, "UTF-8") +
+                    "&q=" + URLEncoder.encode(block, StandardCharsets.UTF_8.toString()) +
                     "&sl=auto" +
                     "&tl=" + tl +
                     "&ie=UTF-8&oe=UTF-8&client=at&dt=t&otf=2";

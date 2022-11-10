@@ -202,7 +202,7 @@ public class SelectLanguageSettings extends BaseFragment {
         ArrayList<CharSequence> namesTemp = new ArrayList<>();
         for (int i = 0; i < targetLanguages.size(); i++) {
             String[] languages = names.get(i).toString().split(" - ");
-            if ((languages.length > 2 ? languages[2]:languages[1]).toLowerCase().contains(filter) || languages[0].toLowerCase().contains(filter)) {
+            if ((languages.length > 2 ? languages[2] : languages[1]).toLowerCase().contains(filter) || languages[0].toLowerCase().contains(filter)) {
                 targetLanguagesTemp.add(targetLanguages.get(i));
                 namesTemp.add(names.get(i));
             }
@@ -231,7 +231,7 @@ public class SelectLanguageSettings extends BaseFragment {
                     String[] languages = names.get(position - languagesStartRow).toString().split(" - ");
                     boolean isSelectedLanguage = OwlConfig.translationTarget.equals(targetLanguages.get(position - languagesStartRow));
                     textRadioCell.setTextAndValueAndCheck(
-                            languages.length > 2 ? languages[2]:languages[1],
+                            languages.length > 2 ? languages[2] : languages[1],
                             languages[0],
                             isSelectedLanguage,
                             false,

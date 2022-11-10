@@ -63,7 +63,7 @@ public class ActionPanelCell extends LinearLayout {
         addView(shimmerFrameLayout);
     }
 
-    public void setLoaded(){
+    public void setLoaded() {
         mainLayout.setVisibility(VISIBLE);
         removeView(shimmerFrameLayout);
     }
@@ -77,7 +77,8 @@ public class ActionPanelCell extends LinearLayout {
         currId = -1;
     }
 
-    protected void onItemClick(int itemId) {}
+    protected void onItemClick(int itemId) {
+    }
 
     public LinearLayout getShimmerButton(Context context, int pos) {
         switch (OwlConfig.buttonStyleType) {
@@ -94,7 +95,7 @@ public class ActionPanelCell extends LinearLayout {
         }
     }
 
-    public SimpleActionCell getButton(Context context, String text, int iconId, String color){
+    public SimpleActionCell getButton(Context context, String text, int iconId, String color) {
         currId++;
         int myId = currId;
         switch (OwlConfig.buttonStyleType) {
@@ -144,30 +145,33 @@ public class ActionPanelCell extends LinearLayout {
     public RLottieDrawable getPhotoAnimationDrawable() {
         try {
             SimpleActionCell simpleActionCell = (SimpleActionCell) mainLayout.getChildAt(0);
-            if(simpleActionCell != null) {
+            if (simpleActionCell != null) {
                 return simpleActionCell.getAnimatedDrawable();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return null;
     }
 
     public RLottieImageView getPhotoImageView() {
         try {
             SimpleActionCell simpleActionCell = (SimpleActionCell) mainLayout.getChildAt(0);
-            if(simpleActionCell != null) {
+            if (simpleActionCell != null) {
                 return simpleActionCell.getLottieImageView();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return null;
     }
 
     public SimpleActionCell.ThemeInfo getTheme() {
         try {
             SimpleActionCell simpleActionCell = (SimpleActionCell) mainLayout.getChildAt(0);
-            if(simpleActionCell != null) {
+            if (simpleActionCell != null) {
                 return simpleActionCell.getTheme();
             }
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
         return null;
     }
 

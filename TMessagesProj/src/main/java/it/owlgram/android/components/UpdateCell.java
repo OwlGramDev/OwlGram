@@ -63,18 +63,18 @@ public class UpdateCell extends FrameLayout {
         ImageView iv1 = new ImageView(context);
         GradientDrawable gd = new GradientDrawable(
                 GradientDrawable.Orientation.BOTTOM_TOP,
-                new int[] {colorBackground, AndroidUtilities.getTransparentColor(colorBackground, 0)});
+                new int[]{colorBackground, AndroidUtilities.getTransparentColor(colorBackground, 0)});
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        layoutParams.setMargins(0, AndroidUtilities.dp(20),0,0);
+        layoutParams.setMargins(0, AndroidUtilities.dp(20), 0, 0);
         iv1.setLayoutParams(layoutParams);
         iv1.setBackground(gd);
         relativeLayoutBackground.addView(iv1);
         ImageView iv2 = new ImageView(context);
         GradientDrawable gd2 = new GradientDrawable(
                 GradientDrawable.Orientation.LEFT_RIGHT,
-                new int[] {colorBackground, AndroidUtilities.getTransparentColor(colorBackground, 0)});
+                new int[]{colorBackground, AndroidUtilities.getTransparentColor(colorBackground, 0)});
         RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        layoutParams2.setMargins(0, 0, AndroidUtilities.dp(20),0);
+        layoutParams2.setMargins(0, 0, AndroidUtilities.dp(20), 0);
         iv2.setLayoutParams(layoutParams2);
         iv2.setBackground(gd2);
         relativeLayoutBackground.addView(iv2);
@@ -85,20 +85,20 @@ public class UpdateCell extends FrameLayout {
 
         LinearLayout linearLayout = new LinearLayout(context);
         RelativeLayout.LayoutParams layoutParams3 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        layoutParams3.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75),0);
+        layoutParams3.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75), 0);
         linearLayout.setLayoutParams(layoutParams3);
         linearLayout.setOrientation(LinearLayout.VERTICAL);
 
         updateTitle = new TextView(context);
         LinearLayout.LayoutParams layoutParams4 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        layoutParams4.setMargins(0, AndroidUtilities.dp(25), 0,0);
+        layoutParams4.setMargins(0, AndroidUtilities.dp(25), 0, 0);
         updateTitle.setLayoutParams(layoutParams4);
         updateTitle.setTextColor(colorText);
         updateTitle.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 23);
 
         descMessage = new TextView(context);
         LinearLayout.LayoutParams layoutParams5 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        layoutParams5.setMargins(0, AndroidUtilities.dp(10), 0,0);
+        layoutParams5.setMargins(0, AndroidUtilities.dp(10), 0, 0);
         descMessage.setLayoutParams(layoutParams5);
         descMessage.setTextColor(colorText);
         descMessage.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
@@ -124,15 +124,15 @@ public class UpdateCell extends FrameLayout {
 
         downloadUpdate = new LinearLayout(context);
         RelativeLayout.LayoutParams layoutParams7 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        layoutParams7.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(25),0);
+        layoutParams7.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(25), 0);
         layoutParams7.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         downloadUpdate.setLayoutParams(layoutParams7);
-        downloadUpdate.setPadding(0,0, 0, AndroidUtilities.dp(20));
+        downloadUpdate.setPadding(0, 0, 0, AndroidUtilities.dp(20));
 
         TextView materialButton = new TextView(context);
         materialButton.setText(LocaleController.getString("DownloadUpdate", R.string.DownloadUpdate));
         LinearLayout.LayoutParams layoutParams10 = new LinearLayout.LayoutParams(0, AndroidUtilities.dp(40), 1.0f);
-        layoutParams10.setMargins(0,0,AndroidUtilities.dp(10), 0);
+        layoutParams10.setMargins(0, 0, AndroidUtilities.dp(10), 0);
         materialButton.setLayoutParams(layoutParams10);
         materialButton.setOnTouchListener((View view, MotionEvent motionEvent) -> {
             if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
@@ -171,12 +171,12 @@ public class UpdateCell extends FrameLayout {
 
         downloadingUpdate = new LinearLayout(context);
         RelativeLayout.LayoutParams layoutParams8 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        layoutParams8.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75),0);
+        layoutParams8.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(75), 0);
         layoutParams8.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         downloadingUpdate.setLayoutParams(layoutParams8);
         downloadingUpdate.setGravity(Gravity.CENTER_VERTICAL);
         downloadingUpdate.setVisibility(GONE);
-        downloadingUpdate.setPadding(0,0,0, AndroidUtilities.dp(20));
+        downloadingUpdate.setPadding(0, 0, 0, AndroidUtilities.dp(20));
 
         RelativeLayout relativeLayout2 = new RelativeLayout(context);
         relativeLayout2.setLayoutParams(new LinearLayout.LayoutParams(AndroidUtilities.dp(52), AndroidUtilities.dp(52)));
@@ -203,7 +203,7 @@ public class UpdateCell extends FrameLayout {
 
         TextView title_download = new TextView(context);
         LinearLayout.LayoutParams layoutParams12 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        layoutParams12.setMargins(AndroidUtilities.dp(12), 0, 0,0);
+        layoutParams12.setMargins(AndroidUtilities.dp(12), 0, 0, 0);
         title_download.setLayoutParams(layoutParams12);
         title_download.setTextColor(colorText);
         setTextEntities(title_download, "<b>" + LocaleController.getString("DownloadingUpdate", R.string.DownloadingUpdate) + "</b>");
@@ -213,7 +213,7 @@ public class UpdateCell extends FrameLayout {
 
         download_status = new TextView(context);
         LinearLayout.LayoutParams layoutParams13 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        layoutParams13.setMargins(AndroidUtilities.dp(12), 0, 0,0);
+        layoutParams13.setMargins(AndroidUtilities.dp(12), 0, 0, 0);
         download_status.setLayoutParams(layoutParams13);
         download_status.setTextColor(AndroidUtilities.getTransparentColor(colorText, 0.4F));
         download_status.setText(LocaleController.getString("Connecting", R.string.Connecting));
@@ -223,11 +223,11 @@ public class UpdateCell extends FrameLayout {
 
         installUpdate = new LinearLayout(context);
         RelativeLayout.LayoutParams layoutParams15 = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        layoutParams15.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(25),0);
+        layoutParams15.setMargins(AndroidUtilities.dp(25), 0, AndroidUtilities.dp(25), 0);
         layoutParams15.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         installUpdate.setLayoutParams(layoutParams15);
         installUpdate.setVisibility(GONE);
-        installUpdate.setPadding(0,0,0, AndroidUtilities.dp(15));
+        installUpdate.setPadding(0, 0, 0, AndroidUtilities.dp(15));
 
         TextView materialButton3 = new TextView(context);
         LinearLayout.LayoutParams layoutParams14 = new LinearLayout.LayoutParams(0, AndroidUtilities.dp(50), 1.0f);
@@ -295,19 +295,19 @@ public class UpdateCell extends FrameLayout {
 
     private void setTextEntities(TextView tv, String text) {
         text = text.replace("\n", "<br>");
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             tv.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
-        }else{
+        } else {
             tv.setText(Html.fromHtml(text));
         }
     }
 
     @SuppressLint("SetTextI18n")
-    public void setUpdate(String titleUpdate, String descUpdate, String noteUpdate, String bannerUpdate){
+    public void setUpdate(String titleUpdate, String descUpdate, String noteUpdate, String bannerUpdate) {
         backupImageView.setImage(bannerUpdate, null, null);
         setTextEntities(updateTitle, titleUpdate);
         setTextEntities(descMessage, descUpdate);
-        setTextEntities(note, "<b>"+LocaleController.getString("UpdateNote", R.string.UpdateNote) + "</b> " + noteUpdate);
+        setTextEntities(note, "<b>" + LocaleController.getString("UpdateNote", R.string.UpdateNote) + "</b> " + noteUpdate);
     }
 
     @Override
@@ -315,9 +315,12 @@ public class UpdateCell extends FrameLayout {
         super.onMeasure(MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(widthMeasureSpec), MeasureSpec.EXACTLY), heightMeasureSpec);
     }
 
-    protected void onConfirmUpdate() {}
+    protected void onConfirmUpdate() {
+    }
 
-    protected void onInstallUpdate() {}
+    protected void onInstallUpdate() {
+    }
 
-    protected void onRemindUpdate() {}
+    protected void onRemindUpdate() {
+    }
 }

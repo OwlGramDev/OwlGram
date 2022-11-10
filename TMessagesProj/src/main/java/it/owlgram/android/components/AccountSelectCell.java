@@ -113,5 +113,6 @@ public class AccountSelectCell extends FrameLayout {
         }
     }
 
-    public void onClick(long accountId) {}
+    public void onClick(long accountId) {
+    }
 }

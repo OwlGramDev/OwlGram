@@ -55,7 +55,8 @@ public class LanguageHelper {
                         versioning.put(langCode, remoteMD5);
                         OwlConfig.setLanguagePackVersioning(versioning.toString());
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }.start();
     }

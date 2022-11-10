@@ -107,7 +107,7 @@ abstract public class BaseTranslator {
                             poll.quiz = original.quiz;
                             AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(new Result(poll, questionResult.sourceLanguage)));
                         } else if (((AdditionalObjectTranslation) query).translation instanceof String) {
-                            Result result = translate((String)((AdditionalObjectTranslation) query).translation, toLang);
+                            Result result = translate((String) ((AdditionalObjectTranslation) query).translation, toLang);
                             if (result != null) {
                                 if (((AdditionalObjectTranslation) query).additionalInfo != null && ((AdditionalObjectTranslation) query).additionalInfo instanceof MessageHelper.ReplyMarkupButtonsTexts) {
                                     MessageHelper.ReplyMarkupButtonsTexts buttonRows = (MessageHelper.ReplyMarkupButtonsTexts) ((AdditionalObjectTranslation) query).additionalInfo;
@@ -171,7 +171,8 @@ abstract public class BaseTranslator {
         return getTargetLanguage(OwlConfig.translationKeyboardTarget);
     }
 
-    public static class Http429Exception extends IOException {}
+    public static class Http429Exception extends IOException {
+    }
 
     public static class Result {
         public Object translation;

@@ -47,7 +47,7 @@ public class DatacenterStatusCell extends LinearLayout {
     public DatacenterStatusCell(Context context) {
         super(context);
         setGravity(Gravity.CENTER_VERTICAL);
-        setPadding(AndroidUtilities.dp(13), AndroidUtilities.dp(5),AndroidUtilities.dp(13),AndroidUtilities.dp(5));
+        setPadding(AndroidUtilities.dp(13), AndroidUtilities.dp(5), AndroidUtilities.dp(13), AndroidUtilities.dp(5));
         RelativeLayout relativeLayout = new RelativeLayout(context);
         radialProgressView = new RadialProgressView(
                 context,
@@ -96,7 +96,7 @@ public class DatacenterStatusCell extends LinearLayout {
         shimmerFrameLayout.addView(linearLayoutLoading, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
 
         for (int i = 0; i < 3; i++) {
-            int radius = i == 0 ? 7:5;
+            int radius = i == 0 ? 7 : 5;
             int w;
             switch (i) {
                 case 0:
@@ -113,7 +113,7 @@ public class DatacenterStatusCell extends LinearLayout {
             cardView.setCardElevation(0);
             cardView.setRadius(AndroidUtilities.dp(radius));
             cardView.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-            linearLayoutLoading.addView(cardView, LayoutHelper.createLinear(w,radius * 2,10, i != 0 ? 9:0, 0, 0));
+            linearLayoutLoading.addView(cardView, LayoutHelper.createLinear(w, radius * 2, 10, i != 0 ? 9 : 0, 0, 0));
         }
     }
 
@@ -134,7 +134,7 @@ public class DatacenterStatusCell extends LinearLayout {
             run.flags |= TextStyleSpan.FLAG_STYLE_BOLD;
             TextStyleSpan mSpan = new TextStyleSpan(run);
             String DC_NAME = DCHelper.getDcName(dcId);
-            if (dcId != -1){
+            if (dcId != -1) {
                 DC_NAME = String.format(Locale.ENGLISH, "%s - DC%d", DC_NAME, dcId);
             }
             SpannableString spannableString = new SpannableString(DC_NAME);
@@ -161,7 +161,7 @@ public class DatacenterStatusCell extends LinearLayout {
         }
     }
 
-    public static Bitmap drawableToBitmap (@NonNull Drawable drawable) {
+    public static Bitmap drawableToBitmap(@NonNull Drawable drawable) {
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());

@@ -72,13 +72,13 @@ public class RadialProgressView extends FrameLayout {
             paint.setShader(new RadialGradient(w, w, w, new int[]{colorKey1, colorKey2}, null, Shader.TileMode.CLAMP));
             paint.setAlpha(76);
             if (i == 1) {
-                canvas.drawRect(0, 0,getMeasuredWidth(),getMeasuredHeight(), getRadialPaint());
-                canvas.drawRect(0, 0,getMeasuredWidth(),getMeasuredHeight(), getRadialPaint());
+                canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), getRadialPaint());
+                canvas.drawRect(0, 0, getMeasuredWidth(), getMeasuredHeight(), getRadialPaint());
             }
 
             canvas.save();
             float scale = BlobDrawable.SCALE_BIG_MIN + BlobDrawable.SCALE_BIG * amplitude * showWavesProgressInterpolated;
-            canvas.scale(scale,  scale, cx, cy);
+            canvas.scale(scale, scale, cx, cy);
             bigWaveDrawable.draw(cx, cy, canvas, paint);
             canvas.restore();
 

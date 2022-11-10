@@ -23,6 +23,6 @@ public class LabsHeader extends LinearLayout {
         imageView.setAdjustViewBounds(true);
         imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         addView(imageView, new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-        setPadding(AndroidUtilities.dp(5),AndroidUtilities.dp(10),AndroidUtilities.dp(5),0);
+        setPadding(AndroidUtilities.dp(5), AndroidUtilities.dp(10), AndroidUtilities.dp(5), 0);
     }
 }

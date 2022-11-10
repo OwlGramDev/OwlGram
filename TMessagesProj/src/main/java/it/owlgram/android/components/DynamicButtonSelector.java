@@ -44,7 +44,7 @@ public class DynamicButtonSelector extends LinearLayout {
         pickerDividersPaint.setStrokeCap(Paint.Cap.ROUND);
         pickerDividersPaint.setStrokeWidth(AndroidUtilities.dp(2));
         int colorIcon = Theme.getColor(Theme.key_switchTrack);
-        int color = AndroidUtilities.getTransparentColor(colorIcon,0.5f);
+        int color = AndroidUtilities.getTransparentColor(colorIcon, 0.5f);
         imageview = new ImageView(context) {
             @SuppressLint("DrawAllocation")
             @Override
@@ -134,14 +134,14 @@ public class DynamicButtonSelector extends LinearLayout {
         RectF rectF = new RectF(xCircle, yCircle, xCircle + dCircle, yCircle + dCircle);
         Path clipPath = new Path();
         clipPath.addRoundRect(rectF, dCircle >> 1, dCircle >> 1, Path.Direction.CW);
-        p.setColor(AndroidUtilities.getTransparentColor(color,0.5f));
+        p.setColor(AndroidUtilities.getTransparentColor(color, 0.5f));
         canvas.drawRoundRect(rectF, dCircle >> 1, dCircle >> 1, p);
-        p.setColor(AndroidUtilities.getTransparentColor(color,0.75f));
+        p.setColor(AndroidUtilities.getTransparentColor(color, 0.75f));
         canvas.drawRoundRect(rectF, dCircle >> 1, dCircle >> 1, p);
         canvas.clipPath(clipPath, Region.Op.DIFFERENCE);
         int topBarH = Math.round((h * 50f) / 100f);
         RectF rectF2 = new RectF(x, y, x + w, y + topBarH);
-        p.setColor(AndroidUtilities.getTransparentColor(color,0.5f));
+        p.setColor(AndroidUtilities.getTransparentColor(color, 0.5f));
         canvas.drawRoundRect(rectF2, rad1, rad1, p);
         int textH = Math.round(((h - topBarH) * 70f) / 100f);
         int textY = (y + h) - textH;
@@ -169,7 +169,8 @@ public class DynamicButtonSelector extends LinearLayout {
         }
     }
 
-    protected void onSelectionChange() {}
+    protected void onSelectionChange() {
+    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {

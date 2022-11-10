@@ -150,7 +150,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
         OwlConfig.toggleDevOpt();
         boolean isEnabled = OwlConfig.isDevOptEnabled();
         textCheckCell.setChecked(isEnabled);
-        textCheckCell.setText(isEnabled ? LocaleController.getString("OnModeCheckTitle", R.string.OnModeCheckTitle):LocaleController.getString("OffModeCheckTitle", R.string.OffModeCheckTitle));
+        textCheckCell.setText(isEnabled ? LocaleController.getString("OnModeCheckTitle", R.string.OnModeCheckTitle) : LocaleController.getString("OffModeCheckTitle", R.string.OffModeCheckTitle));
         textCheckCell.setBackgroundColorAnimated(isEnabled, Theme.getColor(isEnabled ? Theme.key_windowBackgroundChecked : Theme.key_windowBackgroundUnchecked));
         if (isEnabled) {
             listAdapter.notifyItemRemoved(experimentalMessageAlert);
@@ -179,7 +179,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
         experimentalMessageAlert = -1;
 
         checkBoxExperimentalRow = rowCount++;
-        if(OwlConfig.isDevOptEnabled()) {
+        if (OwlConfig.isDevOptEnabled()) {
             headerImageRow = rowCount++;
             bottomHeaderRow = rowCount++;
             headerExperimental = rowCount++;
@@ -232,14 +232,14 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                     } else if (position == checkBoxExperimentalRow) {
                         boolean isEnabled = OwlConfig.isDevOptEnabled();
                         textCheckCell.setDrawCheckRipple(true);
-                        textCheckCell.setTextAndCheck(isEnabled ? LocaleController.getString("OnModeCheckTitle", R.string.OnModeCheckTitle):LocaleController.getString("OffModeCheckTitle", R.string.OffModeCheckTitle), isEnabled, false);
+                        textCheckCell.setTextAndCheck(isEnabled ? LocaleController.getString("OnModeCheckTitle", R.string.OnModeCheckTitle) : LocaleController.getString("OffModeCheckTitle", R.string.OffModeCheckTitle), isEnabled, false);
                         textCheckCell.setBackgroundColor(Theme.getColor(isEnabled ? Theme.key_windowBackgroundChecked : Theme.key_windowBackgroundUnchecked));
                         textCheckCell.setColors(Theme.key_windowBackgroundCheckText, Theme.key_switchTrackBlue, Theme.key_switchTrackBlueChecked, Theme.key_switchTrackBlueThumb, Theme.key_switchTrackBlueThumbChecked);
                         textCheckCell.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
                         textCheckCell.setHeight(56);
                     } else if (position == monetIconRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("MonetIcon", R.string.MonetIcon), LocaleController.getString("MonetIconDesc", R.string.MonetIconDesc), MonetIconsHelper.isSelectedMonet(), true, true);
-                    }  else if (position == uploadSpeedBoostRow) {
+                    } else if (position == uploadSpeedBoostRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("FasterUploadSpeed", R.string.FasterUploadSpeed), OwlConfig.uploadSpeedBoost, false);
                     }
                     break;
@@ -272,7 +272,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int type = holder.getItemViewType();
-            return (type == 2 && holder.getAdapterPosition() != checkBoxExperimentalRow)  || type == 6;
+            return (type == 2 && holder.getAdapterPosition() != checkBoxExperimentalRow) || type == 6;
         }
 
         @NonNull

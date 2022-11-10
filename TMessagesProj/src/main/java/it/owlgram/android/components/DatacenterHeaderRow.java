@@ -49,7 +49,7 @@ public class DatacenterHeaderRow extends LinearLayout {
         Spannable htmlParsed;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             htmlParsed = new SpannableString(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
-        }else{
+        } else {
             htmlParsed = new SpannableString(Html.fromHtml(text));
         }
         textView.setText(EntitiesHelper.getUrlNoUnderlineText(htmlParsed));

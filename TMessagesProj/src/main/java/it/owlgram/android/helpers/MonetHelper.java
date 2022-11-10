@@ -9,7 +9,6 @@ import android.os.PatternMatcher;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
 
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.R;

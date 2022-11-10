@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 
 import java.util.HashMap;
 
-import  it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j;
+import it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j;
 
 public abstract class Prism4jThemeBase implements Prism4jTheme {
 

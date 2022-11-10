@@ -114,7 +114,7 @@ public class DrawerOrderSettings extends BaseFragment {
         itemTouchHelper = new ItemTouchHelper(new TouchHelperCallback());
         itemTouchHelper.attachToRecyclerView(listView);
         listView.setAdapter(listAdapter);
-        if(listView.getItemAnimator() != null){
+        if (listView.getItemAnimator() != null) {
             ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
@@ -130,7 +130,7 @@ public class DrawerOrderSettings extends BaseFragment {
         int size_hints = MenuOrderManager.sizeHints();
         headerHintRow = rowCount++;
 
-        if(size_hints > 0) {
+        if (size_hints > 0) {
             headerSuggestedOptionsRow = rowCount++;
             menuHintsStartRow = rowCount;
             rowCount += size_hints;
@@ -187,15 +187,15 @@ public class DrawerOrderSettings extends BaseFragment {
                 case 4:
                     SwapOrderCell swapOrderCell = (SwapOrderCell) holder.itemView;
                     MenuOrderManager.EditableMenuItem data = MenuOrderManager.getSingleAvailableMenuItem(position - menuItemsStartRow);
-                    if(data != null) {
-                        swapOrderCell.setData(data.text, data.isDefault, data.isPremium, data.id,true);
+                    if (data != null) {
+                        swapOrderCell.setData(data.text, data.isDefault, data.isPremium, data.id, true);
                     }
                     break;
                 case 5:
                     AddItemCell addItemCell = (AddItemCell) holder.itemView;
                     MenuOrderManager.EditableMenuItem notData = MenuOrderManager.getSingleNotAvailableMenuItem(position - menuHintsStartRow);
-                    if(notData != null) {
-                        addItemCell.setData(notData.text, notData.id, notData.isPremium,true);
+                    if (notData != null) {
+                        addItemCell.setData(notData.text, notData.id, notData.isPremium, true);
                     }
                     break;
             }
@@ -233,7 +233,7 @@ public class DrawerOrderSettings extends BaseFragment {
                     swapOrderCell.setOnDeleteClick(v -> {
                         int index = listView.getChildViewHolder(swapOrderCell).getAdapterPosition();
                         int position = index - menuItemsStartRow;
-                        if(MenuOrderManager.isAvailable(swapOrderCell.menuId, position)) {
+                        if (MenuOrderManager.isAvailable(swapOrderCell.menuId, position)) {
                             int prevRecommendedHeaderRow = 0, index2 = 0;
                             MenuOrderManager.removeItem(position);
                             if (!Objects.equals(swapOrderCell.menuId, MenuOrderManager.DIVIDER_ITEM)) {
@@ -267,7 +267,7 @@ public class DrawerOrderSettings extends BaseFragment {
                     AddItemCell addItemCell = new AddItemCell(mContext);
                     addItemCell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     addItemCell.setAddOnClickListener(v -> {
-                        if(!MenuOrderManager.isAvailable(addItemCell.menuId)) {
+                        if (!MenuOrderManager.isAvailable(addItemCell.menuId)) {
                             int index = MenuOrderManager.getPositionOf(addItemCell.menuId);
                             if (index != -1) {
                                 MenuOrderManager.addItem(addItemCell.menuId);
@@ -375,7 +375,8 @@ public class DrawerOrderSettings extends BaseFragment {
         }
 
         @Override
-        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {}
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+        }
 
         @Override
         public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {

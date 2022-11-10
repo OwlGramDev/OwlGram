@@ -179,6 +179,7 @@ public class SendOptionsMenuLayout extends LinearLayout {
         sendPopupLayout2.setOnTouchListener(new View.OnTouchListener() {
 
             private final android.graphics.Rect popupRect = new android.graphics.Rect();
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {

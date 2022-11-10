@@ -84,7 +84,7 @@ public class DatacenterActivity extends BaseFragment {
         listView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         listView.setVerticalScrollBarEnabled(false);
         listView.setAdapter(listAdapter);
-        if(listView.getItemAnimator() != null){
+        if (listView.getItemAnimator() != null) {
             ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
@@ -124,6 +124,7 @@ public class DatacenterActivity extends BaseFragment {
             listAdapter.notifyDataSetChanged();
         }
     }
+
     private class ListAdapter extends RecyclerListView.SelectionAdapter {
         private final Context mContext;
 

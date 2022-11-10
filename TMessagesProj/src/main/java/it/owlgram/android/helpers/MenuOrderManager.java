@@ -15,7 +15,7 @@ public class MenuOrderManager {
     private static boolean configLoaded;
     private static JSONArray data;
     public static final String DIVIDER_ITEM = "divider";
-    public static final String[] list_items = new String[] {
+    public static final String[] list_items = new String[]{
             "new_group",
             "contacts",
             "calls",
@@ -53,7 +53,7 @@ public class MenuOrderManager {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            if(data.length() == 0) {
+            if (data.length() == 0) {
                 loadDefaultItems();
             }
             configLoaded = true;
@@ -61,7 +61,7 @@ public class MenuOrderManager {
     }
 
     private static String[] getDefaultItems() {
-        return new String[] {
+        return new String[]{
                 list_items[14],
                 DIVIDER_ITEM,
                 list_items[0],
@@ -111,11 +111,12 @@ public class MenuOrderManager {
     private static int getArrayPosition(String id, int startFrom) {
         try {
             for (int i = startFrom; i < data.length(); i++) {
-                if(data.getString(i).equals(id)) {
+                if (data.getString(i).equals(id)) {
                     return i;
                 }
             }
-        } catch (JSONException ignored) {}
+        } catch (JSONException ignored) {
+        }
         return -1;
     }
 
@@ -125,7 +126,7 @@ public class MenuOrderManager {
 
     public static int getPositionItem(String id, boolean isDefault, int startFrom) {
         int position = getArrayPosition(id, startFrom);
-        if(position == -1 && isDefault) {
+        if (position == -1 && isDefault) {
             position = 0;
             data.put(id);
             OwlConfig.setDrawerItems(data.toString());
@@ -162,8 +163,8 @@ public class MenuOrderManager {
     public static Boolean isAvailable(String id, int startFrom) {
         ArrayList<EditableMenuItem> list = getMenuItemsEditable();
         for (int i = 0; i < list.size(); i++) {
-            if(getPositionItem(list.get(i).id, list.get(i).isDefault, startFrom) != -1) {
-                if(list.get(i).id.equals(id)) {
+            if (getPositionItem(list.get(i).id, list.get(i).isDefault, startFrom) != -1) {
+                if (list.get(i).id.equals(id)) {
                     return true;
                 }
             }
@@ -175,7 +176,7 @@ public class MenuOrderManager {
         ArrayList<EditableMenuItem> list = getMenuItemsEditable();
         int curr_pos = -1;
         for (int i = 0; i < list.size(); i++) {
-            if(getPositionItem(list.get(i).id, list.get(i).isDefault) == -1) {
+            if (getPositionItem(list.get(i).id, list.get(i).isDefault) == -1) {
                 curr_pos++;
             }
             if (curr_pos == position) {
@@ -215,7 +216,7 @@ public class MenuOrderManager {
             if (list.get(i).id.equals(id) && !isAv) {
                 return sizeNAv;
             }
-            if(!isAv) {
+            if (!isAv) {
                 sizeNAv++;
             }
         }
@@ -347,13 +348,14 @@ public class MenuOrderManager {
                             )
                     );
                 }
-            } catch (JSONException ignored) {}
+            } catch (JSONException ignored) {
+            }
         }
         return list;
     }
 
     public static void addItem(String id) {
-        if(getArrayPosition(id) == -1 || id.equals(DIVIDER_ITEM)) {
+        if (getArrayPosition(id) == -1 || id.equals(DIVIDER_ITEM)) {
             addAsFirst(id);
         }
     }
@@ -377,7 +379,7 @@ public class MenuOrderManager {
         for (int i = 0; i < data.length(); i++) {
             try {
                 String idTmp = data.getString(i);
-                if(i != position) {
+                if (i != position) {
                     result.put(idTmp);
                 }
             } catch (JSONException e) {

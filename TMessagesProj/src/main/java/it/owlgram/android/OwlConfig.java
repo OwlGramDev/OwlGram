@@ -199,7 +199,7 @@ public class OwlConfig extends SettingsManager {
             showSantaHat = preferences.getBoolean("showSantaHat", true);
             showSnowFalling = preferences.getBoolean("showSnowFalling", true);
             cameraType = preferences.getInt("cameraType", CameraXUtilities.getDefault());
-            cameraXFps = preferences.getInt("cameraXFps", SharedConfig.getDevicePerformanceClass() == SharedConfig.PERFORMANCE_CLASS_HIGH ? 60:30);
+            cameraXFps = preferences.getInt("cameraXFps", SharedConfig.getDevicePerformanceClass() == SharedConfig.PERFORMANCE_CLASS_HIGH ? 60 : 30);
             useCameraXOptimizedMode = preferences.getBoolean("useCameraXOptimizedMode", SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_HIGH);
             disableProximityEvents = preferences.getBoolean("disableProximityEvents", false);
             verifyLinkTip = preferences.getBoolean("verifyLinkTip", false);
@@ -229,11 +229,11 @@ public class OwlConfig extends SettingsManager {
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
 
-            String dS = devOptEnabled ? "":"_disabled";
-            maxRecentStickers = preferences.getInt("maxRecentStickers"+dS, 20);
-            betterAudioQuality = preferences.getBoolean("betterAudioQuality"+dS, false);
-            downloadSpeedBoost = preferences.getInt("downloadSpeedBoost"+dS, 0);
-            uploadSpeedBoost = preferences.getBoolean("uploadSpeedBoost"+dS, false);
+            String dS = devOptEnabled ? "" : "_disabled";
+            maxRecentStickers = preferences.getInt("maxRecentStickers" + dS, 20);
+            betterAudioQuality = preferences.getBoolean("betterAudioQuality" + dS, false);
+            downloadSpeedBoost = preferences.getInt("downloadSpeedBoost" + dS, 0);
+            uploadSpeedBoost = preferences.getBoolean("uploadSpeedBoost" + dS, false);
             configLoaded = true;
             migrate();
         }

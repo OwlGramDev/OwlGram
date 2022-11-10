@@ -74,7 +74,7 @@ public class HTMLKeeper {
                 }
             }
             if ((((TextStyleSpan) mSpan).getStyleFlags() & TextStyleSpan.FLAG_STYLE_MENTION) > 0) {
-                long id = ((TLRPC.TL_messageEntityMentionName)((TextStyleSpan) mSpan).getTextStyleRun().urlEntity).user_id;
+                long id = ((TLRPC.TL_messageEntityMentionName) ((TextStyleSpan) mSpan).getTextStyleRun().urlEntity).user_id;
                 messSpan.setSpan(new URLSpan("tg://user?id=" + id), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
         }
@@ -114,9 +114,9 @@ public class HTMLKeeper {
         text = text.replace("\u0327", "<");
         SpannableString htmlParsed;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            htmlParsed = new SpannableString(Html.fromHtml(text,Html.FROM_HTML_MODE_LEGACY));
-        }else{
-            htmlParsed =  new SpannableString(Html.fromHtml(text));
+            htmlParsed = new SpannableString(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            htmlParsed = new SpannableString(Html.fromHtml(text));
         }
         if (internalLinks) {
             AndroidUtilities.addLinks(htmlParsed, Linkify.ALL);
@@ -169,7 +169,7 @@ public class HTMLKeeper {
                             found = true;
                             entity = new TLRPC.TL_messageEntityPhone();
                         }
-                        if(found){
+                        if (found) {
                             copyEntities.remove(i);
                             break;
                         }
@@ -197,7 +197,7 @@ public class HTMLKeeper {
             } else if (mSpan instanceof ForegroundColorSpan) {
                 entity = new TLRPC.TL_messageEntitySpoiler();
             }
-            if(entity != null){
+            if (entity != null) {
                 entity.offset = start;
                 entity.length = end - start;
                 returnEntities.add(entity);
@@ -210,7 +210,7 @@ public class HTMLKeeper {
     private static String fixStrangeSpace(String string) {
         for (String list_param : list_html_params) {
             String fixedStart = String.format("<%s>", list_param);
-            String fixedEnd =  String.format("</%s>", list_param);
+            String fixedEnd = String.format("</%s>", list_param);
             string = string.replace(String.format("< %s>", list_param), fixedStart);
             string = string.replace(String.format("<%s >", list_param), fixedStart);
             string = string.replace(String.format("< %s >", list_param), fixedStart);

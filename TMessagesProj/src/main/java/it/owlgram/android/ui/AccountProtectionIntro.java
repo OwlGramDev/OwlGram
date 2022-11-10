@@ -44,7 +44,8 @@ public class AccountProtectionIntro extends BaseFragment {
             CONFIRM_DOUBLE_BOTTOM,
             SELECT_ACCOUNT
     })
-    public @interface ActionType {}
+    public @interface ActionType {
+    }
 
     public AccountProtectionIntro(@ActionType int type) {
         super();

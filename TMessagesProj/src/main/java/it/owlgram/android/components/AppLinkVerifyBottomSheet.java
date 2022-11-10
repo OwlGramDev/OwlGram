@@ -54,7 +54,8 @@ public class AppLinkVerifyBottomSheet extends OnceBottomSheet {
         DomainVerificationUserState userState = null;
         try {
             userState = manager.getDomainVerificationUserState(context.getPackageName());
-        } catch (PackageManager.NameNotFoundException ignored) {}
+        } catch (PackageManager.NameNotFoundException ignored) {
+        }
 
         if (userState == null) {
             return;
@@ -73,7 +74,8 @@ public class AppLinkVerifyBottomSheet extends OnceBottomSheet {
         if (hasUnverified) {
             try {
                 fragment.showDialog(new AppLinkVerifyBottomSheet(fragment));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 

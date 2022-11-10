@@ -19,6 +19,7 @@ public class ActionButtonManager {
     public void reset() {
         data = new JSONArray();
     }
+
     public void load(
             TLRPC.UserFull userInfo,
             TLRPC.User user,
@@ -34,7 +35,7 @@ public class ActionButtonManager {
             boolean canSearchMembers,
             int maxMegaGroupCount
     ) {
-        if (userInfo != null){
+        if (userInfo != null) {
             if (isSelf) {
                 data.put("camera");
                 data.put("edit_name");
@@ -42,7 +43,7 @@ public class ActionButtonManager {
             } else {
                 boolean isTgUser = userId == 777000 || userId == 42777;
                 data.put("send_message");
-                if (isBot || isTgUser){
+                if (isBot || isTgUser) {
                     if (isBot && !user.bot_nochats) {
                         data.put("add_bot");
                     }
@@ -50,27 +51,27 @@ public class ActionButtonManager {
                     data.put("call");
                 }
 
-                if (userInfo.video_calls_available){
+                if (userInfo.video_calls_available) {
                     data.put("video_call");
                 }
 
                 if (data.length() < 3) {
                     if (!isBot && !TextUtils.isEmpty(user.phone)) {
                         data.put("share_contact");
-                    } else if (!TextUtils.isEmpty(user.username)){
+                    } else if (!TextUtils.isEmpty(user.username)) {
                         data.put("share");
                     }
                 }
 
-                if (!isTgUser){
-                    if (userBlocked){
-                        if (isBot){
+                if (!isTgUser) {
+                    if (userBlocked) {
+                        if (isBot) {
                             data.put("restart");
                         } else {
                             data.put("unblock");
                         }
                     } else {
-                        if (isBot){
+                        if (isBot) {
                             data.put("stop");
                         } else {
                             data.put("block");
@@ -78,7 +79,7 @@ public class ActionButtonManager {
                     }
                 }
             }
-        } else if(chatId != 0 && chat != null){
+        } else if (chatId != 0 && chat != null) {
             boolean hasAdminRights = ChatObject.hasAdminRights(chat);
             boolean isCreator = chat.creator;
             boolean canLeave = !chat.creator && !chat.left && !chat.kicked;
@@ -123,15 +124,15 @@ public class ActionButtonManager {
                 data.put("edit");
             }
 
-            if ((data.length() + (discuss_available ? 1:0) + (canLeave ? 1:0)) < 4 - (canShare ? 1:0) && !isCreator) {
+            if ((data.length() + (discuss_available ? 1 : 0) + (canLeave ? 1 : 0)) < 4 - (canShare ? 1 : 0) && !isCreator) {
                 data.put("report");
             }
 
-            if ((data.length() + (discuss_available ? 1:0) + (canLeave ? 1:0)) < 4 && canShare) {
+            if ((data.length() + (discuss_available ? 1 : 0) + (canLeave ? 1 : 0)) < 4 && canShare) {
                 data.put("share");
             }
 
-            if (discuss_available && data.length() < 3 + (canLeave ? 0:1)) {
+            if (discuss_available && data.length() < 3 + (canLeave ? 0 : 1)) {
                 if (isGroup) {
                     data.put("open_channel");
                 } else {
@@ -139,7 +140,7 @@ public class ActionButtonManager {
                 }
             }
 
-            if (canLeave){
+            if (canLeave) {
                 data.put("leave");
             }
         }
@@ -152,7 +153,8 @@ public class ActionButtonManager {
                     if (data.getString(i).equals(id)) {
                         return true;
                     }
-                } catch (JSONException ignored) {}
+                } catch (JSONException ignored) {
+                }
             }
         }
         return false;
@@ -176,11 +178,12 @@ public class ActionButtonManager {
         return Theme.key_switch2TrackChecked;
     }
 
-    public ActionButtonInfo getItemAt(int index){
+    public ActionButtonInfo getItemAt(int index) {
         String id = null;
         try {
             id = data.getString(index);
-        } catch (JSONException ignored) { }
+        } catch (JSONException ignored) {
+        }
         String text = null;
         int icon = -1;
         if (id != null) {

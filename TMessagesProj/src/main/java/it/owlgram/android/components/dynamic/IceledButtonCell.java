@@ -37,7 +37,7 @@ public class IceledButtonCell extends SimpleActionCell {
     @SuppressLint("ClickableViewAccessibility")
     public IceledButtonCell(Context context, String text, int iconId, String color, int myId) {
         super(context);
-        colors = new String[] {
+        colors = new String[]{
                 color,
                 Theme.key_windowBackgroundWhiteBlackText,
         };
@@ -71,7 +71,7 @@ public class IceledButtonCell extends SimpleActionCell {
 
         iv = new RLottieImageView(context);
         RelativeLayout.LayoutParams layoutParams2 = new RelativeLayout.LayoutParams(AndroidUtilities.dp(25), AndroidUtilities.dp(25));
-        layoutParams2.setMargins(0, AndroidUtilities.dp(5),0,0);
+        layoutParams2.setMargins(0, AndroidUtilities.dp(5), 0, 0);
         layoutParams2.addRule(RelativeLayout.CENTER_IN_PARENT);
         iv.setLayoutParams(layoutParams2);
         if (iconId == R.raw.camera_outline) {
@@ -87,7 +87,7 @@ public class IceledButtonCell extends SimpleActionCell {
 
         tv = new TextView(context);
         LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(0,AndroidUtilities.dp(10),0,0);
+        layoutParams.setMargins(0, AndroidUtilities.dp(10), 0, 0);
         tv.setLayoutParams(layoutParams);
         tv.setTextColor(colorWhite);
         tv.setText(text);
@@ -159,7 +159,7 @@ public class IceledButtonCell extends SimpleActionCell {
         RectF rectF = new RectF(x, totalYMiddle, x + w, totalYMiddle + buttonHeight);
         int rad1 = Math.round((w * 14.77F) / 100F);
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(AndroidUtilities.getTransparentColor(color,0.5f));
+        p.setColor(AndroidUtilities.getTransparentColor(color, 0.5f));
         canvas.drawRoundRect(rectF, rad1, rad1, p);
 
         RectF rectText = new RectF(xText, yText, xText + textWidth, yText + textHeight);
@@ -173,5 +173,6 @@ public class IceledButtonCell extends SimpleActionCell {
         );
     }
 
-    protected void onItemClick(int id) {}
+    protected void onItemClick(int id) {
+    }
 }

@@ -81,7 +81,8 @@ public class MonetAndroidFixDialog extends OnceBottomSheet {
             MonetAndroidFixDialog dialog = new MonetAndroidFixDialog(fragment);
             dialog.setCancelable(false);
             dialog.show();
-        } catch (Exception ignored) {}
+        } catch (Exception ignored) {
+        }
     }
 
     @Override

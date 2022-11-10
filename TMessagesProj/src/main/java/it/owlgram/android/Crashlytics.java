@@ -113,9 +113,9 @@ public class Crashlytics implements Thread.UncaughtExceptionHandler {
             default:
                 CameraName = "Unknown";
         }
-        return  "Steps to reproduce\n" +
+        return "Steps to reproduce\n" +
                 "Write here the steps to reproduce\n\n" +
-                "Details\n"+
+                "Details\n" +
                 "App Version: " + BuildVars.BUILD_VERSION_STRING + " (" + BuildVars.BUILD_VERSION + ")\n" +
                 "Base Version: " + BuildVars.TELEGRAM_VERSION_STRING + " (" + BuildVars.TELEGRAM_BUILD_VERSION + ")\n" +
                 "Device: " + AndroidUtilities.capitalize(Build.MANUFACTURER) + " " + Build.MODEL + "\n" +
