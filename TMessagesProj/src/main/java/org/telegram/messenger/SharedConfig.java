@@ -399,7 +399,6 @@ public class SharedConfig {
             saveStreamMedia = preferences.getBoolean("saveStreamMedia", true);
             smoothKeyboard = preferences.getBoolean("smoothKeyboard2", true);
             pauseMusicOnRecord = preferences.getBoolean("pauseMusicOnRecord", false);
-            chatBlur = preferences.getBoolean("chatBlur", getDevicePerformanceClass() >= PERFORMANCE_CLASS_HIGH);
             forceDisableTabletMode = preferences.getBoolean("forceDisableTabletMode", false);
             streamAllVideo = preferences.getBoolean("streamAllVideo", BuildVars.DEBUG_VERSION);
             streamMkv = preferences.getBoolean("streamMkv", false);
@@ -413,6 +412,7 @@ public class SharedConfig {
             archiveHidden = preferences.getBoolean("archiveHidden", false);
             distanceSystemType = preferences.getInt("distanceSystemType", 0);
             devicePerformanceClass = preferences.getInt("devicePerformanceClass", -1);
+            chatBlur = preferences.getBoolean("chatBlur", getDevicePerformanceClass() >= PERFORMANCE_CLASS_HIGH);
             loopStickers = preferences.getBoolean("loopStickers", true);
             keepMedia = preferences.getInt("keep_media", 2);
             noStatusBar = preferences.getBoolean("noStatusBar", true);
