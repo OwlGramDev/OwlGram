@@ -4710,7 +4710,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 filterTabsView.removeTabs();
                 for (int a = 0, N = filters.size(); a < N; a++) {
                     if (filters.get(a).isDefault()) {
-                        filterTabsView.addTab(a, 0, LocaleController.getString("FilterAllChats", R.string.FilterAllChats), true,  filters.get(a).locked, filters.get(a).emoticon);
+                        if (!OwlConfig.hideAllTab) filterTabsView.addTab(a, 0, LocaleController.getString("FilterAllChats", R.string.FilterAllChats), true,  filters.get(a).locked, filters.get(a).emoticon);
                     } else {
                         filterTabsView.addTab(a, filters.get(a).localId, filters.get(a).name, false,  filters.get(a).locked, filters.get(a).emoticon);
                     }
@@ -4739,6 +4739,26 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
                 if (filterTabsView.isLocked(filterTabsView.getCurrentTabId())) {
                     filterTabsView.selectFirstTab();
+                }
+                if (OwlConfig.hideAllTab) {
+                    int newPage = -1, defaultPage = -1;
+                    for (int a = 0, N = filters.size(); a < N; a++) {
+                        if (filters.get(a).isDefault()) {
+                            defaultPage = a;
+                        } else if (newPage == -1 && !filters.get(a).locked) {
+                            newPage = a;
+                        }
+                    }
+                    newPage = filterTabsView.getCurrentTabId() == defaultPage ? newPage : filterTabsView.getCurrentTabId();
+                    filterTabsView.selectTabWithId(newPage, 1.0f);
+                    if (parentLayout != null) {
+                        parentLayout.getDrawerLayoutContainer().setAllowOpenDrawerBySwipe(newPage == filterTabsView.getFirstTabId());
+                    }
+                    ViewPage[] viewPageArr4 = viewPages;
+                    viewPageArr4[1].selectedType = viewPageArr4[0].selectedType;
+                    viewPages[0].selectedType = newPage;
+                    switchToCurrentSelectedMode(false);
+                    updateCounters(false);
                 }
             }
         } else {

@@ -102,7 +102,6 @@ public class SettingsManager {
             case "translationTarget":
             case "swipeToPiP":
             case "configLoaded":
-            case "hideAllTab":
             case "unlimitedFavoriteStickers":
             case "unlimitedPinnedDialogs":
             case "increaseAudioMessages":

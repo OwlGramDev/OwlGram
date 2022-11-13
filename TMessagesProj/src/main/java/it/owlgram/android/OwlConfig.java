@@ -89,6 +89,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean showStatusInChat;
     public static boolean showPatpat;
     public static boolean unlockedChupa;
+    public static boolean hideAllTab;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -225,6 +226,7 @@ public class OwlConfig extends SettingsManager {
             unlockedSecretIcon = preferences.getInt("unlockedSecretIcon", 0);
             showPatpat = preferences.getBoolean("showPatpat", false);
             unlockedChupa = preferences.getBoolean("unlockedChupa", false);
+            hideAllTab = preferences.getBoolean("hideAllTab", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = preferences.getBoolean("devOptEnabled", false);
@@ -682,6 +684,14 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putBoolean("showPatpat", showPatpat);
+        editor.apply();
+    }
+
+    public static void toggleHideAllTab() {
+        hideAllTab = !hideAllTab;
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("hideAllTab", hideAllTab);
         editor.apply();
     }
 

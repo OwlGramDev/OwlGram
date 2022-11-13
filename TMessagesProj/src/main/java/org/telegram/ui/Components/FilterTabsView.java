@@ -1125,7 +1125,7 @@ public class FilterTabsView extends FrameLayout {
             }
             TabView tabView = (TabView) view;
             if (isEditing) {
-                if (position != 0) {
+                if (position != 0 || OwlConfig.hideAllTab) {
                     int side = AndroidUtilities.dp(6);
                     if (tabView.rect.left - side < x && tabView.rect.right + side > x) {
                         delegate.onDeletePressed(tabView.currentTab.id);
@@ -1427,10 +1427,10 @@ public class FilterTabsView extends FrameLayout {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (!tabs.isEmpty()) {
             int width = MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(7) - AndroidUtilities.dp(7);
-            Tab firstTab = findDefaultTab();
-            firstTab.setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
+            Tab firstTab = OwlConfig.hideAllTab ? tabs.get(0) : findDefaultTab();
+            if (!OwlConfig.hideAllTab) firstTab.setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
             int tabWith = firstTab.getWidth(false);
-            firstTab.setTitle(allTabsWidth > width ? LocaleController.getString("FilterAllChatsShort", R.string.FilterAllChatsShort) : LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
+            if (!OwlConfig.hideAllTab) firstTab.setTitle(allTabsWidth > width ? LocaleController.getString("FilterAllChatsShort", R.string.FilterAllChatsShort) : LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
             int trueTabsWidth = allTabsWidth - tabWith;
             trueTabsWidth += firstTab.getWidth(false);
             int prevWidth = additionalTabWidth;
@@ -1594,7 +1594,7 @@ public class FilterTabsView extends FrameLayout {
                 invalidated = true;
                 requestLayout();
                 allTabsWidth = 0;
-                findDefaultTab().setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
+                if (!OwlConfig.hideAllTab) findDefaultTab().setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
                 for (int b = 0; b < N; b++) {
                     allTabsWidth += tabs.get(b).getWidth(true) + FolderIconHelper.getPaddingTab();
                 }
@@ -1625,7 +1625,7 @@ public class FilterTabsView extends FrameLayout {
             listView.setItemAnimator(itemAnimator);
             adapter.notifyDataSetChanged();
             allTabsWidth = 0;
-            findDefaultTab().setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
+            if (!OwlConfig.hideAllTab) findDefaultTab().setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
             for (int b = 0, N = tabs.size(); b < N; b++) {
                 allTabsWidth += tabs.get(b).getWidth(true) + FolderIconHelper.getPaddingTab();
             }
