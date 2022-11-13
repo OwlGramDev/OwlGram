@@ -86,6 +86,9 @@
 -keepclassmembernames class org.telegram.ui.* { <fields>; }
 -keepclassmembernames class org.telegram.ui.Cells.* { <fields>; }
 -keepclassmembernames class org.telegram.ui.Components.* { <fields>; }
+-keep,allowshrinking,allowobfuscation class org.telegram.ui.Components.GroupCreateSpan {
+    public void updateColors();
+ }
 
 # Huawei Services
 -keep class com.huawei.hianalytics.**{ *; }
