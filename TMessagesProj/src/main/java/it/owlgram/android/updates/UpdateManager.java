@@ -30,6 +30,7 @@ import it.owlgram.android.helpers.StandardHTTPRequest;
 
 public class UpdateManager {
 
+    public static boolean checkingForChangelogs = false;
 
     public static void isDownloadedUpdate(UpdateUICallback updateUICallback) {
         new Thread() {
@@ -46,6 +47,8 @@ public class UpdateManager {
     }
 
     public static void getChangelogs(ChangelogCallback changelogCallback) {
+        if (checkingForChangelogs) return;
+        checkingForChangelogs = true;
         Locale locale = LocaleController.getInstance().getCurrentLocale();
         new Thread() {
             @Override
@@ -58,6 +61,8 @@ public class UpdateManager {
                         AndroidUtilities.runOnUIThread(() -> changelogCallback.onSuccess(HTMLKeeper.htmlToEntities(changelog_text, null, true)));
                     }
                 } catch (Exception ignored) {
+                } finally {
+                    checkingForChangelogs = false;
                 }
             }
         }.start();
