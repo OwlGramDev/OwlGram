@@ -97,8 +97,8 @@ public class OwlConfig extends SettingsManager {
     public static String oldBuildVersion = null;
     public static String languagePackVersioning;
     public static String doNotTranslateLanguages;
-    public static int deepLFormality = DeepLTranslator.FORMALITY_DEFAULT;
-    public static int translationProvider = Translator.PROVIDER_GOOGLE;
+    public static int deepLFormality;
+    public static int translationProvider;
     public static int lastUpdateStatus = 0;
     public static int tabMode = 0;
     public static int remindedUpdate = 0;
@@ -196,6 +196,7 @@ public class OwlConfig extends SettingsManager {
             blurIntensity = preferences.getInt("blurIntensity", 75);
             oldBuildVersion = preferences.getString("oldBuildVersion", null);
             stickerSizeStack = preferences.getInt("stickerSizeStack", 14);
+            deepLFormality = preferences.getInt("deepLFormality", DeepLTranslator.FORMALITY_DEFAULT);
             translationProvider = preferences.getInt("translationProvider", Translator.PROVIDER_GOOGLE);
             showSantaHat = preferences.getBoolean("showSantaHat", true);
             showSnowFalling = preferences.getBoolean("showSnowFalling", true);
