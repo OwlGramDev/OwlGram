@@ -14,7 +14,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.NinePatchDrawable;
 import android.os.Bundle;
-import android.text.Html;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -160,11 +159,7 @@ public class UpdateAlertDialog extends BottomSheet {
 
     private void setTextEntities(TextView tv, String text) {
         text = text.replace("\n", "<br>");
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            tv.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
-        } else {
-            tv.setText(Html.fromHtml(text));
-        }
+        tv.setText(AndroidUtilities.fromHtml(text));
     }
 
     private static class BottomSheetCell extends FrameLayout {

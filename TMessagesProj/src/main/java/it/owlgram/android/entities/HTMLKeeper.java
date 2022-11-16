@@ -1,7 +1,6 @@
 package it.owlgram.android.entities;
 
 import android.graphics.Typeface;
-import android.os.Build;
 import android.text.Html;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -112,12 +111,7 @@ public class HTMLKeeper {
         text = text.replaceAll("<q>(.*?)</q>", "<span style=\"color:#000000;\">$1</span>");
         text = text.replace("\u2027", "&lt;");
         text = text.replace("\u0327", "<");
-        SpannableString htmlParsed;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            htmlParsed = new SpannableString(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
-        } else {
-            htmlParsed = new SpannableString(Html.fromHtml(text));
-        }
+        SpannableString htmlParsed = new SpannableString(AndroidUtilities.fromHtml(text));
         if (internalLinks) {
             AndroidUtilities.addLinks(htmlParsed, Linkify.ALL);
         }

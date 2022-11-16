@@ -18,6 +18,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.text.Html;
 import android.view.ContextThemeWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -4703,5 +4704,13 @@ public class AndroidUtilities {
             spannableStringBuilder.replace(index, index + what.length(), obj);
         }
         return spannableStringBuilder;
+    }
+
+    public static Spanned fromHtml(@NonNull String source) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(source);
+        }
     }
 }

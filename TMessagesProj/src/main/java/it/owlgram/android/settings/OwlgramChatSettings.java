@@ -2,8 +2,6 @@ package it.owlgram.android.settings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Build;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.view.Gravity;
@@ -465,12 +463,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                                 advise = LocaleController.getString("SystemCameraDesc", R.string.SystemCameraDesc);
                                 break;
                         }
-                        Spannable htmlParsed;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            htmlParsed = new SpannableString(Html.fromHtml(advise, Html.FROM_HTML_MODE_LEGACY));
-                        } else {
-                            htmlParsed = new SpannableString(Html.fromHtml(advise));
-                        }
+                        Spannable htmlParsed = new SpannableString(AndroidUtilities.fromHtml(advise));
                         textInfoPrivacyCell.setText(EntitiesHelper.getUrlNoUnderlineText(htmlParsed));
                     }
                     break;

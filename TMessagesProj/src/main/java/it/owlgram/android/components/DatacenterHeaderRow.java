@@ -1,8 +1,6 @@
 package it.owlgram.android.components;
 
 import android.content.Context;
-import android.os.Build;
-import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -46,12 +44,7 @@ public class DatacenterHeaderRow extends LinearLayout {
         textView.setLinkTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkText));
         textView.setHighlightColor(Theme.getColor(Theme.key_windowBackgroundWhiteLinkSelection));
         String text = LocaleController.getString("DatacenterStatusDesc", R.string.DatacenterStatusDesc);
-        Spannable htmlParsed;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            htmlParsed = new SpannableString(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
-        } else {
-            htmlParsed = new SpannableString(Html.fromHtml(text));
-        }
+        Spannable htmlParsed = new SpannableString(AndroidUtilities.fromHtml(text));
         textView.setText(EntitiesHelper.getUrlNoUnderlineText(htmlParsed));
         textView.setMovementMethod(new AndroidUtilities.LinkMovementMethodMy());
 
