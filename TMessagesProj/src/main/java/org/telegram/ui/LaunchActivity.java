@@ -214,6 +214,8 @@ import it.owlgram.android.settings.OwlgramSettings;
 import it.owlgram.android.ui.DatacenterActivity;
 import it.owlgram.android.updates.ApkDownloader;
 import it.owlgram.android.updates.ApkInstaller;
+import it.owlgram.android.updates.AppDownloader;
+import it.owlgram.android.updates.PlayStoreAPI;
 import it.owlgram.android.updates.UpdateManager;
 
 public class LaunchActivity extends BasePermissionsActivity implements INavigationLayout.INavigationLayoutDelegate, NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate {
@@ -4730,7 +4732,11 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     } catch (Exception ignored){}
                 }
             } else if (StoreUtils.isFromPlayStore()) {
-                Browser.openUrl(LaunchActivity.this, BuildVars.PLAYSTORE_APP_URL);
+                if (AppDownloader.updateDownloaded()) {
+                    PlayStoreAPI.installUpdate();
+                } else {
+                    PlayStoreAPI.openUpdatePopup(LaunchActivity.this);
+                }
             }
         });
         updateLayoutIcon = new RadialProgress2(updateLayout);
@@ -4850,17 +4856,17 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     private void updateAppUpdateViews() {
         UpdateManager.isDownloadedUpdate(result -> {
-            if (result || ApkDownloader.isRunningDownload() || UpdateManager.isAvailableUpdate()) {
+            if (result || AppDownloader.isRunningDownload() || UpdateManager.isAvailableUpdate()) {
                 if(result) {
                     createUpdateUI();
                     updateLayoutIcon.setIcon(MediaActionDrawable.ICON_UPDATE, true, true);
                     updateTextView.setText(LocaleController.getString("AppUpdateNow", R.string.AppUpdateNow));
                     updateSizeTextView.setTag(1);
                     updateSizeTextView.animate().alpha(0.0f).scaleX(0.0f).scaleY(0.0f).setDuration(180).start();
-                } else if (ApkDownloader.isRunningDownload()) {
+                } else if (AppDownloader.isRunningDownload()) {
                     createUpdateUI();
                     updateLayoutIcon.setIcon(MediaActionDrawable.ICON_CANCEL, true, true);
-                    int loadProgress = ApkDownloader.percentage();
+                    int loadProgress = AppDownloader.getDownloadProgress();
                     updateLayoutIcon.setProgress(loadProgress, true);
                     updateTextView.setText(LocaleController.formatString("AppUpdateDownloading", R.string.AppUpdateDownloading, loadProgress));
                     updateSizeTextView.setTag(1);
@@ -4871,7 +4877,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         if(data.length() > 0) {
                             JSONObject jsonObject = new JSONObject(data);
                             UpdateManager.UpdateAvailable updateAvailable = UpdateManager.loadUpdate(jsonObject);
-                            if(updateAvailable.version > UpdateManager.currentVersion()) {
+                            if(updateAvailable.version > BuildVars.BUILD_VERSION) {
                                 createUpdateUI();
                                 updateLayoutIcon.setIcon(MediaActionDrawable.ICON_DOWNLOAD, true, true);
                                 updateTextView.setText(LocaleController.getString("UpdateOwlGram", R.string.UpdateOwlGram));
@@ -4902,7 +4908,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         UpdateManager.isDownloadedUpdate(result -> {
             updateAppUpdateViews();
-            ApkDownloader.setDownloadMainListener(new ApkDownloader.UpdateListener() {
+            AppDownloader.setDownloadMainListener(new AppDownloader.UpdateListener() {
                 @Override
                 public void onPreStart() {
                     updateAppUpdateViews();
@@ -4910,8 +4916,12 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
                 @Override
                 public void onProgressChange(int percentage, long downBytes, long totBytes) {
-                    updateLayoutIcon.setProgress((percentage / 100f), true);
-                    updateTextView.setText(LocaleController.formatString("AppUpdateDownloading", R.string.AppUpdateDownloading, percentage));
+                    if (updateLayoutIcon == null || updateTextView == null) {
+                        updateAppUpdateViews();
+                    } else {
+                        updateLayoutIcon.setProgress((percentage / 100f), true);
+                        updateTextView.setText(LocaleController.formatString("AppUpdateDownloading", R.string.AppUpdateDownloading, percentage));
+                    }
                 }
 
                 @Override
@@ -4924,12 +4934,16 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     @Override
                     public void onSuccess(Object updateResult) {
                         if(updateResult instanceof UpdateManager.UpdateAvailable) {
+                            UpdateManager.UpdateAvailable updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
                             long passed_time = (new Date().getTime() - OwlConfig.lastUpdateCheck) / 1000;
-                            if(passed_time >= 3600 * 8 || OwlConfig.lastUpdateStatus != 1 || force) {
+                            if(passed_time >= 3600 * 8 || OwlConfig.lastUpdateStatus != 1 && !updateAvailable.isReminded() || force) {
                                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                                 OwlConfig.setUpdateData(updateResult.toString());
-                                UpdateManager.UpdateAvailable updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
-                                (new UpdateAlertDialog(LaunchActivity.this, updateAvailable)).show();
+                                if (StoreUtils.isFromPlayStore()) {
+                                    PlayStoreAPI.openUpdatePopup(LaunchActivity.this);
+                                } else {
+                                    new UpdateAlertDialog(LaunchActivity.this, updateAvailable).show();
+                                }
                                 OwlConfig.saveUpdateStatus(1);
                                 updateAppUpdateViews();
                             }

@@ -842,6 +842,7 @@ public class OwlConfig extends SettingsManager {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt("remindedUpdate", remindedUpdate);
         editor.apply();
+        saveUpdateStatus(0);
     }
 
     public static void saveOldVersion(int version) {

@@ -3,12 +3,11 @@ package it.owlgram.android.updates;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageInfo;
 import android.os.PowerManager;
 
 import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.NotificationCenter;
 
 import java.io.File;
@@ -24,17 +23,13 @@ import it.owlgram.android.OwlConfig;
 public class ApkDownloader {
     @SuppressLint("StaticFieldLeak")
     private static DownloadThread downloadThread;
-    private static UpdateListener updateManager;
-    private static UpdateListener updateMainManager;
-    private static UpdateListener updateDialogsManager;
+    private final static AppDownloader.UpdateListener []listeners;
+
+    static {
+        listeners = new AppDownloader.UpdateListener[3];
+    }
 
     public static boolean updateDownloaded() {
-        int code = 0;
-        try {
-            PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
-            code = pInfo.versionCode / 10;
-        } catch (Exception ignored) {
-        }
         boolean isCorrupted = true;
         try {
             String data = OwlConfig.updateData;
@@ -47,7 +42,7 @@ public class ApkDownloader {
         } catch (Exception ignored) {
         }
         boolean isAvailableFile = apkFile().exists() && downloadThread == null && !isCorrupted;
-        if ((code >= OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
+        if ((BuildVars.BUILD_VERSION >= OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
             OwlConfig.setUpdateData("");
             return false;
         }
@@ -79,16 +74,16 @@ public class ApkDownloader {
         }
     }
 
-    public static void setDownloadListener(UpdateListener u) {
-        updateManager = u;
+    public static void setDownloadListener(AppDownloader.UpdateListener listener) {
+        listeners[0] = listener;
     }
 
-    public static void setDownloadMainListener(UpdateListener u) {
-        updateMainManager = u;
+    public static void setDownloadMainListener(AppDownloader.UpdateListener listener) {
+        listeners[1] = listener;
     }
 
-    public static void setDownloadDialogsListener(UpdateListener u) {
-        updateDialogsManager = u;
+    public static void setDownloadDialogsListener(AppDownloader.UpdateListener listener) {
+        listeners[2] = listener;
     }
 
     public static boolean isRunningDownload() {
@@ -109,7 +104,7 @@ public class ApkDownloader {
         return 0;
     }
 
-    public static int percentage() {
+    public static int getDownloadProgress() {
         if (downloadThread != null) {
             return downloadThread.percentage;
         }
@@ -197,15 +192,7 @@ public class ApkDownloader {
 
         private void onProgressUpdate(int percentage, long downBytes, long totBytes) {
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoadProgressChanged);
-            if (updateManager != null) {
-                updateManager.onProgressChange(percentage, downBytes, totBytes);
-            }
-            if (updateMainManager != null) {
-                updateMainManager.onProgressChange(percentage, downBytes, totBytes);
-            }
-            if (updateDialogsManager != null) {
-                updateDialogsManager.onProgressChange(percentage, downBytes, totBytes);
-            }
+            onProgressChange(percentage, downBytes, totBytes);
         }
 
         private void onPreExecute() {
@@ -213,15 +200,7 @@ public class ApkDownloader {
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     getClass().getName());
             mWakeLock.acquire(10 * 60 * 1000L);
-            if (updateManager != null) {
-                updateManager.onPreStart();
-            }
-            if (updateMainManager != null) {
-                updateMainManager.onPreStart();
-            }
-            if (updateDialogsManager != null) {
-                updateDialogsManager.onPreStart();
-            }
+            onPreStart();
         }
 
         private void onPostExecute(boolean isCanceled) {
@@ -230,15 +209,25 @@ public class ApkDownloader {
                 deleteUpdate();
             }
             downloadThread = null;
-            if (updateManager != null) {
-                updateManager.onFinished();
-            }
-            if (updateMainManager != null) {
-                updateMainManager.onFinished();
-            }
-            if (updateDialogsManager != null) {
-                updateDialogsManager.onFinished();
-            }
+            onFinished();
+        }
+    }
+
+    private static void onPreStart() {
+        for (AppDownloader.UpdateListener value : listeners) {
+            if (value != null) value.onPreStart();
+        }
+    }
+
+    private static void onProgressChange(int percentage, long downBytes, long totBytes) {
+        for (AppDownloader.UpdateListener value : listeners) {
+            if (value != null) value.onProgressChange(percentage, downBytes, totBytes);
+        }
+    }
+
+    private static void onFinished() {
+        for (AppDownloader.UpdateListener value : listeners) {
+            if (value != null) value.onFinished();
         }
     }
 
@@ -248,13 +237,5 @@ public class ApkDownloader {
         if (file.exists())
             file.delete();
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoadFailed);
-    }
-
-    public interface UpdateListener {
-        void onPreStart();
-
-        void onProgressChange(int percentage, long downBytes, long totBytes);
-
-        void onFinished();
     }
 }

@@ -3459,6 +3459,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             } else if (which == 16) {
                                 SharedConfig.pendingAppUpdate = null;
                                 SharedConfig.saveConfig();
+                                OwlConfig.setUpdateData("");
+                                OwlConfig.saveUpdateStatus(0);
+                                OwlConfig.remindUpdate(-1);
                                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                             } else if (which == 17) {
                                 Set<String> suggestions = getMessagesController().pendingSuggestions;

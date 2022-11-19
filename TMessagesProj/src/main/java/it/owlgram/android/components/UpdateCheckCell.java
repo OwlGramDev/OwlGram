@@ -21,6 +21,8 @@ import org.telegram.ui.Components.LayoutHelper;
 import java.util.Date;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.StoreUtils;
+import it.owlgram.android.updates.UpdateManager;
 
 @SuppressLint("ViewConstructor")
 public class UpdateCheckCell extends RelativeLayout {
@@ -102,15 +104,21 @@ public class UpdateCheckCell extends RelativeLayout {
 
     public void setCheckTime() {
         long date = OwlConfig.lastUpdateCheck;
-        if (date != 0) {
+        checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
+        setTime(date);
+        canCheckForUpdate = true;
+    }
+
+    private void updateTitle() {
+        long date = OwlConfig.lastUpdateCheck;
+        boolean isUpdateAvailable = OwlConfig.lastUpdateStatus == 1 && OwlConfig.updateData.length() > 0;
+        if (isUpdateAvailable) {
+            titleTextView.setText(LocaleController.getString("UpdateAvailable", R.string.UpdateAvailable));
+        } else if (date != 0) {
             titleTextView.setText(LocaleController.getString("NoUpdateAvailable", R.string.NoUpdateAvailable));
         } else {
             titleTextView.setText(LocaleController.getString("NeverChecked", R.string.NeverChecked));
         }
-        checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
-        setTime(date);
-        canCheckForUpdate = true;
-        OwlConfig.saveUpdateStatus(0);
     }
 
     private void setTime(long date) {
@@ -130,17 +138,22 @@ public class UpdateCheckCell extends RelativeLayout {
     }
 
     public void setUpdateAvailableStatus() {
-        titleTextView.setText(LocaleController.getString("UpdateAvailable", R.string.UpdateAvailable));
-        checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
+        if (StoreUtils.isFromPlayStore()) {
+            checkUpdateButton.setText(LocaleController.getString("DownloadUpdate", R.string.DownloadUpdate));
+        } else {
+            checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
+        }
         setTime(OwlConfig.lastUpdateCheck);
         canCheckForUpdate = true;
-        OwlConfig.saveUpdateStatus(1);
+    }
+
+    public void setDownloaded() {
+        checkUpdateButton.setText(LocaleController.getString("InstallUpdate", R.string.InstallUpdate));
     }
 
     public void setFailedStatus() {
         valueTextView.setText(LocaleController.getString("CheckFailed", R.string.CheckFailed));
         checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
-        OwlConfig.saveUpdateStatus(2);
         canCheckForUpdate = true;
     }
 
@@ -154,7 +167,7 @@ public class UpdateCheckCell extends RelativeLayout {
     public void loadLastStatus() {
         switch (OwlConfig.lastUpdateStatus) {
             case 1:
-                if (OwlConfig.updateData.length() > 0) {
+                if (UpdateManager.isAvailableUpdate()) {
                     setUpdateAvailableStatus();
                 } else {
                     setCheckTime();
@@ -167,6 +180,7 @@ public class UpdateCheckCell extends RelativeLayout {
                 setCheckTime();
                 break;
         }
+        updateTitle();
     }
 
     protected void onCheckUpdate() {

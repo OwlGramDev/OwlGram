@@ -3,7 +3,10 @@ package it.owlgram.android.updates;
 import android.content.pm.PackageInfo;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
+
+import com.google.android.play.core.appupdate.AppUpdateInfo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +34,7 @@ public class UpdateManager {
         new Thread() {
             @Override
             public void run() {
-                boolean result = ApkDownloader.updateDownloaded();
+                boolean result = AppDownloader.updateDownloaded();
                 AndroidUtilities.runOnUIThread(() -> updateUICallback.onResult(result));
             }
         }.start();
@@ -67,21 +70,25 @@ public class UpdateManager {
         if (StoreUtils.isFromPlayStore()) {
             PlayStoreAPI.checkUpdates(new PlayStoreAPI.UpdateCheckCallback() {
                 @Override
-                public void onSuccess(int psVersionCode) {
-                    checkInternal(updateCallback, psVersionCode);
+                public void onSuccess(AppUpdateInfo appUpdateInfo) {
+                    checkInternal(updateCallback, appUpdateInfo);
                 }
 
                 @Override
                 public void onError(Exception e) {
-                    updateCallback.onError(e);
+                    if (e instanceof PlayStoreAPI.NoUpdateException) {
+                        updateCallback.onSuccess(new UpdateNotAvailable());
+                    } else {
+                        updateCallback.onError(e);
+                    }
                 }
             });
         } else {
-            checkInternal(updateCallback, -1);
+            checkInternal(updateCallback, null);
         }
     }
 
-    private static void checkInternal(UpdateCallback updateCallback, int psVersionCode) {
+    private static void checkInternal(UpdateCallback updateCallback, AppUpdateInfo psAppUpdateInfo) {
         Locale locale = LocaleController.getInstance().getCurrentLocale();
         boolean betaMode = OwlConfig.betaUpdates && !StoreUtils.isDownloadedFromAnyStore();
         new Thread() {
@@ -119,9 +126,11 @@ public class UpdateManager {
                     if (update_status.equals("no_updates")) {
                         AndroidUtilities.runOnUIThread(() -> updateCallback.onSuccess(new UpdateNotAvailable()));
                     } else {
-                        int remoteVersion = BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE : (psVersionCode <= 0 ? obj.getInt("version") : psVersionCode);
+                        int remoteVersion = BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE : (psAppUpdateInfo != null ? PlayStoreAPI.getVersionCode(psAppUpdateInfo) : obj.getInt("version"));
                         if (remoteVersion > code) {
                             UpdateAvailable updateAvailable = loadUpdate(obj);
+                            OwlConfig.saveUpdateStatus(1);
+                            updateAvailable.setPlayStoreMetaData(psAppUpdateInfo);
                             AndroidUtilities.runOnUIThread(() -> updateCallback.onSuccess(updateAvailable));
                         } else {
                             AndroidUtilities.runOnUIThread(() -> updateCallback.onSuccess(new UpdateNotAvailable()));
@@ -156,6 +165,16 @@ public class UpdateManager {
             this.file_size = file_size;
         }
 
+        public void setPlayStoreMetaData(@Nullable AppUpdateInfo appUpdateInfo) {
+            if (appUpdateInfo == null) return;
+            this.file_size = appUpdateInfo.totalBytesToDownload();
+            this.version = PlayStoreAPI.getVersionCode(appUpdateInfo);
+        }
+
+        public boolean isReminded() {
+            return OwlConfig.remindedUpdate == version;
+        }
+
         @NonNull
         @Override
         public String toString() {
@@ -179,17 +198,17 @@ public class UpdateManager {
         return new UpdateAvailable(obj.getString("title"), obj.getString("desc"), obj.getString("note"), obj.getString("banner"), obj.getString("link_file"), obj.getInt("version"), obj.getLong("file_size"));
     }
 
-    public static int currentVersion() {
-        try {
-            PackageInfo pInfo = ApplicationLoader.applicationContext.getPackageManager().getPackageInfo(ApplicationLoader.applicationContext.getPackageName(), 0);
-            return (pInfo.versionCode / 10);
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
     public static boolean isAvailableUpdate() {
-        return OwlConfig.updateData.length() > 0;
+        boolean updateValid = false;
+        String data = OwlConfig.updateData;
+        try {
+            if(data.length() > 0) {
+                if(UpdateManager.loadUpdate(new JSONObject(data)).version > BuildVars.BUILD_VERSION) {
+                    updateValid = true;
+                }
+            }
+        } catch (Exception ignored){}
+        return updateValid;
     }
 
     public interface UpdateCallback {

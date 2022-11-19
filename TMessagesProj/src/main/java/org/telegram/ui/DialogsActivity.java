@@ -212,6 +212,7 @@ import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.MonetIconsHelper;
 import it.owlgram.android.helpers.PasscodeHelper;
 import it.owlgram.android.updates.ApkDownloader;
+import it.owlgram.android.updates.AppDownloader;
 import it.owlgram.android.updates.UpdateManager;
 
 public class DialogsActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, FloatingDebugProvider {
@@ -1940,7 +1941,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     public DialogsActivity(Bundle args) {
         super(args);
-        ApkDownloader.setDownloadDialogsListener(new ApkDownloader.UpdateListener() {
+        AppDownloader.setDownloadDialogsListener(new AppDownloader.UpdateListener() {
             @Override
             public void onPreStart() {
                 updateMenuButton(false);
@@ -3967,8 +3968,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
                 AndroidUtilities.openForView(SharedConfig.pendingAppUpdate.document, true, getParentActivity());*/
                 UpdateManager.isDownloadedUpdate(result -> {
-                    if (result)
-                        ApkDownloader.installUpdate(getParentActivity());
+                    if (result) AppDownloader.installUpdate(getParentActivity());
                 });
             });
 
@@ -7912,7 +7912,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         } else if (id == NotificationCenter.appUpdateAvailable) {
             updateMenuButton(true);
         } else if (id == NotificationCenter.fileLoaded || id == NotificationCenter.fileLoadFailed || id == NotificationCenter.fileLoadProgressChanged) {
-            showUpdateButton();
+            //showUpdateButton();
             /*String name = (String) args[0];
             if (SharedConfig.isAppUpdateAvailable()) {
                 String fileName = FileLoader.getAttachFileName(SharedConfig.pendingAppUpdate.document);
@@ -8010,19 +8010,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             downloadProgress = 0.0f;
         }*/
         UpdateManager.isDownloadedUpdate(result -> {
-            boolean updateValid = false;
-            String data = OwlConfig.updateData;
-            try {
-                if(data.length() > 0) {
-                    if(UpdateManager.loadUpdate(new JSONObject(data)).version > UpdateManager.currentVersion()) {
-                        updateValid = true;
-                    }
-                }
-            } catch (Exception ignored){}
-            if(ApkDownloader.isRunningDownload()) {
+            if(AppDownloader.isRunningDownload()) {
                 type.set(MenuDrawable.TYPE_UDPATE_DOWNLOADING);
-                downloadProgress.set(ApkDownloader.percentage() / 100f);
-            } else if(result || (UpdateManager.isAvailableUpdate() && updateValid)) {
+                downloadProgress.set(AppDownloader.getDownloadProgress() / 100f);
+            } else if(result || UpdateManager.isAvailableUpdate()) {
                 type.set(MenuDrawable.TYPE_UDPATE_AVAILABLE);
                 downloadProgress.set(0.0f);
             } else {

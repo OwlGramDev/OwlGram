@@ -25,10 +25,8 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
-import org.telegram.messenger.browser.Browser;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.BackupImageView;
@@ -36,7 +34,6 @@ import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.LaunchActivity;
 
-import it.owlgram.android.StoreUtils;
 import it.owlgram.android.updates.ApkDownloader;
 import it.owlgram.android.updates.UpdateManager;
 
@@ -132,11 +129,7 @@ public class UpdateAlertDialog extends BottomSheet {
         BottomSheetCell doneButton = new BottomSheetCell(activity, false);
         doneButton.setText(LocaleController.formatString("AppUpdateDownloadNow", R.string.AppUpdateDownloadNow), false);
         doneButton.background.setOnClickListener(v -> {
-            if (!StoreUtils.isDownloadedFromAnyStore()) {
-                ApkDownloader.downloadAPK(activity, updateAvailable.link_file, updateAvailable.version);
-            } else if (StoreUtils.isFromPlayStore()) {
-                Browser.openUrl(getContext(), BuildVars.PLAYSTORE_APP_URL);
-            }
+            ApkDownloader.downloadAPK(activity, updateAvailable.link_file, updateAvailable.version);
             dismiss();
         });
         linearLayout.addView(doneButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50, 0, AndroidUtilities.dp(8), 0, 0));
