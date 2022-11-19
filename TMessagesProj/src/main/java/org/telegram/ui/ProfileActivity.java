@@ -237,6 +237,7 @@ import it.owlgram.android.settings.OwlgramSettings;
 import it.owlgram.android.translator.AutoTranslatePopupWrapper;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
+import it.owlgram.android.updates.ApkDownloader;
 
 public class ProfileActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, SharedMediaLayout.SharedMediaPreloaderDelegate, ImageUpdater.ImageUpdaterDelegate, SharedMediaLayout.Delegate {
     private final static int PHONE_OPTION_CALL = 0,
@@ -3462,6 +3463,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                 OwlConfig.setUpdateData("");
                                 OwlConfig.saveUpdateStatus(0);
                                 OwlConfig.remindUpdate(-1);
+                                OwlConfig.saveLastUpdateCheck(true);
+                                if (!StoreUtils.isDownloadedFromAnyStore()) ApkDownloader.deleteUpdate();
                                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                             } else if (which == 17) {
                                 Set<String> suggestions = getMessagesController().pendingSuggestions;

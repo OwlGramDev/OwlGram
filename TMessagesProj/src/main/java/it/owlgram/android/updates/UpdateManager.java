@@ -203,7 +203,8 @@ public class UpdateManager {
         String data = OwlConfig.updateData;
         try {
             if(data.length() > 0) {
-                if(UpdateManager.loadUpdate(new JSONObject(data)).version > BuildVars.BUILD_VERSION) {
+                UpdateAvailable update = loadUpdate(new JSONObject(data));
+                if (update.version > BuildVars.BUILD_VERSION && !update.isReminded()) {
                     updateValid = true;
                 }
             }

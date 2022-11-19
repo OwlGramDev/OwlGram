@@ -911,7 +911,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         MediaController.getInstance().setBaseActivity(this, true);
         ApplicationLoader.startAppCenter(this);
-        updateAppUpdateViews(false);
+        updateAppUpdateViews();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             FingerprintController.checkKeyReady();
@@ -4675,7 +4675,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     }
 
     private void createUpdateUI() {
-        if (sideMenuContainer == null) {
+        if (sideMenuContainer == null || updateLayout != null) {
             return;
         }
         updateLayout = new FrameLayout(this) {
@@ -4711,11 +4711,10 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         updateLayout.setWillNotDraw(false);
         updateLayout.setVisibility(View.INVISIBLE);
         updateLayout.setTranslationY(AndroidUtilities.dp(44));
-        if (Build.VERSION.SDK_INT >= 21) {
-            updateLayout.setBackground(Theme.getSelectorDrawable(0x40ffffff, false));
-        }
+        updateLayout.setBackground(Theme.getSelectorDrawable(0x40ffffff, false));
         sideMenuContainer.addView(updateLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 44, Gravity.LEFT | Gravity.BOTTOM));
         updateLayout.setOnClickListener(v -> {
+            if (!UpdateManager.isAvailableUpdate()) return;
             if (!StoreUtils.isDownloadedFromAnyStore()) {
                 if(ApkDownloader.isRunningDownload()) {
                     ApkDownloader.cancel();
@@ -4894,6 +4893,11 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     updateLayout.animate().translationY(0).setInterpolator(CubicBezierInterpolator.EASE_OUT).setListener(null).setDuration(180).start();
                     sideMenu.setPadding(0, 0, 0, AndroidUtilities.dp(44));
                 }
+            } else if (updateLayout != null) {
+                sideMenu.setPadding(0, 0, 0, 0);
+                ViewGroup parent = (ViewGroup) updateLayout.getParent();
+                parent.removeView(updateLayout);
+                updateLayout = null;
             }
         });
     }
@@ -4937,8 +4941,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                             UpdateManager.UpdateAvailable updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
                             long passed_time = (new Date().getTime() - OwlConfig.lastUpdateCheck) / 1000;
                             if(passed_time >= 3600 * 8 || OwlConfig.lastUpdateStatus != 1 && !updateAvailable.isReminded() || force) {
-                                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                                 OwlConfig.setUpdateData(updateResult.toString());
+                                OwlConfig.remindUpdate(-1);
+                                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                                 if (StoreUtils.isFromPlayStore()) {
                                     PlayStoreAPI.openUpdatePopup(LaunchActivity.this);
                                 } else {
@@ -6224,7 +6229,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 }
             }*/
         } else if (id == NotificationCenter.appUpdateAvailable) {
-            updateAppUpdateViews(mainFragmentsStack.size() == 1);
+            updateAppUpdateViews();
         } else if (id == NotificationCenter.currentUserShowLimitReachedDialog) {
             if (!mainFragmentsStack.isEmpty()) {
                 BaseFragment fragment = mainFragmentsStack.get(mainFragmentsStack.size() - 1);

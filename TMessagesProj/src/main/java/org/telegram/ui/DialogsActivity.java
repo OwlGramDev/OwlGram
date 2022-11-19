@@ -7971,20 +7971,25 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (updateLayoutAnimator != null) {
                 updateLayoutAnimator.cancel();
             }
-            if(result && updateLayout != null ) {
-                updateLayout.setVisibility(View.VISIBLE);
-                updateLayout.setTag(1);
-                updateLayoutAnimator = new AnimatorSet();
-                updateLayoutAnimator.setDuration(180);
-                updateLayoutAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT);
-                updateLayoutAnimator.playTogether(ObjectAnimator.ofFloat(updateLayout, View.TRANSLATION_Y, 0));
-                updateLayoutAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        updateLayoutAnimator = null;
-                    }
-                });
-                updateLayoutAnimator.start();
+            if (updateLayout != null) {
+                if(result) {
+                    updateLayout.setVisibility(View.VISIBLE);
+                    updateLayout.setTag(1);
+                    updateLayoutAnimator = new AnimatorSet();
+                    updateLayoutAnimator.setDuration(180);
+                    updateLayoutAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT);
+                    updateLayoutAnimator.playTogether(ObjectAnimator.ofFloat(updateLayout, View.TRANSLATION_Y, 0));
+                    updateLayoutAnimator.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            updateLayoutAnimator = null;
+                        }
+                    });
+                    updateLayoutAnimator.start();
+                } else {
+                    updateLayout.setVisibility(View.INVISIBLE);
+                    updateLayout.setTranslationY(AndroidUtilities.dp(48));
+                }
             }
         });
     }
@@ -7993,8 +7998,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (menuDrawable == null || updateLayout == null) {
             return;
         }
-        AtomicInteger type = new AtomicInteger();
-        AtomicReference<Float> downloadProgress = new AtomicReference<>((float) 0);
         /*if (SharedConfig.isAppUpdateAvailable()) {
             String fileName = FileLoader.getAttachFileName(SharedConfig.pendingAppUpdate.document);
             if (getFileLoader().isLoadingFile(fileName)) {
@@ -8010,19 +8013,19 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             downloadProgress = 0.0f;
         }*/
         UpdateManager.isDownloadedUpdate(result -> {
+            int type;
+            float downloadProgress = 0.0f;
             if(AppDownloader.isRunningDownload()) {
-                type.set(MenuDrawable.TYPE_UDPATE_DOWNLOADING);
-                downloadProgress.set(AppDownloader.getDownloadProgress() / 100f);
+                type = MenuDrawable.TYPE_UDPATE_DOWNLOADING;
+                downloadProgress = AppDownloader.getDownloadProgress() / 100f;
             } else if(result || UpdateManager.isAvailableUpdate()) {
-                type.set(MenuDrawable.TYPE_UDPATE_AVAILABLE);
-                downloadProgress.set(0.0f);
+                type = MenuDrawable.TYPE_UDPATE_AVAILABLE;
             } else {
-                type.set(MenuDrawable.TYPE_DEFAULT);
-                downloadProgress.set(0.0f);
+                type = MenuDrawable.TYPE_DEFAULT;
             }
             showUpdateButton();
-            menuDrawable.setType(type.get(), animated);
-            menuDrawable.setUpdateDownloadProgress(downloadProgress.get(), animated);
+            menuDrawable.setType(type, animated);
+            menuDrawable.setUpdateDownloadProgress(downloadProgress, animated);
         });
 
     }

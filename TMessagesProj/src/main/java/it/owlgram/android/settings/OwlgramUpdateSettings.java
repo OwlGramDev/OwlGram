@@ -116,6 +116,7 @@ public class OwlgramUpdateSettings extends BaseFragment {
                     ApkDownloader.deleteUpdate();
                     if (updateAvailable != null) {
                         OwlConfig.remindUpdate(updateAvailable.version);
+                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                         updateAvailable = null;
                         listAdapter.notifyItemRangeRemoved(updateSectionAvailableRow, 2);
                         listAdapter.notifyItemRangeChanged(updateSectionAvailableRow, 1);
@@ -301,6 +302,8 @@ public class OwlgramUpdateSettings extends BaseFragment {
                             if (updateAvailable != null) {
                                 ApkDownloader.deleteUpdate();
                                 OwlConfig.remindUpdate(updateAvailable.version);
+                                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
+                                updateCheckCell.setCheckTime();
                                 updateAvailable = null;
                                 listAdapter.notifyItemRangeRemoved(updateSectionAvailableRow, 2);
                                 listAdapter.notifyItemRangeChanged(updateSectionAvailableRow, 1);
@@ -373,19 +376,21 @@ public class OwlgramUpdateSettings extends BaseFragment {
                 checkingUpdates = false;
                 OwlConfig.saveLastUpdateCheck();
                 if (updateResult instanceof UpdateManager.UpdateAvailable) {
-                    updateCheckCell.setUpdateAvailableStatus();
-                    OwlConfig.saveUpdateStatus(1);
-                    OwlConfig.remindUpdate(-1);
-                    OwlConfig.setUpdateData(updateResult.toString());
-                    updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
-                    if (StoreUtils.isFromPlayStore()) {
-                        PlayStoreAPI.openUpdatePopup(getParentActivity());
-                    } else {
-                        listAdapter.notifyItemRangeInserted(updateSectionAvailableRow, 2);
-                        listAdapter.notifyItemRangeChanged(updateSectionAvailableRow, 1);
-                        updateRowsId();
+                    if (updateAvailable == null) {
+                        OwlConfig.saveUpdateStatus(1);
+                        OwlConfig.remindUpdate(-1);
+                        OwlConfig.setUpdateData(updateResult.toString());
+                        updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
+                        if (StoreUtils.isFromPlayStore()) {
+                            PlayStoreAPI.openUpdatePopup(getParentActivity());
+                        } else {
+                            listAdapter.notifyItemRangeInserted(updateSectionAvailableRow, 2);
+                            listAdapter.notifyItemRangeChanged(updateSectionAvailableRow, 1);
+                            updateRowsId();
+                        }
+                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                     }
-                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
+                    updateCheckCell.setUpdateAvailableStatus();
                 } else {
                     OwlConfig.saveUpdateStatus(0);
                     updateCheckCell.setCheckTime();

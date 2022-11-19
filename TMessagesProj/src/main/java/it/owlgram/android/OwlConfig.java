@@ -813,7 +813,11 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static void saveLastUpdateCheck() {
-        lastUpdateCheck = new Date().getTime();
+        saveLastUpdateCheck(false);
+    }
+
+    public static void saveLastUpdateCheck(boolean isReset) {
+        lastUpdateCheck = isReset ? 0 : new Date().getTime();
         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putLong("lastUpdateCheck", lastUpdateCheck);

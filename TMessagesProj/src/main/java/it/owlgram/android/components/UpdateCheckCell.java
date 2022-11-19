@@ -107,11 +107,12 @@ public class UpdateCheckCell extends RelativeLayout {
         checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
         setTime(date);
         canCheckForUpdate = true;
+        updateTitle();
     }
 
     private void updateTitle() {
         long date = OwlConfig.lastUpdateCheck;
-        boolean isUpdateAvailable = OwlConfig.lastUpdateStatus == 1 && OwlConfig.updateData.length() > 0;
+        boolean isUpdateAvailable = UpdateManager.isAvailableUpdate();
         if (isUpdateAvailable) {
             titleTextView.setText(LocaleController.getString("UpdateAvailable", R.string.UpdateAvailable));
         } else if (date != 0) {
@@ -144,6 +145,7 @@ public class UpdateCheckCell extends RelativeLayout {
             checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
         }
         setTime(OwlConfig.lastUpdateCheck);
+        updateTitle();
         canCheckForUpdate = true;
     }
 
@@ -155,6 +157,7 @@ public class UpdateCheckCell extends RelativeLayout {
         valueTextView.setText(LocaleController.getString("CheckFailed", R.string.CheckFailed));
         checkUpdateButton.setText(LocaleController.getString("CheckUpdates", R.string.CheckUpdates));
         canCheckForUpdate = true;
+        updateTitle();
     }
 
     public void setCanCheckForUpdate(boolean canCheckForUpdate) {
@@ -180,7 +183,6 @@ public class UpdateCheckCell extends RelativeLayout {
                 setCheckTime();
                 break;
         }
-        updateTitle();
     }
 
     protected void onCheckUpdate() {

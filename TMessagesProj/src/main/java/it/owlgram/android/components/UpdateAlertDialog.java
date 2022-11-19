@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.BottomSheet;
 import org.telegram.ui.ActionBar.Theme;
@@ -34,6 +35,7 @@ import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.LaunchActivity;
 
+import it.owlgram.android.OwlConfig;
 import it.owlgram.android.updates.ApkDownloader;
 import it.owlgram.android.updates.UpdateManager;
 
@@ -136,7 +138,11 @@ public class UpdateAlertDialog extends BottomSheet {
 
         BottomSheetCell scheduleButton = new BottomSheetCell(activity, true);
         scheduleButton.setText(LocaleController.getString("AppUpdateRemindMeLater", R.string.AppUpdateRemindMeLater), false);
-        scheduleButton.background.setOnClickListener(v -> dismiss());
+        scheduleButton.background.setOnClickListener(v -> {
+            OwlConfig.remindUpdate(updateAvailable.version);
+            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
+            dismiss();
+        });
         linearLayout.addView(scheduleButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50));
 
         ScrollView scrollView = new ScrollView(activity);

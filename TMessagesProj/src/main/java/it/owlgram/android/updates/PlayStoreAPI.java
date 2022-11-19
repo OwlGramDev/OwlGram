@@ -123,6 +123,7 @@ public class PlayStoreAPI {
                                 } else if (result == Activity.RESULT_CANCELED) {
                                     OwlConfig.remindUpdate(getVersionCode(appUpdateInfo));
                                     lastInstallStatus = InstallStatus.UNKNOWN;
+                                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                                 }
                             }
                         }
