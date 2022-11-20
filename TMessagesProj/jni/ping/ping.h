@@ -14,7 +14,7 @@
 #define SOCKET_MSG_ETIMEDOUT "The attempt to connect timed out before a connection was made"
 #define SOCKET_MSG_ECONNRESET "A connection was forcibly closed by a peer"
 #define SOCKET_MSG_ENETDOWN "The local network interface used to reach the destination is down"
-#define SOCKET_MSG_ENETUNREACH "No route to the network is present."
+#define SOCKET_MSG_ENETUNREACH "No route to the network is present"
 
 #define SOCKET_FMT_EGENERIC "A generic error has occurred. Errno: %d"
 

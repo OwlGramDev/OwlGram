@@ -37,7 +37,7 @@ extern JNIEXPORT jint JNICALL Java_it_owlgram_android_helpers_StandardHTTPReques
 
     int t0 = clock_gettime(CLOCK_REALTIME, &ts);
 
-    int socketfd = socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
+    int socketfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
     struct sockaddr_in* socketAddress = getSockAddrIn(env, address);
 
