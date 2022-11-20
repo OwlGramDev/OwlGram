@@ -18,6 +18,15 @@
 
 #define SOCKET_FMT_EGENERIC "A generic error has occurred. Errno: %d"
 
+#define MEASURE(t0, t1, clock_type, block) \
+    struct timespec t0; \
+    clock_gettime(clock_type, &t0);\
+    { \
+        block \
+    } \
+    struct timespec t1; \
+    clock_gettime(clock_type, &t1)
+
 #define LOGF(level, size, fmt, ...) \
     { \
         const char buffer[size]; \

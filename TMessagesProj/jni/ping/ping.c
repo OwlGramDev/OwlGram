@@ -34,29 +34,28 @@ extern JNIEXPORT jint JNICALL Java_it_owlgram_android_helpers_StandardHTTPReques
     __attribute__((unused)) jclass clazz,
     jstring address
 ) {
-    struct timespec ts;
+    MEASURE(t0, t1, CLOCK_MONOTONIC,
+    {
+        int socketfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-    int t0 = clock_gettime(CLOCK_REALTIME, &ts);
+        struct sockaddr_in *socketAddress = getSockAddrIn(env, address);
 
-    int socketfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        int res = connect(socketfd, socketAddress, sizeof(*socketAddress));
+        if (handleConnectError(env, res) == EXIT_FAILURE) {
+            return NULL; // won't be processed
+        }
 
-    struct sockaddr_in* socketAddress = getSockAddrIn(env, address);
+        res = send(socketfd, PING_REQUEST, strlen(PING_REQUEST), MSG_NOSIGNAL);
+        if (handleSendError(env, res) == EXIT_FAILURE) {
+            return NULL; // won't be processed
+        }
 
-    int res = connect(socketfd, socketAddress, sizeof(*socketAddress));
-    if(handleConnectError(env, res) == EXIT_FAILURE) {
-        return NULL; // won't be processed
-    }
+        shutdown(socketfd, SHUT_RDWR);
+    });
 
-    res = send(socketfd, PING_REQUEST, strlen(PING_REQUEST), MSG_NOSIGNAL);
-    if(handleSendError(env, res) == EXIT_FAILURE) {
-        return NULL; // won't be processed
-    }
+    int delta = (int) ((t1.tv_sec - t0.tv_sec) * 1000L + ((t1.tv_nsec - t0.tv_nsec) / 1000000L));
 
-    shutdown(socketfd, SHUT_RDWR);
+    LOGF(D, 255, "t0: %ul t1: %ul delta: %d", t0.tv_nsec, t1.tv_nsec, delta);
 
-    int t1 = clock_gettime(CLOCK_REALTIME, &ts);
-
-    LOGF(D, 255, "t0: %d t1: %d delta: %d", t0, t1, t1 - t0);
-
-    return (jint) (t1 - t0);
+    return (jint) delta;
 }

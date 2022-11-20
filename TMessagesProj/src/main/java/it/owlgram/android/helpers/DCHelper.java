@@ -195,6 +195,7 @@ public class DCHelper {
                             SystemClock.sleep(1000L * refreshTimeIn);
                         } catch (SocketException e) {
                             Log.e("owlgram/ping", "Ping failed", e);
+                            SystemClock.sleep(1000L);
                         } catch (Exception ignored) {
                             SystemClock.sleep(1000L);
                         }
