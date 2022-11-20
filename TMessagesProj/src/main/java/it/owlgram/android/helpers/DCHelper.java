@@ -2,6 +2,7 @@ package it.owlgram.android.helpers;
 
 import android.graphics.Color;
 import android.os.SystemClock;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -14,6 +15,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.tgnet.TLRPC;
 
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -191,6 +193,8 @@ public class DCHelper {
                                 AndroidUtilities.runOnUIThread(() -> updateCallback.onUpdate(infoArrayList));
                             }
                             SystemClock.sleep(1000L * refreshTimeIn);
+                        } catch (SocketException e) {
+                            Log.e("owlgram/ping", "Ping failed", e);
                         } catch (Exception ignored) {
                             SystemClock.sleep(1000L);
                         }
