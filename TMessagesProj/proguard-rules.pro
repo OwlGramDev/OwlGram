@@ -102,11 +102,11 @@
 -keep class org.apache.commons.text.** { *; }
 
 # Keep all class member names of CameraX
--keep class androidx.camera.extensions.impl.* { *; }
--keep class androidx.camera.camera2.internal.* { *; }
--keep class androidx.camera.camera2.interop.* { *; }
--keep class androidx.camera.core.* { *; }
--keep class androidx.camera.core.impl.* { *; }
+-keep class androidx.camera.extensions.impl.** { *; }
+-keep class androidx.camera.camera2.internal.** { *; }
+-keep class androidx.camera.camera2.interop.** { *; }
+-keep class androidx.camera.core.** { *; }
+-keep class androidx.camera.core.impl.** { *; }
 
 -keepclassmembernames class androidx.core.widget.NestedScrollView {
     private android.widget.OverScroller mScroller;
