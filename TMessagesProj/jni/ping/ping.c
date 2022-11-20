@@ -1,6 +1,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include <netinet/in.h>
@@ -20,7 +21,7 @@ struct sockaddr_in* getSockAddrIn(JNIEnv *env, jstring address) {
 
     const char *ip = (*env)->GetStringUTFChars(env, address, 0);
 
-    LOGF(I, 255, "Pinging %s", ip);
+    LOGF(D, 255, "Pinging %s", ip);
 
     inet_aton(ip, &socketAddress.sin_addr);
     (*env)->ReleaseStringUTFChars(env, address, ip);
@@ -46,7 +47,7 @@ extern JNIEXPORT jint JNICALL Java_it_owlgram_android_helpers_StandardHTTPReques
         return NULL; // won't be processed
     }
 
-    res = send(socketfd, PING_REQUEST, sizeof(PING_REQUEST), MSG_NOSIGNAL);
+    res = send(socketfd, PING_REQUEST, strlen(PING_REQUEST), MSG_NOSIGNAL);
     if(handleSendError(env, res) == EXIT_FAILURE) {
         return NULL; // won't be processed
     }
@@ -54,6 +55,8 @@ extern JNIEXPORT jint JNICALL Java_it_owlgram_android_helpers_StandardHTTPReques
     shutdown(socketfd, SHUT_RDWR);
 
     int t1 = clock_gettime(CLOCK_REALTIME, &ts);
+
+    LOGF(D, 255, "t0: %d t1: %d delta: %d", t0, t1, t1 - t0);
 
     return (jint) (t1 - t0);
 }
