@@ -1,8 +1,5 @@
 package it.owlgram.android;
 
-import android.app.Activity;
-import android.content.SharedPreferences;
-
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
@@ -126,117 +123,108 @@ public class OwlConfig extends SettingsManager {
             if (configLoaded) {
                 return;
             }
-            SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
             //VERSION_CHECK
             if (firstLoad) {
                 boolean backupFileExist = backupFile().exists();
-                DB_VERSION = preferences.getInt("DB_VERSION", 0);
-                if ((DB_VERSION < BuildVars.BUILD_VERSION || !backupFileExist) && preferences.getAll().size() > 0) {
+                DB_VERSION = getInt("DB_VERSION", 0);
+                if (DB_VERSION < BuildVars.BUILD_VERSION && backupFileExist) {
+                    restoreBackup(backupFile(), true);
                     DB_VERSION = BuildVars.BUILD_VERSION;
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putInt("DB_VERSION", DB_VERSION);
-                    editor.apply();
-                    if (preferences.getAll().size() != 0 || backupFileExist) {
-                        if (!backupFileExist) {
-                            executeBackup();
-                        } else {
-                            restoreBackup(backupFile(), true);
-                        }
-                    }
+                    putValue("DB_VERSION", DB_VERSION);
                 }
-                preferences.registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> executeBackup());
+                registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> executeBackup());
             }
             isChineseUser = ApplicationLoader.applicationContext.getResources().getBoolean(R.bool.isChineseUser);
-            hidePhoneNumber = preferences.getBoolean("hidePhoneNumber", true);
-            hideContactNumber = preferences.getBoolean("hideContactNumber", true);
-            fullTime = preferences.getBoolean("fullTime", false);
-            roundedNumbers = preferences.getBoolean("roundedNumbers", true);
-            confirmCall = preferences.getBoolean("confirmCall", true);
-            mediaFlipByTap = preferences.getBoolean("mediaFlipByTap", true);
-            jumpChannel = preferences.getBoolean("jumpChannel", true);
-            hideKeyboard = preferences.getBoolean("hideKeyboard", false);
-            gifAsVideo = preferences.getBoolean("gifAsVideo", false);
-            showFolderWhenForward = preferences.getBoolean("showFolderWhenForward", true);
-            useRearCamera = preferences.getBoolean("useRearCamera", false);
-            sendConfirm = preferences.getBoolean("sendConfirm", false);
-            useSystemFont = preferences.getBoolean("useSystemFont", false);
-            useSystemEmoji = preferences.getBoolean("useSystemEmoji", false);
-            showGreetings = preferences.getBoolean("showGreetings", true);
-            showTranslate = preferences.getBoolean("showTranslate", false);
-            showSaveMessage = preferences.getBoolean("showSaveMessage", false);
-            showRepeat = preferences.getBoolean("showRepeat", false);
-            showNoQuoteForward = preferences.getBoolean("showNoQuoteForward", false);
-            showMessageDetails = preferences.getBoolean("showMessageDetails", false);
-            betaUpdates = preferences.getBoolean("betaUpdates", false);
-            notifyUpdates = preferences.getBoolean("notifyUpdates", true);
-            avatarBackgroundDarken = preferences.getBoolean("avatarBackgroundDarken", false);
-            avatarBackgroundBlur = preferences.getBoolean("avatarBackgroundBlur", false);
-            avatarAsDrawerBackground = preferences.getBoolean("avatarAsDrawerBackground", false);
-            showReportMessage = preferences.getBoolean("showReportMessage", true);
-            showGradientColor = preferences.getBoolean("showGradientColor", false);
-            showAvatarImage = preferences.getBoolean("showAvatarImage", true);
-            owlEasterSound = preferences.getBoolean("owlEasterSound", true);
-            pacmanForced = preferences.getBoolean("pacmanForced", false);
-            smartButtons = preferences.getBoolean("smartButtons", false);
-            disableAppBarShadow = preferences.getBoolean("disableAppBarShadow", false);
-            accentAsNotificationColor = preferences.getBoolean("accentAsNotificationColor", false);
-            showDeleteDownloadedFile = preferences.getBoolean("showDeleteDownloadedFile", false);
-            lastUpdateCheck = preferences.getLong("lastUpdateCheck", 0);
-            lastUpdateStatus = preferences.getInt("lastUpdateStatus", 0);
-            remindedUpdate = preferences.getInt("remindedUpdate", 0);
-            translationTarget = preferences.getString("translationTarget", "app");
-            translationKeyboardTarget = preferences.getString("translationKeyboardTarget", "app");
-            updateData = preferences.getString("updateData", "");
-            drawerItems = preferences.getString("drawerItems", "[]");
-            oldDownloadedVersion = preferences.getInt("oldDownloadedVersion", 0);
-            eventType = preferences.getInt("eventType", 0);
-            buttonStyleType = preferences.getInt("buttonStyleType", 0);
-            tabMode = preferences.getInt("tabMode", 1);
-            translatorStyle = preferences.getInt("translatorStyle", BaseTranslator.INLINE_STYLE);
-            blurIntensity = preferences.getInt("blurIntensity", 75);
-            oldBuildVersion = preferences.getString("oldBuildVersion", null);
-            stickerSizeStack = preferences.getInt("stickerSizeStack", 14);
-            deepLFormality = preferences.getInt("deepLFormality", DeepLTranslator.FORMALITY_DEFAULT);
-            translationProvider = preferences.getInt("translationProvider", Translator.PROVIDER_GOOGLE);
-            showSantaHat = preferences.getBoolean("showSantaHat", true);
-            showSnowFalling = preferences.getBoolean("showSnowFalling", true);
-            cameraType = preferences.getInt("cameraType", CameraXUtilities.getDefault());
-            cameraXFps = preferences.getInt("cameraXFps", SharedConfig.getDevicePerformanceClass() == SharedConfig.PERFORMANCE_CLASS_HIGH ? 60 : 30);
-            useCameraXOptimizedMode = preferences.getBoolean("useCameraXOptimizedMode", SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_HIGH);
-            disableProximityEvents = preferences.getBoolean("disableProximityEvents", false);
-            verifyLinkTip = preferences.getBoolean("verifyLinkTip", false);
-            languagePackVersioning = preferences.getString("languagePackVersioning", "{}");
-            xiaomiBlockedInstaller = preferences.getBoolean("xiaomiBlockedInstaller", false);
-            voicesAgc = preferences.getBoolean("voicesAgc", false);
-            turnSoundOnVDKey = preferences.getBoolean("turnSoundOnVDKey", true);
-            openArchiveOnPull = preferences.getBoolean("openArchiveOnPull", false);
-            slidingChatTitle = preferences.getBoolean("slidingChatTitle", false);
-            confirmStickersGIFs = preferences.getBoolean("confirmStickersGIFs", false);
-            showIDAndDC = preferences.getBoolean("showIDAndDC", false);
-            doNotTranslateLanguages = preferences.getString("doNotTranslateLanguages", "[\"app\"]");
-            dcStyleType = preferences.getInt("dcStyleType", 0);
-            idType = preferences.getInt("idType", 0);
-            searchIconInActionBar = preferences.getBoolean("searchIconInActionBar", false);
-            autoTranslate = preferences.getBoolean("autoTranslate", false);
-            showCopyPhoto = preferences.getBoolean("showCopyPhoto", false);
-            showNameInActionBar = preferences.getBoolean("showNameInActionBar", false);
-            showPencilIcon = preferences.getBoolean("showPencilIcon", false);
-            keepTranslationMarkdown = preferences.getBoolean("keepTranslationMarkdown", true);
-            hideTimeOnSticker = preferences.getBoolean("hideTimeOnSticker", false);
-            showStatusInChat = preferences.getBoolean("showStatusInChat", false);
-            unlockedSecretIcon = preferences.getInt("unlockedSecretIcon", 0);
-            showPatpat = preferences.getBoolean("showPatpat", false);
-            unlockedChupa = preferences.getBoolean("unlockedChupa", false);
-            hideAllTab = preferences.getBoolean("hideAllTab", false);
+            hidePhoneNumber = getBoolean("hidePhoneNumber", true);
+            hideContactNumber = getBoolean("hideContactNumber", true);
+            fullTime = getBoolean("fullTime", false);
+            roundedNumbers = getBoolean("roundedNumbers", true);
+            confirmCall = getBoolean("confirmCall", true);
+            mediaFlipByTap = getBoolean("mediaFlipByTap", true);
+            jumpChannel = getBoolean("jumpChannel", true);
+            hideKeyboard = getBoolean("hideKeyboard", false);
+            gifAsVideo = getBoolean("gifAsVideo", false);
+            showFolderWhenForward = getBoolean("showFolderWhenForward", true);
+            useRearCamera = getBoolean("useRearCamera", false);
+            sendConfirm = getBoolean("sendConfirm", false);
+            useSystemFont = getBoolean("useSystemFont", false);
+            useSystemEmoji = getBoolean("useSystemEmoji", false);
+            showGreetings = getBoolean("showGreetings", true);
+            showTranslate = getBoolean("showTranslate", false);
+            showSaveMessage = getBoolean("showSaveMessage", false);
+            showRepeat = getBoolean("showRepeat", false);
+            showNoQuoteForward = getBoolean("showNoQuoteForward", false);
+            showMessageDetails = getBoolean("showMessageDetails", false);
+            betaUpdates = getBoolean("betaUpdates", false);
+            notifyUpdates = getBoolean("notifyUpdates", true);
+            avatarBackgroundDarken = getBoolean("avatarBackgroundDarken", false);
+            avatarBackgroundBlur = getBoolean("avatarBackgroundBlur", false);
+            avatarAsDrawerBackground = getBoolean("avatarAsDrawerBackground", false);
+            showReportMessage = getBoolean("showReportMessage", true);
+            showGradientColor = getBoolean("showGradientColor", false);
+            showAvatarImage = getBoolean("showAvatarImage", true);
+            owlEasterSound = getBoolean("owlEasterSound", true);
+            pacmanForced = getBoolean("pacmanForced", false);
+            smartButtons = getBoolean("smartButtons", false);
+            disableAppBarShadow = getBoolean("disableAppBarShadow", false);
+            accentAsNotificationColor = getBoolean("accentAsNotificationColor", false);
+            showDeleteDownloadedFile = getBoolean("showDeleteDownloadedFile", false);
+            lastUpdateCheck = getLong("lastUpdateCheck", 0);
+            lastUpdateStatus = getInt("lastUpdateStatus", 0);
+            remindedUpdate = getInt("remindedUpdate", 0);
+            translationTarget = getString("translationTarget", "app");
+            translationKeyboardTarget = getString("translationKeyboardTarget", "app");
+            updateData = getString("updateData", "");
+            drawerItems = getString("drawerItems", "[]");
+            oldDownloadedVersion = getInt("oldDownloadedVersion", 0);
+            eventType = getInt("eventType", 0);
+            buttonStyleType = getInt("buttonStyleType", 0);
+            tabMode = getInt("tabMode", 1);
+            translatorStyle = getInt("translatorStyle", BaseTranslator.INLINE_STYLE);
+            blurIntensity = getInt("blurIntensity", 75);
+            oldBuildVersion = getString("oldBuildVersion", null);
+            stickerSizeStack = getInt("stickerSizeStack", 14);
+            deepLFormality = getInt("deepLFormality", DeepLTranslator.FORMALITY_DEFAULT);
+            translationProvider = getInt("translationProvider", Translator.PROVIDER_GOOGLE);
+            showSantaHat = getBoolean("showSantaHat", true);
+            showSnowFalling = getBoolean("showSnowFalling", true);
+            cameraType = getInt("cameraType", CameraXUtilities.getDefault());
+            cameraXFps = getInt("cameraXFps", SharedConfig.getDevicePerformanceClass() == SharedConfig.PERFORMANCE_CLASS_HIGH ? 60 : 30);
+            useCameraXOptimizedMode = getBoolean("useCameraXOptimizedMode", SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_HIGH);
+            disableProximityEvents = getBoolean("disableProximityEvents", false);
+            verifyLinkTip = getBoolean("verifyLinkTip", false);
+            languagePackVersioning = getString("languagePackVersioning", "{}");
+            xiaomiBlockedInstaller = getBoolean("xiaomiBlockedInstaller", false);
+            voicesAgc = getBoolean("voicesAgc", false);
+            turnSoundOnVDKey = getBoolean("turnSoundOnVDKey", true);
+            openArchiveOnPull = getBoolean("openArchiveOnPull", false);
+            slidingChatTitle = getBoolean("slidingChatTitle", false);
+            confirmStickersGIFs = getBoolean("confirmStickersGIFs", false);
+            showIDAndDC = getBoolean("showIDAndDC", false);
+            doNotTranslateLanguages = getString("doNotTranslateLanguages", "[\"app\"]");
+            dcStyleType = getInt("dcStyleType", 0);
+            idType = getInt("idType", 0);
+            searchIconInActionBar = getBoolean("searchIconInActionBar", false);
+            autoTranslate = getBoolean("autoTranslate", false);
+            showCopyPhoto = getBoolean("showCopyPhoto", false);
+            showNameInActionBar = getBoolean("showNameInActionBar", false);
+            showPencilIcon = getBoolean("showPencilIcon", false);
+            keepTranslationMarkdown = getBoolean("keepTranslationMarkdown", true);
+            hideTimeOnSticker = getBoolean("hideTimeOnSticker", false);
+            showStatusInChat = getBoolean("showStatusInChat", false);
+            unlockedSecretIcon = getInt("unlockedSecretIcon", 0);
+            showPatpat = getBoolean("showPatpat", false);
+            unlockedChupa = getBoolean("unlockedChupa", false);
+            hideAllTab = getBoolean("hideAllTab", false);
 
             //EXPERIMENTAL OPTIONS
-            devOptEnabled = preferences.getBoolean("devOptEnabled", false);
+            devOptEnabled = getBoolean("devOptEnabled", false);
 
             String dS = devOptEnabled ? "" : "_disabled";
-            maxRecentStickers = preferences.getInt("maxRecentStickers" + dS, 20);
-            betterAudioQuality = preferences.getBoolean("betterAudioQuality" + dS, false);
-            downloadSpeedBoost = preferences.getInt("downloadSpeedBoost" + dS, 0);
-            uploadSpeedBoost = preferences.getBoolean("uploadSpeedBoost" + dS, false);
+            maxRecentStickers = getInt("maxRecentStickers" + dS, 20);
+            betterAudioQuality = getBoolean("betterAudioQuality" + dS, false);
+            downloadSpeedBoost = getInt("downloadSpeedBoost" + dS, 0);
+            uploadSpeedBoost = getBoolean("uploadSpeedBoost" + dS, false);
             configLoaded = true;
             migrate();
         }
@@ -250,554 +238,347 @@ public class OwlConfig extends SettingsManager {
 
     public static void toggleHidePhone() {
         hidePhoneNumber = !hidePhoneNumber;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("hidePhoneNumber", hidePhoneNumber);
-        editor.apply();
+        putValue("hidePhoneNumber", hidePhoneNumber);
     }
 
     public static void toggleHideContactNumber() {
         hideContactNumber = !hideContactNumber;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("hideContactNumber", hideContactNumber);
-        editor.apply();
+        putValue("hideContactNumber", hideContactNumber);
     }
 
     public static void toggleFullTime() {
         fullTime = !fullTime;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("fullTime", fullTime);
-        editor.apply();
+        putValue("fullTime", fullTime);
     }
 
     public static void toggleRoundedNumbers() {
         roundedNumbers = !roundedNumbers;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("roundedNumbers", roundedNumbers);
-        editor.apply();
+        putValue("roundedNumbers", roundedNumbers);
     }
 
     public static void toggleConfirmCall() {
         confirmCall = !confirmCall;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("confirmCall", confirmCall);
-        editor.apply();
+        putValue("confirmCall", confirmCall);
     }
 
     public static void toggleMediaFlipByTap() {
         mediaFlipByTap = !mediaFlipByTap;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("mediaFlipByTap", mediaFlipByTap);
-        editor.apply();
+        putValue("mediaFlipByTap", mediaFlipByTap);
     }
 
     public static void toggleJumpChannel() {
         jumpChannel = !jumpChannel;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("jumpChannel", jumpChannel);
-        editor.apply();
+        putValue("jumpChannel", jumpChannel);
     }
 
     public static void toggleHideKeyboard() {
         hideKeyboard = !hideKeyboard;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("hideKeyboard", hideKeyboard);
-        editor.apply();
+        putValue("hideKeyboard", hideKeyboard);
     }
 
     public static void toggleGifAsVideo() {
         gifAsVideo = !gifAsVideo;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("gifAsVideo", gifAsVideo);
-        editor.apply();
+        putValue("gifAsVideo", gifAsVideo);
     }
 
     public static void toggleShowFolderWhenForward() {
         showFolderWhenForward = !showFolderWhenForward;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showFolderWhenForward", showFolderWhenForward);
-        editor.apply();
+        putValue("showFolderWhenForward", showFolderWhenForward);
     }
 
     public static void toggleUseRearCamera() {
         useRearCamera = !useRearCamera;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("useRearCamera", useRearCamera);
-        editor.apply();
+        putValue("useRearCamera", useRearCamera);
     }
 
     public static void toggleSendConfirm() {
         sendConfirm = !sendConfirm;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("sendConfirm", sendConfirm);
-        editor.apply();
+        putValue("sendConfirm", sendConfirm);
     }
 
     public static void toggleUseSystemFont() {
         useSystemFont = !useSystemFont;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("useSystemFont", useSystemFont);
-        editor.apply();
+        putValue("useSystemFont", useSystemFont);
     }
 
     public static void toggleUseSystemEmoji() {
         useSystemEmoji = !useSystemEmoji;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("useSystemEmoji", useSystemEmoji);
-        editor.apply();
+        putValue("useSystemEmoji", useSystemEmoji);
     }
 
     public static void toggleShowGreetings() {
         showGreetings = !showGreetings;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showGreetings", showGreetings);
-        editor.apply();
+        putValue("showGreetings", showGreetings);
     }
 
     public static void toggleShowTranslate() {
         showTranslate = !showTranslate;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showTranslate", showTranslate);
-        editor.apply();
+        putValue("showTranslate", showTranslate);
     }
 
     public static void toggleShowSaveMessage() {
         showSaveMessage = !showSaveMessage;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showSaveMessage", showSaveMessage);
-        editor.apply();
+        putValue("showSaveMessage", showSaveMessage);
     }
 
     public static void toggleShowRepeat() {
         showRepeat = !showRepeat;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showRepeat", showRepeat);
-        editor.apply();
+        putValue("showRepeat", showRepeat);
     }
 
     public static void toggleShowMessageDetails() {
         showMessageDetails = !showMessageDetails;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showMessageDetails", showMessageDetails);
-        editor.apply();
+        putValue("showMessageDetails", showMessageDetails);
     }
 
     public static void toggleShowNoQuoteForwardRow() {
         showNoQuoteForward = !showNoQuoteForward;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showNoQuoteForward", showNoQuoteForward);
-        editor.apply();
+        putValue("showNoQuoteForward", showNoQuoteForward);
     }
 
     public static void toggleBetaUpdates() {
         betaUpdates = !betaUpdates;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("betaUpdates", betaUpdates);
-        editor.apply();
+        putValue("betaUpdates", betaUpdates);
     }
 
     public static void toggleNotifyUpdates() {
         notifyUpdates = !notifyUpdates;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("notifyUpdates", notifyUpdates);
-        editor.apply();
+        putValue("notifyUpdates", notifyUpdates);
     }
 
     public static void toggleAvatarAsDrawerBackground() {
         avatarAsDrawerBackground = !avatarAsDrawerBackground;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("avatarAsDrawerBackground", avatarAsDrawerBackground);
-        editor.apply();
+        putValue("avatarAsDrawerBackground", avatarAsDrawerBackground);
     }
 
     public static void toggleAvatarBackgroundBlur() {
         avatarBackgroundBlur = !avatarBackgroundBlur;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("avatarBackgroundBlur", avatarBackgroundBlur);
-        editor.apply();
+        putValue("avatarBackgroundBlur", avatarBackgroundBlur);
     }
 
     public static void toggleAvatarBackgroundDarken() {
         avatarBackgroundDarken = !avatarBackgroundDarken;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("avatarBackgroundDarken", avatarBackgroundDarken);
-        editor.apply();
+        putValue("avatarBackgroundDarken", avatarBackgroundDarken);
     }
 
     public static void toggleShowReportMessage() {
         showReportMessage = !showReportMessage;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showReportMessage", showReportMessage);
-        editor.apply();
+        putValue("showReportMessage", showReportMessage);
     }
 
     public static void toggleBetterAudioQuality() {
         betterAudioQuality = !betterAudioQuality;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("betterAudioQuality", betterAudioQuality);
-        editor.apply();
+        putValue("betterAudioQuality", betterAudioQuality);
     }
 
     public static void toggleShowGradientColor() {
         showGradientColor = !showGradientColor;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showGradientColor", showGradientColor);
-        editor.apply();
+        putValue("showGradientColor", showGradientColor);
     }
 
     public static void toggleShowAvatarImage() {
         showAvatarImage = !showAvatarImage;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showAvatarImage", showAvatarImage);
-        editor.apply();
+        putValue("showAvatarImage", showAvatarImage);
     }
 
     public static void toggleOwlEasterSound() {
         owlEasterSound = !owlEasterSound;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("owlEasterSound", owlEasterSound);
-        editor.apply();
+        putValue("owlEasterSound", owlEasterSound);
     }
 
     public static void togglePacmanForced() {
         pacmanForced = !pacmanForced;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("pacmanForced", pacmanForced);
-        editor.apply();
+        putValue("pacmanForced", pacmanForced);
     }
 
     public static void toggleSmartButtons() {
         smartButtons = !smartButtons;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("smartButtons", smartButtons);
-        editor.apply();
+        putValue("smartButtons", smartButtons);
     }
 
     public static void toggleAppBarShadow() {
         disableAppBarShadow = !disableAppBarShadow;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("disableAppBarShadow", disableAppBarShadow);
-        editor.apply();
+        putValue("disableAppBarShadow", disableAppBarShadow);
     }
 
     public static void toggleAccentColor() {
         accentAsNotificationColor = !accentAsNotificationColor;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("accentAsNotificationColor", accentAsNotificationColor);
-        editor.apply();
+        putValue("accentAsNotificationColor", accentAsNotificationColor);
     }
 
     public static void toggleShowDeleteDownloadedFile() {
         showDeleteDownloadedFile = !showDeleteDownloadedFile;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showDeleteDownloadedFile", showDeleteDownloadedFile);
-        editor.apply();
+        putValue("showDeleteDownloadedFile", showDeleteDownloadedFile);
     }
 
     public static void toggleShowCopyPhoto() {
         showCopyPhoto = !showCopyPhoto;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showCopyPhoto", showCopyPhoto);
-        editor.apply();
+        putValue("showCopyPhoto", showCopyPhoto);
     }
 
     public static void toggleShowNameInActionBar() {
         showNameInActionBar = !showNameInActionBar;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showNameInActionBar", showNameInActionBar);
-        editor.apply();
+        putValue("showNameInActionBar", showNameInActionBar);
     }
 
     public static void toggleShowSantaHat() {
         showSantaHat = !showSantaHat;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showSantaHat", showSantaHat);
-        editor.apply();
+        putValue("showSantaHat", showSantaHat);
     }
 
     public static void toggleShowSnowFalling() {
         showSnowFalling = !showSnowFalling;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showSnowFalling", showSnowFalling);
-        editor.apply();
+        putValue("showSnowFalling", showSnowFalling);
     }
 
     public static void toggleCameraXOptimizedMode() {
         useCameraXOptimizedMode = !useCameraXOptimizedMode;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("useCameraXOptimizedMode", useCameraXOptimizedMode);
-        editor.apply();
+        putValue("useCameraXOptimizedMode", useCameraXOptimizedMode);
     }
 
     public static void toggleDisableProximityEvents() {
         disableProximityEvents = !disableProximityEvents;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("disableProximityEvents", disableProximityEvents);
-        editor.apply();
+        putValue("disableProximityEvents", disableProximityEvents);
     }
 
     public static void toggleVoicesAgc() {
         voicesAgc = !voicesAgc;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("voicesAgc", voicesAgc);
-        editor.apply();
+        putValue("voicesAgc", voicesAgc);
     }
 
     public static void toggleTurnSoundOnVDKey() {
         turnSoundOnVDKey = !turnSoundOnVDKey;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("turnSoundOnVDKey", turnSoundOnVDKey);
-        editor.apply();
+        putValue("turnSoundOnVDKey", turnSoundOnVDKey);
     }
 
     public static void toggleOpenArchiveOnPull() {
         openArchiveOnPull = !openArchiveOnPull;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("openArchiveOnPull", openArchiveOnPull);
-        editor.apply();
+        putValue("openArchiveOnPull", openArchiveOnPull);
     }
 
     public static void toggleSlidingChatTitle() {
         slidingChatTitle = !slidingChatTitle;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("slidingChatTitle", slidingChatTitle);
-        editor.apply();
+        putValue("slidingChatTitle", slidingChatTitle);
     }
 
     public static void toggleConfirmStickersGIFs() {
         confirmStickersGIFs = !confirmStickersGIFs;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("confirmStickersGIFs", confirmStickersGIFs);
-        editor.apply();
+        putValue("confirmStickersGIFs", confirmStickersGIFs);
     }
 
     public static void toggleShowIDAndDC() {
         showIDAndDC = !showIDAndDC;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showIDAndDC", showIDAndDC);
-        editor.apply();
+        putValue("showIDAndDC", showIDAndDC);
     }
 
     public static void toggleSearchIconInActionBar() {
         searchIconInActionBar = !searchIconInActionBar;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("searchIconInActionBar", searchIconInActionBar);
-        editor.apply();
+        putValue("searchIconInActionBar", searchIconInActionBar);
     }
 
     public static void toggleAutoTranslate() {
         autoTranslate = !autoTranslate;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("autoTranslate", autoTranslate);
-        editor.apply();
+        putValue("autoTranslate", autoTranslate);
     }
 
     public static void toggleShowPencilIcon() {
         showPencilIcon = !showPencilIcon;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showPencilIcon", showPencilIcon);
-        editor.apply();
+        putValue("showPencilIcon", showPencilIcon);
     }
 
     public static void toggleKeepTranslationMarkdown() {
         keepTranslationMarkdown = !keepTranslationMarkdown;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("keepTranslationMarkdown", keepTranslationMarkdown);
-        editor.apply();
+        putValue("keepTranslationMarkdown", keepTranslationMarkdown);
     }
 
     public static void toggleUploadSpeedBoost() {
         uploadSpeedBoost = !uploadSpeedBoost;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("uploadSpeedBoost", uploadSpeedBoost);
-        editor.apply();
+        putValue("uploadSpeedBoost", uploadSpeedBoost);
     }
 
     public static void toggleHideTimeOnSticker() {
         hideTimeOnSticker = !hideTimeOnSticker;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("hideTimeOnSticker", hideTimeOnSticker);
-        editor.apply();
+        putValue("hideTimeOnSticker", hideTimeOnSticker);
     }
 
     public static void toggleShowStatusInChat() {
         showStatusInChat = !showStatusInChat;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showStatusInChat", showStatusInChat);
-        editor.apply();
+        putValue("showStatusInChat", showStatusInChat);
     }
 
     public static void toggleShowPatpat() {
         showPatpat = !showPatpat;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("showPatpat", showPatpat);
-        editor.apply();
+        putValue("showPatpat", showPatpat);
     }
 
     public static void toggleHideAllTab() {
         hideAllTab = !hideAllTab;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("hideAllTab", hideAllTab);
-        editor.apply();
+        putValue("hideAllTab", hideAllTab);
     }
 
     public static void unlockChupa() {
         unlockedChupa = true;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("unlockedChupa", unlockedChupa);
-        editor.apply();
+        putValue("unlockedChupa", true);
     }
 
     public static void setUnlockedSecretIcon(int value) {
         unlockedSecretIcon = value;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("unlockedSecretIcon", unlockedSecretIcon);
-        editor.apply();
+        putValue("unlockedSecretIcon", unlockedSecretIcon);
     }
 
     public static void setXiaomiBlockedInstaller() {
         xiaomiBlockedInstaller = true;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("xiaomiBlockedInstaller", xiaomiBlockedInstaller);
-        editor.apply();
+        putValue("xiaomiBlockedInstaller", true);
     }
 
     public static void setVerifyLinkTip(boolean shown) {
         verifyLinkTip = shown;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("verifyLinkTip", verifyLinkTip);
-        editor.apply();
+        putValue("verifyLinkTip", verifyLinkTip);
     }
 
     public static void setTranslationProvider(int provider) {
         translationProvider = provider;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("translationProvider", translationProvider);
-        editor.apply();
+        putValue("translationProvider", translationProvider);
     }
 
     public static void setTranslationTarget(String target) {
         translationTarget = target;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("translationTarget", translationTarget);
-        editor.apply();
+        putValue("translationTarget", translationTarget);
     }
 
     public static void setTranslationKeyboardTarget(String target) {
         translationKeyboardTarget = target;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("translationKeyboardTarget", translationKeyboardTarget);
-        editor.apply();
+        putValue("translationKeyboardTarget", translationKeyboardTarget);
     }
 
     public static void setDeepLFormality(int formality) {
         deepLFormality = formality;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("deepLFormality", deepLFormality);
-        editor.apply();
+        putValue("deepLFormality", deepLFormality);
     }
 
     public static void setTranslatorStyle(int style) {
         translatorStyle = style;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("translatorStyle", translatorStyle);
-        editor.apply();
+        putValue("translatorStyle", translatorStyle);
     }
 
     public static void setTabMode(int mode) {
         tabMode = mode;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("tabMode", tabMode);
-        editor.apply();
+        putValue("tabMode", tabMode);
     }
 
     public static void setStickerSize(int size) {
         stickerSizeStack = size;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("stickerSizeStack", stickerSizeStack);
-        editor.apply();
+        putValue("stickerSizeStack", stickerSizeStack);
     }
 
     public static void setDcStyleType(int type) {
         dcStyleType = type;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("dcStyleType", dcStyleType);
-        editor.apply();
+        putValue("dcStyleType", dcStyleType);
     }
 
     public static void setIdType(int type) {
         idType = type;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("idType", idType);
-        editor.apply();
+        putValue("idType", idType);
     }
 
     public static String currentNotificationVersion() {
@@ -806,10 +587,7 @@ public class OwlConfig extends SettingsManager {
 
     public static void updateCurrentVersion() {
         oldBuildVersion = currentNotificationVersion();
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("oldBuildVersion", oldBuildVersion);
-        editor.apply();
+        putValue("oldBuildVersion", oldBuildVersion);
     }
 
     public static void saveLastUpdateCheck() {
@@ -818,123 +596,78 @@ public class OwlConfig extends SettingsManager {
 
     public static void saveLastUpdateCheck(boolean isReset) {
         lastUpdateCheck = isReset ? 0 : new Date().getTime();
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putLong("lastUpdateCheck", lastUpdateCheck);
-        editor.apply();
+        putValue("lastUpdateCheck", lastUpdateCheck);
     }
 
     public static void saveUpdateStatus(int status) {
         lastUpdateStatus = status;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("lastUpdateStatus", lastUpdateStatus);
-        editor.apply();
+        putValue("lastUpdateStatus", lastUpdateStatus);
     }
 
     public static void saveBlurIntensity(int intensity) {
         blurIntensity = intensity;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("blurIntensity", blurIntensity);
-        editor.apply();
+        putValue("blurIntensity", blurIntensity);
     }
 
     public static void remindUpdate(int version) {
         remindedUpdate = version;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("remindedUpdate", remindedUpdate);
-        editor.apply();
+        putValue("remindedUpdate", remindedUpdate);
         saveUpdateStatus(0);
     }
 
     public static void saveOldVersion(int version) {
         oldDownloadedVersion = version;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("oldDownloadedVersion", oldDownloadedVersion);
-        editor.apply();
+        putValue("oldDownloadedVersion", oldDownloadedVersion);
     }
 
     public static void saveButtonStyle(int type) {
         buttonStyleType = type;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("buttonStyleType", buttonStyleType);
-        editor.apply();
+        putValue("buttonStyleType", buttonStyleType);
     }
 
     public static void saveEventType(int type) {
         eventType = type;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("eventType", eventType);
-        editor.apply();
+        putValue("eventType", eventType);
     }
 
     public static void saveCameraType(int type) {
         cameraType = type;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("cameraType", cameraType);
-        editor.apply();
+        putValue("cameraType", cameraType);
     }
 
     public static void saveCameraXFps(int fps) {
         cameraXFps = fps;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("cameraXFps", cameraXFps);
-        editor.apply();
+        putValue("cameraXFps", cameraXFps);
     }
 
     public static void setMaxRecentStickers(int size) {
         maxRecentStickers = size;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("maxRecentStickers", maxRecentStickers);
-        editor.apply();
+        putValue("maxRecentStickers", maxRecentStickers);
     }
 
     public static void setUpdateData(String data) {
         updateData = data;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("updateData", updateData);
-        editor.apply();
+        putValue("updateData", updateData);
     }
 
     public static void setDrawerItems(String data) {
         drawerItems = data;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("drawerItems", drawerItems);
-        editor.apply();
+        putValue("drawerItems", drawerItems);
     }
 
     public static void setLanguagePackVersioning(String data) {
         languagePackVersioning = data;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("languagePackVersioning", languagePackVersioning);
-        editor.apply();
+        putValue("languagePackVersioning", languagePackVersioning);
     }
 
     public static void setDoNotTranslateLanguages(String data) {
         doNotTranslateLanguages = data;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("doNotTranslateLanguages", doNotTranslateLanguages);
-        editor.apply();
+        putValue("doNotTranslateLanguages", doNotTranslateLanguages);
     }
 
     public static void setDownloadSpeedBoost(int boost) {
         downloadSpeedBoost = boost;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("downloadSpeedBoost", downloadSpeedBoost);
-        editor.apply();
+        putValue("downloadSpeedBoost", downloadSpeedBoost);
     }
 
     public static int getNotificationColor() {
@@ -958,10 +691,7 @@ public class OwlConfig extends SettingsManager {
 
     public static void toggleDevOpt() {
         devOptEnabled = !devOptEnabled;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("devOptEnabled", devOptEnabled);
-        editor.apply();
+        putValue("devOptEnabled", devOptEnabled);
         configLoaded = false;
         loadConfig(false);
     }

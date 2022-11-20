@@ -2,7 +2,6 @@ package it.owlgram.android;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
@@ -37,9 +36,10 @@ import java.util.Scanner;
 
 import it.owlgram.android.components.FileSettingsNameDialog;
 import it.owlgram.android.helpers.MenuOrderManager;
+import it.owlgram.android.helpers.SharedPreferencesHelper;
 import it.owlgram.android.translator.Translator;
 
-public class SettingsManager {
+public class SettingsManager extends SharedPreferencesHelper {
     protected static boolean configLoaded;
 
     public static int DB_VERSION = 0;
@@ -117,8 +117,7 @@ public class SettingsManager {
         ArrayList<String> listDifference = new ArrayList<>();
         File locFile = getSettingFileFromMessage(selectedObject);
         FileInputStream stream = null;
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        Map<String, ?> listPreferences = preferences.getAll();
+        Map<String, ?> listPreferences = getAll();
         try {
             stream = new FileInputStream(locFile);
             JSONObject jsonObject = new JSONObject(new Scanner(stream, "UTF-8")
@@ -351,8 +350,7 @@ public class SettingsManager {
 
     public static int getDifferenceUI() {
         ArrayList<String> listDifference = new ArrayList<>();
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        Map<String, ?> mapBackup = preferences.getAll();
+        Map<String, ?> mapBackup = getAll();
         for (Map.Entry<?, ?> entry : mapBackup.entrySet()) {
             String key = (String) entry.getKey();
             if (key == null) {
@@ -417,27 +415,24 @@ public class SettingsManager {
             JSONObject jsonObject = new JSONObject(new Scanner(stream, "UTF-8")
                     .useDelimiter("\\A")
                     .next());
-            SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
             if (!isRestore) {
                 internalResetSettings();
             }
             for (Iterator<String> data = jsonObject.keys(); data.hasNext(); ) {
                 String key = data.next();
                 if (isNotDeprecatedConfig(key) && (isRestore || isBackupAvailable(key))) {
-                    SharedPreferences.Editor editor = preferences.edit();
                     Object result = jsonObject.get(key);
                     if (result instanceof String) {
-                        editor.putString(key, (String) result);
+                        putValue(key, (String) result);
                     } else if (result instanceof Integer) {
-                        editor.putInt(key, (Integer) result);
+                        putValue(key, (Integer) result);
                     } else if (result instanceof Boolean) {
-                        editor.putBoolean(key, (Boolean) result);
+                        putValue(key, (Boolean) result);
                     } else if (result instanceof Float) {
-                        editor.putFloat(key, (Float) result);
+                        putValue(key, (Float) result);
                     } else if (result instanceof Long) {
-                        editor.putLong(key, (Long) result);
+                        putValue(key, (Long) result);
                     }
-                    editor.apply();
                 }
             }
             if (!isRestore) {
@@ -462,9 +457,8 @@ public class SettingsManager {
         new Thread() {
             @Override
             public void run() {
-                SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
                 JSONObject object = new JSONObject();
-                Map<String, ?> mapBackup = preferences.getAll();
+                Map<String, ?> mapBackup = getAll();
                 for (Map.Entry<?, ?> entry : mapBackup.entrySet()) {
                     String key = (String) entry.getKey();
                     if (key == null) {
@@ -502,14 +496,11 @@ public class SettingsManager {
     }
 
     public static void internalResetSettings() {
-        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlconfig", Activity.MODE_PRIVATE);
-        Map<String, ?> mapBackup = preferences.getAll();
+        Map<String, ?> mapBackup = getAll();
         for (Map.Entry<?, ?> entry : mapBackup.entrySet()) {
             String key = (String) entry.getKey();
             if (isBackupAvailable(key)) {
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.remove(key);
-                editor.apply();
+                remove(key);
             }
         }
     }

@@ -1,6 +1,9 @@
 package it.owlgram.android.helpers;
 
+import android.widget.Toast;
+
 import org.telegram.messenger.AccountInstance;
+import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.ConnectionsManager;
