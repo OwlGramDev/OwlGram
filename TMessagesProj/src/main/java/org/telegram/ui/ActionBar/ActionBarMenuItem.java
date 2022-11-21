@@ -87,6 +87,8 @@ public class ActionBarMenuItem extends FrameLayout {
     }
 
     public static class ActionBarMenuItemSearchListener {
+        public void onPreToggleSearch() {}
+
         public void onSearchExpand() {
         }
 
@@ -144,6 +146,8 @@ public class ActionBarMenuItem extends FrameLayout {
     private LinearLayout searchFilterLayout;
     private ArrayList<SearchFilterView> searchFilterViews = new ArrayList<>();
     private TextView searchFieldCaption;
+    private CharSequence searchFieldHint;
+    private CharSequence searchFieldText;
     private ImageView clearButton;
     private AnimatorSet clearButtonAnimator;
     private View searchAdditionalButton;
@@ -151,6 +155,7 @@ public class ActionBarMenuItem extends FrameLayout {
     protected TextView textView;
     private FrameLayout searchContainer;
     private boolean isSearchField;
+    private boolean wrapSearchInScrollView;
     protected ActionBarMenuItemSearchListener listener;
     private Rect rect;
     private int[] location;
@@ -760,6 +765,7 @@ public class ActionBarMenuItem extends FrameLayout {
     }
 
     public void openSearch(boolean openKeyboard) {
+        checkCreateSearchField();
         if (searchContainer == null || searchContainer.getVisibility() == VISIBLE || parentMenu == null) {
             return;
         }
@@ -777,6 +783,10 @@ public class ActionBarMenuItem extends FrameLayout {
     AnimatorSet searchContainerAnimator;
 
     public boolean toggleSearch(boolean openKeyboard) {
+        checkCreateSearchField();
+        if (listener != null) {
+            listener.onPreToggleSearch();
+        }
         if (searchContainer == null || (listener != null && !listener.canToggleSearch())) {
             return false;
         }
@@ -1094,6 +1104,7 @@ public class ActionBarMenuItem extends FrameLayout {
     }
 
     public void setSearchFieldHint(CharSequence hint) {
+        searchFieldHint = hint;
         if (searchFieldCaption == null) {
             return;
         }
@@ -1102,6 +1113,7 @@ public class ActionBarMenuItem extends FrameLayout {
     }
 
     public void setSearchFieldText(CharSequence text, boolean animated) {
+        searchFieldText = text;
         if (searchFieldCaption == null) {
             return;
         }
@@ -1119,6 +1131,7 @@ public class ActionBarMenuItem extends FrameLayout {
     }
 
     public EditTextBoldCursor getSearchField() {
+        checkCreateSearchField();
         return searchField;
     }
 
@@ -1139,7 +1152,13 @@ public class ActionBarMenuItem extends FrameLayout {
         if (parentMenu == null) {
             return this;
         }
-        if (value && searchContainer == null) {
+        isSearchField = value;
+        wrapSearchInScrollView = wrapInScrollView;
+        return this;
+    }
+
+    private void checkCreateSearchField() {
+        if (searchContainer == null && isSearchField) {
             searchContainer = new FrameLayout(getContext()) {
 
                 private boolean ignoreRequestLayout;
@@ -1170,7 +1189,7 @@ public class ActionBarMenuItem extends FrameLayout {
 
                 @Override
                 protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-                    if (!wrapInScrollView) {
+                    if (!wrapSearchInScrollView) {
                         measureChildWithMargins(clearButton, widthMeasureSpec, 0, heightMeasureSpec, 0);
                         if (searchAdditionalButton != null) {
                             measureChildWithMargins(searchAdditionalButton, widthMeasureSpec, 0, heightMeasureSpec, 0);
@@ -1237,7 +1256,7 @@ public class ActionBarMenuItem extends FrameLayout {
             };
             searchContainer.setClipChildren(searchItemPaddingStart != 0);
             wrappedSearchFrameLayout = null;
-            if (wrapInScrollView) {
+            if (wrapSearchInScrollView) {
                 wrappedSearchFrameLayout = new FrameLayout(getContext());
                 HorizontalScrollView horizontalScrollView = new HorizontalScrollView(getContext()) {
 
@@ -1406,16 +1425,24 @@ public class ActionBarMenuItem extends FrameLayout {
             searchField.setHighlightColor(getThemedColor(Theme.key_chat_inTextSelectionHighlight));
             searchField.setHandlesColor(getThemedColor(Theme.key_chat_TextSelectionCursor));
 
+            if (searchFieldHint != null) {
+                searchField.setHint(searchFieldHint);
+                setContentDescription(searchFieldHint);
+            }
+            if (searchFieldText != null) {
+                searchField.setText(searchFieldText);
+            }
+
             searchFilterLayout = new LinearLayout(getContext());
             searchFilterLayout.setOrientation(LinearLayout.HORIZONTAL);
             searchFilterLayout.setVisibility(View.VISIBLE);
             if (!LocaleController.isRTL) {
                 searchContainer.addView(searchFieldCaption, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 36, Gravity.CENTER_VERTICAL | Gravity.LEFT, 0, 5.5f, 0, 0));
-                searchContainer.addView(searchField, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 36, Gravity.CENTER_VERTICAL, 6, 0, wrapInScrollView ? 0 : 48, 0));
+                searchContainer.addView(searchField, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 36, Gravity.CENTER_VERTICAL, 6, 0, wrapSearchInScrollView ? 0 : 48, 0));
                 searchContainer.addView(searchFilterLayout, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 32, Gravity.CENTER_VERTICAL, 0, 0, 48, 0));
             } else {
                 searchContainer.addView(searchFilterLayout, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 32, Gravity.CENTER_VERTICAL, 0, 0, 48, 0));
-                searchContainer.addView(searchField, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 36, Gravity.CENTER_VERTICAL, 0, 0, wrapInScrollView ? 0 : 48, 0));
+                searchContainer.addView(searchField, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 36, Gravity.CENTER_VERTICAL, 0, 0, wrapSearchInScrollView ? 0 : 48, 0));
                 searchContainer.addView(searchFieldCaption, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 36, Gravity.CENTER_VERTICAL | Gravity.RIGHT, 0, 5.5f, 48, 0));
             }
             searchFilterLayout.setClipChildren(false);
@@ -1478,14 +1505,12 @@ public class ActionBarMenuItem extends FrameLayout {
                 AndroidUtilities.showKeyboard(searchField);
             });
             clearButton.setContentDescription(LocaleController.getString("ClearButton", R.string.ClearButton));
-            if (wrapInScrollView) {
+            if (wrapSearchInScrollView) {
                 wrappedSearchFrameLayout.addView(clearButton, LayoutHelper.createFrame(48, LayoutHelper.MATCH_PARENT, Gravity.CENTER_VERTICAL | Gravity.RIGHT));
             } else {
                 searchContainer.addView(clearButton, LayoutHelper.createFrame(48, LayoutHelper.MATCH_PARENT, Gravity.CENTER_VERTICAL | Gravity.RIGHT));
             }
         }
-        isSearchField = value;
-        return this;
     }
 
     public OnClickListener getOnClickListener() {
@@ -1636,6 +1661,7 @@ public class ActionBarMenuItem extends FrameLayout {
     }
 
     public void clearSearchText() {
+        searchFieldText = null;
         if (searchField == null) {
             return;
         }
