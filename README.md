@@ -2,11 +2,16 @@
 OwlGram is an **unofficial** messaging app that uses **Telegram's API**.
 
 # 🛠 About Reproducible Builds
-To reproduce the build of OwlGram is only needed ccache, you can install it from
-https://ccache.dev/download.html if you're from Windows
+To reproduce the build of OwlGram is only needed ccache (**already installed in "Tools" folder**), but the build
+isn't reproducible from macOS because it doesn't support ccache.
 
-Add the following to your `local.properties` file:
-
+1. [**Obtain your own api_id**](https://core.telegram.org/api/obtaining_api_id) for your application and put [**here**](https://github.com/OwlGramDev/OwlGram/blob/master/TMessagesProj/src/main/java/org/telegram/messenger/BuildVars.java).
+2. Please **do not** use the name Telegram for your app — or make sure your users understand that it is unofficial.
+3. Kindly **do not** use our standard logo (white paper plane in a blue circle) as your app's logo.
+4. Please study our [**security guidelines**](https://core.telegram.org/mtproto/security_guidelines) and take good care of your users' data and privacy.
+5. Please remember to publish **your** code too in order to comply with the licences.
+6. Add your google-services.json file to the [**root of the project**](https://github.com/OwlGramDev/OwlGram/tree/master/TMessagesProj_App).
+7. Add the following to your `local.properties` file:
 ```
 MAPS_API_KEY=<your-api-key>
 ```
@@ -55,7 +60,7 @@ MAPS_API_KEY=<your-api-key>
 • [And more...](<https://telegra.ph/OwlGram---List-of-Features-03-04>)
 
 ## ✏️ Credits
-• **[Nekogram](<https://gitlab.com/Nekogram/Nekogram>)**  
-• **[CatoGramX](<https://github.com/CatogramX/CatogramX>)**  
-*[Licensed under GNU GPL-2.0](<https://github.com/OwlGramDev/OwlGram/blob/master/LICENSE>)*
+• [**Nekogram**](<https://gitlab.com/Nekogram/Nekogram>)  
+• [**CatoGramX**](<https://github.com/CatogramX/CatogramX>)  
+[*Licensed under GNU GPL-2.0*](<https://github.com/OwlGramDev/OwlGram/blob/master/LICENSE>)
 
