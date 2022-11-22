@@ -53,6 +53,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
     private int phoneNumberSwitchRow;
     private int phoneContactsSwitchRow;
     private int translationHeaderRow;
+    private int showTranslateButtonRow;
     private int translationStyle;
     private int translationProviderSelectRow;
     private int destinationLanguageSelectRow;
@@ -237,6 +238,11 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.keepTranslationMarkdown);
                 }
+            } else if (position == showTranslateButtonRow) {
+                OwlConfig.toggleShowTranslate();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.showTranslate);
+                }
             }
         });
         return fragmentView;
@@ -251,6 +257,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
         phoneContactsSwitchRow = rowCount++;
         divisorPrivacyRow = rowCount++;
         translationHeaderRow = rowCount++;
+        showTranslateButtonRow = rowCount++;
         translationStyle = rowCount++;
         translationProviderSelectRow = rowCount++;
         destinationLanguageSelectRow = rowCount++;
@@ -334,9 +341,12 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     } else if (position == notificationAccentRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("AccentAsNotificationColor", R.string.AccentAsNotificationColor), OwlConfig.accentAsNotificationColor, true);
                     } else if (position == autoTranslateRow) {
-                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("AutoTranslate", R.string.AutoTranslate), LocaleController.getString("AutoTranslateDesc", R.string.AutoTranslateDesc), OwlConfig.autoTranslate, true, keepMarkdownRow != -1);
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("AutoTranslate", R.string.AutoTranslate), LocaleController.getString("AutoTranslateDesc", R.string.AutoTranslateDesc), OwlConfig.autoTranslate && supportLanguageDetector, true, keepMarkdownRow != -1);
+                        if (!supportLanguageDetector) textCheckCell.setAlpha(0.5f);
                     } else if (position == keepMarkdownRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("KeepMarkdown", R.string.KeepMarkdown), LocaleController.getString("KeepMarkdownDesc", R.string.KeepMarkdownDesc), OwlConfig.keepTranslationMarkdown, true, false);
+                    } else if (position == showTranslateButtonRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("ShowTranslateButton", R.string.ShowTranslateButton), OwlConfig.showTranslate, true);
                     }
                     break;
                 case 4:
@@ -392,6 +402,10 @@ public class OwlgramGeneralSettings extends BaseFragment {
                         }
                         if (doNotTranslateCellValue == null)
                             doNotTranslateCellValue = String.format(LocaleController.getPluralString("Languages", langCodes.size()), langCodes.size());
+                        if (!supportLanguageDetector) {
+                            doNotTranslateCellValue = LocaleController.getString("EmptyExceptions", R.string.EmptyExceptions);
+                            textSettingsCell.setAlpha(0.5f);
+                        }
                         textSettingsCell.setTextAndValue(LocaleController.getString("DoNotTranslate", R.string.DoNotTranslate), doNotTranslateCellValue, true);
                     } else if (position == deepLFormalityRow) {
                         String value;
@@ -521,7 +535,7 @@ public class OwlgramGeneralSettings extends BaseFragment {
                 return 2;
             } else if (position == phoneNumberSwitchRow || position == phoneContactsSwitchRow || position == dcIdRow ||
                     position == confirmCallSwitchRow || position == notificationAccentRow || position == autoTranslateRow ||
-                    position == keepMarkdownRow) {
+                    position == keepMarkdownRow || position == showTranslateButtonRow) {
                 return 3;
             } else if (position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow ||
                     position == translationStyle || position == doNotTranslateSelectRow || position == idTypeRow) {

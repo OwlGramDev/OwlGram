@@ -4938,6 +4938,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             final boolean translateButtonEnabled = MessagesController.getGlobalMainSettings().getBoolean("translate_button2", false);
             final boolean[] withTranslate = new boolean[1];
             withTranslate[0] = position == bioRow || position == channelInfoRow || position == userInfoRow;
+            withTranslate[0] &= OwlConfig.showTranslate;
             final String toLang = LocaleController.getInstance().getCurrentLocale().getLanguage();
             Runnable showMenu = () -> {
                 if (getParentActivity() == null) {
@@ -8219,8 +8220,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         createAutoTranslateItem(context, dialogId, 0);
     }
     private void createAutoTranslateItem(Context context, long dialogId, int topicId) {
-        AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, topicId, getResourceProvider());
-        otherItem.addSwipeBackItem(R.drawable.msg_translate, null, LocaleController.getString("AutoTranslate", R.string.AutoTranslate), autoTranslatePopupWrapper.windowLayout);
+        if (LanguageDetector.hasSupport()) {
+            AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, topicId, getResourceProvider());
+            otherItem.addSwipeBackItem(R.drawable.msg_translate, null, LocaleController.getString("AutoTranslate", R.string.AutoTranslate), autoTranslatePopupWrapper.windowLayout);
+        }
         otherItem.addColoredGap();
     }
 

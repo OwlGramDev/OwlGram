@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class LanguageDetector {
+    private static Boolean hasSupport = null;
+
     public static final List<String> SUPPORTED_LANGUAGES = Arrays.asList(
             "af", "am", "ar", "az", "be", "bg", "bn", "bs", "ca", "ceb", "co", "cs", "cy", "da", "de", "el", "en", "eo",
             "es", "et", "eu", "fa", "fil", "fr", "fy", "ga", "gd", "gl", "gu", "ha", "haw", "he", "hi", "hmn", "hr", "ht",
@@ -12,15 +14,42 @@ public class LanguageDetector {
             "pt", "ro", "ru", "sd", "si", "sk", "sl", "sm", "sn", "so", "sq", "sr", "st", "su", "sv", "sw", "ta", "te",
             "tg", "th", "tr", "uk", "ur", "uz", "vi", "xh", "yi", "yo", "zh", "zu"
     );
+
     public interface StringCallback {
         void run(String str);
     }
+
     public interface ExceptionCallback {
         void run(Exception e);
     }
 
     public static boolean hasSupport() {
-        return true;
+        return hasSupport(false);
+    }
+
+    private static boolean hasSupport(boolean initializeFirst) {
+        if (hasSupport == null) {
+            try {
+                if (initializeFirst) {
+                    com.google.mlkit.common.sdkinternal.MlKitContext.initializeIfNeeded(ApplicationLoader.applicationContext);
+                }
+                com.google.mlkit.nl.languageid.LanguageIdentification.getClient()
+                        .identifyLanguage("apple")
+                        .addOnSuccessListener(str -> {
+                        })
+                        .addOnFailureListener(e -> {
+                        });
+                hasSupport = true;
+            } catch (Throwable t) {
+                FileLog.e(t);
+                if (initializeFirst) {
+                    hasSupport = false;
+                } else {
+                    return hasSupport(true);
+                }
+            }
+        }
+        return hasSupport;
     }
 
     public static void detectLanguage(String text, StringCallback onSuccess, ExceptionCallback onFail) {
@@ -30,7 +59,7 @@ public class LanguageDetector {
     public static void detectLanguage(String text, StringCallback onSuccess, ExceptionCallback onFail, boolean initializeFirst) {
         try {
             if (initializeFirst) {
-                com.google.mlkit.common.sdkinternal.MlKitContext.zza(ApplicationLoader.applicationContext);
+                com.google.mlkit.common.sdkinternal.MlKitContext.initializeIfNeeded(ApplicationLoader.applicationContext);
             }
             com.google.mlkit.nl.languageid.LanguageIdentification.getClient()
                 .identifyLanguage(text)

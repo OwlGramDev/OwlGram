@@ -24574,7 +24574,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     private void handleAutoTranslate(MessageObject messageObject) {
-        if (AutoTranslateConfig.isAutoTranslateEnabled(dialog_id, getTopicId())) {
+        if (AutoTranslateConfig.isAutoTranslateEnabled(dialog_id, getTopicId()) && LanguageDetector.hasSupport()) {
             if (!messageObject.translated && !messageObject.translating && !messageObject.canceledTranslation && getMessageHelper().isMessageObjectAutoTranslatable(messageObject)) {
                 LanguageDetector.detectLanguage(
                         messageObject.messageOwner.message,

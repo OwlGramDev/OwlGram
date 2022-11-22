@@ -63,7 +63,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
     private int showFolderWhenForwardRow;
     private int foldersDividerRow;
     private int messageMenuHeaderRow;
-    private int showTranslateRow;
     private int showAddToSMRow;
     private int showRepeatRow;
     private int showNoQuoteForwardRow;
@@ -186,11 +185,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                 OwlConfig.toggleSendConfirm();
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.sendConfirm);
-                }
-            } else if (position == showTranslateRow) {
-                OwlConfig.toggleShowTranslate();
-                if (view instanceof TextCheckbox2Cell) {
-                    ((TextCheckbox2Cell) view).setChecked(OwlConfig.showTranslate);
                 }
             } else if (position == showAddToSMRow) {
                 OwlConfig.toggleShowSaveMessage();
@@ -356,7 +350,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
         showAddToSMRow = rowCount++;
         showRepeatRow = rowCount++;
         showPatpatRow = rowCount++;
-        showTranslateRow = rowCount++;
         showReportRow = rowCount++;
         showMessageDetailsRow = rowCount++;
 
@@ -484,8 +477,6 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                         textCheckbox2Cell.setTextAndCheck(LocaleController.getString("AddToSavedMessages", R.string.AddToSavedMessages), OwlConfig.showSaveMessage, true);
                     } else if (position == showRepeatRow) {
                         textCheckbox2Cell.setTextAndCheck(LocaleController.getString("Repeat", R.string.Repeat), OwlConfig.showRepeat, true);
-                    } else if (position == showTranslateRow) {
-                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("TranslateMessage", R.string.TranslateMessage), OwlConfig.showTranslate, true);
                     } else if (position == showReportRow) {
                         textCheckbox2Cell.setTextAndCheck(LocaleController.getString("ReportChat", R.string.ReportChat), OwlConfig.showReportMessage, true);
                     } else if (position == showMessageDetailsRow) {
@@ -597,7 +588,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
             } else if (position == cameraXFpsRow) {
                 return 7;
             } else if (position == showDeleteRow || position == showNoQuoteForwardRow || position == showAddToSMRow ||
-                    position == showRepeatRow || position == showTranslateRow || position == showReportRow ||
+                    position == showRepeatRow || position == showReportRow ||
                     position == showMessageDetailsRow || position == showCopyPhotoRow || position == showPatpatRow) {
                 return 8;
             }
