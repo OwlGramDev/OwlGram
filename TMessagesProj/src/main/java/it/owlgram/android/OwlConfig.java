@@ -130,9 +130,8 @@ public class OwlConfig extends SettingsManager {
                 DB_VERSION = getInt("DB_VERSION", 0);
                 if (DB_VERSION < BuildVars.BUILD_VERSION && backupFileExist) {
                     restoreBackup(backupFile(), true);
-                    DB_VERSION = BuildVars.BUILD_VERSION;
-                    putValue("DB_VERSION", DB_VERSION);
                 }
+                putValue("DB_VERSION", DB_VERSION = BuildVars.BUILD_VERSION);
                 registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> executeBackup());
             }
             isChineseUser = ApplicationLoader.applicationContext.getResources().getBoolean(R.bool.isChineseUser);
