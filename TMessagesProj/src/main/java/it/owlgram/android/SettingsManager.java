@@ -380,6 +380,7 @@ public class SettingsManager extends SharedPreferencesHelper {
                     returnStatus = addWithCheck(returnStatus, NEED_RECREATE_SHADOW);
                 case "roundedNumbers":
                 case "showPencilIcon":
+                case "hideSendAsChannel":
                     returnStatus = addWithCheck(returnStatus, NEED_FRAGMENT_REBASE_WITH_LAST);
                     break;
             }
@@ -423,15 +424,15 @@ public class SettingsManager extends SharedPreferencesHelper {
                 if (isNotDeprecatedConfig(key) && (isRestore || isBackupAvailable(key))) {
                     Object result = jsonObject.get(key);
                     if (result instanceof String) {
-                        putValue(key, (String) result);
+                        putValue(key, result);
                     } else if (result instanceof Integer) {
-                        putValue(key, (Integer) result);
+                        putValue(key, result);
                     } else if (result instanceof Boolean) {
-                        putValue(key, (Boolean) result);
+                        putValue(key, result);
                     } else if (result instanceof Float) {
-                        putValue(key, (Float) result);
+                        putValue(key, result);
                     } else if (result instanceof Long) {
-                        putValue(key, (Long) result);
+                        putValue(key, result);
                     }
                 }
             }

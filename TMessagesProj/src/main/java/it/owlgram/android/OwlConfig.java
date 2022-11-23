@@ -113,6 +113,7 @@ public class OwlConfig extends SettingsManager {
     public static long lastUpdateCheck = 0;
     public static int downloadSpeedBoost;
     public static int unlockedSecretIcon;
+    public static boolean hideSendAsChannel;
 
     static {
         loadConfig(true);
@@ -216,6 +217,7 @@ public class OwlConfig extends SettingsManager {
             showPatpat = getBoolean("showPatpat", false);
             unlockedChupa = getBoolean("unlockedChupa", false);
             hideAllTab = getBoolean("hideAllTab", false);
+            hideSendAsChannel = getBoolean("hideSendAsChannel", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -458,6 +460,10 @@ public class OwlConfig extends SettingsManager {
 
     public static void toggleHideAllTab() {
         putValue("hideAllTab", hideAllTab ^= true);
+    }
+
+    public static void toggleHideSendAsChannel() {
+        putValue("hideSendAsChannel", hideSendAsChannel ^= true);
     }
 
     public static void unlockChupa() {

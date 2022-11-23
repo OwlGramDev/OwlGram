@@ -88,6 +88,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
     private int confirmStickersGIFsRow;
     private int hideTimeOnStickerRow;
     private int onlineStatusRow;
+    private int hideSendAsChannelRow;
 
     private UndoView restartTooltip;
 
@@ -284,6 +285,12 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                 if (view instanceof TextCheckCell) {
                     ((TextCheckCell) view).setChecked(OwlConfig.showStatusInChat);
                 }
+            } else if (position == hideSendAsChannelRow) {
+                OwlConfig.toggleHideSendAsChannel();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.hideSendAsChannel);
+                }
+                parentLayout.rebuildAllFragmentViews(true, true);
             }
         });
         restartTooltip = new UndoView(context);
@@ -322,6 +329,7 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
         showGreetings = rowCount++;
         playGifAsVideoRow = rowCount++;
         hideKeyboardRow = rowCount++;
+        hideSendAsChannelRow = rowCount++;
         openArchiveOnPullRow = rowCount++;
         onlineStatusRow = rowCount++;
         chatDividerRow = rowCount++;
@@ -438,6 +446,8 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                         textCheckCell.setTextAndCheck(LocaleController.getString("HideTimeOnSticker", R.string.HideTimeOnSticker), OwlConfig.hideTimeOnSticker, false);
                     } else if (position == onlineStatusRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("OnlineStatus", R.string.OnlineStatus), LocaleController.getString("OnlineStatusDesc", R.string.OnlineStatusDesc), OwlConfig.showStatusInChat, true, false);
+                    } else if (position == hideSendAsChannelRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("HideSendAsChannel", R.string.HideSendAsChannel), OwlConfig.hideSendAsChannel, true);
                     }
                     break;
                 case 6:
@@ -577,7 +587,8 @@ public class OwlgramChatSettings extends BaseFragment implements NotificationCen
                     position == rearCameraStartingRow || position == confirmSendRow || position == showGreetings ||
                     position == cameraXOptimizeRow || position == proximitySensorRow || position == suppressionRow ||
                     position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow || position == confirmStickersGIFsRow ||
-                    position == hideTimeOnStickerRow || position == onlineStatusRow || position == hideAllTabRow) {
+                    position == hideTimeOnStickerRow || position == onlineStatusRow || position == hideAllTabRow ||
+                    position == hideSendAsChannelRow) {
                 return 3;
             } else if (position == stickerSizeRow) {
                 return 4;

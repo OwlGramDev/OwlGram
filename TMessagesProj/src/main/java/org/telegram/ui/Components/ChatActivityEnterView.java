@@ -7066,7 +7066,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         }
         boolean wasVisible = senderSelectView.getVisibility() == View.VISIBLE;
         boolean isVisible = defPeer != null && (delegate.getSendAsPeers() == null || delegate.getSendAsPeers().peers.size() > 1) &&
-                !isEditingMessage() && !isRecordingAudioVideo() && recordedAudioPanel.getVisibility() != View.VISIBLE;
+                !isEditingMessage() && !isRecordingAudioVideo() && !OwlConfig.hideSendAsChannel && recordedAudioPanel.getVisibility() != View.VISIBLE;
         int pad = AndroidUtilities.dp(2);
         MarginLayoutParams params = (MarginLayoutParams) senderSelectView.getLayoutParams();
         float startAlpha = isVisible ? 0 : 1;
