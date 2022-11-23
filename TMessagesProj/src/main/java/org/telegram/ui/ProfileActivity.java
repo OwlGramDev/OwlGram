@@ -3329,6 +3329,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 sendLogs(true);
             } else if (position == clearLogsRow) {
                 FileLog.cleanupLogs();
+                ((TextCell) view).setValue(FileLog.getLogDirSize(), true);
             } else if (position == switchBackendRow) {
                 if (getParentActivity() == null) {
                     return;
@@ -9427,7 +9428,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == sendLastLogsRow) {
                         textCell.setText(LocaleController.getString("DebugSendLastLogs", R.string.DebugSendLastLogs), true);
                     } else if (position == clearLogsRow) {
-                        textCell.setText(LocaleController.getString("DebugClearLogs", R.string.DebugClearLogs), switchBackendRow != -1);
+                        textCell.setTextAndValue(LocaleController.getString("DebugClearLogs", R.string.DebugClearLogs), FileLog.getLogDirSize(), switchBackendRow != -1);
                     } else if (position == switchBackendRow) {
                         textCell.setText("Switch Backend", false);
                     } else if (position == devicesRow) {
