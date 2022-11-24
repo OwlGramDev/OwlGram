@@ -297,4 +297,5 @@
     <string name="OwlPrivacyPolicy">OwlGram Privacy Policy</string>
     <string name="HideSendAsChannel">Hide Send as Channel</string>
     <string name="ProviderTelegram">Telegram Translate</string>
+    <string name="ResetAutoTranslationPreferences">Reset Auto-Translation Preferences</string>
 </resources>
