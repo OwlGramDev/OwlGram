@@ -102,6 +102,7 @@ public class DoNotTranslateSettings extends BaseSettingsActivity {
     }
 
     public static HashSet<String> getRestrictedLanguages(boolean detectMode) {
+        if (!LanguageDetector.hasSupport()) return new HashSet<>();
         try {
             BaseTranslator translator = Translator.getCurrentTranslator();
             JSONArray array = new JSONArray(OwlConfig.doNotTranslateLanguages);

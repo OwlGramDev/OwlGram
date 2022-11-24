@@ -42,8 +42,9 @@ public class TranslatorHelper {
     }
 
     public static MessageObject applyTranslatedMessage(BaseTranslator.Result result, MessageObject messageObject, long dialog_id, BaseFragment fragment, boolean autoTranslate) {
-        if (result.sourceLanguage != null) {
-            String src_lang = result.sourceLanguage.toUpperCase();
+        if (result.sourceLanguage != null || !Translator.isSupportedOutputLang(OwlConfig.translationProvider)) {
+            String src_lang = result.sourceLanguage;
+            if (src_lang != null) src_lang = src_lang.toUpperCase();
             String language = Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage().toUpperCase();
             if (result.translation instanceof String) {
                 if (messageObject.originalEntities != null) {
@@ -123,11 +124,8 @@ public class TranslatorHelper {
     public static boolean isSupportHTMLMode(int provider) {
         return provider == Translator.PROVIDER_GOOGLE ||
                 provider == Translator.PROVIDER_YANDEX ||
-                provider == Translator.PROVIDER_DEEPL;
-    }
-
-    private static boolean isSupportedProvider() {
-        return isSupportHTMLMode() || Translator.isSupportedOutputLang(OwlConfig.translationProvider);
+                provider == Translator.PROVIDER_DEEPL ||
+                provider == Translator.PROVIDER_TELEGRAM;
     }
 
     public static class TranslatorContext {
@@ -148,7 +146,7 @@ public class TranslatorHelper {
                 messageObject.originalReplyMarkupRows = new MessageHelper.ReplyMarkupButtonsTexts(messageObject.messageOwner.reply_markup.rows);
                 additionalObjectTranslation.additionalInfo = new MessageHelper.ReplyMarkupButtonsTexts(messageObject.messageOwner.reply_markup.rows);
             }
-            if (messageObject.messageOwner.entities != null && additionalObjectTranslation.translation instanceof String && isSupportedProvider()) {
+            if (messageObject.messageOwner.entities != null && additionalObjectTranslation.translation instanceof String) {
                 messageObject.originalEntities = messageObject.messageOwner.entities;
                 if (isSupportHTMLMode() && OwlConfig.keepTranslationMarkdown) {
                     additionalObjectTranslation.translation = HTMLKeeper.entitiesToHtml((String) additionalObjectTranslation.translation, messageObject.originalEntities, false);

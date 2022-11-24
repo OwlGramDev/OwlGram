@@ -296,4 +296,5 @@
     <string name="PrivacyPolicyLogin">By logging in,\nyou agree to the *Privacy Policy*.</string>
     <string name="OwlPrivacyPolicy">OwlGram Privacy Policy</string>
     <string name="HideSendAsChannel">Hide Send as Channel</string>
+    <string name="ProviderTelegram">Telegram Translate</string>
 </resources>
