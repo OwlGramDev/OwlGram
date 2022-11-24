@@ -130,6 +130,17 @@ public class TranslatorHelper {
                 provider == Translator.PROVIDER_TELEGRAM;
     }
 
+    public static boolean isSupportAutoTranslate() {
+        return isSupportAutoTranslate(OwlConfig.translationProvider);
+    }
+
+    public static boolean isSupportAutoTranslate(int provider) {
+        return provider == Translator.PROVIDER_GOOGLE ||
+                provider == Translator.PROVIDER_YANDEX ||
+                provider == Translator.PROVIDER_DEEPL ||
+                provider == Translator.PROVIDER_DUCKDUCKGO;
+    }
+
     public static class TranslatorContext {
         private final String UID;
         private final Object translateObject;

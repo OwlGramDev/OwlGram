@@ -237,6 +237,7 @@ import it.owlgram.android.settings.OwlgramSettings;
 import it.owlgram.android.translator.AutoTranslatePopupWrapper;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
+import it.owlgram.android.translator.TranslatorHelper;
 import it.owlgram.android.updates.ApkDownloader;
 
 public class ProfileActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, SharedMediaLayout.SharedMediaPreloaderDelegate, ImageUpdater.ImageUpdaterDelegate, SharedMediaLayout.Delegate {
@@ -8221,7 +8222,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         createAutoTranslateItem(context, dialogId, 0);
     }
     private void createAutoTranslateItem(Context context, long dialogId, int topicId) {
-        if (LanguageDetector.hasSupport()) {
+        if (LanguageDetector.hasSupport() && TranslatorHelper.isSupportAutoTranslate()) {
             AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, topicId, getResourceProvider());
             otherItem.addSwipeBackItem(R.drawable.msg_translate, null, LocaleController.getString("AutoTranslate", R.string.AutoTranslate), autoTranslatePopupWrapper.windowLayout);
         }

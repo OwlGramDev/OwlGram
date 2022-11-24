@@ -116,16 +116,32 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                 }
                 listAdapter.notifyItemChanged(hintTranslation2);
                 if (oldProvider != OwlConfig.translationProvider) {
-                    boolean oldProviderSupport = TranslatorHelper.isSupportHTMLMode(oldProvider);
-                    boolean newProviderSupport = TranslatorHelper.isSupportHTMLMode();
-                    if (oldProviderSupport != newProviderSupport) {
-                        if (newProviderSupport) {
-                            listAdapter.notifyItemInserted(autoTranslateRow + 1);
+                    int index = deepLFormalityRow;
+                    index = index == -1 ? doNotTranslateSelectRow: index;
+
+                    boolean oldProviderSupportAuto = TranslatorHelper.isSupportAutoTranslate(oldProvider);
+                    boolean newProviderSupportAuto = TranslatorHelper.isSupportAutoTranslate();
+                    boolean oldProviderSupportHtml = TranslatorHelper.isSupportHTMLMode(oldProvider);
+                    boolean newProviderSupportHtml = TranslatorHelper.isSupportHTMLMode();
+
+                    if (oldProviderSupportAuto != newProviderSupportAuto && oldProviderSupportHtml != newProviderSupportHtml) {
+                        listAdapter.notifyItemChanged(index + 1);
+                    } else if (oldProviderSupportAuto != newProviderSupportAuto) {
+                        if (newProviderSupportAuto) {
+                            listAdapter.notifyItemInserted(index + 1);
                         } else {
-                            listAdapter.notifyItemRemoved(autoTranslateRow + 1);
+                            listAdapter.notifyItemRemoved(index + 1);
                         }
-                        listAdapter.notifyItemChanged(autoTranslateRow);
+                        listAdapter.notifyItemChanged(index);
+                    }else if (oldProviderSupportHtml != newProviderSupportHtml) {
+                        if (newProviderSupportHtml) {
+                            listAdapter.notifyItemInserted(index + 2);
+                        } else {
+                            listAdapter.notifyItemRemoved(index + 2);
+                        }
+                        listAdapter.notifyItemChanged(index + 1);
                     }
+
                     if (oldProvider == Translator.PROVIDER_DEEPL) {
                         listAdapter.notifyItemChanged(destinationLanguageSelectRow, PARTIAL);
                         listAdapter.notifyItemRemoved(deepLFormalityRow);
@@ -134,7 +150,9 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                         updateRowsId();
                         listAdapter.notifyItemChanged(destinationLanguageSelectRow, PARTIAL);
                         listAdapter.notifyItemInserted(deepLFormalityRow);
-                    } else if (oldProviderSupport != newProviderSupport) {
+                    } else if (oldProviderSupportHtml != newProviderSupportHtml) {
+                        updateRowsId();
+                    } else if (oldProviderSupportAuto != newProviderSupportAuto) {
                         updateRowsId();
                     }
                     listAdapter.notifyItemChanged(doNotTranslateSelectRow, PARTIAL);
@@ -219,7 +237,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
         destinationLanguageSelectRow = rowCount++;
         doNotTranslateSelectRow = rowCount++;
         deepLFormalityRow = OwlConfig.translationProvider == Translator.PROVIDER_DEEPL ? rowCount++ : -1;
-        autoTranslateRow = rowCount++;
+        autoTranslateRow = TranslatorHelper.isSupportAutoTranslate() ? rowCount++ : -1;
         keepMarkdownRow = TranslatorHelper.isSupportHTMLMode() ? rowCount++ : -1;
         divisorTranslationRow = rowCount++;
         hintTranslation1 = rowCount++;
