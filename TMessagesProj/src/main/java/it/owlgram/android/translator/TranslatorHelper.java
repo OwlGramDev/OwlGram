@@ -1,5 +1,7 @@
 package it.owlgram.android.translator;
 
+import android.text.TextUtils;
+
 import androidx.core.util.Pair;
 
 import org.telegram.messenger.AndroidUtilities;
@@ -49,7 +51,7 @@ public class TranslatorHelper {
             if (result.translation instanceof String) {
                 if (messageObject.originalEntities != null) {
                     Pair<String, ArrayList<TLRPC.MessageEntity>> entitiesResult = HTMLKeeper.htmlToEntities((String) result.translation, messageObject.originalEntities, !isSupportHTMLMode());
-                    if (autoTranslate && (entitiesResult.first.equalsIgnoreCase(messageObject.originalMessage.toString()) || DoNotTranslateSettings.getRestrictedLanguages().contains(src_lang.toLowerCase()))) {
+                    if (autoTranslate && (entitiesResult.first.equalsIgnoreCase(messageObject.originalMessage.toString()) || !TextUtils.isEmpty(src_lang) && DoNotTranslateSettings.getRestrictedLanguages().contains(src_lang.toLowerCase()))) {
                         messageObject.translating = false;
                         messageObject.translated = false;
                         messageObject.canceledTranslation = true;
