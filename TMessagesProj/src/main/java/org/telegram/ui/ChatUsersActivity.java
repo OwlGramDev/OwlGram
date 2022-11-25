@@ -2998,6 +2998,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                         selectedSlowmode = which;
 //                        listViewAdapter.notifyItemChanged(slowmodeInfoRow);
                     });
+                    chooseView.setSlidable(ChatObject.hasAdminRights(currentChat));
                     break;
             }
             return new RecyclerListView.Holder(view);
