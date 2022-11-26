@@ -30,6 +30,7 @@ public class Translator {
     public static final int PROVIDER_DEEPL = 5;
     public static final int PROVIDER_NIU = 9;
     public static final int PROVIDER_DUCKDUCKGO = 13;
+    public static final int PROVIDER_TELEGRAM = 14;
 
     @SuppressLint("StaticFieldLeak")
     private static AlertDialog progressDialog;
@@ -39,7 +40,10 @@ public class Translator {
     }
 
     public static boolean isSupportedOutputLang(int provider) {
-        return provider == PROVIDER_GOOGLE || provider == PROVIDER_YANDEX || provider == PROVIDER_DEEPL || provider == PROVIDER_DUCKDUCKGO;
+        return provider == PROVIDER_GOOGLE ||
+                provider == PROVIDER_YANDEX ||
+                provider == PROVIDER_DEEPL ||
+                provider == PROVIDER_DUCKDUCKGO;
     }
 
     public static void showTranslateDialog(Context context, String query, Runnable callback, Theme.ResourcesProvider resourcesProvider) {
@@ -127,6 +131,8 @@ public class Translator {
         types.add(Translator.PROVIDER_DUCKDUCKGO);
         names.add(LocaleController.getString("ProviderYandex", R.string.ProviderYandex));
         types.add(Translator.PROVIDER_YANDEX);
+        names.add(LocaleController.getString("ProviderTelegram", R.string.ProviderTelegram));
+        types.add(Translator.PROVIDER_TELEGRAM);
         return new Pair<>(names, types);
     }
 
@@ -219,6 +225,8 @@ public class Translator {
                 return DeepLTranslator.getInstance();
             case PROVIDER_DUCKDUCKGO:
                 return DuckDuckGoTranslator.getInstance();
+            case PROVIDER_TELEGRAM:
+                return TelegramTranslator.getInstance();
             case PROVIDER_GOOGLE:
             default:
                 return GoogleAppTranslator.getInstance();

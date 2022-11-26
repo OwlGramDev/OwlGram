@@ -64,7 +64,7 @@ public class GoogleAppTranslator extends BaseTranslator {
         StringBuilder resultString = new StringBuilder();
         String resultLang = "";
         for (String block : blocks) {
-            String url = "https://translate.googleapis.com/translate_a/single?dj=1" +
+            String url = "https://translate.google.com/translate_a/single?dj=1" +
                     "&q=" + URLEncoder.encode(block, StandardCharsets.UTF_8.toString()) +
                     "&sl=auto" +
                     "&tl=" + tl +

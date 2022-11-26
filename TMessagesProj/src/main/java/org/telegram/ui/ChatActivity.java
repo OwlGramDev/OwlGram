@@ -12631,7 +12631,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         position++;
                     }
                 }
-                if (top && messages != null && messages.get(position) != null) {
+                if (top && messages != null && messages.size() > 0 && messages.get(position) != null) {
                     long groupId = messages.get(position).getGroupId();
                     while (groupId != 0 && position + 1 < messages.size()) {
                         if (groupId != messages.get(position + 1).getGroupId()) {
@@ -12640,7 +12640,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         position++;
                     }
                 }
-                if (messages != null) {
+                if (messages != null && messages.size() > 0) {
                     position = Math.min(position, messages.size() - 1);
                 }
                 chatScrollHelper.scrollToPosition(chatScrollHelperCallback.position = position, chatScrollHelperCallback.offset = 0, chatScrollHelperCallback.bottom = !top, true);
@@ -14206,7 +14206,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 int copyVisible = copyItem.getVisibility();
                 int starVisible = starItem.getVisibility();
                 int newVisibility;
-                translateItem.setVisibility(selectedMessagesIds[0].size() + selectedMessagesIds[1].size() > 1 ? View.VISIBLE : View.GONE);
+                translateItem.setVisibility(selectedMessagesIds[0].size() + selectedMessagesIds[1].size() > 1 && OwlConfig.showTranslate ? View.VISIBLE : View.GONE);
                 copyItem.setVisibility(!noforwards && selectedMessagesCanCopyIds[0].size() + selectedMessagesCanCopyIds[1].size() != 0 ? View.VISIBLE : View.GONE);
                 starItem.setVisibility(getMediaDataController().canAddStickerToFavorites() && (selectedMessagesCanStarIds[0].size() + selectedMessagesCanStarIds[1].size()) == selectedCount ? View.VISIBLE : View.GONE);
                 int newCopyVisible = copyItem.getVisibility();
@@ -24574,7 +24574,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     }
 
     private void handleAutoTranslate(MessageObject messageObject) {
-        if (AutoTranslateConfig.isAutoTranslateEnabled(dialog_id, getTopicId())) {
+        if (AutoTranslateConfig.isAutoTranslateEnabled(dialog_id, getTopicId()) && LanguageDetector.hasSupport() && TranslatorHelper.isSupportAutoTranslate()) {
             if (!messageObject.translated && !messageObject.translating && !messageObject.canceledTranslation && getMessageHelper().isMessageObjectAutoTranslatable(messageObject)) {
                 LanguageDetector.detectLanguage(
                         messageObject.messageOwner.message,

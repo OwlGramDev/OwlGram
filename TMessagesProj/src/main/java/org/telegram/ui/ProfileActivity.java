@@ -237,6 +237,7 @@ import it.owlgram.android.settings.OwlgramSettings;
 import it.owlgram.android.translator.AutoTranslatePopupWrapper;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
+import it.owlgram.android.translator.TranslatorHelper;
 import it.owlgram.android.updates.ApkDownloader;
 
 public class ProfileActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, SharedMediaLayout.SharedMediaPreloaderDelegate, ImageUpdater.ImageUpdaterDelegate, SharedMediaLayout.Delegate {
@@ -3329,6 +3330,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 sendLogs(true);
             } else if (position == clearLogsRow) {
                 FileLog.cleanupLogs();
+                ((TextCell) view).setValue(FileLog.getLogDirSize(), true);
             } else if (position == switchBackendRow) {
                 if (getParentActivity() == null) {
                     return;
@@ -4938,6 +4940,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             final boolean translateButtonEnabled = MessagesController.getGlobalMainSettings().getBoolean("translate_button2", false);
             final boolean[] withTranslate = new boolean[1];
             withTranslate[0] = position == bioRow || position == channelInfoRow || position == userInfoRow;
+            withTranslate[0] &= OwlConfig.showTranslate;
             final String toLang = LocaleController.getInstance().getCurrentLocale().getLanguage();
             Runnable showMenu = () -> {
                 if (getParentActivity() == null) {
@@ -6632,7 +6635,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     animatingItem.setAlpha(1.0f);
                     animators.add(ObjectAnimator.ofFloat(animatingItem, View.ALPHA, 0.0f));
                 }
-                if (callItemVisible && chatId != 0) {
+                if (callItemVisible && (chatId != 0 || OwlConfig.searchIconInActionBar)) {
                     callItem.setAlpha(0.0f);
                     animators.add(ObjectAnimator.ofFloat(callItem, View.ALPHA, 1.0f));
                 }
@@ -6706,7 +6709,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     animatingItem.setAlpha(0.0f);
                     animators.add(ObjectAnimator.ofFloat(animatingItem, View.ALPHA, 1.0f));
                 }
-                if (callItemVisible && chatId != 0) {
+                if (callItemVisible && (chatId != 0 || OwlConfig.searchIconInActionBar)) {
                     callItem.setAlpha(1.0f);
                     animators.add(ObjectAnimator.ofFloat(callItem, View.ALPHA, 0.0f));
                 }
@@ -8219,8 +8222,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         createAutoTranslateItem(context, dialogId, 0);
     }
     private void createAutoTranslateItem(Context context, long dialogId, int topicId) {
-        AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, topicId, getResourceProvider());
-        otherItem.addSwipeBackItem(R.drawable.msg_translate, null, LocaleController.getString("AutoTranslate", R.string.AutoTranslate), autoTranslatePopupWrapper.windowLayout);
+        if (LanguageDetector.hasSupport() && TranslatorHelper.isSupportAutoTranslate()) {
+            AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, topicId, getResourceProvider());
+            otherItem.addSwipeBackItem(R.drawable.msg_translate, null, LocaleController.getString("AutoTranslate", R.string.AutoTranslate), autoTranslatePopupWrapper.windowLayout);
+        }
         otherItem.addColoredGap();
     }
 
@@ -9424,7 +9429,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == sendLastLogsRow) {
                         textCell.setText(LocaleController.getString("DebugSendLastLogs", R.string.DebugSendLastLogs), true);
                     } else if (position == clearLogsRow) {
-                        textCell.setText(LocaleController.getString("DebugClearLogs", R.string.DebugClearLogs), switchBackendRow != -1);
+                        textCell.setTextAndValue(LocaleController.getString("DebugClearLogs", R.string.DebugClearLogs), FileLog.getLogDirSize(), switchBackendRow != -1);
                     } else if (position == switchBackendRow) {
                         textCell.setText("Switch Backend", false);
                     } else if (position == devicesRow) {

@@ -61,6 +61,7 @@ public class SlideChooseView extends View {
     private boolean touchWasClose = false;
 
     private boolean needDivider;
+    private boolean slidable = true;
 
     public void setDivider(boolean divider) {
         needDivider = divider;
@@ -126,6 +127,9 @@ public class SlideChooseView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
+        if(!isSlidable()){
+            return true;
+        }
         float indexTouch = MathUtils.clamp((x - sideSide + circleSize / 2f) / (lineSize + gapSize * 2 + circleSize), 0, optionsStr.length - 1);
         boolean isClose = Math.abs(indexTouch - Math.round(indexTouch)) < .35f;
         if (isClose) {
@@ -213,6 +217,7 @@ public class SlideChooseView extends View {
             float t = Math.max(0, 1f - Math.abs(a - selectedIndexAnimated));
             float ut = MathUtils.clamp(selectedIndexAnimated - a + 1f, 0, 1);
             int color = ColorUtils.blendARGB(getThemedColor(Theme.key_switchTrack), getThemedColor(Theme.key_switchTrackChecked), ut);
+            color = AndroidUtilities.getTransparentColor(color, isSlidable() ? 1.0f : 0.5f);
             paint.setColor(color);
             linePaint.setColor(color);
             canvas.drawCircle(cx, cy, AndroidUtilities.lerp(circleSize / 2, AndroidUtilities.dp(6), t), paint);
@@ -239,7 +244,7 @@ public class SlideChooseView extends View {
             }
             int size = optionsSizes[a];
             String text = optionsStr[a];
-            textPaint.setColor(ColorUtils.blendARGB(getThemedColor(Theme.key_windowBackgroundWhiteGrayText), getThemedColor(Theme.key_windowBackgroundWhiteBlueText), t));
+            textPaint.setColor(AndroidUtilities.getTransparentColor(ColorUtils.blendARGB(getThemedColor(Theme.key_windowBackgroundWhiteGrayText), getThemedColor(Theme.key_windowBackgroundWhiteBlueText), t), isSlidable() ? 1.0f : 0.5f));
             if (a == 0) {
                 canvas.drawText(text, AndroidUtilities.dp(22), AndroidUtilities.dp(28), textPaint);
             } else if (a == optionsStr.length - 1) {
@@ -250,9 +255,9 @@ public class SlideChooseView extends View {
         }
 
         float cx = sideSide + (lineSize + gapSize * 2 + circleSize) * selectedIndexAnimated + circleSize / 2;
-        paint.setColor(ColorUtils.setAlphaComponent(getThemedColor(Theme.key_switchTrackChecked), 80));
+        paint.setColor(AndroidUtilities.getTransparentColor(ColorUtils.setAlphaComponent(getThemedColor(Theme.key_switchTrackChecked), 80), isSlidable() ? 1.0f : 0.5f));
         canvas.drawCircle(cx, cy, AndroidUtilities.dp(12 * movingAnimated), paint);
-        paint.setColor(getThemedColor(Theme.key_switchTrackChecked));
+        paint.setColor(AndroidUtilities.getTransparentColor(getThemedColor(Theme.key_switchTrackChecked), isSlidable() ? 1.0f : 0.5f));
         canvas.drawCircle(cx, cy, AndroidUtilities.dp(6), paint);
 
         if (needDivider) {
@@ -280,6 +285,13 @@ public class SlideChooseView extends View {
         return color != null ? color : Theme.getColor(key);
     }
 
+    public void setSlidable(boolean slidable) {
+        this.slidable = slidable;
+    }
+
+    public boolean isSlidable() {
+        return slidable;
+    }
 
     public interface Callback {
         void onOptionSelected(int index);
