@@ -1,6 +1,5 @@
 package it.owlgram.android.helpers;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.SharedPreferences;
 

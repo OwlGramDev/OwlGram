@@ -11310,7 +11310,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 dateTextView.setText("");
             } else {
                 menuItem.hideSubItem(gallery_menu_translate);
-                if (!noforwards) {
+                if (OwlConfig.showTranslate) {
                     MessageHelper messageHelper = MessageHelper.getInstance(currentAccount);
                     MessageObject messageObject = messageHelper.getMessageForTranslate(newMessageObject, null);
                     if (messageObject != null) {

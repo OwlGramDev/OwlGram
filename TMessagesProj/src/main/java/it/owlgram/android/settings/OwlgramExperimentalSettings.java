@@ -1,31 +1,20 @@
 package it.owlgram.android.settings;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.os.Build;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
-import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.AlertDialog;
-import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
-import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextSettingsCell;
-import org.telegram.ui.Components.LayoutHelper;
-import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.SlideChooseView;
 
 import java.util.ArrayList;
@@ -35,10 +24,7 @@ import it.owlgram.android.components.LabsHeader;
 import it.owlgram.android.helpers.MonetIconsHelper;
 import it.owlgram.android.helpers.PopupHelper;
 
-public class OwlgramExperimentalSettings extends BaseFragment {
-
-    private int rowCount;
-    private ListAdapter listAdapter;
+public class OwlgramExperimentalSettings extends BaseSettingsActivity {
 
     private int checkBoxExperimentalRow;
     private int headerImageRow;
@@ -53,97 +39,68 @@ public class OwlgramExperimentalSettings extends BaseFragment {
     private int downloadSpeedBoostRow;
     private int uploadSpeedBoostRow;
 
+    // VIEW TYPES
+    private static final int TYPE_IMAGE_HEADER = 200;
+    private static final int TYPE_SLIDE_CHOOSE = 201;
+
     @Override
-    public boolean onFragmentCreate() {
-        super.onFragmentCreate();
-        updateRowsId(true);
-        return true;
+    protected String getActionBarTitle() {
+        return LocaleController.getString("Experimental", R.string.Experimental);
     }
 
     @Override
-    public View createView(Context context) {
-        actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setTitle(LocaleController.getString("Experimental", R.string.Experimental));
-        actionBar.setAllowOverlayTitle(false);
-        if (AndroidUtilities.isTablet()) {
-            actionBar.setOccupyStatusBar(false);
-        }
-        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
-            @Override
-            public void onItemClick(int id) {
-                if (id == -1) {
-                    finishFragment();
+    protected void onItemClick(View view, int position, float x, float y) {
+        if (position == betterAudioCallRow) {
+            OwlConfig.toggleBetterAudioQuality();
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(OwlConfig.betterAudioQuality);
+            }
+        } else if (position == maxRecentStickersRow) {
+            int[] counts = {20, 30, 40, 50, 80, 100, 120, 150, 180, 200};
+            ArrayList<String> types = new ArrayList<>();
+            for (int count : counts) {
+                if (count <= getMessagesController().maxRecentStickersCount) {
+                    types.add(String.valueOf(count));
                 }
             }
-        });
-
-        listAdapter = new ListAdapter(context);
-        fragmentView = new FrameLayout(context);
-        fragmentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
-        FrameLayout frameLayout = (FrameLayout) fragmentView;
-
-        RecyclerListView listView = new RecyclerListView(context);
-        listView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-        listView.setVerticalScrollBarEnabled(false);
-        listView.setAdapter(listAdapter);
-        if (listView.getItemAnimator() != null) {
-            ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
-        }
-        frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        listView.setOnItemClickListener((view, position, x, y) -> {
-            if (position == betterAudioCallRow) {
-                OwlConfig.toggleBetterAudioQuality();
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.betterAudioQuality);
-                }
-            } else if (position == maxRecentStickersRow) {
-                int[] counts = {20, 30, 40, 50, 80, 100, 120, 150, 180, 200};
-                ArrayList<String> types = new ArrayList<>();
-                for (int count : counts) {
-                    if (count <= getMessagesController().maxRecentStickersCount) {
-                        types.add(String.valueOf(count));
-                    }
-                }
-                PopupHelper.show(types, LocaleController.getString("MaxRecentStickers", R.string.MaxRecentStickers), types.indexOf(String.valueOf(OwlConfig.maxRecentStickers)), context, i -> {
-                    OwlConfig.setMaxRecentStickers(Integer.parseInt(types.get(i)));
-                    listAdapter.notifyItemChanged(maxRecentStickersRow);
-                });
-            } else if (position == checkBoxExperimentalRow) {
-                if (view instanceof TextCheckCell) {
-                    TextCheckCell textCheckCell = (TextCheckCell) view;
-                    if (MonetIconsHelper.isSelectedMonet()) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                        builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
-                        builder.setMessage(LocaleController.getString("DisableExperimentalAlert", R.string.DisableExperimentalAlert));
-                        builder.setPositiveButton(LocaleController.getString("AutoDeleteConfirm", R.string.AutoDeleteConfirm), (dialogInterface, i) -> {
-                            MonetIconsHelper.switchToMonet();
-                            toggleExperimentalMode(textCheckCell);
-                            AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
-                            progressDialog.show();
-                            AndroidUtilities.runOnUIThread(progressDialog::dismiss, 2000);
-                        });
-                        builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
-                        builder.show();
-                    } else {
+            PopupHelper.show(types, LocaleController.getString("MaxRecentStickers", R.string.MaxRecentStickers), types.indexOf(String.valueOf(OwlConfig.maxRecentStickers)), context, i -> {
+                OwlConfig.setMaxRecentStickers(Integer.parseInt(types.get(i)));
+                listAdapter.notifyItemChanged(maxRecentStickersRow, PARTIAL);
+            });
+        } else if (position == checkBoxExperimentalRow) {
+            if (view instanceof TextCheckCell) {
+                TextCheckCell textCheckCell = (TextCheckCell) view;
+                if (MonetIconsHelper.isSelectedMonet()) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle(LocaleController.getString("AppName", R.string.AppName));
+                    builder.setMessage(LocaleController.getString("DisableExperimentalAlert", R.string.DisableExperimentalAlert));
+                    builder.setPositiveButton(LocaleController.getString("AutoDeleteConfirm", R.string.AutoDeleteConfirm), (dialogInterface, i) -> {
+                        MonetIconsHelper.switchToMonet();
                         toggleExperimentalMode(textCheckCell);
-                    }
-                }
-            } else if (position == monetIconRow) {
-                MonetIconsHelper.switchToMonet();
-                AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
-                progressDialog.show();
-                AndroidUtilities.runOnUIThread(progressDialog::dismiss, 2000);
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(MonetIconsHelper.isSelectedMonet());
-                }
-            } else if (position == uploadSpeedBoostRow) {
-                OwlConfig.toggleUploadSpeedBoost();
-                if (view instanceof TextCheckCell) {
-                    ((TextCheckCell) view).setChecked(OwlConfig.uploadSpeedBoost);
+                        AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
+                        progressDialog.show();
+                        AndroidUtilities.runOnUIThread(progressDialog::dismiss, 2000);
+                    });
+                    builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+                    builder.show();
+                } else {
+                    toggleExperimentalMode(textCheckCell);
                 }
             }
-        });
-        return fragmentView;
+        } else if (position == monetIconRow) {
+            MonetIconsHelper.switchToMonet();
+            AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
+            progressDialog.show();
+            AndroidUtilities.runOnUIThread(progressDialog::dismiss, 2000);
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(MonetIconsHelper.isSelectedMonet());
+            }
+        } else if (position == uploadSpeedBoostRow) {
+            OwlConfig.toggleUploadSpeedBoost();
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(OwlConfig.uploadSpeedBoost);
+            }
+        }
     }
 
     private void toggleExperimentalMode(TextCheckCell textCheckCell) {
@@ -154,18 +111,18 @@ public class OwlgramExperimentalSettings extends BaseFragment {
         textCheckCell.setBackgroundColorAnimated(isEnabled, Theme.getColor(isEnabled ? Theme.key_windowBackgroundChecked : Theme.key_windowBackgroundUnchecked));
         if (isEnabled) {
             listAdapter.notifyItemRemoved(experimentalMessageAlert);
-            updateRowsId(false);
+            updateRowsId();
             listAdapter.notifyItemRangeInserted(headerImageRow, rowCount - headerImageRow);
         } else {
             listAdapter.notifyItemRangeRemoved(headerImageRow, rowCount - headerImageRow);
-            updateRowsId(false);
+            updateRowsId();
             listAdapter.notifyItemInserted(experimentalMessageAlert);
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private void updateRowsId(boolean notify) {
-        rowCount = 0;
+    @Override
+    protected void updateRowsId() {
+        super.updateRowsId();
         headerImageRow = -1;
         bottomHeaderRow = -1;
         headerExperimental = -1;
@@ -195,37 +152,19 @@ public class OwlgramExperimentalSettings extends BaseFragment {
         } else {
             experimentalMessageAlert = rowCount++;
         }
-
-        if (listAdapter != null && notify) {
-            listAdapter.notifyDataSetChanged();
-        }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     @Override
-    public void onResume() {
-        super.onResume();
-        if (listAdapter != null) {
-            listAdapter.notifyDataSetChanged();
-        }
+    protected BaseListAdapter createAdapter() {
+        return new ListAdapter();
     }
 
-    private class ListAdapter extends RecyclerListView.SelectionAdapter {
-        private final Context mContext;
-
-        public ListAdapter(Context context) {
-            mContext = context;
-        }
+    private class ListAdapter extends BaseListAdapter {
 
         @Override
-        public int getItemCount() {
-            return rowCount;
-        }
-
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
             switch (holder.getItemViewType()) {
-                case 2:
+                case TYPE_SWITCH:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
                     if (position == betterAudioCallRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("MediaStreamVoip", R.string.MediaStreamVoip), OwlConfig.betterAudioQuality, true);
@@ -243,7 +182,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                         textCheckCell.setTextAndCheck(LocaleController.getString("FasterUploadSpeed", R.string.FasterUploadSpeed), OwlConfig.uploadSpeedBoost, false);
                     }
                     break;
-                case 4:
+                case TYPE_TEXT_HINT_WITH_PADDING:
                     TextInfoPrivacyCell textInfoPrivacyCell = (TextInfoPrivacyCell) holder.itemView;
                     if (position == bottomHeaderRow) {
                         textInfoPrivacyCell.setText(LocaleController.getString("ExperimentalDesc", R.string.ExperimentalDesc));
@@ -251,7 +190,7 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                         textInfoPrivacyCell.setText(LocaleController.getString("ExperimentalOff", R.string.ExperimentalOff));
                     }
                     break;
-                case 5:
+                case TYPE_HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == headerExperimental) {
                         headerCell.setText(LocaleController.getString("General", R.string.General));
@@ -259,11 +198,11 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                         headerCell.setText(LocaleController.getString("DownloadSpeed", R.string.DownloadSpeed));
                     }
                     break;
-                case 6:
+                case TYPE_SETTINGS:
                     TextSettingsCell textCell = (TextSettingsCell) holder.itemView;
                     textCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                     if (position == maxRecentStickersRow) {
-                        textCell.setTextAndValue(LocaleController.getString("MaxRecentStickers", R.string.MaxRecentStickers), String.valueOf(OwlConfig.maxRecentStickers), true);
+                        textCell.setTextAndValue(LocaleController.getString("MaxRecentStickers", R.string.MaxRecentStickers), String.valueOf(OwlConfig.maxRecentStickers), partial, true);
                     }
                     break;
             }
@@ -272,36 +211,18 @@ public class OwlgramExperimentalSettings extends BaseFragment {
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int type = holder.getItemViewType();
-            return (type == 2 && holder.getAdapterPosition() != checkBoxExperimentalRow) || type == 6;
+            return (type == TYPE_SWITCH && holder.getAdapterPosition() != checkBoxExperimentalRow) || type == TYPE_SETTINGS;
         }
 
-        @NonNull
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view;
+        protected View onCreateViewHolder(int viewType) {
+            View view = null;
             switch (viewType) {
-                case 2:
-                    view = new TextCheckCell(mContext);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                case TYPE_IMAGE_HEADER:
+                    view = new LabsHeader(context);
                     break;
-                case 3:
-                    view = new LabsHeader(mContext);
-                    break;
-                case 4:
-                    TextInfoPrivacyCell textInfoPrivacyCell = new TextInfoPrivacyCell(mContext);
-                    textInfoPrivacyCell.setBottomPadding(16);
-                    view = textInfoPrivacyCell;
-                    break;
-                case 5:
-                    view = new HeaderCell(mContext);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-                    break;
-                case 6:
-                    view = new TextSettingsCell(mContext);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-                    break;
-                case 7:
-                    SlideChooseView slideChooseView = new SlideChooseView(mContext);
+                case TYPE_SLIDE_CHOOSE:
+                    SlideChooseView slideChooseView = new SlideChooseView(context);
                     view = slideChooseView;
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     ArrayList<String> arrayList = new ArrayList<>();
@@ -316,33 +237,29 @@ public class OwlgramExperimentalSettings extends BaseFragment {
                     slideChooseView.setOptions(types.indexOf(OwlConfig.downloadSpeedBoost), arrayList.toArray(new String[0]));
                     slideChooseView.setDivider(true);
                     break;
-                default:
-                    view = new ShadowSectionCell(mContext);
-                    break;
             }
-            view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
-            return new RecyclerListView.Holder(view);
+            return view;
         }
 
         @Override
         public int getItemViewType(int position) {
-            if (position == betterAudioCallRow || position == checkBoxExperimentalRow || position == monetIconRow ||
+            if (position == downloadDividersRow) {
+                return TYPE_SHADOW;
+            } else if (position == betterAudioCallRow || position == checkBoxExperimentalRow || position == monetIconRow ||
                     position == uploadSpeedBoostRow) {
-                return 2;
+                return TYPE_SWITCH;
             } else if (position == headerImageRow) {
-                return 3;
+                return TYPE_IMAGE_HEADER;
             } else if (position == bottomHeaderRow || position == experimentalMessageAlert) {
-                return 4;
+                return TYPE_TEXT_HINT_WITH_PADDING;
             } else if (position == headerExperimental || position == headerDownloadSpeed) {
-                return 5;
+                return TYPE_HEADER;
             } else if (position == maxRecentStickersRow) {
-                return 6;
+                return TYPE_SETTINGS;
             } else if (position == downloadSpeedBoostRow) {
-                return 7;
-            } else if (position == downloadDividersRow) {
-                return 1;
+                return TYPE_SLIDE_CHOOSE;
             }
-            return 1;
+            throw new IllegalArgumentException("Invalid position");
         }
     }
 }

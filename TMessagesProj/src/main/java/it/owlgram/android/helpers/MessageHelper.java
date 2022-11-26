@@ -260,7 +260,7 @@ public class MessageHelper extends BaseController {
             return LocaleController.getString("MessageTranslateProgress", R.string.MessageTranslateProgress) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
         }
         Pair<String, String> translatedLanguage = messageObject.translatedLanguage;
-        if (translatedLanguage == null || translatedLanguage.first == null || translatedLanguage.second == null) {
+        if (translatedLanguage == null || TextUtils.isEmpty(translatedLanguage.first) || TextUtils.isEmpty(translatedLanguage.second)) {
             return LocaleController.getString("MessageTranslated", R.string.MessageTranslated) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
         }
         if (arrowDrawable == null) {
