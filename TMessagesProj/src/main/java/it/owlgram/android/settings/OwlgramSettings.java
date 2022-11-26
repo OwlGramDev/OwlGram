@@ -2,7 +2,6 @@ package it.owlgram.android.settings;
 
 import android.content.DialogInterface;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,17 +18,14 @@ import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Cells.CheckBoxCell;
 import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextDetailSettingsCell;
 import org.telegram.ui.Components.BulletinFactory;
-import org.telegram.ui.Components.LayoutHelper;
 
 import it.owlgram.android.Crashlytics;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.StoreUtils;
-import it.owlgram.android.translator.AutoTranslateConfig;
 
 public class OwlgramSettings extends BaseSettingsActivity {
 
@@ -70,17 +66,8 @@ public class OwlgramSettings extends BaseSettingsActivity {
             OwlConfig.shareSettings(getParentActivity());
         } else if (id == 2) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            LinearLayout linearLayout = new LinearLayout(context);
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            builder.setView(linearLayout);
             builder.setTitle(LocaleController.getString("ThemeResetToDefaultsTitle", R.string.ThemeResetToDefaultsTitle));
             builder.setMessage(LocaleController.getString("ResetSettingsAlert", R.string.ResetSettingsAlert));
-            CheckBoxCell cell = new CheckBoxCell(context, 1);
-            cell.setBackground(Theme.getSelectorDrawable(false));
-            cell.setText(LocaleController.getString("ResetAutoTranslationPreferences", R.string.ResetAutoTranslationPreferences), "", false, false);
-            cell.setPadding(LocaleController.isRTL ? AndroidUtilities.dp(16) : AndroidUtilities.dp(8), 0, LocaleController.isRTL ? AndroidUtilities.dp(8) : AndroidUtilities.dp(16), 0);
-            linearLayout.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
-            cell.setOnClickListener(v -> cell.setChecked(!cell.isChecked(), true));
             builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
             builder.setPositiveButton(LocaleController.getString("Reset", R.string.Reset), (dialogInterface, i) -> {
                 int differenceUI = OwlConfig.getDifferenceUI();
@@ -89,7 +76,6 @@ public class OwlgramSettings extends BaseSettingsActivity {
                 Theme.dialogs_holidayDrawable = null;
                 getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
                 getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
-                if (cell.isChecked()) AutoTranslateConfig.resetExceptions();
                 OwlConfig.doRebuildUIWithDiff(differenceUI, parentLayout);
                 BulletinFactory.of(OwlgramSettings.this).createSimpleBulletin(R.raw.forward, LocaleController.getString("ResetSettingsHint", R.string.ResetSettingsHint)).show();
             });

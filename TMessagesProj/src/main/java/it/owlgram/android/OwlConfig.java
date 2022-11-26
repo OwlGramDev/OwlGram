@@ -114,7 +114,6 @@ public class OwlConfig extends SettingsManager {
     public static int downloadSpeedBoost;
     public static int unlockedSecretIcon;
     public static int showInActionBar;
-    public static boolean hideSendAsChannel;
 
     static {
         loadConfig(true);

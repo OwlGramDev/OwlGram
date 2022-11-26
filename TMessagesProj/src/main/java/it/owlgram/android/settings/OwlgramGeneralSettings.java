@@ -206,7 +206,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                 BulletinFactory.of(this).createErrorBulletinSubtitle(LocaleController.getString("BrokenMLKit", R.string.BrokenMLKit), LocaleController.getString("BrokenMLKitDetail", R.string.BrokenMLKitDetail), null).show();
                 return;
             }
-            OwlConfig.toggleAutoTranslate();
+            OwlConfig.setAutoTranslate(!OwlConfig.autoTranslate);
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.autoTranslate);
             }
