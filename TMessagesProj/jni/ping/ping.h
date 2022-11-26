@@ -1,22 +1,27 @@
 #pragma once
 
+#include <time.h>
+
+#include <netinet/ip_icmp.h>
+
 #define LOG_TAG "owlgram/native/ping"
 
-#define PING_REQUEST "HEAD / HTTP/1.1\r\nConnection: close\r\n\r\n"
-#define PING_PORT 80
+#define PING_MSG "Echo Hello 12345\0"
+#define PING_MSG_SIZE strlen(PING_MSG) + 1
+#define PING_BUFFER_SIZE 2048
 
-#define SOCKET_CONNECT_OK 0
-#define SOCKET_SEND_FAIL -1
+#define PING_DEFTIMEOUT_SECONDS 2
+
+#define SOCKET_FAIL -1
+
 #define SOCKET_EXCEPTION_CLASSNAME "java/net/SocketException"
 
-#define SOCKET_MSG_EADDRNOTAVAIL "The specified address is not available from the local machine"
-#define SOCKET_MSG_ECONNREFUSED "The target address was not listening for connections or refused the connection request"
-#define SOCKET_MSG_ETIMEDOUT "The attempt to connect timed out before a connection was made"
-#define SOCKET_MSG_ECONNRESET "A connection was forcibly closed by a peer"
-#define SOCKET_MSG_ENETDOWN "The local network interface used to reach the destination is down"
-#define SOCKET_MSG_ENETUNREACH "No route to the network is present"
+#define SOCKET_ERROR_SHORT_ICMP_PACKET "ICMP packet too short"
+#define SOCKET_ERROR_INVALID_ICMP_PACKET "Invalid ICMP packet"
 
-#define SOCKET_FMT_EGENERIC "A generic error has occurred. Errno: %d"
+#define SOCKET_ERROR_FMT_SHORT_ICMP_REPLY "Error, got short ICMP packet, %d bytes %d"
+
+#define DEFTIMEVAL(name, s, u) struct timeval name = { .tv_sec = s, .tv_usec = u }
 
 #define MEASURE(t0, t1, clock_type, block) \
     struct timespec t0; \
@@ -27,13 +32,20 @@
     struct timespec t1; \
     clock_gettime(clock_type, &t1)
 
+#ifndef LOG_DISABLED
 #define LOGF(level, size, fmt, ...) \
     { \
         const char buffer[size]; \
         sprintf(buffer, fmt, __VA_ARGS__); \
         LOG##level(buffer); \
     } NULL
+#else
+#define LOGF(level, size, fmt, ...) NULL
+#endif
 
-jint throwSocketException(JNIEnv *env, char *msg);
-unsigned char handleConnectError(JNIEnv *env, int res);
-unsigned char handleSendError(JNIEnv *env, int res);
+inline jint throwSocketException(JNIEnv *env, char *msg);
+
+int handleSocketError(JNIEnv *env, int socketfd);
+int handleSendtoError(JNIEnv *env, int count);
+int handleRecvError(JNIEnv *env, int count, size_t recv_header_size);
+int handleICMPError(JNIEnv *env, struct icmphdr* header);

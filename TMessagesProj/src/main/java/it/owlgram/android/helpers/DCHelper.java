@@ -2,7 +2,6 @@ package it.owlgram.android.helpers;
 
 import android.graphics.Color;
 import android.os.SystemClock;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,9 +14,9 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.tgnet.TLRPC;
 
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 
 import it.owlgram.android.OwlConfig;
 
@@ -91,7 +90,9 @@ public class DCHelper {
         }
     }
 
-    public static String getDCIp(int dc_id) {
+    public static String getDCIp(int dc_id)
+        throws NoSuchElementException {
+
         switch (dc_id) {
             case 1:
                 return "149.154.175.50";
@@ -104,7 +105,7 @@ public class DCHelper {
             case 5:
                 return "91.108.56.100";
             default:
-                return "?.?.?.?";
+                throw new NoSuchElementException("Unknown DC");
         }
     }
 
@@ -174,33 +175,30 @@ public class DCHelper {
             thread = new Thread() {
                 @Override
                 public void run() {
-                    while (isRunning) {
-                        try {
-                            String url = "https://app.owlgram.org/dc_status";
-                            JSONObject obj = new JSONObject(new StandardHTTPRequest(url).request());
-                            JSONArray listDatacenters = obj.getJSONArray("status");
-                            int refreshTimeIn = obj.getInt("refresh_in_time");
-                            DatacenterList infoArrayList = new DatacenterList();
-                            for (int i = 0; i < listDatacenters.length(); i++) {
-                                JSONObject dcInfo = listDatacenters.getJSONObject(i);
-                                int dcID = dcInfo.getInt("dc_id");
-                                int status = dcInfo.getInt("dc_status");
-                                int ping = StandardHTTPRequest.ping(DCHelper.getDCIp(dcID));
-                                infoArrayList.add(new DatacenterInfo(dcID, status, ping));
-                                SystemClock.sleep(25);
-                            }
-                            if (updateCallback != null) {
-                                AndroidUtilities.runOnUIThread(() -> updateCallback.onUpdate(infoArrayList));
-                            }
-                            SystemClock.sleep(1000L * refreshTimeIn);
-                        } catch (SocketException e) {
-                            Log.e("owlgram/ping", "Ping failed", e);
-                            SystemClock.sleep(1000L);
-                        } catch (Exception ignored) {
-                            SystemClock.sleep(1000L);
+                while (isRunning) {
+                    try {
+                        String url = "https://app.owlgram.org/dc_status";
+                        JSONObject obj = new JSONObject(new StandardHTTPRequest(url).request());
+                        JSONArray listDatacenters = obj.getJSONArray("status");
+                        int refreshTimeIn = obj.getInt("refresh_in_time");
+                        DatacenterList infoArrayList = new DatacenterList();
+                        for (int i = 0; i < listDatacenters.length(); i++) {
+                            JSONObject dcInfo = listDatacenters.getJSONObject(i);
+                            int dcID = dcInfo.getInt("dc_id");
+                            int status = dcInfo.getInt("dc_status");
+                            int ping = StandardHTTPRequest.ping(DCHelper.getDCIp(dcID));
+                            infoArrayList.add(new DatacenterInfo(dcID, status, ping));
+                            SystemClock.sleep(25);
                         }
+                        if (updateCallback != null) {
+                            AndroidUtilities.runOnUIThread(() -> updateCallback.onUpdate(infoArrayList));
+                        }
+                        SystemClock.sleep(1000L * refreshTimeIn);
+                    } catch (Exception ignored) {
+                        SystemClock.sleep(1000L);
                     }
-                    doneStopRunning = true;
+                }
+                doneStopRunning = true;
                 }
             };
             thread.start();

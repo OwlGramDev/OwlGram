@@ -1,5 +1,4 @@
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include <jni.h>
@@ -7,65 +6,55 @@
 
 #include "ping.h"
 
-jint throwSocketException(JNIEnv *env, char *msg) {
-    jclass exceptionClass = (*env)->FindClass(env, SOCKET_EXCEPTION_CLASSNAME);
+inline jint throwSocketException(JNIEnv *env, char *msg) {
+    jclass ex = (*env)->FindClass(env, SOCKET_EXCEPTION_CLASSNAME);
 
-    return (*env)->ThrowNew(env, exceptionClass, msg);
+    return (*env)->ThrowNew(env, ex, msg);
 }
 
-jint throwGenericError(JNIEnv *env) {
-    const char buffer[] = { SOCKET_FMT_EGENERIC "\00\00\00\00\00" };
-    sprintf(&buffer, &buffer, errno);
-
-    return throwSocketException(env, buffer);
-}
-
-unsigned char handleConnectError(JNIEnv *env, int res) {
-    LOGF(D, 255, "connect errno: %d", res);
-
-    if(res != SOCKET_CONNECT_OK) {
-        switch(errno) {
-        case EADDRNOTAVAIL:
-            throwSocketException(env, SOCKET_MSG_EADDRNOTAVAIL);
-            break;
-        case ECONNREFUSED:
-            throwSocketException(env, SOCKET_MSG_ECONNREFUSED);
-            break;
-        case ETIMEDOUT:
-            throwSocketException(env, SOCKET_MSG_ETIMEDOUT);
-            break;
-
-        default:
-            throwGenericError(env);
-            break;
-        }
+int handleSocketError(JNIEnv *env, int socketfd) {
+    if(socketfd == SOCKET_FAIL) {
+        const char *err = strerror(errno);
+        throwSocketException(env, err);
 
         return EXIT_FAILURE;
     }
-    else {
-        return EXIT_SUCCESS;
-    }
+
+    return EXIT_SUCCESS;
 }
 
-unsigned char handleSendError(JNIEnv *env, int res) {
-    LOGF(D, 255, "send errno: %d", res);
+int handleSendtoError(JNIEnv *env, int count) {
+    if(count < 0) {
+        const char *err = strerror(errno);
+        throwSocketException(env, err);
 
-    if(res == SOCKET_SEND_FAIL) {
-        switch(errno) {
-        case ECONNRESET:
-            throwSocketException(env, SOCKET_MSG_ECONNRESET);
-            break;
-        case ENETDOWN:
-            throwSocketException(env, SOCKET_MSG_ENETDOWN);
-            break;
-        case ENETUNREACH:
-            throwSocketException(env, SOCKET_MSG_ENETUNREACH);
-            break;
+        return EXIT_FAILURE;
+    }
 
-        default:
-            throwGenericError(env);
-            break;
-        }
+    return EXIT_SUCCESS;
+}
+
+int handleRecvError(JNIEnv *env, int count, size_t recv_header_size) {
+    if(count < 0) {
+        const char *err = strerror(errno);
+        throwSocketException(env, err);
+
+        return EXIT_FAILURE;
+    }
+    else if(count < recv_header_size) {
+        LOGF(E, 255, SOCKET_ERROR_FMT_SHORT_ICMP_REPLY, count, errno);
+
+        throwSocketException(env, SOCKET_ERROR_SHORT_ICMP_PACKET);
+
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int handleICMPError(JNIEnv *env, struct icmphdr* header) {
+    if(header->type != ICMP_ECHOREPLY) {
+        throwSocketException(env, SOCKET_ERROR_INVALID_ICMP_PACKET);
 
         return EXIT_FAILURE;
     }

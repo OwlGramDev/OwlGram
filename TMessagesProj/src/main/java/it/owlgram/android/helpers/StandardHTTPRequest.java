@@ -24,7 +24,7 @@ public class StandardHTTPRequest {
         return this;
     }
 
-    public native static int ping(String address) throws SocketException;
+    public native static int ping(String ip) throws SocketException;
 
     public StandardHTTPRequest data(String data) throws IOException {
         httpURLConnection.setDoOutput(true);
