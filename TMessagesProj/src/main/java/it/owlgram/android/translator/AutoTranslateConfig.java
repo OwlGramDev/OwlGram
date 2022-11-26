@@ -25,4 +25,8 @@ public class AutoTranslateConfig {
     public static void removeAutoTranslateConfig(long dialog_id, int topicId) {
         preferences.edit().remove("autoTranslate_" + dialog_id + (topicId != 0 ? "_" + topicId : "")).apply();
     }
+
+    public static boolean resetAutoTranslateConfigs() {
+        return preferences.edit().clear().commit();
+    }
 }

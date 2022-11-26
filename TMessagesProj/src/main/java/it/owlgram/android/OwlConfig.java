@@ -114,6 +114,7 @@ public class OwlConfig extends SettingsManager {
     public static int downloadSpeedBoost;
     public static int unlockedSecretIcon;
     public static int showInActionBar;
+    public static boolean hideSendAsChannel;
 
     static {
         loadConfig(true);
@@ -130,9 +131,8 @@ public class OwlConfig extends SettingsManager {
                 DB_VERSION = getInt("DB_VERSION", 0);
                 if (DB_VERSION < BuildVars.BUILD_VERSION && backupFileExist) {
                     restoreBackup(backupFile(), true);
-                    DB_VERSION = BuildVars.BUILD_VERSION;
-                    putValue("DB_VERSION", DB_VERSION);
                 }
+                putValue("DB_VERSION", DB_VERSION = BuildVars.BUILD_VERSION);
                 registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> executeBackup());
             }
             isChineseUser = ApplicationLoader.applicationContext.getResources().getBoolean(R.bool.isChineseUser);
@@ -243,293 +243,239 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static void toggleHidePhone() {
-        hidePhoneNumber = !hidePhoneNumber;
-        putValue("hidePhoneNumber", hidePhoneNumber);
+        putValue("hidePhoneNumber", hidePhoneNumber ^= true);
     }
 
     public static void toggleHideContactNumber() {
-        hideContactNumber = !hideContactNumber;
-        putValue("hideContactNumber", hideContactNumber);
+        putValue("hideContactNumber", hideContactNumber ^= true);
     }
 
     public static void toggleFullTime() {
-        fullTime = !fullTime;
-        putValue("fullTime", fullTime);
+        putValue("fullTime", fullTime ^= true);
     }
 
     public static void toggleRoundedNumbers() {
-        roundedNumbers = !roundedNumbers;
-        putValue("roundedNumbers", roundedNumbers);
+        putValue("roundedNumbers", roundedNumbers ^= true);
     }
 
     public static void toggleConfirmCall() {
-        confirmCall = !confirmCall;
-        putValue("confirmCall", confirmCall);
+        putValue("confirmCall", confirmCall ^= true);
     }
 
     public static void toggleMediaFlipByTap() {
-        mediaFlipByTap = !mediaFlipByTap;
-        putValue("mediaFlipByTap", mediaFlipByTap);
+        putValue("mediaFlipByTap", mediaFlipByTap ^= true);
     }
 
     public static void toggleJumpChannel() {
-        jumpChannel = !jumpChannel;
-        putValue("jumpChannel", jumpChannel);
+        putValue("jumpChannel", jumpChannel ^= true);
     }
 
     public static void toggleHideKeyboard() {
-        hideKeyboard = !hideKeyboard;
-        putValue("hideKeyboard", hideKeyboard);
+        putValue("hideKeyboard", hideKeyboard ^= true);
     }
 
     public static void toggleGifAsVideo() {
-        gifAsVideo = !gifAsVideo;
-        putValue("gifAsVideo", gifAsVideo);
+        putValue("gifAsVideo", gifAsVideo ^= true);
     }
 
     public static void toggleShowFolderWhenForward() {
-        showFolderWhenForward = !showFolderWhenForward;
-        putValue("showFolderWhenForward", showFolderWhenForward);
+        putValue("showFolderWhenForward", showFolderWhenForward ^= true);
     }
 
     public static void toggleUseRearCamera() {
-        useRearCamera = !useRearCamera;
-        putValue("useRearCamera", useRearCamera);
+        putValue("useRearCamera", useRearCamera ^= true);
     }
 
     public static void toggleSendConfirm() {
-        sendConfirm = !sendConfirm;
-        putValue("sendConfirm", sendConfirm);
+        putValue("sendConfirm", sendConfirm ^= true);
     }
 
     public static void toggleUseSystemFont() {
-        useSystemFont = !useSystemFont;
-        putValue("useSystemFont", useSystemFont);
+        putValue("useSystemFont", useSystemFont ^= true);
     }
 
     public static void toggleUseSystemEmoji() {
-        useSystemEmoji = !useSystemEmoji;
-        putValue("useSystemEmoji", useSystemEmoji);
+        putValue("useSystemEmoji", useSystemEmoji ^= true);
     }
 
     public static void toggleShowGreetings() {
-        showGreetings = !showGreetings;
-        putValue("showGreetings", showGreetings);
+        putValue("showGreetings", showGreetings ^= true);
     }
 
     public static void toggleShowTranslate() {
-        showTranslate = !showTranslate;
-        putValue("showTranslate", showTranslate);
+        putValue("showTranslate", showTranslate ^= true);
     }
 
     public static void toggleShowSaveMessage() {
-        showSaveMessage = !showSaveMessage;
-        putValue("showSaveMessage", showSaveMessage);
+        putValue("showSaveMessage", showSaveMessage ^= true);
     }
 
     public static void toggleShowRepeat() {
-        showRepeat = !showRepeat;
-        putValue("showRepeat", showRepeat);
+        putValue("showRepeat", showRepeat ^= true);
     }
 
     public static void toggleShowMessageDetails() {
-        showMessageDetails = !showMessageDetails;
-        putValue("showMessageDetails", showMessageDetails);
+        putValue("showMessageDetails", showMessageDetails ^= true);
     }
 
     public static void toggleShowNoQuoteForwardRow() {
-        showNoQuoteForward = !showNoQuoteForward;
-        putValue("showNoQuoteForward", showNoQuoteForward);
+        putValue("showNoQuoteForward", showNoQuoteForward ^= true);
     }
 
     public static void toggleBetaUpdates() {
-        betaUpdates = !betaUpdates;
-        putValue("betaUpdates", betaUpdates);
+        putValue("betaUpdates", betaUpdates ^= true);
     }
 
     public static void toggleNotifyUpdates() {
-        notifyUpdates = !notifyUpdates;
-        putValue("notifyUpdates", notifyUpdates);
+        putValue("notifyUpdates", notifyUpdates ^= true);
     }
 
     public static void toggleAvatarAsDrawerBackground() {
-        avatarAsDrawerBackground = !avatarAsDrawerBackground;
-        putValue("avatarAsDrawerBackground", avatarAsDrawerBackground);
+        putValue("avatarAsDrawerBackground", avatarAsDrawerBackground ^= true);
     }
 
     public static void toggleAvatarBackgroundBlur() {
-        avatarBackgroundBlur = !avatarBackgroundBlur;
-        putValue("avatarBackgroundBlur", avatarBackgroundBlur);
+        putValue("avatarBackgroundBlur", avatarBackgroundBlur ^= true);
     }
 
     public static void toggleAvatarBackgroundDarken() {
-        avatarBackgroundDarken = !avatarBackgroundDarken;
-        putValue("avatarBackgroundDarken", avatarBackgroundDarken);
+        putValue("avatarBackgroundDarken", avatarBackgroundDarken ^= true);
     }
 
     public static void toggleShowReportMessage() {
-        showReportMessage = !showReportMessage;
-        putValue("showReportMessage", showReportMessage);
+        putValue("showReportMessage", showReportMessage ^= true);
     }
 
     public static void toggleBetterAudioQuality() {
-        betterAudioQuality = !betterAudioQuality;
-        putValue("betterAudioQuality", betterAudioQuality);
+        putValue("betterAudioQuality", betterAudioQuality ^= true);
     }
 
     public static void toggleShowGradientColor() {
-        showGradientColor = !showGradientColor;
-        putValue("showGradientColor", showGradientColor);
+        putValue("showGradientColor", showGradientColor ^= true);
     }
 
     public static void toggleShowAvatarImage() {
-        showAvatarImage = !showAvatarImage;
-        putValue("showAvatarImage", showAvatarImage);
+        putValue("showAvatarImage", showAvatarImage ^= true);
     }
 
     public static void toggleOwlEasterSound() {
-        owlEasterSound = !owlEasterSound;
-        putValue("owlEasterSound", owlEasterSound);
+        putValue("owlEasterSound", owlEasterSound ^= true);
     }
 
     public static void togglePacmanForced() {
-        pacmanForced = !pacmanForced;
-        putValue("pacmanForced", pacmanForced);
+        putValue("pacmanForced", pacmanForced ^= true);
     }
 
     public static void toggleSmartButtons() {
-        smartButtons = !smartButtons;
-        putValue("smartButtons", smartButtons);
+        putValue("smartButtons", smartButtons ^= true);
     }
 
     public static void toggleAppBarShadow() {
-        disableAppBarShadow = !disableAppBarShadow;
-        putValue("disableAppBarShadow", disableAppBarShadow);
+        putValue("disableAppBarShadow", disableAppBarShadow ^= true);
     }
 
     public static void toggleAccentColor() {
-        accentAsNotificationColor = !accentAsNotificationColor;
-        putValue("accentAsNotificationColor", accentAsNotificationColor);
+        putValue("accentAsNotificationColor", accentAsNotificationColor ^= true);
     }
 
     public static void toggleShowDeleteDownloadedFile() {
-        showDeleteDownloadedFile = !showDeleteDownloadedFile;
-        putValue("showDeleteDownloadedFile", showDeleteDownloadedFile);
+        putValue("showDeleteDownloadedFile", showDeleteDownloadedFile ^= true);
     }
 
     public static void toggleShowCopyPhoto() {
-        showCopyPhoto = !showCopyPhoto;
-        putValue("showCopyPhoto", showCopyPhoto);
+        putValue("showCopyPhoto", showCopyPhoto ^= true);
     }
 
     public static void toggleShowSantaHat() {
-        showSantaHat = !showSantaHat;
-        putValue("showSantaHat", showSantaHat);
+        putValue("showSantaHat", showSantaHat ^= true);
     }
 
     public static void toggleShowSnowFalling() {
-        showSnowFalling = !showSnowFalling;
-        putValue("showSnowFalling", showSnowFalling);
+        putValue("showSnowFalling", showSnowFalling ^= true);
     }
 
     public static void toggleCameraXOptimizedMode() {
-        useCameraXOptimizedMode = !useCameraXOptimizedMode;
-        putValue("useCameraXOptimizedMode", useCameraXOptimizedMode);
+        putValue("useCameraXOptimizedMode", useCameraXOptimizedMode ^= true);
     }
 
     public static void toggleDisableProximityEvents() {
-        disableProximityEvents = !disableProximityEvents;
-        putValue("disableProximityEvents", disableProximityEvents);
+        putValue("disableProximityEvents", disableProximityEvents ^= true);
     }
 
     public static void toggleVoicesAgc() {
-        voicesAgc = !voicesAgc;
-        putValue("voicesAgc", voicesAgc);
+        putValue("voicesAgc", voicesAgc ^= true);
     }
 
     public static void toggleTurnSoundOnVDKey() {
-        turnSoundOnVDKey = !turnSoundOnVDKey;
-        putValue("turnSoundOnVDKey", turnSoundOnVDKey);
+        putValue("turnSoundOnVDKey", turnSoundOnVDKey ^= true);
     }
 
     public static void toggleOpenArchiveOnPull() {
-        openArchiveOnPull = !openArchiveOnPull;
-        putValue("openArchiveOnPull", openArchiveOnPull);
+        putValue("openArchiveOnPull", openArchiveOnPull ^= true);
     }
 
     public static void toggleSlidingChatTitle() {
-        slidingChatTitle = !slidingChatTitle;
-        putValue("slidingChatTitle", slidingChatTitle);
+        putValue("slidingChatTitle", slidingChatTitle ^= true);
     }
 
     public static void toggleConfirmStickersGIFs() {
-        confirmStickersGIFs = !confirmStickersGIFs;
-        putValue("confirmStickersGIFs", confirmStickersGIFs);
+        putValue("confirmStickersGIFs", confirmStickersGIFs ^= true);
     }
 
     public static void toggleShowIDAndDC() {
-        showIDAndDC = !showIDAndDC;
-        putValue("showIDAndDC", showIDAndDC);
+        putValue("showIDAndDC", showIDAndDC ^= true);
     }
 
     public static void toggleSearchIconInActionBar() {
-        searchIconInActionBar = !searchIconInActionBar;
-        putValue("searchIconInActionBar", searchIconInActionBar);
+        putValue("searchIconInActionBar", searchIconInActionBar ^= true);
     }
 
     public static void toggleShowPencilIcon() {
-        showPencilIcon = !showPencilIcon;
-        putValue("showPencilIcon", showPencilIcon);
+        putValue("showPencilIcon", showPencilIcon ^= true);
     }
 
     public static void toggleKeepTranslationMarkdown() {
-        keepTranslationMarkdown = !keepTranslationMarkdown;
-        putValue("keepTranslationMarkdown", keepTranslationMarkdown);
+        putValue("keepTranslationMarkdown", keepTranslationMarkdown ^= true);
     }
 
     public static void toggleUploadSpeedBoost() {
-        uploadSpeedBoost = !uploadSpeedBoost;
-        putValue("uploadSpeedBoost", uploadSpeedBoost);
+        putValue("uploadSpeedBoost", uploadSpeedBoost ^= true);
     }
 
     public static void toggleHideTimeOnSticker() {
-        hideTimeOnSticker = !hideTimeOnSticker;
-        putValue("hideTimeOnSticker", hideTimeOnSticker);
+        putValue("hideTimeOnSticker", hideTimeOnSticker ^= true);
     }
 
     public static void toggleShowStatusInChat() {
-        showStatusInChat = !showStatusInChat;
-        putValue("showStatusInChat", showStatusInChat);
+        putValue("showStatusInChat", showStatusInChat ^= true);
     }
 
     public static void toggleShowPatpat() {
-        showPatpat = !showPatpat;
-        putValue("showPatpat", showPatpat);
+        putValue("showPatpat", showPatpat ^= true);
     }
 
     public static void toggleHideAllTab() {
-        hideAllTab = !hideAllTab;
-        putValue("hideAllTab", hideAllTab);
+        putValue("hideAllTab", hideAllTab ^= true);
+    }
+
+    public static void toggleHideSendAsChannel() {
+        putValue("hideSendAsChannel", hideSendAsChannel ^= true);
     }
 
     public static void unlockChupa() {
-        unlockedChupa = true;
-        putValue("unlockedChupa", true);
+        putValue("unlockedChupa", unlockedChupa = true);
     }
 
     public static void setUnlockedSecretIcon(int value) {
-        unlockedSecretIcon = value;
-        putValue("unlockedSecretIcon", unlockedSecretIcon);
+        putValue("unlockedSecretIcon", unlockedSecretIcon = value);
     }
 
     public static void setXiaomiBlockedInstaller() {
-        xiaomiBlockedInstaller = true;
-        putValue("xiaomiBlockedInstaller", true);
+        putValue("xiaomiBlockedInstaller", xiaomiBlockedInstaller = true);
     }
 
     public static void setVerifyLinkTip(boolean shown) {
-        verifyLinkTip = shown;
-        putValue("verifyLinkTip", verifyLinkTip);
+        putValue("verifyLinkTip", verifyLinkTip = shown);
     }
 
     public static void setAutoTranslate(boolean enabled) {
@@ -537,48 +483,39 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static void setTranslationProvider(int provider) {
-        translationProvider = provider;
-        putValue("translationProvider", translationProvider);
+        putValue("translationProvider", translationProvider = provider);
     }
 
     public static void setTranslationTarget(String target) {
-        translationTarget = target;
-        putValue("translationTarget", translationTarget);
+        putValue("translationTarget", translationTarget = target);
     }
 
     public static void setTranslationKeyboardTarget(String target) {
-        translationKeyboardTarget = target;
-        putValue("translationKeyboardTarget", translationKeyboardTarget);
+        putValue("translationKeyboardTarget", translationKeyboardTarget = target);
     }
 
     public static void setDeepLFormality(int formality) {
-        deepLFormality = formality;
-        putValue("deepLFormality", deepLFormality);
+        putValue("deepLFormality", deepLFormality = formality);
     }
 
     public static void setTranslatorStyle(int style) {
-        translatorStyle = style;
-        putValue("translatorStyle", translatorStyle);
+        putValue("translatorStyle", translatorStyle = style);
     }
 
     public static void setTabMode(int mode) {
-        tabMode = mode;
-        putValue("tabMode", tabMode);
+        putValue("tabMode", tabMode = mode);
     }
 
     public static void setStickerSize(int size) {
-        stickerSizeStack = size;
-        putValue("stickerSizeStack", stickerSizeStack);
+        putValue("stickerSizeStack", stickerSizeStack = size);
     }
 
     public static void setDcStyleType(int type) {
-        dcStyleType = type;
-        putValue("dcStyleType", dcStyleType);
+        putValue("dcStyleType", dcStyleType = type);
     }
 
     public static void setIdType(int type) {
-        idType = type;
-        putValue("idType", idType);
+        putValue("idType", idType = type);
     }
 
     public static String currentNotificationVersion() {
@@ -586,8 +523,7 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static void updateCurrentVersion() {
-        oldBuildVersion = currentNotificationVersion();
-        putValue("oldBuildVersion", oldBuildVersion);
+        putValue("oldBuildVersion", oldBuildVersion = currentNotificationVersion());
     }
 
     public static void saveLastUpdateCheck() {
@@ -595,54 +531,44 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static void saveLastUpdateCheck(boolean isReset) {
-        lastUpdateCheck = isReset ? 0 : new Date().getTime();
-        putValue("lastUpdateCheck", lastUpdateCheck);
+        putValue("lastUpdateCheck", lastUpdateCheck = isReset ? 0 : new Date().getTime());
     }
 
     public static void saveUpdateStatus(int status) {
-        lastUpdateStatus = status;
-        putValue("lastUpdateStatus", lastUpdateStatus);
+        putValue("lastUpdateStatus", lastUpdateStatus = status);
     }
 
     public static void saveBlurIntensity(int intensity) {
-        blurIntensity = intensity;
-        putValue("blurIntensity", blurIntensity);
+        putValue("blurIntensity", blurIntensity = intensity);
     }
 
     public static void remindUpdate(int version) {
-        remindedUpdate = version;
-        putValue("remindedUpdate", remindedUpdate);
+        putValue("remindedUpdate", remindedUpdate = version);
         saveUpdateStatus(0);
     }
 
     public static void saveOldVersion(int version) {
-        oldDownloadedVersion = version;
-        putValue("oldDownloadedVersion", oldDownloadedVersion);
+        putValue("oldDownloadedVersion", oldDownloadedVersion = version);
     }
 
     public static void saveButtonStyle(int type) {
-        buttonStyleType = type;
-        putValue("buttonStyleType", buttonStyleType);
+        putValue("buttonStyleType", buttonStyleType = type);
     }
 
     public static void saveEventType(int type) {
-        eventType = type;
-        putValue("eventType", eventType);
+        putValue("eventType", eventType = type);
     }
 
     public static void saveCameraType(int type) {
-        cameraType = type;
-        putValue("cameraType", cameraType);
+        putValue("cameraType", cameraType = type);
     }
 
     public static void saveCameraXFps(int fps) {
-        cameraXFps = fps;
-        putValue("cameraXFps", cameraXFps);
+        putValue("cameraXFps", cameraXFps = fps);
     }
 
     public static void setMaxRecentStickers(int size) {
-        maxRecentStickers = size;
-        putValue("maxRecentStickers", maxRecentStickers);
+        putValue("maxRecentStickers", maxRecentStickers = size);
     }
 
     public static void setShowInActionBar(int type) {
@@ -650,28 +576,23 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static void setUpdateData(String data) {
-        updateData = data;
-        putValue("updateData", updateData);
+        putValue("updateData", updateData = data);
     }
 
     public static void setDrawerItems(String data) {
-        drawerItems = data;
-        putValue("drawerItems", drawerItems);
+        putValue("drawerItems", drawerItems = data);
     }
 
     public static void setLanguagePackVersioning(String data) {
-        languagePackVersioning = data;
-        putValue("languagePackVersioning", languagePackVersioning);
+        putValue("languagePackVersioning", languagePackVersioning = data);
     }
 
     public static void setDoNotTranslateLanguages(String data) {
-        doNotTranslateLanguages = data;
-        putValue("doNotTranslateLanguages", doNotTranslateLanguages);
+        putValue("doNotTranslateLanguages", doNotTranslateLanguages = data);
     }
 
     public static void setDownloadSpeedBoost(int boost) {
-        downloadSpeedBoost = boost;
-        putValue("downloadSpeedBoost", downloadSpeedBoost);
+        putValue("downloadSpeedBoost", downloadSpeedBoost = boost);
     }
 
     public static int getNotificationColor() {
@@ -694,10 +615,8 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static void toggleDevOpt() {
-        devOptEnabled = !devOptEnabled;
-        putValue("devOptEnabled", devOptEnabled);
-        configLoaded = false;
-        loadConfig(false);
+        putValue("devOptEnabled", devOptEnabled ^= true);
+        loadConfig(configLoaded = false);
     }
 
     public static boolean isDevOptEnabled() {

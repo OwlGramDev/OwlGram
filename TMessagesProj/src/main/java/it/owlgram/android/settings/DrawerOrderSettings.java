@@ -5,28 +5,18 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
-import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
-import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
-import org.telegram.ui.Cells.ShadowSectionCell;
-import org.telegram.ui.Components.LayoutHelper;
-import org.telegram.ui.Components.RecyclerListView;
 
 import java.util.Objects;
 
@@ -35,12 +25,8 @@ import it.owlgram.android.components.HintHeaderCell;
 import it.owlgram.android.components.SwapOrderCell;
 import it.owlgram.android.helpers.MenuOrderManager;
 
-public class DrawerOrderSettings extends BaseFragment {
-    private int rowCount;
-    private ListAdapter listAdapter;
+public class DrawerOrderSettings extends BaseSettingsActivity {
     private ItemTouchHelper itemTouchHelper;
-    private RecyclerListView listView;
-    private ActionBarMenuItem menuItem;
 
     private int headerHintRow;
     private int headerSuggestedOptionsRow;
@@ -52,48 +38,39 @@ public class DrawerOrderSettings extends BaseFragment {
     private int menuItemsEndRow;
     private int menuItemsDividerRow;
 
+    // TYPES
+    private static final int TYPE_HINT_HEADER = 200;
+    private static final int TYPE_MENU_ITEM = 201;
+    private static final int TYPE_SUGGESTED_OPTIONS = 202;
+
+
+    @SuppressLint("NotifyDataSetChanged")
     @Override
-    public boolean onFragmentCreate() {
-        super.onFragmentCreate();
-        updateRowsId(true);
-        return true;
+    protected void onMenuItemClick(int id) {
+        super.onMenuItemClick(id);
+        if (id == 1) {
+            MenuOrderManager.addItem(MenuOrderManager.DIVIDER_ITEM);
+            updateRowsId();
+            listAdapter.notifyItemInserted(menuItemsStartRow);
+            if (MenuOrderManager.IsDefaultPosition()) {
+                menuItem.hideSubItem(2);
+            } else {
+                menuItem.showSubItem(2);
+            }
+            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+        } else if (id == 2) {
+            MenuOrderManager.resetToDefaultPosition();
+            updateRowsId();
+            listAdapter.notifyDataSetChanged();
+            menuItem.hideSubItem(2);
+            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+        }
     }
 
-
     @Override
-    public View createView(Context context) {
-        actionBar.setBackButtonImage(R.drawable.ic_ab_back);
-        actionBar.setTitle(LocaleController.getString("MenuItems", R.string.MenuItems));
-        actionBar.setAllowOverlayTitle(false);
-        if (AndroidUtilities.isTablet()) {
-            actionBar.setOccupyStatusBar(false);
-        }
-        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
-            @Override
-            public void onItemClick(int id) {
-                if (id == -1) {
-                    finishFragment();
-                } else if (id == 1) {
-                    MenuOrderManager.addItem(MenuOrderManager.DIVIDER_ITEM);
-                    updateRowsId(false);
-                    listAdapter.notifyItemInserted(menuItemsStartRow);
-                    if (MenuOrderManager.IsDefaultPosition()) {
-                        menuItem.hideSubItem(2);
-                    } else {
-                        menuItem.showSubItem(2);
-                    }
-                    getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
-                } else if (id == 2) {
-                    MenuOrderManager.resetToDefaultPosition();
-                    updateRowsId(true);
-                    menuItem.hideSubItem(2);
-                    getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
-                }
-            }
-        });
-
+    protected ActionBarMenuItem createMenuItem() {
         ActionBarMenu menu = actionBar.createMenu();
-        menuItem = menu.addItem(0, R.drawable.ic_ab_other);
+        ActionBarMenuItem menuItem = menu.addItem(0, R.drawable.ic_ab_other);
         menuItem.setContentDescription(LocaleController.getString("AccDescrMoreOptions", R.string.AccDescrMoreOptions));
         menuItem.addSubItem(1, R.drawable.msg_newfilter, LocaleController.getString("AddDivider", R.string.AddDivider));
         menuItem.addSubItem(2, R.drawable.msg_reset, LocaleController.getString("ResetItemsOrder", R.string.ResetItemsOrder));
@@ -102,28 +79,24 @@ public class DrawerOrderSettings extends BaseFragment {
         } else {
             menuItem.showSubItem(2);
         }
-
-        listAdapter = new ListAdapter(context);
-        fragmentView = new FrameLayout(context);
-        fragmentView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundGray));
-        FrameLayout frameLayout = (FrameLayout) fragmentView;
-
-        listView = new RecyclerListView(context);
-        listView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
-        listView.setVerticalScrollBarEnabled(false);
-        itemTouchHelper = new ItemTouchHelper(new TouchHelperCallback());
-        itemTouchHelper.attachToRecyclerView(listView);
-        listView.setAdapter(listAdapter);
-        if (listView.getItemAnimator() != null) {
-            ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
-        }
-        frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        return fragmentView;
+        return menuItem;
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private void updateRowsId(boolean notify) {
-        rowCount = 0;
+    @Override
+    public View createView(Context context) {
+        View res = super.createView(context);
+        itemTouchHelper = new ItemTouchHelper(new TouchHelperCallback());
+        itemTouchHelper.attachToRecyclerView(listView);
+        return res;
+    }
+
+    @Override
+    protected String getActionBarTitle() {
+        return LocaleController.getString("MenuItems", R.string.MenuItems);
+    }
+
+    protected void updateRowsId() {
+        super.updateRowsId();
         headerSuggestedOptionsRow = -1;
         hintsDividerRow = -1;
 
@@ -143,40 +116,22 @@ public class DrawerOrderSettings extends BaseFragment {
         rowCount += MenuOrderManager.sizeAvailable();
         menuItemsEndRow = rowCount;
         menuItemsDividerRow = rowCount++;
-
-        if (listAdapter != null && notify) {
-            listAdapter.notifyDataSetChanged();
-        }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     @Override
-    public void onResume() {
-        super.onResume();
-        if (listAdapter != null) {
-            listAdapter.notifyDataSetChanged();
-        }
+    protected BaseListAdapter createAdapter() {
+        return new ListAdapter();
     }
 
-    private class ListAdapter extends RecyclerListView.SelectionAdapter {
-        private final Context mContext;
-
-        public ListAdapter(Context context) {
-            mContext = context;
-        }
+    private class ListAdapter extends BaseListAdapter {
 
         @Override
-        public int getItemCount() {
-            return rowCount;
-        }
-
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
             switch (holder.getItemViewType()) {
-                case 1:
-                    holder.itemView.setBackground(Theme.getThemedDrawable(mContext, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
+                case TYPE_SHADOW:
+                    holder.itemView.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
                     break;
-                case 3:
+                case TYPE_HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == headerSuggestedOptionsRow) {
                         headerCell.setText(LocaleController.getString("RecommendedItems", R.string.RecommendedItems));
@@ -184,14 +139,14 @@ public class DrawerOrderSettings extends BaseFragment {
                         headerCell.setText(LocaleController.getString("MenuItems", R.string.MenuItems));
                     }
                     break;
-                case 4:
+                case TYPE_MENU_ITEM:
                     SwapOrderCell swapOrderCell = (SwapOrderCell) holder.itemView;
                     MenuOrderManager.EditableMenuItem data = MenuOrderManager.getSingleAvailableMenuItem(position - menuItemsStartRow);
                     if (data != null) {
                         swapOrderCell.setData(data.text, data.isDefault, data.isPremium, data.id, true);
                     }
                     break;
-                case 5:
+                case TYPE_SUGGESTED_OPTIONS:
                     AddItemCell addItemCell = (AddItemCell) holder.itemView;
                     MenuOrderManager.EditableMenuItem notData = MenuOrderManager.getSingleNotAvailableMenuItem(position - menuHintsStartRow);
                     if (notData != null) {
@@ -203,26 +158,20 @@ public class DrawerOrderSettings extends BaseFragment {
 
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            int type = holder.getItemViewType();
-            return type == 4;
+            return holder.getItemViewType() == TYPE_MENU_ITEM;
         }
 
-        @SuppressLint("ClickableViewAccessibility")
-        @NonNull
+        @SuppressLint({"ClickableViewAccessibility", "NotifyDataSetChanged"})
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view;
+        protected View onCreateViewHolder(int viewType) {
+            View view = null;
             switch (viewType) {
-                case 2:
-                    view = new HintHeaderCell(mContext, R.raw.filters, LocaleController.formatString("MenuItemsOrderDesc", R.string.MenuItemsOrderDesc));
-                    view.setBackground(Theme.getThemedDrawable(mContext, R.drawable.greydivider_top, Theme.key_windowBackgroundGrayShadow));
+                case TYPE_HINT_HEADER:
+                    view = new HintHeaderCell(context, R.raw.filters, LocaleController.formatString("MenuItemsOrderDesc", R.string.MenuItemsOrderDesc));
+                    view.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider_top, Theme.key_windowBackgroundGrayShadow));
                     break;
-                case 3:
-                    view = new HeaderCell(mContext);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-                    break;
-                case 4:
-                    SwapOrderCell swapOrderCell = new SwapOrderCell(mContext);
+                case TYPE_MENU_ITEM:
+                    SwapOrderCell swapOrderCell = new SwapOrderCell(context);
                     swapOrderCell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     swapOrderCell.setOnReorderButtonTouchListener((v, event) -> {
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -241,7 +190,7 @@ public class DrawerOrderSettings extends BaseFragment {
                                 index2 += menuHintsStartRow;
                                 prevRecommendedHeaderRow = headerSuggestedOptionsRow;
                             }
-                            updateRowsId(false);
+                            updateRowsId();
                             if (!Objects.equals(swapOrderCell.menuId, MenuOrderManager.DIVIDER_ITEM)) {
                                 if (prevRecommendedHeaderRow == -1 && headerSuggestedOptionsRow != -1) {
                                     int itemsCount = hintsDividerRow - headerSuggestedOptionsRow + 1;
@@ -263,8 +212,8 @@ public class DrawerOrderSettings extends BaseFragment {
                     });
                     view = swapOrderCell;
                     break;
-                case 5:
-                    AddItemCell addItemCell = new AddItemCell(mContext);
+                case TYPE_SUGGESTED_OPTIONS:
+                    AddItemCell addItemCell = new AddItemCell(context);
                     addItemCell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     addItemCell.setAddOnClickListener(v -> {
                         if (!MenuOrderManager.isAvailable(addItemCell.menuId)) {
@@ -274,7 +223,7 @@ public class DrawerOrderSettings extends BaseFragment {
                                 int prevRecommendedHintHeaderRow = headerSuggestedOptionsRow;
                                 int prevRecommendedHintSectionRow = hintsDividerRow;
                                 index += menuHintsStartRow;
-                                updateRowsId(false);
+                                updateRowsId();
                                 if (prevRecommendedHintHeaderRow != -1 && headerSuggestedOptionsRow == -1) {
                                     listAdapter.notifyItemRangeRemoved(prevRecommendedHintHeaderRow, prevRecommendedHintSectionRow - prevRecommendedHintHeaderRow + 1);
                                 } else {
@@ -282,7 +231,8 @@ public class DrawerOrderSettings extends BaseFragment {
                                 }
                                 listAdapter.notifyItemInserted(menuItemsStartRow);
                             } else {
-                                updateRowsId(true);
+                                updateRowsId();
+                                listAdapter.notifyDataSetChanged();
                             }
                             if (MenuOrderManager.IsDefaultPosition()) {
                                 menuItem.hideSubItem(2);
@@ -294,28 +244,24 @@ public class DrawerOrderSettings extends BaseFragment {
                     });
                     view = addItemCell;
                     break;
-                default:
-                    view = new ShadowSectionCell(mContext);
-                    break;
             }
-            view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
-            return new RecyclerListView.Holder(view);
+            return view;
         }
 
         @Override
         public int getItemViewType(int position) {
             if (position == hintsDividerRow || position == menuItemsDividerRow) {
-                return 1;
+                return TYPE_SHADOW;
             } else if (position == headerHintRow) {
-                return 2;
+                return TYPE_HINT_HEADER;
             } else if (position == headerSuggestedOptionsRow || position == headerMenuRow) {
-                return 3;
+                return TYPE_HEADER;
             } else if (position >= menuItemsStartRow && position < menuItemsEndRow) {
-                return 4;
+                return TYPE_MENU_ITEM;
             } else if (position >= menuHintsStartRow && position < menuHintsEndRow) {
-                return 5;
+                return TYPE_SUGGESTED_OPTIONS;
             }
-            return 1;
+            throw new IllegalArgumentException("Invalid position");
         }
 
         public void swapElements(int fromIndex, int toIndex) {
@@ -345,7 +291,7 @@ public class DrawerOrderSettings extends BaseFragment {
 
         @Override
         public int getMovementFlags(@NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            if (viewHolder.getItemViewType() != 4) {
+            if (viewHolder.getItemViewType() != TYPE_MENU_ITEM) {
                 return makeMovementFlags(0, 0);
             }
             return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0);
@@ -356,7 +302,7 @@ public class DrawerOrderSettings extends BaseFragment {
             if (source.getItemViewType() != target.getItemViewType()) {
                 return false;
             }
-            listAdapter.swapElements(source.getAdapterPosition(), target.getAdapterPosition());
+            ((ListAdapter) listAdapter).swapElements(source.getAdapterPosition(), target.getAdapterPosition());
             return true;
         }
 
