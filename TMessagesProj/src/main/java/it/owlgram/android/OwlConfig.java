@@ -78,7 +78,6 @@ public class OwlConfig extends SettingsManager {
     public static boolean xiaomiBlockedInstaller;
     public static boolean searchIconInActionBar;
     public static boolean autoTranslate;
-    public static boolean showNameInActionBar;
     public static boolean showPencilIcon;
     public static boolean keepTranslationMarkdown;
     public static boolean uploadSpeedBoost;
@@ -87,6 +86,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean showPatpat;
     public static boolean unlockedChupa;
     public static boolean hideAllTab;
+    public static boolean hideSendAsChannel;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -113,6 +113,7 @@ public class OwlConfig extends SettingsManager {
     public static long lastUpdateCheck = 0;
     public static int downloadSpeedBoost;
     public static int unlockedSecretIcon;
+    public static int showInActionBar;
 
     static {
         loadConfig(true);
@@ -207,7 +208,6 @@ public class OwlConfig extends SettingsManager {
             searchIconInActionBar = getBoolean("searchIconInActionBar", false);
             autoTranslate = getBoolean("autoTranslate", false);
             showCopyPhoto = getBoolean("showCopyPhoto", false);
-            showNameInActionBar = getBoolean("showNameInActionBar", false);
             showPencilIcon = getBoolean("showPencilIcon", false);
             keepTranslationMarkdown = getBoolean("keepTranslationMarkdown", true);
             hideTimeOnSticker = getBoolean("hideTimeOnSticker", false);
@@ -216,6 +216,8 @@ public class OwlConfig extends SettingsManager {
             showPatpat = getBoolean("showPatpat", false);
             unlockedChupa = getBoolean("unlockedChupa", false);
             hideAllTab = getBoolean("hideAllTab", false);
+            hideSendAsChannel = getBoolean("hideSendAsChannel", false);
+            showInActionBar = getInt("showInActionBar", 0);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -233,6 +235,10 @@ public class OwlConfig extends SettingsManager {
     private static void migrate() {
         if (translationProvider == Translator.PROVIDER_NIU) {
             setTranslationProvider(Translator.PROVIDER_GOOGLE);
+        }
+        if (getBoolean("showNameInActionBar", false)) {
+            setShowInActionBar(1);
+            remove("showNameInActionBar");
         }
     }
 
@@ -416,11 +422,6 @@ public class OwlConfig extends SettingsManager {
         putValue("showCopyPhoto", showCopyPhoto);
     }
 
-    public static void toggleShowNameInActionBar() {
-        showNameInActionBar = !showNameInActionBar;
-        putValue("showNameInActionBar", showNameInActionBar);
-    }
-
     public static void toggleShowSantaHat() {
         showSantaHat = !showSantaHat;
         putValue("showSantaHat", showSantaHat);
@@ -476,11 +477,6 @@ public class OwlConfig extends SettingsManager {
         putValue("searchIconInActionBar", searchIconInActionBar);
     }
 
-    public static void toggleAutoTranslate() {
-        autoTranslate = !autoTranslate;
-        putValue("autoTranslate", autoTranslate);
-    }
-
     public static void toggleShowPencilIcon() {
         showPencilIcon = !showPencilIcon;
         putValue("showPencilIcon", showPencilIcon);
@@ -534,6 +530,10 @@ public class OwlConfig extends SettingsManager {
     public static void setVerifyLinkTip(boolean shown) {
         verifyLinkTip = shown;
         putValue("verifyLinkTip", verifyLinkTip);
+    }
+
+    public static void setAutoTranslate(boolean enabled) {
+        putValue("autoTranslate", autoTranslate = enabled);
     }
 
     public static void setTranslationProvider(int provider) {
@@ -643,6 +643,10 @@ public class OwlConfig extends SettingsManager {
     public static void setMaxRecentStickers(int size) {
         maxRecentStickers = size;
         putValue("maxRecentStickers", maxRecentStickers);
+    }
+
+    public static void setShowInActionBar(int type) {
+        putValue("showInActionBar", showInActionBar = type);
     }
 
     public static void setUpdateData(String data) {
