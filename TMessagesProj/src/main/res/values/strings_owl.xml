@@ -296,4 +296,10 @@
     <string name="PrivacyPolicyLogin">By logging in,\nyou agree to the *Privacy Policy*.</string>
     <string name="OwlPrivacyPolicy">OwlGram Privacy Policy</string>
     <string name="HideSendAsChannel">Hide Send as Channel</string>
+    <string name="ProviderTelegram">Telegram Translate</string>
+    <string name="AutoTranslateTitle">Do you want auto-translation of messages?</string>
+    <string name="AutoTranslateDesc2">These chats will or will not be translated regardless of the settings above.</string>
+    <string name="AlwaysTranslate">Always translate</string>
+    <string name="NeverTranslate">Never translate</string>
+    <string name="ResetAutoTranslationPreferences">Reset Auto-Translation Preferences</string>
 </resources>

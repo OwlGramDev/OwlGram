@@ -38,6 +38,7 @@ import java.util.Locale;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.DcStyleSelector;
 import it.owlgram.android.helpers.PopupHelper;
+import it.owlgram.android.translator.AutoTranslateConfig;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.DeepLTranslator;
 import it.owlgram.android.translator.Translator;
@@ -238,8 +239,59 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     ((TextCheckCell) view).setChecked(OwlConfig.keepTranslationMarkdown);
                 }
             }
-        });
-        return fragmentView;
+            presentFragment(new DoNotTranslateSettings());
+        } else if (position == deepLFormalityRow) {
+            ArrayList<String> arrayList = new ArrayList<>();
+            ArrayList<Integer> types = new ArrayList<>();
+            arrayList.add(LocaleController.getString("DeepLFormalityDefault", R.string.DeepLFormalityDefault));
+            types.add(DeepLTranslator.FORMALITY_DEFAULT);
+            arrayList.add(LocaleController.getString("DeepLFormalityMore", R.string.DeepLFormalityMore));
+            types.add(DeepLTranslator.FORMALITY_MORE);
+            arrayList.add(LocaleController.getString("DeepLFormalityLess", R.string.DeepLFormalityLess));
+            types.add(DeepLTranslator.FORMALITY_LESS);
+            PopupHelper.show(arrayList, LocaleController.getString("DeepLFormality", R.string.DeepLFormality), types.indexOf(OwlConfig.deepLFormality), context, i -> {
+                OwlConfig.setDeepLFormality(types.get(i));
+                listAdapter.notifyItemChanged(deepLFormalityRow, PARTIAL);
+            });
+        } else if (position == confirmCallSwitchRow) {
+            OwlConfig.toggleConfirmCall();
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(OwlConfig.confirmCall);
+            }
+        } else if (position == notificationAccentRow) {
+            OwlConfig.toggleAccentColor();
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(OwlConfig.accentAsNotificationColor);
+            }
+        } else if (position == idTypeRow) {
+            ArrayList<String> arrayList = new ArrayList<>();
+            ArrayList<Integer> types = new ArrayList<>();
+            arrayList.add("Bot API");
+            types.add(0);
+            arrayList.add("Telegram API");
+            types.add(1);
+            PopupHelper.show(arrayList, LocaleController.getString("IDType", R.string.IDType), types.indexOf(OwlConfig.idType), context, i -> {
+                OwlConfig.setIdType(types.get(i));
+                listAdapter.notifyItemChanged(idTypeRow, PARTIAL);
+                parentLayout.rebuildAllFragmentViews(false, false);
+            });
+        } else if (position == autoTranslateRow) {
+            if (!supportLanguageDetector) {
+                BulletinFactory.of(this).createErrorBulletinSubtitle(LocaleController.getString("BrokenMLKit", R.string.BrokenMLKit), LocaleController.getString("BrokenMLKitDetail", R.string.BrokenMLKitDetail), null).show();
+                return;
+            }
+            presentFragment(new AutoTranslateSettings());
+        } else if (position == keepMarkdownRow) {
+            OwlConfig.toggleKeepTranslationMarkdown();
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(OwlConfig.keepTranslationMarkdown);
+            }
+        } else if (position == showTranslateButtonRow) {
+            OwlConfig.toggleShowTranslate();
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(OwlConfig.showTranslate);
+            }
+        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -333,8 +385,6 @@ public class OwlgramGeneralSettings extends BaseFragment {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("ConfirmCalls", R.string.ConfirmCalls), LocaleController.getString("ConfirmCallsDesc", R.string.ConfirmCallsDesc), OwlConfig.confirmCall, true, true);
                     } else if (position == notificationAccentRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("AccentAsNotificationColor", R.string.AccentAsNotificationColor), OwlConfig.accentAsNotificationColor, true);
-                    } else if (position == autoTranslateRow) {
-                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("AutoTranslate", R.string.AutoTranslate), LocaleController.getString("AutoTranslateDesc", R.string.AutoTranslateDesc), OwlConfig.autoTranslate, true, keepMarkdownRow != -1);
                     } else if (position == keepMarkdownRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("KeepMarkdown", R.string.KeepMarkdown), LocaleController.getString("KeepMarkdownDesc", R.string.KeepMarkdownDesc), OwlConfig.keepTranslationMarkdown, true, false);
                     }
@@ -431,7 +481,25 @@ public class OwlgramGeneralSettings extends BaseFragment {
                                 value = "Telegram API";
                                 break;
                         }
-                        textSettingsCell.setTextAndValue(LocaleController.getString("IDType", R.string.IDType), value, false);
+                        textSettingsCell.setTextAndValue(LocaleController.getString("IDType", R.string.IDType), value, partial,false);
+                    } else if (position == autoTranslateRow) {
+                        String value;
+                        if (supportLanguageDetector) {
+                            value = OwlConfig.autoTranslate ? LocaleController.getString("UseLessDataAlways", R.string.UseLessDataAlways) : LocaleController.getString("UseLessDataNever", R.string.UseLessDataNever);
+                            int always = AutoTranslateConfig.getAlwaysExceptions();
+                            int never = AutoTranslateConfig.getNeverExceptions();
+                            if (always > 0 && never > 0) {
+                                value += " (-" + never + ", +" + always + ")";
+                            } else if (always > 0) {
+                                value += " (+" + always + ")";
+                            } else if (never > 0) {
+                                value += " (-" + never + ")";
+                            }
+                        } else {
+                            value = LocaleController.getString("UseLessDataNever", R.string.UseLessDataNever);
+                        }
+                        textSettingsCell.setTextAndValue(LocaleController.getString("AutoTranslate", R.string.AutoTranslate), value, keepMarkdownRow != -1);
+                        if (!supportLanguageDetector) textSettingsCell.setAlpha(0.5f);
                     }
                     break;
                 case 5:
@@ -520,12 +588,12 @@ public class OwlgramGeneralSettings extends BaseFragment {
                     position == dcIdSettingsHeaderRow || position == notificationHeaderRow) {
                 return 2;
             } else if (position == phoneNumberSwitchRow || position == phoneContactsSwitchRow || position == dcIdRow ||
-                    position == confirmCallSwitchRow || position == notificationAccentRow || position == autoTranslateRow ||
-                    position == keepMarkdownRow) {
-                return 3;
+                    position == confirmCallSwitchRow || position == notificationAccentRow || position == keepMarkdownRow ||
+                    position == showTranslateButtonRow) {
+                return TYPE_SWITCH;
             } else if (position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow ||
-                    position == translationStyle || position == doNotTranslateSelectRow || position == idTypeRow) {
-                return 4;
+                    position == translationStyle || position == doNotTranslateSelectRow || position == idTypeRow || position == autoTranslateRow) {
+                return TYPE_SETTINGS;
             } else if (position == hintTranslation1 || position == hintTranslation2 || position == hintIdRow) {
                 return 5;
             } else if (position == dcStyleSelectorRow) {
