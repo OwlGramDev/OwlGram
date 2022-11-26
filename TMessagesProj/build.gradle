@@ -31,6 +31,20 @@ def getGitDate = { ->
     return stdout.toString().trim()
 }
 
+def getGitBranch = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().replace("feature/", "").trim()
+}
+
+def getVersionPBetaName = { ->
+    def version_name = APP_VERSION_NAME.split(" ")[0]
+    return version_name + " #" + getGitBranch()
+}
+
 def isWindows = DefaultNativePlatform.currentOperatingSystem.toFamilyName() == OperatingSystemFamily.WINDOWS
 
 dependencies {
@@ -126,11 +140,13 @@ android {
         debug {
             resValue "string", "BuildAppName", "@string/AppNameBeta"
             buildConfigField "boolean", "DEBUG_PRIVATE_VERSION", "true"
+            buildConfigField "String", "BUILD_VERSION_STRING", "\"${getVersionPBetaName()}\""
         }
 
         pbeta {
             resValue "string", "BuildAppName", "@string/AppNameBeta"
             buildConfigField "boolean", "DEBUG_PRIVATE_VERSION", "true"
+            buildConfigField "String", "BUILD_VERSION_STRING", "\"${getVersionPBetaName()}\""
         }
 
         release {
