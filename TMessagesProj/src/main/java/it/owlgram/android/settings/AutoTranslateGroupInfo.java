@@ -1,5 +1,6 @@
 package it.owlgram.android.settings;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.view.View;
 import android.widget.TextView;
@@ -8,7 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
+import org.telegram.messenger.TopicsController;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
@@ -16,16 +19,17 @@ import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Cells.UserCell2;
+import org.telegram.ui.Components.FlickerLoadingView;
 
 import java.util.ArrayList;
 
 import it.owlgram.android.components.EditTopicCell;
 import it.owlgram.android.translator.AutoTranslateConfig;
 
-public class AutoTranslateGroupInfo extends BaseSettingsActivity {
+public class AutoTranslateGroupInfo extends BaseSettingsActivity implements NotificationCenter.NotificationCenterDelegate {
 
     private final TLRPC.Chat chat;
-    private final ArrayList<TLRPC.TL_forumTopic> topics;
+    private final ArrayList<TLRPC.TL_forumTopic> topics = new ArrayList<>();
     private final boolean isAllow;
 
     private int avatarRow;
@@ -33,6 +37,7 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity {
     private int headerRow;
     private int startTopicsRow;
     private int endTopicsRow;
+    private int topicPlaceholderRow;
     private int topicExceptionHintRow;
     private int removeGroupExceptionRow;
     private int divider2Row;
@@ -44,7 +49,7 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity {
 
     public AutoTranslateGroupInfo(TLRPC.Chat chat, boolean isAllow) {
         this.chat = chat;
-        topics = getMessagesController().getTopicsController().getTopics(chat.id);
+        topics.addAll(getMessagesController().getTopicsController().getTopics(chat.id));
         this.isAllow = isAllow;
     }
 
@@ -91,12 +96,21 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity {
     @Override
     protected void updateRowsId() {
         super.updateRowsId();
+        startTopicsRow = -1;
+        endTopicsRow = -1;
+        topicPlaceholderRow = -1;
+
         avatarRow = rowCount++;
         dividerRow = rowCount++;
         headerRow = rowCount++;
-        startTopicsRow = rowCount;
-        rowCount += topics.size();
-        endTopicsRow = rowCount;
+        if (!topics.isEmpty()) {
+            startTopicsRow = rowCount;
+            rowCount += topics.size();
+            endTopicsRow = rowCount;
+        }
+        if (!getMessagesController().getTopicsController().endIsReached(chat.id) || topics.isEmpty()) {
+            topicPlaceholderRow = rowCount++;
+        }
         topicExceptionHintRow = rowCount++;
         removeGroupExceptionRow = rowCount++;
         divider2Row = rowCount++;
@@ -105,6 +119,36 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity {
     @Override
     protected BaseListAdapter createAdapter() {
         return new ListAdapter();
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    @Override
+    public void didReceivedNotification(int id, int account, Object... args) {
+        if (id == NotificationCenter.topicsDidLoaded) {
+            Long chatId = (Long) args[0];
+            if (this.chat.id == chatId) {
+                topics.clear();
+                topics.addAll(getMessagesController().getTopicsController().getTopics(chat.id));
+                updateRowsId();
+                listAdapter.notifyDataSetChanged();
+                if (!getMessagesController().getTopicsController().endIsReached(chat.id)) {
+                    getMessagesController().getTopicsController().loadTopics(chat.id);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean onFragmentCreate() {
+        NotificationCenter.getInstance(currentAccount).addObserver(this, NotificationCenter.topicsDidLoaded);
+        getMessagesController().getTopicsController().loadTopics(chat.id, true, TopicsController.LOAD_TYPE_LOAD_NEXT);
+        return super.onFragmentCreate();
+    }
+
+    @Override
+    public void onFragmentDestroy() {
+        super.onFragmentDestroy();
+        NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.topicsDidLoaded);
     }
 
     private class ListAdapter extends BaseListAdapter {
@@ -143,6 +187,11 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity {
                         settingsCell.setText(LocaleController.getString("EditDeleteException", R.string.EditDeleteException), false);
                     }
                     break;
+                case PLACEHOLDER:
+                    FlickerLoadingView flickerLoadingView = (FlickerLoadingView) holder.itemView;
+                    flickerLoadingView.setViewType(FlickerLoadingView.EDIT_TOPIC_CELL_TYPE);
+                    flickerLoadingView.setIsSingleCell(true);
+                    break;
             }
         }
 
@@ -160,6 +209,8 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity {
                 return ViewType.TEXT_HINT_WITH_PADDING;
             } else if (position == removeGroupExceptionRow) {
                 return ViewType.SETTINGS;
+            } else if (position == topicPlaceholderRow) {
+                return ViewType.PLACEHOLDER;
             }
             return null;
         }
