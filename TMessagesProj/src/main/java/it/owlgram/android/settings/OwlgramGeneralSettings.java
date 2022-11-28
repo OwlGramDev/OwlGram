@@ -64,9 +64,6 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
     private int confirmCallSwitchRow;
     private int deepLFormalityRow;
 
-    // TYPES
-    private static final int TYPE_DC_STYLE_SELECTOR = 200;
-
     public OwlgramGeneralSettings() {
         supportLanguageDetector = LanguageDetector.hasSupport();
     }
@@ -262,11 +259,11 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
 
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
-            switch (holder.getItemViewType()) {
-                case TYPE_SHADOW:
+            switch (ViewType.fromInt(holder.getItemViewType())) {
+                case SHADOW:
                     holder.itemView.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
                     break;
-                case TYPE_HEADER:
+                case HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == privacyHeaderRow) {
                         headerCell.setText(LocaleController.getString("PrivacyTitle", R.string.PrivacyTitle));
@@ -280,7 +277,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                         headerCell.setText(LocaleController.getString("Notifications", R.string.Notifications));
                     }
                     break;
-                case TYPE_SWITCH:
+                case SWITCH:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
                     textCheckCell.setEnabled(true, null);
                     if (position == phoneNumberSwitchRow) {
@@ -299,7 +296,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ShowTranslateButton", R.string.ShowTranslateButton), OwlConfig.showTranslate, true);
                     }
                     break;
-                case TYPE_SETTINGS:
+                case SETTINGS:
                     TextSettingsCell textSettingsCell = (TextSettingsCell) holder.itemView;
                     textSettingsCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                     if (position == translationProviderSelectRow) {
@@ -400,8 +397,8 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                         String value;
                         if (supportLanguageDetector) {
                             value = OwlConfig.autoTranslate ? LocaleController.getString("UseLessDataAlways", R.string.UseLessDataAlways) : LocaleController.getString("UseLessDataNever", R.string.UseLessDataNever);
-                            int always = AutoTranslateConfig.getAlwaysExceptions();
-                            int never = AutoTranslateConfig.getNeverExceptions();
+                            int always = AutoTranslateConfig.getExceptions(true).size();
+                            int never = AutoTranslateConfig.getExceptions(false).size();
                             if (always > 0 && never > 0) {
                                 value += " (-" + never + ", +" + always + ")";
                             } else if (always > 0) {
@@ -416,7 +413,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                         if (!supportLanguageDetector) textSettingsCell.setAlpha(0.5f);
                     }
                     break;
-                case TYPE_TEXT_HINT_WITH_PADDING:
+                case TEXT_HINT_WITH_PADDING:
                     TextInfoPrivacyCell textInfoPrivacyCell = (TextInfoPrivacyCell) holder.itemView;
                     if (position == hintTranslation1) {
                         textInfoPrivacyCell.setTopPadding(0);
@@ -443,19 +440,17 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            int type = holder.getItemViewType();
-            int position = holder.getAdapterPosition();
+        protected boolean isEnabled(ViewType viewType, int position) {
             if (position == autoTranslateRow || position == doNotTranslateSelectRow) {
                 return supportLanguageDetector;
             }
-            return type == TYPE_SWITCH || type == TYPE_SETTINGS;
+            return viewType == ViewType.SWITCH || viewType == ViewType.SETTINGS;
         }
 
         @Override
-        protected View onCreateViewHolder(int viewType) {
+        protected View onCreateViewHolder(ViewType viewType) {
             View view = null;
-            if (viewType == TYPE_DC_STYLE_SELECTOR) {
+            if (viewType == ViewType.DC_STYLE_SELECTOR) {
                 view = new DcStyleSelector(context) {
                     @Override
                     protected void onSelectedStyle() {
@@ -470,24 +465,24 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public ViewType getViewType(int position) {
             if (position == divisorPrivacyRow || position == divisorTranslationRow || position == divisorDCIdRow ||
                     position == dividerNotificationRow) {
-                return TYPE_SHADOW;
+                return ViewType.SHADOW;
             } else if (position == privacyHeaderRow || position == translationHeaderRow || position == callHeaderRow ||
                     position == dcIdSettingsHeaderRow || position == notificationHeaderRow) {
-                return TYPE_HEADER;
+                return ViewType.HEADER;
             } else if (position == phoneNumberSwitchRow || position == phoneContactsSwitchRow || position == dcIdRow ||
                     position == confirmCallSwitchRow || position == notificationAccentRow || position == keepMarkdownRow ||
                     position == showTranslateButtonRow) {
-                return TYPE_SWITCH;
+                return ViewType.SWITCH;
             } else if (position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow ||
                     position == translationStyle || position == doNotTranslateSelectRow || position == idTypeRow || position == autoTranslateRow) {
-                return TYPE_SETTINGS;
+                return ViewType.SETTINGS;
             } else if (position == hintTranslation1 || position == hintTranslation2 || position == hintIdRow) {
-                return TYPE_TEXT_HINT_WITH_PADDING;
+                return ViewType.TEXT_HINT_WITH_PADDING;
             } else if (position == dcStyleSelectorRow) {
-                return TYPE_DC_STYLE_SELECTOR;
+                return ViewType.DC_STYLE_SELECTOR;
             }
             throw new IllegalArgumentException("Invalid position");
         }

@@ -23,7 +23,7 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.ManageChatTextCell;
-import org.telegram.ui.Cells.NotificationsCheckCell;
+import org.telegram.ui.Cells.ManageChatUserCell;
 import org.telegram.ui.Cells.RadioCell;
 import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Cells.TextCell;
@@ -33,6 +33,8 @@ import org.telegram.ui.Cells.TextDetailSettingsCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextRadioCell;
 import org.telegram.ui.Cells.TextSettingsCell;
+import org.telegram.ui.Cells.UserCell;
+import org.telegram.ui.Cells.UserCell2;
 import org.telegram.ui.Components.EmptyTextProgressView;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
@@ -40,6 +42,8 @@ import org.telegram.ui.Components.UndoView;
 
 import java.util.List;
 import java.util.Locale;
+
+import it.owlgram.android.components.EditTopicCell;
 
 public abstract class BaseSettingsActivity extends BaseFragment {
     protected static final Object PARTIAL = new Object();
@@ -50,21 +54,7 @@ public abstract class BaseSettingsActivity extends BaseFragment {
     protected ActionBarMenuItem menuItem;
     protected UndoView restartTooltip;
     protected EmptyTextProgressView emptyView;
-
-    // VIEW TYPES
-    protected static final int TYPE_SHADOW = 0;
-    protected static final int TYPE_HEADER = 1;
-    protected static final int TYPE_HEADER_NO_SHADOW = 2;
-    protected static final int TYPE_CHECKBOX = 3;
-    protected static final int TYPE_TEXT_RADIO = 4;
-    protected static final int TYPE_SWITCH = 5;
-    protected static final int TYPE_TEXT_CELL = 6;
-    protected static final int TYPE_TEXT_HINT = 7;
-    protected static final int TYPE_TEXT_HINT_WITH_PADDING = 8;
-    protected static final int TYPE_SETTINGS = 9;
-    protected static final int TYPE_DETAILED_SETTINGS = 10;
-    protected static final int TYPE_ADD_EXCEPTION = 11;
-    protected static final int TYPE_RADIO = 12;
+    private BaseFragment parentFragment;
 
     protected abstract String getActionBarTitle();
 
@@ -130,7 +120,22 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         restartTooltip = new UndoView(context);
         restartTooltip.setInfoText(LocaleController.formatString("RestartAppToApplyChanges", R.string.RestartAppToApplyChanges));
         frameLayout.addView(restartTooltip, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.LEFT, 8, 0, 8, 8));
+        parentFragment = parentLayout.getLastFragment();
         return fragmentView;
+    }
+
+    protected void hideLastFragment() {
+        if (parentFragment != null && parentLayout.getFragmentStack().contains(parentFragment)) {
+            parentLayout.removeFragmentFromStack(parentFragment);
+        }
+    }
+
+    protected void showLastFragment() {
+        if (parentFragment != null && !parentLayout.getFragmentStack().contains(parentFragment)) {
+            int position = parentLayout.getFragmentStack().size() - 1;
+            parentFragment.rebuild();
+            parentLayout.addFragmentToStack(parentFragment, position);
+        }
     }
 
     protected void onItemClick(View view, int position, float x, float y) {
@@ -145,6 +150,7 @@ public abstract class BaseSettingsActivity extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+        updateRowsId();
         if (listAdapter != null) {
             listAdapter.notifyDataSetChanged();
         }
@@ -182,61 +188,76 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         }
 
         protected abstract void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial);
+        protected abstract ViewType getViewType(int position);
+        protected abstract boolean isEnabled(ViewType viewType, int position);
 
         @NonNull
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view;
             boolean canSetBackground = true;
-            switch (viewType) {
-                case TYPE_SHADOW:
+            ViewType type = ViewType.fromInt(viewType);
+            switch (type) {
+                case SHADOW:
                     view = new ShadowSectionCell(context);
                     break;
-                case TYPE_HEADER:
-                case TYPE_HEADER_NO_SHADOW:
+                case HEADER:
+                case HEADER_NO_SHADOW:
                     view = new HeaderCell(context);
                     break;
-                case TYPE_CHECKBOX:
+                case CHECKBOX:
                     view = new TextCheckbox2Cell(context);
                     break;
-                case TYPE_TEXT_RADIO:
+                case TEXT_RADIO:
                     view = new TextRadioCell(context);
                     break;
-                case TYPE_SWITCH:
+                case SWITCH:
                     view = new TextCheckCell(context);
                     break;
-                case TYPE_TEXT_CELL:
+                case TEXT_CELL:
                     view = new TextCell(context);
                     break;
-                case TYPE_TEXT_HINT:
+                case TEXT_HINT:
                     view = new TextInfoPrivacyCell(context);
                     break;
-                case TYPE_TEXT_HINT_WITH_PADDING:
+                case TEXT_HINT_WITH_PADDING:
                     TextInfoPrivacyCell textInfoPrivacyCell = new TextInfoPrivacyCell(context);
                     textInfoPrivacyCell.setBottomPadding(16);
                     view = textInfoPrivacyCell;
                     break;
-                case TYPE_SETTINGS:
+                case SETTINGS:
                     view = new TextSettingsCell(context);
                     break;
-                case TYPE_DETAILED_SETTINGS:
+                case DETAILED_SETTINGS:
                     view = new TextDetailSettingsCell(context);
                     break;
-                case TYPE_ADD_EXCEPTION:
+                case ADD_EXCEPTION:
                     view = new ManageChatTextCell(context);
                     break;
-                case TYPE_RADIO:
+                case RADIO:
                     view = new RadioCell(context);
                     break;
+                case MANAGE_CHAT:
+                    view = new ManageChatUserCell(context, 7, 6, true);
+                    break;
+                case ACCOUNT:
+                    view = new UserCell(context, 16, 1, false, false, null, false, true);
+                    break;
+                case CHAT:
+                    view = new UserCell2(context, 4, 0);
+                    break;
+                case EDIT_TOPIC:
+                    view = new EditTopicCell(context);
+                    break;
                 default:
-                    view = onCreateViewHolder(viewType);
+                    view = onCreateViewHolder(type);
                     canSetBackground = false;
                     if (view == null) throw new IllegalArgumentException("Unknown viewType: " + viewType);
             }
-            switch (viewType) {
-                case TYPE_HEADER_NO_SHADOW:
-                case TYPE_SHADOW:
-                case TYPE_TEXT_HINT:
-                case TYPE_TEXT_HINT_WITH_PADDING:
+            switch (ViewType.fromInt(viewType)) {
+                case HEADER_NO_SHADOW:
+                case SHADOW:
+                case TEXT_HINT:
+                case TEXT_HINT_WITH_PADDING:
                     break;
                 default:
                     if (canSetBackground) view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
@@ -245,8 +266,18 @@ public abstract class BaseSettingsActivity extends BaseFragment {
             return new RecyclerListView.Holder(view);
         }
 
-        protected View onCreateViewHolder(int viewType) {
+        protected View onCreateViewHolder(ViewType viewType) {
             return null;
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return getViewType(position).toInt();
+        }
+
+        @Override
+        public boolean isEnabled(RecyclerView.ViewHolder holder) {
+            return isEnabled(ViewType.fromInt(holder.getItemViewType()), holder.getAdapterPosition());
         }
     }
 

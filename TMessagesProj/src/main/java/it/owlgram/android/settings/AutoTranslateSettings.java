@@ -47,14 +47,14 @@ public class AutoTranslateSettings extends BaseSettingsActivity {
             listAdapter.notifyItemRangeChanged(alwaysTranslateRow, 2, PARTIAL);
         } else if (position == alwaysAllowExceptionRow || position == neverAllowExceptionRow) {
             final boolean isAllow = position == alwaysAllowExceptionRow;
-            if (AutoTranslateConfig.getAlwaysExceptions() == 0 && isAllow || AutoTranslateConfig.getNeverExceptions() == 0 && !isAllow) {
+            if (AutoTranslateConfig.getExceptions(isAllow).size() == 0) {
                 Bundle args = new Bundle();
                 args.putBoolean(isAllow ? "isAlwaysShare" : "isNeverShare", true);
                 args.putInt("chatAddType", 1);
                 GroupCreateActivity fragment = new GroupCreateActivity(args);
                 fragment.setDelegate(ids -> {
                     for (int i = 0; i < ids.size(); i++) {
-                        AutoTranslateConfig.setAutoTranslateEnable(ids.get(i), 0, isAllow);
+                        AutoTranslateConfig.setEnabled(ids.get(i), 0, isAllow);
                     }
                     listAdapter.notifyItemChanged(position, PARTIAL);
                 });
@@ -62,7 +62,7 @@ public class AutoTranslateSettings extends BaseSettingsActivity {
             } else {
                 presentFragment(new AutoTranslationException(isAllow));
             }
-        } else if (position == resetExceptionsRow && AutoTranslateConfig.getExceptions() > 0) {
+        } else if (position == resetExceptionsRow && AutoTranslateConfig.getAllExceptions().size() > 0) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
             builder.setTitle(LocaleController.getString("NotificationsDeleteAllExceptionTitle", R.string.NotificationsDeleteAllExceptionTitle));
             builder.setMessage(LocaleController.getString("NotificationsDeleteAllExceptionAlert", R.string.NotificationsDeleteAllExceptionAlert));
@@ -103,10 +103,11 @@ public class AutoTranslateSettings extends BaseSettingsActivity {
 
     private class ListAdapter extends BaseListAdapter {
 
+
         @Override
         protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
-            switch (holder.getItemViewType()) {
-                case TYPE_TEXT_HINT_WITH_PADDING:
+            switch (ViewType.fromInt(holder.getItemViewType())) {
+                case TEXT_HINT_WITH_PADDING:
                     TextInfoPrivacyCell hintCell = (TextInfoPrivacyCell) holder.itemView;
                     if (position == autoTranslateHintRow) {
                         hintCell.setText(LocaleController.getString("AutoTranslateDesc", R.string.AutoTranslateDesc));
@@ -114,7 +115,7 @@ public class AutoTranslateSettings extends BaseSettingsActivity {
                         hintCell.setText(LocaleController.getString("AutoTranslateDesc2", R.string.AutoTranslateDesc2));
                     }
                     break;
-                case TYPE_HEADER:
+                case HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == headerDefaultSettingsRow) {
                         headerCell.setText(LocaleController.getString("AutoTranslateTitle", R.string.AutoTranslateTitle));
@@ -122,7 +123,7 @@ public class AutoTranslateSettings extends BaseSettingsActivity {
                         headerCell.setText(LocaleController.getString("AddExceptions", R.string.AddExceptions));
                     }
                     break;
-                case TYPE_RADIO:
+                case RADIO:
                     RadioCell radioCell = (RadioCell) holder.itemView;
                     if (position == alwaysTranslateRow) {
                         if (partial) {
@@ -138,12 +139,12 @@ public class AutoTranslateSettings extends BaseSettingsActivity {
                         }
                     }
                     break;
-                case TYPE_SETTINGS:
+                case SETTINGS:
                     TextSettingsCell settingsCell = (TextSettingsCell) holder.itemView;
                     if (position == alwaysAllowExceptionRow) {
-                        settingsCell.setTextAndValue(LocaleController.getString("AlwaysAllow", R.string.AlwaysAllow), getExceptionText(AutoTranslateConfig.getAlwaysExceptions()), partial, true);
+                        settingsCell.setTextAndValue(LocaleController.getString("AlwaysAllow", R.string.AlwaysAllow), getExceptionText(AutoTranslateConfig.getExceptions(true).size()), partial, true);
                     } else if (position == neverAllowExceptionRow) {
-                        settingsCell.setTextAndValue(LocaleController.getString("NeverAllow", R.string.NeverAllow), getExceptionText(AutoTranslateConfig.getNeverExceptions()), partial, false);
+                        settingsCell.setTextAndValue(LocaleController.getString("NeverAllow", R.string.NeverAllow), getExceptionText(AutoTranslateConfig.getExceptions(false).size()), partial, false);
                     } else if (position == resetExceptionsRow) {
                         settingsCell.setTag(Theme.key_dialogTextRed);
                         settingsCell.setTextColor(Theme.getColor(Theme.key_dialogTextRed));
@@ -161,22 +162,24 @@ public class AutoTranslateSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            int type = holder.getItemViewType();
-            boolean canReset = AutoTranslateConfig.getExceptions() > 0;
-            return type == TYPE_ADD_EXCEPTION || type == TYPE_RADIO || type == TYPE_SETTINGS && holder.getAdapterPosition() != resetExceptionsRow || type == TYPE_SETTINGS && holder.getAdapterPosition() == resetExceptionsRow && canReset;
+        protected boolean isEnabled(ViewType viewType, int position) {
+            boolean canReset = AutoTranslateConfig.getAllExceptions().size() > 0;
+            return viewType == ViewType.ADD_EXCEPTION ||
+                    viewType == ViewType.RADIO ||
+                    viewType == ViewType.SETTINGS && position != resetExceptionsRow ||
+                    viewType == ViewType.SETTINGS && canReset;
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public ViewType getViewType(int position) {
             if (position == autoTranslateHintRow || position == exceptionsHintRow) {
-                return TYPE_TEXT_HINT_WITH_PADDING;
+                return ViewType.TEXT_HINT_WITH_PADDING;
             } else if (position == headerDefaultSettingsRow || position == addExceptionsRow) {
-                return TYPE_HEADER;
+                return ViewType.HEADER;
             } else if (position == alwaysTranslateRow || position == neverTranslateRow) {
-                return TYPE_RADIO;
+                return ViewType.RADIO;
             } else if (position == alwaysAllowExceptionRow || position == neverAllowExceptionRow || position == resetExceptionsRow) {
-                return TYPE_SETTINGS;
+                return ViewType.SETTINGS;
             }
             throw new IllegalArgumentException("Invalid position");
         }

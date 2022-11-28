@@ -195,8 +195,8 @@ public class DoNotTranslateSettings extends BaseSettingsActivity {
 
         @Override
         protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
-            switch (holder.getItemViewType()) {
-                case TYPE_CHECKBOX:
+            switch (ViewType.fromInt(holder.getItemViewType())) {
+                case CHECKBOX:
                     TextCheckbox2Cell textRadioCell = (TextCheckbox2Cell) holder.itemView;
                     String[] languages = names.get(position - languagesStartRow).toString().split(" - ");
                     boolean isSelectedLanguage = selectedLanguages.contains(targetLanguages.get(position - languagesStartRow));
@@ -208,7 +208,7 @@ public class DoNotTranslateSettings extends BaseSettingsActivity {
                             true
                     );
                     break;
-                case TYPE_HEADER:
+                case HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == languageHeaderRow) {
                         headerCell.setText(LocaleController.getString("ChooseLanguages", R.string.ChooseLanguages));
@@ -218,16 +218,16 @@ public class DoNotTranslateSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            return holder.getItemViewType() == TYPE_CHECKBOX;
+        protected boolean isEnabled(ViewType viewType, int position) {
+            return viewType == ViewType.CHECKBOX;
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public ViewType getViewType(int position) {
             if (position == languageHeaderRow) {
-                return TYPE_HEADER;
+                return ViewType.HEADER;
             }
-            return TYPE_CHECKBOX;
+            return ViewType.CHECKBOX;
         }
     }
 }

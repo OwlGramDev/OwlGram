@@ -12,6 +12,7 @@ import java.util.Date;
 
 import it.owlgram.android.camera.CameraXUtilities;
 import it.owlgram.android.helpers.MonetIconsHelper;
+import it.owlgram.android.translator.AutoTranslateConfig;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.DeepLTranslator;
 import it.owlgram.android.translator.Translator;
@@ -118,6 +119,7 @@ public class OwlConfig extends SettingsManager {
     static {
         loadConfig(true);
     }
+
 
     public static void loadConfig(boolean firstLoad) {
         synchronized (sync) {
@@ -239,6 +241,7 @@ public class OwlConfig extends SettingsManager {
             setShowInActionBar(1);
             remove("showNameInActionBar");
         }
+        AutoTranslateConfig.migrate();
     }
 
     public static void toggleHidePhone() {

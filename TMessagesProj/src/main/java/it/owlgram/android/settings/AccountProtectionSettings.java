@@ -41,10 +41,6 @@ public class AccountProtectionSettings extends BaseSettingsActivity {
     private int disableAccountProtectionRow;
     private final ArrayList<TLRPC.User> accounts = new ArrayList<>();
 
-    // VIEW TYPES
-    protected static final int TYPE_ACCOUNT = 200;
-    protected static final int TYPE_STICKER_HOLDER = 201;
-
     @Override
     protected String getActionBarTitle() {
         return LocaleController.getString("AccountProtection", R.string.AccountProtection);
@@ -146,8 +142,8 @@ public class AccountProtectionSettings extends BaseSettingsActivity {
 
         @Override
         protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
-            switch (holder.getItemViewType()) {
-                case TYPE_TEXT_HINT:
+            switch (ViewType.fromInt(holder.getItemViewType())) {
+                case TEXT_HINT:
                     TextInfoPrivacyCell cell = (TextInfoPrivacyCell) holder.itemView;
                     if (position == hintRow) {
                         cell.setText(LocaleController.getString("AccountProtectionHint1", R.string.AccountProtectionHint1));
@@ -159,26 +155,26 @@ public class AccountProtectionSettings extends BaseSettingsActivity {
                         cell.getTextView().setGravity(LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT);
                     }
                     break;
-                case TYPE_STICKER_HOLDER:
+                case STICKER_HOLDER:
                     RLottieImageHolderView holderView = (RLottieImageHolderView) holder.itemView;
                     holderView.imageView.setAnimation(R.raw.double_bottom, 100, 100);
                     holderView.imageView.getAnimatedDrawable().setAutoRepeat(1);
                     holderView.imageView.playAnimation();
                     break;
-                case TYPE_HEADER:
+                case HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == accountsHeaderRow) {
                         headerCell.setText(LocaleController.getString("AllAccounts", R.string.AllAccounts));
                     }
                     break;
-                case TYPE_ACCOUNT:
+                case ACCOUNT:
                     int accountNum = position - accountsStartRow;
                     TLRPC.User user = accounts.get(accountNum);
                     UserCell userCell = (UserCell) holder.itemView;
                     userCell.setCheckedRight(PasscodeHelper.isProtectedAccount(user.id));
                     userCell.setData(user, null, null, 0, accountNum != accounts.size() - 1);
                     break;
-                case TYPE_SETTINGS:
+                case SETTINGS:
                     TextSettingsCell textCell = (TextSettingsCell) holder.itemView;
                     if (position == disableAccountProtectionRow) {
                         textCell.setText(LocaleController.getString("DisableAccountProtection", R.string.DisableAccountProtection), false);
@@ -190,38 +186,31 @@ public class AccountProtectionSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            int type = holder.getItemViewType();
-            return type == TYPE_ACCOUNT || type == TYPE_SETTINGS;
+        protected boolean isEnabled(ViewType viewType, int position) {
+            return viewType == ViewType.ACCOUNT || viewType == ViewType.SETTINGS;
         }
 
         @Override
-        protected View onCreateViewHolder(int viewType) {
+        protected View onCreateViewHolder(ViewType viewType) {
             View view = null;
-            switch (viewType) {
-                case TYPE_ACCOUNT:
-                    view = new UserCell(context, 16, 1, false, false, null, false, true);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-                    break;
-                case TYPE_STICKER_HOLDER:
-                    view = new RLottieImageHolderView(context);
-                    break;
+            if (viewType == ViewType.STICKER_HOLDER) {
+                view = new RLottieImageHolderView(context);
             }
             return view;
         }
 
         @Override
-        public int getItemViewType(int position) {
+        protected ViewType getViewType(int position) {
             if (position == dbAnRow) {
-                return TYPE_STICKER_HOLDER;
+                return ViewType.STICKER_HOLDER;
             } else if (position == accountsHeaderRow) {
-                return TYPE_HEADER;
+                return ViewType.HEADER;
             } else if (position >= accountsStartRow && position < accountsEndRow) {
-                return TYPE_ACCOUNT;
+                return ViewType.ACCOUNT;
             } else if (position == disableAccountProtectionRow) {
-                return TYPE_SETTINGS;
+                return ViewType.SETTINGS;
             } else if (position == hintRow || position == accountsDetailsRow) {
-                return TYPE_TEXT_HINT;
+                return ViewType.TEXT_HINT;
             }
             throw new IllegalArgumentException("Invalid position");
         }
