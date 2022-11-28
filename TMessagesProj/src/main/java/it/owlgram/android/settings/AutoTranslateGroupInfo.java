@@ -35,6 +35,7 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity {
     private int endTopicsRow;
     private int topicExceptionHintRow;
     private int removeGroupExceptionRow;
+    private int divider2Row;
 
     @Override
     protected String getActionBarTitle() {
@@ -98,6 +99,7 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity {
         endTopicsRow = rowCount;
         topicExceptionHintRow = rowCount++;
         removeGroupExceptionRow = rowCount++;
+        divider2Row = rowCount++;
     }
 
     @Override
@@ -148,7 +150,7 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity {
         protected ViewType getViewType(int position) {
             if (position == avatarRow) {
                 return ViewType.CHAT;
-            } else if (position == dividerRow) {
+            } else if (position == dividerRow || position == divider2Row) {
                 return ViewType.SHADOW;
             } else if (position == headerRow) {
                 return ViewType.HEADER;

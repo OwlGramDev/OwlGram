@@ -39,6 +39,7 @@ public class AutoTranslationException extends BaseSettingsActivity {
     private int exceptionsEndRow;
     private int dividerRow;
     private int deleteAllExceptionsRow;
+    private int divider2Row;
 
     public AutoTranslationException(boolean isAllow) {
         this.isAllow = isAllow;
@@ -106,6 +107,7 @@ public class AutoTranslationException extends BaseSettingsActivity {
         exceptionsEndRow = rowCount;
         dividerRow = rowCount++;
         deleteAllExceptionsRow = rowCount++;
+        divider2Row = rowCount++;
     }
 
     @Override
@@ -232,7 +234,7 @@ public class AutoTranslationException extends BaseSettingsActivity {
                 return ViewType.HEADER;
             } else if (position >= exceptionsStartRow && position < exceptionsEndRow) {
                 return ViewType.MANAGE_CHAT;
-            } else if (position == dividerRow) {
+            } else if (position == dividerRow || position == divider2Row) {
                 return ViewType.SHADOW;
             } else if (position == deleteAllExceptionsRow) {
                 return ViewType.SETTINGS;
