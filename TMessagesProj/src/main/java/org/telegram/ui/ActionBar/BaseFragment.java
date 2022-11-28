@@ -336,6 +336,14 @@ public abstract class BaseFragment {
         }
     }
 
+    public void rebuild() {
+        isFinished = false;
+        finishing = false;
+        if (actionBar != null) {
+            actionBar.setEnabled(true);
+        }
+    }
+
     public boolean needDelayOpenAnimation() {
         return false;
     }
