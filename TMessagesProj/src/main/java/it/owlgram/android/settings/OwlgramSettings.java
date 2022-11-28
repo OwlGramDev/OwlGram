@@ -148,11 +148,11 @@ public class OwlgramSettings extends BaseSettingsActivity {
 
         @Override
         protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
-            switch (holder.getItemViewType()) {
-                case TYPE_SHADOW:
+            switch (ViewType.fromInt(holder.getItemViewType())) {
+                case SHADOW:
                     holder.itemView.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
                     break;
-                case TYPE_TEXT_CELL:
+                case TEXT_CELL:
                     TextCell textCell = (TextCell) holder.itemView;
                     textCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                     if (position == generalSettingsRow) {
@@ -171,7 +171,7 @@ public class OwlgramSettings extends BaseSettingsActivity {
                         textCell.setTextAndIcon(LocaleController.getString("Appearance", R.string.Appearance), R.drawable.settings_appearance, true);
                     }
                     break;
-                case TYPE_HEADER:
+                case HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == categoryHeaderRow) {
                         headerCell.setText(LocaleController.getString("Settings", R.string.Settings));
@@ -179,7 +179,7 @@ public class OwlgramSettings extends BaseSettingsActivity {
                         headerCell.setText(LocaleController.getString("Info", R.string.Info));
                     }
                     break;
-                case TYPE_DETAILED_SETTINGS:
+                case DETAILED_SETTINGS:
                     TextDetailSettingsCell textDetailCell = (TextDetailSettingsCell) holder.itemView;
                     textDetailCell.setMultilineDetail(true);
                     if (position == supportTranslationRow) {
@@ -197,23 +197,22 @@ public class OwlgramSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            int type = holder.getItemViewType();
-            return type == TYPE_TEXT_CELL || type == TYPE_DETAILED_SETTINGS;
+        protected boolean isEnabled(ViewType viewType, int position) {
+            return viewType == ViewType.TEXT_CELL || viewType == ViewType.DETAILED_SETTINGS;
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public ViewType getViewType(int position) {
             if (position == divisorInfoRow) {
-                return TYPE_SHADOW;
+                return ViewType.SHADOW;
             } else if (position == generalSettingsRow || position == chatSettingsRow || position == updateSettingsRow ||
                     position == channelUpdatesRow || position == groupUpdatesRow ||
                     position == experimentalSettingsRow || position == appearanceSettingsRow) {
-                return TYPE_TEXT_CELL;
+                return ViewType.TEXT_CELL;
             } else if (position == categoryHeaderRow || position == infoHeaderRow) {
-                return TYPE_HEADER;
+                return ViewType.HEADER;
             } else if (position == supportTranslationRow || position == supportDonationRow || position == sourceCodeRow || position == bugReportRow) {
-                return TYPE_DETAILED_SETTINGS;
+                return ViewType.DETAILED_SETTINGS;
             }
             throw new IllegalArgumentException("Invalid position");
         }

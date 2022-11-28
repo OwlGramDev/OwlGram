@@ -21,8 +21,8 @@ public class AutoTranslatePopupWrapper {
     private final long dialogId;
     private final int topicId;
     private final ActionBarMenuSubItem defaultItem;
-    private final ActionBarMenuSubItem enableItem;
-    private final ActionBarMenuSubItem disableItem;
+    private ActionBarMenuSubItem enableItem;
+    private ActionBarMenuSubItem disableItem;
 
     public AutoTranslatePopupWrapper(Context context, PopupSwipeBackLayout swipeBackLayout, long dialogId, int topicId, Theme.ResourcesProvider resourcesProvider) {
         windowLayout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(context, 0, resourcesProvider);
@@ -38,23 +38,27 @@ public class AutoTranslatePopupWrapper {
         defaultItem = ActionBarMenuItem.addItem(windowLayout, 0, LocaleController.getString("Default", R.string.Default), true, resourcesProvider);
 
         defaultItem.setOnClickListener(view -> {
-            AutoTranslateConfig.removeAutoTranslateConfig(dialogId, topicId);
+            AutoTranslateConfig.setDefault(dialogId, topicId);
             updateItems();
         });
 
-        enableItem = ActionBarMenuItem.addItem(windowLayout, 0, LocaleController.getString("Enable", R.string.Enable), true, resourcesProvider);
-        enableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
-        enableItem.setOnClickListener(view -> {
-            AutoTranslateConfig.setAutoTranslateEnable(dialogId, topicId, true);
-            updateItems();
-        });
+        if (topicId == 0 || AutoTranslateConfig.isLastTopicAvailable(dialogId, topicId, false)) {
+            enableItem = ActionBarMenuItem.addItem(windowLayout, 0, LocaleController.getString("Enable", R.string.Enable), true, resourcesProvider);
+            enableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
+            enableItem.setOnClickListener(view -> {
+                AutoTranslateConfig.setEnabled(dialogId, topicId, true);
+                updateItems();
+            });
+        }
 
-        disableItem = ActionBarMenuItem.addItem(windowLayout, 0, LocaleController.getString("Disable", R.string.Disable), true, resourcesProvider);
-        disableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && !AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
-        disableItem.setOnClickListener(view -> {
-            AutoTranslateConfig.setAutoTranslateEnable(dialogId, topicId, false);
-            updateItems();
-        });
+        if (topicId == 0 || AutoTranslateConfig.isLastTopicAvailable(dialogId, topicId, true)) {
+            disableItem = ActionBarMenuItem.addItem(windowLayout, 0, LocaleController.getString("Disable", R.string.Disable), true, resourcesProvider);
+            disableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && !AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
+            disableItem.setOnClickListener(view -> {
+                AutoTranslateConfig.setEnabled(dialogId, topicId, false);
+                updateItems();
+            });
+        }
         updateItems();
 
         View gap = new FrameLayout(context);
@@ -73,7 +77,7 @@ public class AutoTranslatePopupWrapper {
 
     public void updateItems() {
         defaultItem.setChecked(!AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId));
-        enableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
-        disableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && !AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
+        if (enableItem != null) enableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
+        if (disableItem != null) disableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && !AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
     }
 }

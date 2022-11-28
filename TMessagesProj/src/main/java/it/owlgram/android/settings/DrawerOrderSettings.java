@@ -38,11 +38,6 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
     private int menuItemsEndRow;
     private int menuItemsDividerRow;
 
-    // TYPES
-    private static final int TYPE_HINT_HEADER = 200;
-    private static final int TYPE_MENU_ITEM = 201;
-    private static final int TYPE_SUGGESTED_OPTIONS = 202;
-
 
     @SuppressLint("NotifyDataSetChanged")
     @Override
@@ -127,11 +122,11 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
 
         @Override
         protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
-            switch (holder.getItemViewType()) {
-                case TYPE_SHADOW:
+            switch (ViewType.fromInt(holder.getItemViewType())) {
+                case SHADOW:
                     holder.itemView.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
                     break;
-                case TYPE_HEADER:
+                case HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == headerSuggestedOptionsRow) {
                         headerCell.setText(LocaleController.getString("RecommendedItems", R.string.RecommendedItems));
@@ -139,14 +134,14 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
                         headerCell.setText(LocaleController.getString("MenuItems", R.string.MenuItems));
                     }
                     break;
-                case TYPE_MENU_ITEM:
+                case MENU_ITEM:
                     SwapOrderCell swapOrderCell = (SwapOrderCell) holder.itemView;
                     MenuOrderManager.EditableMenuItem data = MenuOrderManager.getSingleAvailableMenuItem(position - menuItemsStartRow);
                     if (data != null) {
                         swapOrderCell.setData(data.text, data.isDefault, data.isPremium, data.id, true);
                     }
                     break;
-                case TYPE_SUGGESTED_OPTIONS:
+                case SUGGESTED_OPTIONS:
                     AddItemCell addItemCell = (AddItemCell) holder.itemView;
                     MenuOrderManager.EditableMenuItem notData = MenuOrderManager.getSingleNotAvailableMenuItem(position - menuHintsStartRow);
                     if (notData != null) {
@@ -157,20 +152,20 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            return holder.getItemViewType() == TYPE_MENU_ITEM;
+        protected boolean isEnabled(ViewType viewType, int position) {
+            return viewType == ViewType.MENU_ITEM;
         }
 
         @SuppressLint({"ClickableViewAccessibility", "NotifyDataSetChanged"})
         @Override
-        protected View onCreateViewHolder(int viewType) {
+        protected View onCreateViewHolder(ViewType viewType) {
             View view = null;
             switch (viewType) {
-                case TYPE_HINT_HEADER:
+                case HINT_HEADER:
                     view = new HintHeaderCell(context, R.raw.filters, LocaleController.formatString("MenuItemsOrderDesc", R.string.MenuItemsOrderDesc));
                     view.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider_top, Theme.key_windowBackgroundGrayShadow));
                     break;
-                case TYPE_MENU_ITEM:
+                case MENU_ITEM:
                     SwapOrderCell swapOrderCell = new SwapOrderCell(context);
                     swapOrderCell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     swapOrderCell.setOnReorderButtonTouchListener((v, event) -> {
@@ -212,7 +207,7 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
                     });
                     view = swapOrderCell;
                     break;
-                case TYPE_SUGGESTED_OPTIONS:
+                case SUGGESTED_OPTIONS:
                     AddItemCell addItemCell = new AddItemCell(context);
                     addItemCell.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     addItemCell.setAddOnClickListener(v -> {
@@ -249,17 +244,17 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public ViewType getViewType(int position) {
             if (position == hintsDividerRow || position == menuItemsDividerRow) {
-                return TYPE_SHADOW;
+                return ViewType.SHADOW;
             } else if (position == headerHintRow) {
-                return TYPE_HINT_HEADER;
+                return ViewType.HINT_HEADER;
             } else if (position == headerSuggestedOptionsRow || position == headerMenuRow) {
-                return TYPE_HEADER;
+                return ViewType.HEADER;
             } else if (position >= menuItemsStartRow && position < menuItemsEndRow) {
-                return TYPE_MENU_ITEM;
+                return ViewType.MENU_ITEM;
             } else if (position >= menuHintsStartRow && position < menuHintsEndRow) {
-                return TYPE_SUGGESTED_OPTIONS;
+                return ViewType.SUGGESTED_OPTIONS;
             }
             throw new IllegalArgumentException("Invalid position");
         }
@@ -291,7 +286,7 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
 
         @Override
         public int getMovementFlags(@NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            if (viewHolder.getItemViewType() != TYPE_MENU_ITEM) {
+            if (viewHolder.getItemViewType() != ViewType.MENU_ITEM.toInt()) {
                 return makeMovementFlags(0, 0);
             }
             return makeMovementFlags(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0);

@@ -42,10 +42,6 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
     private UpdateCheckCell updateCheckCell;
     private UpdateCell updateCell;
 
-    // TYPES
-    private static final int TYPE_UPDATE = 200;
-    private static final int TYPE_UPDATE_CHECK = 201;
-
     @Override
     public boolean onFragmentCreate() {
         String data = OwlConfig.updateData;
@@ -158,11 +154,11 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
 
         @Override
         protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
-            switch (holder.getItemViewType()) {
-                case TYPE_SHADOW:
+            switch (ViewType.fromInt(holder.getItemViewType())) {
+                case SHADOW:
                     holder.itemView.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
                     break;
-                case TYPE_UPDATE:
+                case UPDATE:
                     UpdateCell updateCell = (UpdateCell) holder.itemView;
                     OwlgramUpdateSettings.this.updateCell = updateCell;
                     updateCell.setUpdate(
@@ -182,13 +178,13 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                     }
                     updateCell.setPercentage(AppDownloader.getDownloadProgress(), AppDownloader.downloadedBytes(), AppDownloader.totalBytes());
                     break;
-                case TYPE_HEADER:
+                case HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == updateSectionHeader) {
                         headerCell.setText(LocaleController.getString("InAppUpdates", R.string.InAppUpdates));
                     }
                     break;
-                case TYPE_UPDATE_CHECK:
+                case UPDATE_CHECK:
                     UpdateCheckCell updateCheckCell = (UpdateCheckCell) holder.itemView;
                     updateCheckCell.loadLastStatus();
                     updateCheckCell.setCanCheckForUpdate(!AppDownloader.updateDownloaded() && !PlayStoreAPI.isRunningDownload());
@@ -196,7 +192,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                         updateCheckCell.setDownloaded();
                     }
                     break;
-                case TYPE_SWITCH:
+                case SWITCH:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
                     textCheckCell.setEnabled(!AppDownloader.updateDownloaded() || position != betaUpdatesRow, null);
                     if (position == betaUpdatesRow) {
@@ -206,7 +202,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("AutoUpdate", R.string.AutoUpdate), LocaleController.getString("AutoUpdatePrompt", R.string.AutoUpdatePrompt), OwlConfig.notifyUpdates, true, true);
                     }
                     break;
-                case TYPE_TEXT_CELL:
+                case TEXT_CELL:
                     TextCell textCell = (TextCell) holder.itemView;
                     if (position == apkChannelRow) {
                         textCell.setTextAndValue(LocaleController.getString("APKsChannel", R.string.APKsChannel), "@OwlGramAPKs", false);
@@ -216,16 +212,15 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            int type = holder.getItemViewType();
-            return type == TYPE_SWITCH || type == TYPE_TEXT_CELL;
+        protected boolean isEnabled(ViewType viewType, int position) {
+            return viewType == ViewType.SWITCH || viewType == ViewType.TEXT_CELL;
         }
 
         @Override
-        protected View onCreateViewHolder(int viewType) {
+        protected View onCreateViewHolder(ViewType viewType) {
             View view = null;
             switch (viewType) {
-                case TYPE_UPDATE:
+                case UPDATE:
                     view = new UpdateCell(context) {
                         @Override
                         protected void onInstallUpdate() {
@@ -259,7 +254,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                         }
                     };
                     break;
-                case TYPE_UPDATE_CHECK:
+                case UPDATE_CHECK:
                     view = new UpdateCheckCell(context, true) {
                         @Override
                         protected void onCheckUpdate() {
@@ -281,19 +276,19 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public ViewType getViewType(int position) {
             if (position == updateSectionDividerRow) {
-                return TYPE_SHADOW;
+                return ViewType.SHADOW;
             } else if (position == updateSectionAvailableRow) {
-                return TYPE_UPDATE;
+                return ViewType.UPDATE;
             } else if (position == updateSectionHeader) {
-                return TYPE_HEADER;
+                return ViewType.HEADER;
             } else if (position == updateCheckRow) {
-                return TYPE_UPDATE_CHECK;
+                return ViewType.UPDATE_CHECK;
             } else if (position == betaUpdatesRow || position == notifyWhenAvailableRow) {
-                return TYPE_SWITCH;
+                return ViewType.SWITCH;
             } else if (position == apkChannelRow) {
-                return TYPE_TEXT_CELL;
+                return ViewType.TEXT_CELL;
             }
             throw new IllegalArgumentException("Invalid position");
         }

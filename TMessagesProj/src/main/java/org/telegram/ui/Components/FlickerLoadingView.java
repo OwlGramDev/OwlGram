@@ -42,6 +42,7 @@ public class FlickerLoadingView extends View {
     public final static int LIMIT_REACHED_LINKS = 22;
     public final static int REACTED_TYPE_WITH_EMOJI_HINT = 23;
     public static final int TOPIC_CELL_TYPE = 24;
+    public static final int EDIT_TOPIC_CELL_TYPE = 25;
 
     private int gradientWidth;
     private LinearGradient gradient;
@@ -228,6 +229,25 @@ public class FlickerLoadingView extends View {
                     break;
                 }
             }
+        } else if (getViewType() == EDIT_TOPIC_CELL_TYPE) {
+            int r = AndroidUtilities.dp(14);
+            int childH = getCellHeight(getMeasuredWidth());
+            canvas.drawCircle(checkRtl(AndroidUtilities.dp(24) + r), childH >> 1, r, paint);
+            canvas.save();
+
+            int x = AndroidUtilities.dp(80);
+            int height = AndroidUtilities.dp(18);
+            int y = (childH - height) >> 1;
+            rectF.set(x, y, x + AndroidUtilities.dp(130), y + height);
+            checkRtl(rectF);
+            canvas.drawRoundRect(rectF, AndroidUtilities.dp(10), AndroidUtilities.dp(10), paint);
+
+            x = getMeasuredWidth() - AndroidUtilities.dp(25);
+            height = AndroidUtilities.dp(16);
+            y = (childH - height) >> 1;
+            rectF.set(x - AndroidUtilities.dp(35), y, x, y + height);
+            checkRtl(rectF);
+            canvas.drawRoundRect(rectF, AndroidUtilities.dp(10), AndroidUtilities.dp(10), paint);
         } else if (getViewType() == CONTACT_TYPE) {
             int k = 0;
             while (h <= getMeasuredHeight()) {
@@ -772,6 +792,7 @@ public class FlickerLoadingView extends View {
             case INVITE_LINKS_TYPE:
                 return AndroidUtilities.dp(66);
             case USERS2_TYPE:
+            case EDIT_TOPIC_CELL_TYPE:
                 return AndroidUtilities.dp(58);
             case CALL_LOG_TYPE:
                 return AndroidUtilities.dp(61);

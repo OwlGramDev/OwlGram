@@ -74,10 +74,6 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
     private int onlineStatusRow;
     private int hideSendAsChannelRow;
 
-    // VIEW TYPES
-    private static final int TYPE_STICKER_SIZE = 200;
-    private static final int TYPE_CAMERA_TYPE_SELECTOR = 201;
-
     @Override
     public boolean onFragmentCreate() {
         NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.emojiLoaded);
@@ -335,11 +331,11 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
     private class ListAdapter extends BaseListAdapter {
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
-            switch (holder.getItemViewType()) {
-                case TYPE_SHADOW:
+            switch (ViewType.fromInt(holder.getItemViewType())) {
+                case SHADOW:
                     holder.itemView.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
                     break;
-                case TYPE_HEADER:
+                case HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == chatHeaderRow) {
                         headerCell.setText(LocaleController.getString("Chat", R.string.Chat));
@@ -355,7 +351,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                         headerCell.setText(LocaleController.getString("CameraType", R.string.CameraType));
                     }
                     break;
-                case TYPE_SWITCH:
+                case SWITCH:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
                     textCheckCell.setEnabled(true, null);
                     if (position == mediaSwipeByTapRow) {
@@ -396,7 +392,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                         textCheckCell.setTextAndCheck(LocaleController.getString("HideSendAsChannel", R.string.HideSendAsChannel), OwlConfig.hideSendAsChannel, true);
                     }
                     break;
-                case TYPE_TEXT_HINT_WITH_PADDING:
+                case TEXT_HINT_WITH_PADDING:
                     TextInfoPrivacyCell textInfoPrivacyCell = (TextInfoPrivacyCell) holder.itemView;
                     if (position == cameraAdviseRow) {
                         String advise;
@@ -416,14 +412,14 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                         textInfoPrivacyCell.setText(EntitiesHelper.getUrlNoUnderlineText(htmlParsed));
                     }
                     break;
-                case TYPE_SETTINGS:
+                case SETTINGS:
                     TextSettingsCell textSettingsCell = (TextSettingsCell) holder.itemView;
                     textSettingsCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                     if (position == cameraXFpsRow) {
                         textSettingsCell.setTextAndValue(LocaleController.getString("MotionSmoothness", R.string.MotionSmoothness), OwlConfig.cameraXFps + " Fps", partial,false);
                     }
                     break;
-                case TYPE_CHECKBOX:
+                case CHECKBOX:
                     TextCheckbox2Cell textCheckbox2Cell = (TextCheckbox2Cell) holder.itemView;
                     if (position == showDeleteRow) {
                         textCheckbox2Cell.setTextAndCheck(LocaleController.getString("ClearFromCache", R.string.ClearFromCache), OwlConfig.showDeleteDownloadedFile, true);
@@ -447,16 +443,15 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
         }
 
         @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            int type = holder.getItemViewType();
-            return type == TYPE_SWITCH || type == TYPE_SETTINGS || type == TYPE_CHECKBOX;
+        protected boolean isEnabled(ViewType viewType, int position) {
+            return viewType == ViewType.SWITCH || viewType == ViewType.SETTINGS || viewType == ViewType.CHECKBOX;
         }
 
         @Override
-        protected View onCreateViewHolder(int viewType) {
+        protected View onCreateViewHolder(ViewType viewType) {
             View view = null;
             switch (viewType) {
-                case TYPE_STICKER_SIZE:
+                case STICKER_SIZE:
                     view = new StickerSizeCell(context, parentLayout) {
                         @Override
                         protected void onSeek() {
@@ -469,7 +464,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                         }
                     };
                     break;
-                case TYPE_CAMERA_TYPE_SELECTOR:
+                case CAMERA_SELECTOR:
                     view = new CameraTypeSelector(context) {
                         @Override
                         protected void onSelectedCamera(int cameraSelected) {
@@ -494,13 +489,13 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public ViewType getViewType(int position) {
             if (position == chatDividerRow || position == foldersDividerRow || position == audioVideoDividerRow ||
                     position == stickerSizeDividerRow) {
-                return TYPE_SHADOW;
+                return ViewType.SHADOW;
             } else if (position == chatHeaderRow || position == foldersHeaderRow || position == audioVideoHeaderRow ||
                     position == messageMenuHeaderRow || position == stickerSizeHeaderRow || position == cameraTypeHeaderRow) {
-                return TYPE_HEADER;
+                return ViewType.HEADER;
             } else if (position == mediaSwipeByTapRow || position == jumpChannelRow || position == hideKeyboardRow ||
                     position == playGifAsVideoRow || position == showFolderWhenForwardRow ||
                     position == rearCameraStartingRow || position == confirmSendRow || position == showGreetings ||
@@ -508,19 +503,19 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                     position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow || position == confirmStickersGIFsRow ||
                     position == hideTimeOnStickerRow || position == onlineStatusRow || position == hideAllTabRow ||
                     position == hideSendAsChannelRow) {
-                return TYPE_SWITCH;
+                return ViewType.SWITCH;
             } else if (position == stickerSizeRow) {
-                return TYPE_STICKER_SIZE;
+                return ViewType.STICKER_SIZE;
             } else if (position == cameraTypeSelectorRow) {
-                return TYPE_CAMERA_TYPE_SELECTOR;
+                return ViewType.CAMERA_SELECTOR;
             } else if (position == cameraAdviseRow) {
-                return TYPE_TEXT_HINT_WITH_PADDING;
+                return ViewType.TEXT_HINT_WITH_PADDING;
             } else if (position == cameraXFpsRow) {
-                return TYPE_SETTINGS;
+                return ViewType.SETTINGS;
             } else if (position == showDeleteRow || position == showNoQuoteForwardRow || position == showAddToSMRow ||
                     position == showRepeatRow || position == showReportRow ||
                     position == showMessageDetailsRow || position == showCopyPhotoRow || position == showPatpatRow) {
-                return TYPE_CHECKBOX;
+                return ViewType.CHECKBOX;
             }
             throw new IllegalArgumentException("Invalid position");
         }
