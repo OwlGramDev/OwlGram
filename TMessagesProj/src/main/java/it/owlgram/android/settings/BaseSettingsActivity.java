@@ -36,6 +36,7 @@ import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Cells.UserCell;
 import org.telegram.ui.Cells.UserCell2;
 import org.telegram.ui.Components.EmptyTextProgressView;
+import org.telegram.ui.Components.FlickerLoadingView;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RecyclerListView;
 import org.telegram.ui.Components.UndoView;
@@ -247,6 +248,9 @@ public abstract class BaseSettingsActivity extends BaseFragment {
                     break;
                 case EDIT_TOPIC:
                     view = new EditTopicCell(context);
+                    break;
+                case PLACEHOLDER:
+                    view = new FlickerLoadingView(parent.getContext());
                     break;
                 default:
                     view = onCreateViewHolder(type);
