@@ -48,4 +48,4 @@ inline jint throwSocketException(JNIEnv *env, char *msg);
 int handleSocketError(JNIEnv *env, int socketfd);
 int handleSendtoError(JNIEnv *env, int count);
 int handleRecvError(JNIEnv *env, int count, size_t recv_header_size);
-int handleICMPError(JNIEnv *env, struct icmphdr* header);
+int handleICMPError(JNIEnv *env, struct icmphdr *header);
