@@ -17,6 +17,7 @@ import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedEmojiDrawable;
 import org.telegram.ui.Components.BackupImageView;
+import org.telegram.ui.Components.Forum.ForumUtilities;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.Switch;
 
@@ -62,7 +63,11 @@ public class EditTopicCell extends FrameLayout {
     public void setData(TLRPC.TL_forumTopic topic) {
         this.topic = topic;
         textView.setText(topic.title);
-        imageView.setAnimatedEmojiDrawable(new AnimatedEmojiDrawable(AnimatedEmojiDrawable.CACHE_TYPE_MESSAGES, UserConfig.selectedAccount, topic.icon_emoji_id));
+        if (topic.icon_emoji_id != 0) {
+            imageView.setAnimatedEmojiDrawable(new AnimatedEmojiDrawable(AnimatedEmojiDrawable.CACHE_TYPE_MESSAGES, UserConfig.selectedAccount, topic.icon_emoji_id));
+        } else {
+            imageView.setImageDrawable(ForumUtilities.createTopicDrawable(topic));
+        }
     }
 
     public void setChecked(boolean checked) {
