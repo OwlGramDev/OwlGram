@@ -2702,7 +2702,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
                 @Override
                 public void onSearchExpand() {
-                    if (threadMessageId != 0 || UserObject.isReplyUser(currentUser)) {
+                    if (threadMessageId != 0 && !isTopic || UserObject.isReplyUser(currentUser)) {
                         openSearchWithText(null);
                     }
                     if (!openSearchKeyboard) {
@@ -25954,7 +25954,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if ((threadMessageId == 0 || isTopic) && !UserObject.isReplyUser(currentUser)) {
             openSearchKeyboard = text == null;
             if (searchItem != null) {
-                searchItem.openSearch(openSearchKeyboard);
+                searchItem.openSearch(true);
             }
         }
         if (text != null) {
