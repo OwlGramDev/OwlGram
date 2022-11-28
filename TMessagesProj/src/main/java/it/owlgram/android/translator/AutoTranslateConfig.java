@@ -68,6 +68,15 @@ public class AutoTranslateConfig {
         }
     }
 
+    public static boolean isLastTopicAvailable(long dialog_id, int topicId, boolean enabled) {
+        List<TLRPC.TL_forumTopic> topics = MessagesController.getInstance(UserConfig.selectedAccount).getTopicsController().getTopics(-dialog_id);
+        if (topics != null) {
+            return topics.stream().filter(t -> t.id != topicId).anyMatch(t -> isAutoTranslateEnabled(dialog_id, t.id) == enabled);
+        } else {
+            return false;
+        }
+    }
+
     public static void setDefault(long dialog_id, int topicId) {
         preferences.edit().remove(getExceptionsKey(dialog_id, topicId)).apply();
     }
