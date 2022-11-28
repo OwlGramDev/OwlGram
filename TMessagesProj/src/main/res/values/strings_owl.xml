@@ -302,4 +302,12 @@
     <string name="AlwaysTranslate">Always translate</string>
     <string name="NeverTranslate">Never translate</string>
     <string name="ResetAutoTranslationPreferences">Reset Auto-Translation Preferences</string>
+    <string name="EditExceptionTitle">Do you want to edit topics?</string>
+    <string name="EditExceptionHint">You can disable auto-translate for specific topics in this group.</string>
+    <string name="EditRemoveAlwaysText">Are you sure you want to delete \"%1$s\" from always auto-translate exceptions?</string>
+    <string name="EditRemoveNeverText">Are you sure you want to delete \"%1$s\" from never auto-translate exceptions?</string>
+    <string name="EditDeleteException">Delete exception</string>
+    <string name="DeleteAllAllowExceptions">Are you sure you want to delete all always allowed exceptions?</string>
+    <string name="DeleteAllNeverExceptions">Are you sure you want to delete all never allowed exceptions?</string>
+    <string name="EditTopicsException">Edit topics exception</string>
 </resources>
