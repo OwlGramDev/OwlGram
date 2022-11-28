@@ -17,6 +17,7 @@ enum ViewType {
     IMAGE_HEADER,
     MANAGE_CHAT,
     MENU_ITEM,
+    PLACEHOLDER,
     PROFILE_PREVIEW,
     RADIO,
     SETTINGS,
