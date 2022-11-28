@@ -49,7 +49,10 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
 
     public AutoTranslateGroupInfo(TLRPC.Chat chat, boolean isAllow) {
         this.chat = chat;
-        topics.addAll(getMessagesController().getTopicsController().getTopics(chat.id));
+        ArrayList<TLRPC.TL_forumTopic> tmp = getMessagesController().getTopicsController().getTopics(chat.id);
+        if (tmp != null) {
+            topics.addAll(tmp);
+        }
         this.isAllow = isAllow;
     }
 
