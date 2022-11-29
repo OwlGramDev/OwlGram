@@ -72,13 +72,7 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
         } else if (position == removeGroupExceptionRow) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
             builder.setTitle(LocaleController.getString("EditDeleteException", R.string.EditDeleteException));
-            String message;
-            if (isAllow) {
-                message = LocaleController.formatString("EditRemoveAlwaysText", R.string.EditRemoveAlwaysText, chat.title);
-            } else {
-                message = LocaleController.formatString("EditRemoveNeverText", R.string.EditRemoveNeverText, chat.title);
-            }
-            builder.setMessage(message);
+            builder.setMessage(LocaleController.formatString("EditRemoveExceptionText", R.string.EditRemoveExceptionText, chat.title));
             builder.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialogInterface, i) -> {
                 AutoTranslateConfig.removeGroupException(-chat.id);
                 if (AutoTranslateConfig.getExceptions(isAllow).isEmpty()) {

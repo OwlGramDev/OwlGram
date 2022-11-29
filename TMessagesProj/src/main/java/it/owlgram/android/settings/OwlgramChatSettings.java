@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBarMenu;
@@ -232,7 +233,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.hideSendAsChannel);
             }
-            parentLayout.rebuildAllFragmentViews(true, true);
+            getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_CHAT);
         } else if (position == disableStickersReorderRow) {
             OwlConfig.toggleStickersAutoReorder();
             if (view instanceof TextCheckCell) {
