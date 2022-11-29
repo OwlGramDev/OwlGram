@@ -23,8 +23,15 @@ public class AutoTranslatePopupWrapper {
     private final ActionBarMenuSubItem defaultItem;
     private ActionBarMenuSubItem enableItem;
     private ActionBarMenuSubItem disableItem;
+    private FragmentDelegate delegate;
+    private final boolean isAlwaysShare;
 
     public AutoTranslatePopupWrapper(Context context, PopupSwipeBackLayout swipeBackLayout, long dialogId, int topicId, Theme.ResourcesProvider resourcesProvider) {
+        this(context, swipeBackLayout, dialogId, topicId, false, resourcesProvider);
+    }
+
+    public AutoTranslatePopupWrapper(Context context, PopupSwipeBackLayout swipeBackLayout, long dialogId, int topicId, boolean isAlwaysShare, Theme.ResourcesProvider resourcesProvider) {
+        this.isAlwaysShare = isAlwaysShare;
         windowLayout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(context, 0, resourcesProvider);
         windowLayout.setFitItems(true);
         this.dialogId = dialogId;
@@ -40,6 +47,7 @@ public class AutoTranslatePopupWrapper {
         defaultItem.setOnClickListener(view -> {
             AutoTranslateConfig.setDefault(dialogId, topicId);
             updateItems();
+            updateLastFragment();
         });
 
         if (topicId == 0 || AutoTranslateConfig.isLastTopicAvailable(dialogId, topicId, false)) {
@@ -48,6 +56,7 @@ public class AutoTranslatePopupWrapper {
             enableItem.setOnClickListener(view -> {
                 AutoTranslateConfig.setEnabled(dialogId, topicId, true);
                 updateItems();
+                updateLastFragment();
             });
         }
 
@@ -57,6 +66,7 @@ public class AutoTranslatePopupWrapper {
             disableItem.setOnClickListener(view -> {
                 AutoTranslateConfig.setEnabled(dialogId, topicId, false);
                 updateItems();
+                updateLastFragment();
             });
         }
         updateItems();
@@ -79,5 +89,23 @@ public class AutoTranslatePopupWrapper {
         defaultItem.setChecked(!AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId));
         if (enableItem != null) enableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
         if (disableItem != null) disableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && !AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
+    }
+
+    private void updateLastFragment() {
+        if (delegate == null) return;
+        if (AutoTranslateConfig.getExceptions(isAlwaysShare).isEmpty()) {
+            this.delegate.hideLastFragment();
+        } else {
+            this.delegate.showLastFragment();
+        }
+    }
+
+    public void setDelegate(FragmentDelegate delegate) {
+        this.delegate = delegate;
+    }
+
+    public interface FragmentDelegate {
+        void hideLastFragment();
+        void showLastFragment();
     }
 }

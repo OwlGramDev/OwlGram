@@ -70,6 +70,8 @@ public class AutoTranslationException extends BaseSettingsActivity {
             } else {
                 args.putLong("chat_id", -uid);
             }
+            args.putBoolean("isSettings", true);
+            args.putBoolean("isAlwaysShare", isAllow);
             presentFragment(new ProfileActivity(args));
         } else if (position == deleteAllExceptionsRow) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
