@@ -52,7 +52,7 @@ int handleRecvError(JNIEnv *env, int count, size_t recv_header_size) {
     return EXIT_SUCCESS;
 }
 
-int handleICMPError(JNIEnv *env, struct icmphdr* header) {
+int handleICMPError(JNIEnv *env, struct icmphdr *header) {
     if(header->type != ICMP_ECHOREPLY) {
         throwSocketException(env, SOCKET_ERROR_INVALID_ICMP_PACKET);
 

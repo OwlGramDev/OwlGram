@@ -2125,6 +2125,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 getNotificationCenter().removeObserver(this, NotificationCenter.filterSettingsUpdated);
                 getNotificationCenter().removeObserver(this, NotificationCenter.dialogFiltersUpdated);
                 getNotificationCenter().removeObserver(this, NotificationCenter.dialogsUnreadCounterChanged);
+                getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
             }
             getNotificationCenter().removeObserver(this, NotificationCenter.updateInterfaces);
             getNotificationCenter().removeObserver(this, NotificationCenter.encryptedChatUpdated);
@@ -4731,7 +4732,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         filterTabsView.addTab(a, filters.get(a).localId, filters.get(a).name, false,  filters.get(a).locked, filters.get(a).emoticon);
                     }
                 }
-                if (stableId >= 0) {
+                if (OwlConfig.hideAllTab && stableId <= 0) {
+                    id = filterTabsView.getFirstTabId();
+                    updateCurrentTab = true;
+                    viewPages[0].selectedType = id;
+                    filterTabsView.selectTabWithStableId(filterTabsView.getStableId(0));
+                } else if (stableId >= 0) {
                     if (filterTabsView.getStableId(viewPages[0].selectedType) != stableId) {
                         updateCurrentTab = true;
                         viewPages[0].selectedType = id;
@@ -4773,9 +4779,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     ViewPage[] viewPageArr4 = viewPages;
                     viewPageArr4[1].selectedType = viewPageArr4[0].selectedType;
                     viewPages[0].selectedType = newPage;
-                    switchToCurrentSelectedMode(false);
-                    updateCounters(false);
                 }
+                switchToCurrentSelectedMode(false);
+                updateCounters(false);
             }
         } else {
             if (filterTabsView.getVisibility() != View.GONE) {
