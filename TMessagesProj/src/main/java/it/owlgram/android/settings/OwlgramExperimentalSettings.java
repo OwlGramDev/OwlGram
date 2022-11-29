@@ -39,10 +39,6 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
     private int downloadSpeedBoostRow;
     private int uploadSpeedBoostRow;
 
-    // VIEW TYPES
-    private static final int TYPE_IMAGE_HEADER = 200;
-    private static final int TYPE_SLIDE_CHOOSE = 201;
-
     @Override
     protected String getActionBarTitle() {
         return LocaleController.getString("Experimental", R.string.Experimental);
@@ -163,8 +159,8 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
 
         @Override
         protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
-            switch (holder.getItemViewType()) {
-                case TYPE_SWITCH:
+            switch (ViewType.fromInt(holder.getItemViewType())) {
+                case SWITCH:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
                     if (position == betterAudioCallRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("MediaStreamVoip", R.string.MediaStreamVoip), OwlConfig.betterAudioQuality, true);
@@ -182,7 +178,7 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
                         textCheckCell.setTextAndCheck(LocaleController.getString("FasterUploadSpeed", R.string.FasterUploadSpeed), OwlConfig.uploadSpeedBoost, false);
                     }
                     break;
-                case TYPE_TEXT_HINT_WITH_PADDING:
+                case TEXT_HINT_WITH_PADDING:
                     TextInfoPrivacyCell textInfoPrivacyCell = (TextInfoPrivacyCell) holder.itemView;
                     if (position == bottomHeaderRow) {
                         textInfoPrivacyCell.setText(LocaleController.getString("ExperimentalDesc", R.string.ExperimentalDesc));
@@ -190,7 +186,7 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
                         textInfoPrivacyCell.setText(LocaleController.getString("ExperimentalOff", R.string.ExperimentalOff));
                     }
                     break;
-                case TYPE_HEADER:
+                case HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == headerExperimental) {
                         headerCell.setText(LocaleController.getString("General", R.string.General));
@@ -198,7 +194,7 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
                         headerCell.setText(LocaleController.getString("DownloadSpeed", R.string.DownloadSpeed));
                     }
                     break;
-                case TYPE_SETTINGS:
+                case SETTINGS:
                     TextSettingsCell textCell = (TextSettingsCell) holder.itemView;
                     textCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                     if (position == maxRecentStickersRow) {
@@ -209,19 +205,18 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            int type = holder.getItemViewType();
-            return (type == TYPE_SWITCH && holder.getAdapterPosition() != checkBoxExperimentalRow) || type == TYPE_SETTINGS;
+        protected boolean isEnabled(ViewType viewType, int position) {
+            return viewType == ViewType.SWITCH && position != checkBoxExperimentalRow || viewType == ViewType.SETTINGS;
         }
 
         @Override
-        protected View onCreateViewHolder(int viewType) {
+        protected View onCreateViewHolder(ViewType viewType) {
             View view = null;
             switch (viewType) {
-                case TYPE_IMAGE_HEADER:
+                case IMAGE_HEADER:
                     view = new LabsHeader(context);
                     break;
-                case TYPE_SLIDE_CHOOSE:
+                case SLIDE_CHOOSE:
                     SlideChooseView slideChooseView = new SlideChooseView(context);
                     view = slideChooseView;
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
@@ -242,22 +237,22 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public ViewType getViewType(int position) {
             if (position == downloadDividersRow) {
-                return TYPE_SHADOW;
+                return ViewType.SHADOW;
             } else if (position == betterAudioCallRow || position == checkBoxExperimentalRow || position == monetIconRow ||
                     position == uploadSpeedBoostRow) {
-                return TYPE_SWITCH;
+                return ViewType.SWITCH;
             } else if (position == headerImageRow) {
-                return TYPE_IMAGE_HEADER;
+                return ViewType.IMAGE_HEADER;
             } else if (position == bottomHeaderRow || position == experimentalMessageAlert) {
-                return TYPE_TEXT_HINT_WITH_PADDING;
+                return ViewType.TEXT_HINT_WITH_PADDING;
             } else if (position == headerExperimental || position == headerDownloadSpeed) {
-                return TYPE_HEADER;
+                return ViewType.HEADER;
             } else if (position == maxRecentStickersRow) {
-                return TYPE_SETTINGS;
+                return ViewType.SETTINGS;
             } else if (position == downloadSpeedBoostRow) {
-                return TYPE_SLIDE_CHOOSE;
+                return ViewType.SLIDE_CHOOSE;
             }
             throw new IllegalArgumentException("Invalid position");
         }

@@ -162,8 +162,8 @@ public class SelectLanguageSettings extends BaseSettingsActivity {
 
         @Override
         protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
-            switch (holder.getItemViewType()) {
-                case TYPE_RADIO:
+            switch (ViewType.fromInt(holder.getItemViewType())) {
+                case TEXT_RADIO:
                     TextRadioCell textRadioCell = (TextRadioCell) holder.itemView;
                     String[] languages = names.get(position - languagesStartRow).toString().split(" - ");
                     boolean isSelectedLanguage = OwlConfig.translationTarget.equals(targetLanguages.get(position - languagesStartRow));
@@ -175,7 +175,7 @@ public class SelectLanguageSettings extends BaseSettingsActivity {
                             true
                     );
                     break;
-                case TYPE_HEADER:
+                case HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == languageHeaderRow) {
                         headerCell.setText(LocaleController.getString("Language", R.string.Language));
@@ -185,16 +185,16 @@ public class SelectLanguageSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            return holder.getItemViewType() == TYPE_RADIO;
+        protected boolean isEnabled(ViewType viewType, int position) {
+            return viewType == ViewType.TEXT_RADIO;
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public ViewType getViewType(int position) {
             if (position == languageHeaderRow) {
-                return TYPE_HEADER;
+                return ViewType.HEADER;
             }
-            return TYPE_RADIO;
+            return ViewType.TEXT_RADIO;
         }
     }
 }

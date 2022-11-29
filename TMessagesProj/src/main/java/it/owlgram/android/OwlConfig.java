@@ -12,6 +12,7 @@ import java.util.Date;
 
 import it.owlgram.android.camera.CameraXUtilities;
 import it.owlgram.android.helpers.MonetIconsHelper;
+import it.owlgram.android.translator.AutoTranslateConfig;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.DeepLTranslator;
 import it.owlgram.android.translator.Translator;
@@ -78,7 +79,6 @@ public class OwlConfig extends SettingsManager {
     public static boolean xiaomiBlockedInstaller;
     public static boolean searchIconInActionBar;
     public static boolean autoTranslate;
-    public static boolean showNameInActionBar;
     public static boolean showPencilIcon;
     public static boolean keepTranslationMarkdown;
     public static boolean uploadSpeedBoost;
@@ -87,6 +87,9 @@ public class OwlConfig extends SettingsManager {
     public static boolean showPatpat;
     public static boolean unlockedChupa;
     public static boolean hideAllTab;
+    public static boolean hideSendAsChannel;
+    public static boolean showNameInActionBar;
+    public static boolean disableStickersAutoReorder;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -113,11 +116,11 @@ public class OwlConfig extends SettingsManager {
     public static long lastUpdateCheck = 0;
     public static int downloadSpeedBoost;
     public static int unlockedSecretIcon;
-    public static boolean hideSendAsChannel;
 
     static {
         loadConfig(true);
     }
+
 
     public static void loadConfig(boolean firstLoad) {
         synchronized (sync) {
@@ -207,7 +210,6 @@ public class OwlConfig extends SettingsManager {
             searchIconInActionBar = getBoolean("searchIconInActionBar", false);
             autoTranslate = getBoolean("autoTranslate", false);
             showCopyPhoto = getBoolean("showCopyPhoto", false);
-            showNameInActionBar = getBoolean("showNameInActionBar", false);
             showPencilIcon = getBoolean("showPencilIcon", false);
             keepTranslationMarkdown = getBoolean("keepTranslationMarkdown", true);
             hideTimeOnSticker = getBoolean("hideTimeOnSticker", false);
@@ -217,6 +219,8 @@ public class OwlConfig extends SettingsManager {
             unlockedChupa = getBoolean("unlockedChupa", false);
             hideAllTab = getBoolean("hideAllTab", false);
             hideSendAsChannel = getBoolean("hideSendAsChannel", false);
+            showNameInActionBar = getBoolean("showNameInActionBar", false);
+            disableStickersAutoReorder = getBoolean("disableStickersAutoReorder", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -235,6 +239,7 @@ public class OwlConfig extends SettingsManager {
         if (translationProvider == Translator.PROVIDER_NIU) {
             setTranslationProvider(Translator.PROVIDER_GOOGLE);
         }
+        AutoTranslateConfig.migrate();
     }
 
     public static void toggleHidePhone() {
@@ -381,10 +386,6 @@ public class OwlConfig extends SettingsManager {
         putValue("showCopyPhoto", showCopyPhoto ^= true);
     }
 
-    public static void toggleShowNameInActionBar() {
-        putValue("showNameInActionBar", showNameInActionBar ^= true);
-    }
-
     public static void toggleShowSantaHat() {
         putValue("showSantaHat", showSantaHat ^= true);
     }
@@ -429,10 +430,6 @@ public class OwlConfig extends SettingsManager {
         putValue("searchIconInActionBar", searchIconInActionBar ^= true);
     }
 
-    public static void toggleAutoTranslate() {
-        putValue("autoTranslate", autoTranslate ^= true);
-    }
-
     public static void toggleShowPencilIcon() {
         putValue("showPencilIcon", showPencilIcon ^= true);
     }
@@ -465,6 +462,14 @@ public class OwlConfig extends SettingsManager {
         putValue("hideSendAsChannel", hideSendAsChannel ^= true);
     }
 
+    public static void toggleShowNameInActionBar() {
+        putValue("showNameInActionBar", showNameInActionBar ^= true);
+    }
+
+    public static void toggleStickersAutoReorder() {
+        putValue("stickersAutoReorder", disableStickersAutoReorder ^= true);
+    }
+
     public static void unlockChupa() {
         putValue("unlockedChupa", unlockedChupa = true);
     }
@@ -479,6 +484,10 @@ public class OwlConfig extends SettingsManager {
 
     public static void setVerifyLinkTip(boolean shown) {
         putValue("verifyLinkTip", verifyLinkTip = shown);
+    }
+
+    public static void setAutoTranslate(boolean enabled) {
+        putValue("autoTranslate", autoTranslate = enabled);
     }
 
     public static void setTranslationProvider(int provider) {

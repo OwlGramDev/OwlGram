@@ -98,6 +98,7 @@ import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.ChatThemeController;
@@ -232,6 +233,7 @@ import it.owlgram.android.components.DcStyleSelector;
 import it.owlgram.android.components.dynamic.SimpleActionCell;
 import it.owlgram.android.helpers.ActionButtonManager;
 import it.owlgram.android.helpers.DCHelper;
+import it.owlgram.android.settings.BaseSettingsActivity;
 import it.owlgram.android.settings.DoNotTranslateSettings;
 import it.owlgram.android.settings.OwlgramSettings;
 import it.owlgram.android.translator.AutoTranslatePopupWrapper;
@@ -8223,7 +8225,21 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     }
     private void createAutoTranslateItem(Context context, long dialogId, int topicId) {
         if (LanguageDetector.hasSupport() && TranslatorHelper.isSupportAutoTranslate()) {
-            AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, topicId, getResourceProvider());
+            AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, topicId, arguments.getBoolean("isAlwaysShare", false), getResourceProvider());
+            if (arguments.getBoolean("isSettings")) {
+                BaseFragment parentFragment = parentLayout.getFragmentStack().get(parentLayout.getFragmentStack().size() - 2);
+                autoTranslatePopupWrapper.setDelegate(new AutoTranslatePopupWrapper.FragmentDelegate() {
+                    @Override
+                    public void hideLastFragment() {
+                        BaseSettingsActivity.hideLastFragment(parentFragment, parentLayout);
+                    }
+
+                    @Override
+                    public void showLastFragment() {
+                        BaseSettingsActivity.showLastFragment(parentFragment, parentLayout);
+                    }
+                });
+            }
             otherItem.addSwipeBackItem(R.drawable.msg_translate, null, LocaleController.getString("AutoTranslate", R.string.AutoTranslate), autoTranslatePopupWrapper.windowLayout);
         }
         otherItem.addColoredGap();
@@ -8975,7 +8991,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                 }
                                 break;
                         }
-                        String version_info = LocaleController.formatString("OwlGramVersion", R.string.OwlGramVersion, String.format(Locale.US, "v%s (%d) %s", pInfo.versionName, BuildVars.BUILD_VERSION, abi), String.format(Locale.US, "v%s (%d)", BuildVars.TELEGRAM_VERSION_STRING, BuildVars.TELEGRAM_BUILD_VERSION));
+                        String version_info = LocaleController.formatString("OwlGramVersion", R.string.OwlGramVersion, String.format(Locale.US, "v%s (%s) %s", BuildVars.BUILD_VERSION_STRING, BuildVars.DEBUG_PRIVATE_VERSION ? BuildConfig.GIT_COMMIT_HASH:BuildVars.BUILD_VERSION, abi), String.format(Locale.US, "v%s (%d)", BuildVars.TELEGRAM_VERSION_STRING, BuildVars.TELEGRAM_BUILD_VERSION));
                         cell.setText(version_info);
                     } catch (Exception e) {
                         FileLog.e(e);

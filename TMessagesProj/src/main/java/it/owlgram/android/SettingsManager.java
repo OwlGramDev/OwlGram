@@ -107,6 +107,8 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "increaseAudioMessages":
             case "useMonetIcon":
             case "scrollableChatPreview":
+            case "showNameInActionBar":
+            case "showInActionBar":
                 return false;
             default:
                 return true;

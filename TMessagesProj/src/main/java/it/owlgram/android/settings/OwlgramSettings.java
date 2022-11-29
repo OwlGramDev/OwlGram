@@ -2,8 +2,6 @@ package it.owlgram.android.settings;
 
 import android.content.DialogInterface;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,19 +18,14 @@ import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Cells.CheckBoxCell;
 import org.telegram.ui.Cells.HeaderCell;
-import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextDetailSettingsCell;
 import org.telegram.ui.Components.BulletinFactory;
-import org.telegram.ui.Components.LayoutHelper;
-import org.telegram.ui.Components.RecyclerListView;
 
 import it.owlgram.android.Crashlytics;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.StoreUtils;
-import it.owlgram.android.translator.AutoTranslateConfig;
 
 public class OwlgramSettings extends BaseSettingsActivity {
 
@@ -73,17 +66,8 @@ public class OwlgramSettings extends BaseSettingsActivity {
             OwlConfig.shareSettings(getParentActivity());
         } else if (id == 2) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            LinearLayout linearLayout = new LinearLayout(context);
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            builder.setView(linearLayout);
             builder.setTitle(LocaleController.getString("ThemeResetToDefaultsTitle", R.string.ThemeResetToDefaultsTitle));
             builder.setMessage(LocaleController.getString("ResetSettingsAlert", R.string.ResetSettingsAlert));
-            CheckBoxCell cell = new CheckBoxCell(context, 1);
-            cell.setBackground(Theme.getSelectorDrawable(false));
-            cell.setText(LocaleController.getString("ResetAutoTranslationPreferences", R.string.ResetAutoTranslationPreferences), "", false, false);
-            cell.setPadding(LocaleController.isRTL ? AndroidUtilities.dp(16) : AndroidUtilities.dp(8), 0, LocaleController.isRTL ? AndroidUtilities.dp(8) : AndroidUtilities.dp(16), 0);
-            linearLayout.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
-            cell.setOnClickListener(v -> cell.setChecked(!cell.isChecked(), true));
             builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
             builder.setPositiveButton(LocaleController.getString("Reset", R.string.Reset), (dialogInterface, i) -> {
                 int differenceUI = OwlConfig.getDifferenceUI();
@@ -92,7 +76,6 @@ public class OwlgramSettings extends BaseSettingsActivity {
                 Theme.dialogs_holidayDrawable = null;
                 getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
                 getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
-                if (cell.isChecked()) AutoTranslateConfig.resetAutoTranslateConfigs();
                 OwlConfig.doRebuildUIWithDiff(differenceUI, parentLayout);
                 BulletinFactory.of(OwlgramSettings.this).createSimpleBulletin(R.raw.forward, LocaleController.getString("ResetSettingsHint", R.string.ResetSettingsHint)).show();
             });
@@ -165,11 +148,11 @@ public class OwlgramSettings extends BaseSettingsActivity {
 
         @Override
         protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
-            switch (holder.getItemViewType()) {
-                case TYPE_SHADOW:
+            switch (ViewType.fromInt(holder.getItemViewType())) {
+                case SHADOW:
                     holder.itemView.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
                     break;
-                case TYPE_TEXT_CELL:
+                case TEXT_CELL:
                     TextCell textCell = (TextCell) holder.itemView;
                     textCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                     if (position == generalSettingsRow) {
@@ -188,7 +171,7 @@ public class OwlgramSettings extends BaseSettingsActivity {
                         textCell.setTextAndIcon(LocaleController.getString("Appearance", R.string.Appearance), R.drawable.settings_appearance, true);
                     }
                     break;
-                case TYPE_HEADER:
+                case HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == categoryHeaderRow) {
                         headerCell.setText(LocaleController.getString("Settings", R.string.Settings));
@@ -196,7 +179,7 @@ public class OwlgramSettings extends BaseSettingsActivity {
                         headerCell.setText(LocaleController.getString("Info", R.string.Info));
                     }
                     break;
-                case TYPE_DETAILED_SETTINGS:
+                case DETAILED_SETTINGS:
                     TextDetailSettingsCell textDetailCell = (TextDetailSettingsCell) holder.itemView;
                     textDetailCell.setMultilineDetail(true);
                     if (position == supportTranslationRow) {
@@ -214,48 +197,22 @@ public class OwlgramSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            int type = holder.getItemViewType();
-            return type == TYPE_TEXT_CELL || type == TYPE_DETAILED_SETTINGS;
-        }
-
-        @NonNull
-        @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view;
-            switch (viewType) {
-                case TYPE_TEXT_CELL:
-                    view = new TextCell(context);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-                    break;
-                case TYPE_HEADER:
-                    view = new HeaderCell(context);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-                    break;
-                case TYPE_DETAILED_SETTINGS:
-                    view = new TextDetailSettingsCell(context);
-                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-                    break;
-                default:
-                    view = new ShadowSectionCell(context);
-                    break;
-            }
-            view.setLayoutParams(new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.WRAP_CONTENT));
-            return new RecyclerListView.Holder(view);
+        protected boolean isEnabled(ViewType viewType, int position) {
+            return viewType == ViewType.TEXT_CELL || viewType == ViewType.DETAILED_SETTINGS;
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public ViewType getViewType(int position) {
             if (position == divisorInfoRow) {
-                return TYPE_SHADOW;
+                return ViewType.SHADOW;
             } else if (position == generalSettingsRow || position == chatSettingsRow || position == updateSettingsRow ||
                     position == channelUpdatesRow || position == groupUpdatesRow ||
                     position == experimentalSettingsRow || position == appearanceSettingsRow) {
-                return TYPE_TEXT_CELL;
+                return ViewType.TEXT_CELL;
             } else if (position == categoryHeaderRow || position == infoHeaderRow) {
-                return TYPE_HEADER;
+                return ViewType.HEADER;
             } else if (position == supportTranslationRow || position == supportDonationRow || position == sourceCodeRow || position == bugReportRow) {
-                return TYPE_DETAILED_SETTINGS;
+                return ViewType.DETAILED_SETTINGS;
             }
             throw new IllegalArgumentException("Invalid position");
         }

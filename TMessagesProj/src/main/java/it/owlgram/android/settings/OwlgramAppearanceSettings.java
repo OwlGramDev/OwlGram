@@ -16,11 +16,14 @@ import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextCheckCell;
 
+import java.util.ArrayList;
+
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.BlurIntensityCell;
 import it.owlgram.android.components.DrawerProfilePreviewCell;
 import it.owlgram.android.components.DynamicButtonSelector;
 import it.owlgram.android.components.ThemeSelectorDrawerCell;
+import it.owlgram.android.helpers.PopupHelper;
 
 public class OwlgramAppearanceSettings extends BaseSettingsActivity {
     private DrawerProfilePreviewCell profilePreviewCell;
@@ -58,12 +61,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
     private int searchIconInActionBarRow;
     private int appearanceDividerRow;
     private int showPencilIconRow;
-
-    // VIEW TYPES
-    private static final int TYPE_PROFILE_PREVIEW = 200;
-    private static final int TYPE_BLUR_INTENSITY = 201;
-    private static final int TYPE_THEME_SELECTOR = 202;
-    private static final int TYPE_DYNAMIC_BUTTON_SELECTOR = 203;
+    private int showInActionBarRow;
 
     @Override
     protected String getActionBarTitle() {
@@ -195,6 +193,12 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.showPencilIcon);
             }
+        } else if (position == showInActionBarRow) {
+            OwlConfig.toggleShowNameInActionBar();
+            getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(OwlConfig.showNameInActionBar);
+            }
         }
     }
 
@@ -252,6 +256,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
         smartButtonsRow = rowCount++;
         appBarShadowRow = rowCount++;
         slidingTitleRow = rowCount++;
+        showInActionBarRow = rowCount++;
         searchIconInActionBarRow = rowCount++;
         appearanceDividerRow = rowCount++;
     }
@@ -265,11 +270,11 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
 
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
-            switch (holder.getItemViewType()) {
-                case TYPE_SHADOW:
+            switch (ViewType.fromInt(holder.getItemViewType())) {
+                case SHADOW:
                     holder.itemView.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
                     break;
-                case TYPE_HEADER:
+                case HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == editBlurHeaderRow) {
                         headerCell.setText(LocaleController.getString("BlurIntensity", R.string.BlurIntensity));
@@ -283,7 +288,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                         headerCell.setText(LocaleController.getString("Appearance", R.string.Appearance));
                     }
                     break;
-                case TYPE_SWITCH:
+                case SWITCH:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
                     if (position == showGradientRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ShadeBackground", R.string.ShadeBackground), OwlConfig.showGradientColor, true);
@@ -319,16 +324,18 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                         textCheckCell.setTextAndCheck(LocaleController.getString("SearchIconTitleBar", R.string.SearchIconTitleBar), OwlConfig.searchIconInActionBar, true);
                     } else if (position == showPencilIconRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ShowPencilIcon", R.string.ShowPencilIcon), OwlConfig.showPencilIcon, true);
+                    } else if (position == showInActionBarRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("AccountNameTitleBar", R.string.AccountNameTitleBar), OwlConfig.showNameInActionBar, true);
                     }
                     break;
-                case TYPE_PROFILE_PREVIEW:
+                case PROFILE_PREVIEW:
                     DrawerProfilePreviewCell cell = (DrawerProfilePreviewCell) holder.itemView;
                     cell.setUser(getUserConfig().getCurrentUser(), false);
                     break;
-                case TYPE_TEXT_CELL:
+                case TEXT_CELL:
                     TextCell textCell = (TextCell) holder.itemView;
-                    textCell.setColors(Theme.key_windowBackgroundWhiteBlueText4, Theme.key_windowBackgroundWhiteBlueText4);
                     if (position == menuItemsRow) {
+                        textCell.setColors(Theme.key_windowBackgroundWhiteBlueText4, Theme.key_windowBackgroundWhiteBlueText4);
                         textCell.setTextAndIcon(LocaleController.getString("MenuItems", R.string.MenuItems), R.drawable.msg_newfilter, false);
                     }
                     break;
@@ -336,20 +343,19 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public boolean isEnabled(RecyclerView.ViewHolder holder) {
-            int type = holder.getItemViewType();
-            return type == TYPE_SWITCH || type == TYPE_TEXT_CELL;
+        protected boolean isEnabled(ViewType viewType, int position) {
+            return viewType == ViewType.SWITCH || viewType == ViewType.TEXT_CELL;
         }
 
         @Override
-        protected View onCreateViewHolder(int viewType) {
+        protected View onCreateViewHolder(ViewType viewType) {
             View view = null;
             switch (viewType) {
-                case TYPE_PROFILE_PREVIEW:
+                case PROFILE_PREVIEW:
                     view = profilePreviewCell = new DrawerProfilePreviewCell(context);
                     view.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
                     break;
-                case TYPE_BLUR_INTENSITY:
+                case BLUR_INTENSITY:
                     view = new BlurIntensityCell(context) {
                         @Override
                         protected void onBlurIntensityChange(int percentage, boolean layout) {
@@ -370,7 +376,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                     };
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
-                case TYPE_THEME_SELECTOR:
+                case THEME_SELECTOR:
                     view = new ThemeSelectorDrawerCell(context, OwlConfig.eventType) {
                         @Override
                         protected void onSelectedEvent(int eventSelected) {
@@ -385,7 +391,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                     };
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
-                case TYPE_DYNAMIC_BUTTON_SELECTOR:
+                case DYNAMIC_BUTTON_SELECTOR:
                     view = new DynamicButtonSelector(context) {
                         @Override
                         protected void onSelectionChange() {
@@ -400,30 +406,31 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
         }
 
         @Override
-        public int getItemViewType(int position) {
+        public ViewType getViewType(int position) {
             if (position == drawerDividerRow || position == editBlurDividerRow || position == themeDrawerDividerRow ||
                     position == dynamicDividerRow || position == fontsAndEmojiDividerRow || position == appearanceDividerRow) {
-                return TYPE_SHADOW;
+                return ViewType.SHADOW;
             } else if (position == editBlurHeaderRow || position == themeDrawerHeader || position == dynamicButtonHeaderRow ||
                     position == fontsAndEmojiHeaderRow || position == appearanceHeaderRow) {
-                return TYPE_HEADER;
+                return ViewType.HEADER;
             } else if (position == roundedNumberSwitchRow || position == messageTimeSwitchRow ||
                     position == useSystemFontRow || position == useSystemEmojiRow || position == drawerAvatarAsBackgroundRow ||
                     position == drawerDarkenBackgroundRow || position == drawerBlurBackgroundRow || position == showGradientRow ||
                     position == showAvatarRow || position == forcePacmanRow || position == smartButtonsRow ||
                     position == appBarShadowRow || position == showSantaHatRow || position == showFallingSnowRow ||
-                    position == slidingTitleRow || position == searchIconInActionBarRow || position == showPencilIconRow) {
-                return TYPE_SWITCH;
+                    position == slidingTitleRow || position == searchIconInActionBarRow || position == showPencilIconRow ||
+                    position == showInActionBarRow) {
+                return ViewType.SWITCH;
             } else if (position == drawerRow) {
-                return TYPE_PROFILE_PREVIEW;
+                return ViewType.PROFILE_PREVIEW;
             } else if (position == editBlurRow) {
-                return TYPE_BLUR_INTENSITY;
+                return ViewType.BLUR_INTENSITY;
             } else if (position == menuItemsRow) {
-                return TYPE_TEXT_CELL;
+                return ViewType.TEXT_CELL;
             } else if (position == themeDrawerRow) {
-                return TYPE_THEME_SELECTOR;
+                return ViewType.THEME_SELECTOR;
             } else if (position == dynamicButtonRow) {
-                return TYPE_DYNAMIC_BUTTON_SELECTOR;
+                return ViewType.DYNAMIC_BUTTON_SELECTOR;
             }
             throw new IllegalArgumentException("Invalid position");
         }

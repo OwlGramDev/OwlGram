@@ -349,6 +349,7 @@ public class CameraXController {
         previewUseCase = previewBuilder.build();
         previewUseCase.setSurfaceProvider(surfaceProvider);
 
+        if (lifecycle.getLifecycle().getCurrentState() == Lifecycle.State.DESTROYED) return;
         if (stableFPSPreviewOnly) {
             camera = provider.bindToLifecycle(lifecycle, cameraSelector, previewUseCase, vCapture);
         } else {
