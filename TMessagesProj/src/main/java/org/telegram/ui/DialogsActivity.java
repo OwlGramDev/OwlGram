@@ -2214,6 +2214,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         return actionBar;
     }
 
+    private String actionBarDefaultTitle;
+
     @Override
     public View createView(final Context context) {
         searching = false;
@@ -2393,11 +2395,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (onlySelect) {
             actionBar.setBackButtonImage(R.drawable.ic_ab_back);
             if (initialDialogsType == 3 && selectAlertString == null) {
-                actionBar.setTitle(LocaleController.getString("ForwardTo", R.string.ForwardTo));
+                actionBar.setTitle(actionBarDefaultTitle = LocaleController.getString("ForwardTo", R.string.ForwardTo));
             } else if (initialDialogsType == 10) {
-                actionBar.setTitle(LocaleController.getString("SelectChats", R.string.SelectChats));
+                actionBar.setTitle(actionBarDefaultTitle = LocaleController.getString("SelectChats", R.string.SelectChats));
             } else {
-                actionBar.setTitle(LocaleController.getString("SelectChat", R.string.SelectChat));
+                actionBar.setTitle(actionBarDefaultTitle = LocaleController.getString("SelectChat", R.string.SelectChat));
             }
             actionBar.setBackgroundColor(Theme.getColor(Theme.key_actionBarDefault));
         } else {
@@ -2409,16 +2411,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 actionBar.setBackButtonContentDescription(LocaleController.getString("AccDescrOpenMenu", R.string.AccDescrOpenMenu));
             }
             if (folderId != 0) {
-                actionBar.setTitle(LocaleController.getString("ArchivedChats", R.string.ArchivedChats));
+                actionBar.setTitle(actionBarDefaultTitle = LocaleController.getString("ArchivedChats", R.string.ArchivedChats));
             } else {
                 statusDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(null, AndroidUtilities.dp(26));
                 statusDrawable.center = true;
-                /*if (OwlConfig.showNameInActionBar) {
+                if (OwlConfig.showInActionBar == OwlConfig.ACTIONBAR_TAB_NAME) {
                     TLRPC.User selfUser = UserConfig.getInstance(currentAccount).getCurrentUser();
                     actionBar.setTitle(selfUser.first_name + " " + (selfUser.last_name != null ? selfUser.last_name : ""), statusDrawable);
-                } else {*/
-                actionBar.setTitle(LocaleController.getString("BuildAppName", R.string.BuildAppName), statusDrawable);
-                //}
+                } else {
+                    actionBar.setTitle(actionBarDefaultTitle = LocaleController.getString("BuildAppName", R.string.BuildAppName), statusDrawable);
+                }
                 updateStatus(UserConfig.getInstance(currentAccount).getCurrentUser(), false);
             }
             if (folderId == 0) {
@@ -2823,6 +2825,27 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 @Override
                 public void onDeletePressed(int id) {
                     showDeleteAlert(getMessagesController().dialogFilters.get(id));
+                }
+
+                private int lastTitleType = OwlConfig.showInActionBar;
+
+                @Override
+                public void onTabSelected(FilterTabsView.Tab tab, boolean forward, boolean animated) {
+                    if (OwlConfig.showInActionBar != OwlConfig.ACTIONBAR_TAB_NAME) {
+                        if (lastTitleType == OwlConfig.ACTIONBAR_TAB_NAME) {
+                            actionBar.setTitle(actionBarDefaultTitle);
+                            lastTitleType = OwlConfig.showInActionBar;
+                        }
+                        return;
+                    }
+                    if (!selectedDialogs.isEmpty()) {
+                        return;
+                    }
+                    if (animated) {
+                        actionBar.setTitleAnimatedX(tab.isDefault ? actionBarDefaultTitle : tab.realTitle, tab.isDefault ? statusDrawable : null, forward, 200);
+                    } else {
+                        actionBar.setTitle(tab.isDefault ? actionBarDefaultTitle : tab.realTitle, tab.isDefault ? statusDrawable : null);
+                    }
                 }
             });
         }
@@ -4816,6 +4839,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     viewPages[a].listView.setScrollingTouchSlop(RecyclerView.TOUCH_SLOP_DEFAULT);
                     viewPages[a].listView.requestLayout();
                     viewPages[a].requestLayout();
+                }
+                if (!actionBarDefaultTitle.equals(actionBar.getTitle())) {
+                    if (animated) {
+                        actionBar.setTitleAnimatedX(actionBarDefaultTitle, statusDrawable, false, 200);
+                    } else {
+                        actionBar.setTitle(actionBarDefaultTitle, statusDrawable);
+                    }
                 }
             }
             if (parentLayout != null) {

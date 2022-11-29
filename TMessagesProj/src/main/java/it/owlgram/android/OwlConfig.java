@@ -22,6 +22,10 @@ public class OwlConfig extends SettingsManager {
     public static final int TAB_TYPE_MIX = 1;
     public static final int TAB_TYPE_ICON = 2;
 
+    public static final int ACTIONBAR_DEFAULT = 0;
+    public static final int ACTIONBAR_USERNAME = 1;
+    public static final int ACTIONBAR_TAB_NAME = 2;
+
     public static final int DOWNLOAD_BOOST_DEFAULT = 0;
     public static final int DOWNLOAD_BOOST_FAST = 1;
     public static final int DOWNLOAD_BOOST_EXTREME = 2;
@@ -218,7 +222,7 @@ public class OwlConfig extends SettingsManager {
             unlockedChupa = getBoolean("unlockedChupa", false);
             hideAllTab = getBoolean("hideAllTab", false);
             hideSendAsChannel = getBoolean("hideSendAsChannel", false);
-            showInActionBar = getInt("showInActionBar", 0);
+            showInActionBar = getInt("showInActionBar", ACTIONBAR_DEFAULT);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -238,7 +242,7 @@ public class OwlConfig extends SettingsManager {
             setTranslationProvider(Translator.PROVIDER_GOOGLE);
         }
         if (getBoolean("showNameInActionBar", false)) {
-            setShowInActionBar(1);
+            setShowInActionBar(ACTIONBAR_USERNAME);
             remove("showNameInActionBar");
         }
         AutoTranslateConfig.migrate();
