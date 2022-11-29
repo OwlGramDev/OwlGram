@@ -72,7 +72,7 @@ public class AutoTranslatePopupWrapper {
         updateItems();
 
         View gap = new FrameLayout(context);
-        gap.setBackgroundColor(Theme.getColor(Theme.key_graySection));
+        gap.setBackgroundColor(Theme.getColor(Theme.key_actionBarDefaultSubmenuSeparator));
         gap.setTag(R.id.fit_width_tag, 1);
         windowLayout.addView(gap, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 8));
 
