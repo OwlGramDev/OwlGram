@@ -108,6 +108,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "useMonetIcon":
             case "scrollableChatPreview":
             case "showNameInActionBar":
+            case "showInActionBar":
                 return false;
             default:
                 return true;
@@ -369,7 +370,7 @@ public class SettingsManager extends SharedPreferencesHelper {
                 case "showIDAndDC":
                 case "buttonStyleType":
                 case "hidePhoneNumber":
-                case "showInActionBar":
+                case "showNameInActionBar":
                 case "useSystemFont":
                     returnStatus = addWithCheck(returnStatus, NEED_FRAGMENT_REBASE);
                     break;

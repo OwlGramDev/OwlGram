@@ -35,7 +35,6 @@ public class AutoTranslateSettings extends BaseSettingsActivity {
 
     @Override
     protected String getActionBarTitle() {
-        //TLRPC.Chat chat = getMessagesController().getTopicsController().getTopics()
         return LocaleController.getString("AutoTranslate", R.string.AutoTranslate);
     }
 

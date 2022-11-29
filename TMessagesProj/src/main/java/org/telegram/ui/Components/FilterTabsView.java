@@ -104,11 +104,14 @@ public class FilterTabsView extends FrameLayout {
         void onPageReorder(int fromId, int toId);
 
         boolean canPerformActions();
+
+        default void onTabSelected(Tab tab, boolean forward, boolean animated) {};
     }
 
     public class Tab {
         public int id;
         public String title;
+        public String realTitle;
         public int titleWidth;
         public String emoticon;
         public int iconWidth;
@@ -119,6 +122,7 @@ public class FilterTabsView extends FrameLayout {
         public Tab(int i, String t, String e) {
             id = i;
             title = OwlConfig.tabMode != OwlConfig.TAB_TYPE_ICON ? t:"";
+            realTitle = t;
             emoticon = e;
         }
 
@@ -152,6 +156,7 @@ public class FilterTabsView extends FrameLayout {
                 return false;
             }
             title = OwlConfig.tabMode != OwlConfig.TAB_TYPE_ICON ? newTitle:"";
+            realTitle = newTitle;
             return true;
         }
     }
@@ -1191,6 +1196,8 @@ public class FilterTabsView extends FrameLayout {
 
         if (delegate != null) {
             delegate.onPageSelected(tab, scrollingForward);
+            delegate.onTabSelected(tab, scrollingForward, true);
+            oldAnimatedTab = currentPosition;
         }
         scrollToChild(position);
     }
@@ -1262,6 +1269,8 @@ public class FilterTabsView extends FrameLayout {
     public void finishAddingTabs(boolean animated) {
         listView.setItemAnimator(animated ? itemAnimator : null);
         adapter.notifyDataSetChanged();
+        delegate.onTabSelected(tabs.get(currentPosition), false, false);
+        oldAnimatedTab = currentPosition;
     }
 
     public void animateColorsTo(String line, String active, String unactive, String selector, String background) {
@@ -1427,13 +1436,17 @@ public class FilterTabsView extends FrameLayout {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (!tabs.isEmpty()) {
             int width = MeasureSpec.getSize(widthMeasureSpec) - AndroidUtilities.dp(7) - AndroidUtilities.dp(7);
-            Tab firstTab = OwlConfig.hideAllTab ? tabs.get(0) : findDefaultTab();
-            if (firstTab == null) return;
-            if (!OwlConfig.hideAllTab) firstTab.setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
-            int tabWith = firstTab.getWidth(false);
-            if (!OwlConfig.hideAllTab) firstTab.setTitle(allTabsWidth > width ? LocaleController.getString("FilterAllChatsShort", R.string.FilterAllChatsShort) : LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
-            int trueTabsWidth = allTabsWidth - tabWith;
-            trueTabsWidth += firstTab.getWidth(false);
+            int trueTabsWidth;
+            if (!OwlConfig.hideAllTab)  {
+                Tab firstTab = findDefaultTab();
+                firstTab.setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
+                int tabWith = firstTab.getWidth(false);
+                firstTab.setTitle(allTabsWidth > width ? LocaleController.getString("FilterAllChatsShort", R.string.FilterAllChatsShort) : LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
+                trueTabsWidth = allTabsWidth - tabWith;
+                trueTabsWidth += firstTab.getWidth(false);
+            } else {
+                trueTabsWidth = allTabsWidth;
+            }
             int prevWidth = additionalTabWidth;
             additionalTabWidth = trueTabsWidth < width ? (width - trueTabsWidth) / tabs.size() : 0;
             if (prevWidth != additionalTabWidth) {
@@ -1493,6 +1506,8 @@ public class FilterTabsView extends FrameLayout {
         }
     }
 
+    private int oldAnimatedTab = -1;
+
     public void selectTabWithId(int id, float progress) {
         int position = idToPosition.get(id, -1);
         if (position < 0) {
@@ -1516,6 +1531,11 @@ public class FilterTabsView extends FrameLayout {
         invalidate();
         scrollToChild(position);
 
+        if ((((progress >= 0.5f && oldAnimatedTab != position) || (progress <= 0.5f && oldAnimatedTab != currentPosition)) && manualScrollingToPosition != currentPosition)) {
+            position = progress >= 0.5f ? position : currentPosition;
+            delegate.onTabSelected(tabs.get(position), currentPosition < position, true);
+            oldAnimatedTab = position;
+        }
         if (progress >= 1.0f) {
             manualScrollingToPosition = -1;
             manualScrollingToId = -1;
@@ -1684,6 +1704,21 @@ public class FilterTabsView extends FrameLayout {
                 return;
             }
             ArrayList<MessagesController.DialogFilter> filters = MessagesController.getInstance(UserConfig.selectedAccount).dialogFilters;
+            if (OwlConfig.hideAllTab) {
+                int defaultPosition = 0;
+                for (int i = 0; i < filters.size(); i++) {
+                    if (filters.get(i).isDefault()) {
+                        defaultPosition = i;
+                        break;
+                    }
+                }
+                if (idx1 >= defaultPosition) {
+                    idx1++;
+                }
+                if (idx2 >= defaultPosition) {
+                    idx2++;
+                }
+            }
             MessagesController.DialogFilter filter1 = filters.get(idx1);
             MessagesController.DialogFilter filter2 = filters.get(idx2);
             int temp = filter1.order;
@@ -1782,7 +1817,7 @@ public class FilterTabsView extends FrameLayout {
 
         @Override
         public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-            if (MessagesController.getInstance(UserConfig.selectedAccount).premiumLocked && (!isEditing || (viewHolder.getAdapterPosition() == 0 && tabs.get(0).isDefault && !UserConfig.getInstance(UserConfig.selectedAccount).isPremium()))) {
+            if (!OwlConfig.hideAllTab && MessagesController.getInstance(UserConfig.selectedAccount).premiumLocked && (!isEditing || (viewHolder.getAdapterPosition() == 0 && tabs.get(0).isDefault && !UserConfig.getInstance(UserConfig.selectedAccount).isPremium()))) {
                 return makeMovementFlags(0, 0);
             }
             return makeMovementFlags(ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, 0);
@@ -1790,7 +1825,7 @@ public class FilterTabsView extends FrameLayout {
 
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder source, RecyclerView.ViewHolder target) {
-            if (MessagesController.getInstance(UserConfig.selectedAccount).premiumLocked && ((source.getAdapterPosition() == 0 || target.getAdapterPosition() == 0) && !UserConfig.getInstance(UserConfig.selectedAccount).isPremium())) {
+            if (!OwlConfig.hideAllTab && MessagesController.getInstance(UserConfig.selectedAccount).premiumLocked && ((source.getAdapterPosition() == 0 || target.getAdapterPosition() == 0) && !UserConfig.getInstance(UserConfig.selectedAccount).isPremium())) {
                 return false;
             }
             adapter.swapElements(source.getAdapterPosition(), target.getAdapterPosition());

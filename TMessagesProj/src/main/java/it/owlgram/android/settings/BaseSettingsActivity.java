@@ -20,6 +20,7 @@ import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.ManageChatTextCell;
@@ -126,12 +127,20 @@ public abstract class BaseSettingsActivity extends BaseFragment {
     }
 
     protected void hideLastFragment() {
+        hideLastFragment(parentFragment, parentLayout);
+    }
+
+    protected void showLastFragment() {
+        showLastFragment(parentFragment, parentLayout);
+    }
+
+    public static void hideLastFragment(BaseFragment parentFragment, INavigationLayout parentLayout) {
         if (parentFragment != null && parentLayout.getFragmentStack().contains(parentFragment)) {
             parentLayout.removeFragmentFromStack(parentFragment);
         }
     }
 
-    protected void showLastFragment() {
+    public static void showLastFragment(BaseFragment parentFragment, INavigationLayout parentLayout) {
         if (parentFragment != null && !parentLayout.getFragmentStack().contains(parentFragment)) {
             int position = parentLayout.getFragmentStack().size() - 1;
             parentFragment.rebuild();

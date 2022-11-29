@@ -555,7 +555,9 @@ public class FiltersSetupActivity extends BaseFragment implements NotificationCe
                 RadioCell currRadioCell = (RadioCell) listView.getChildAt(position);
                 oldRadioCell.setChecked(false, true);
                 currRadioCell.setChecked(true, true);
+                ignoreUpdates = true;
                 getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
+                ignoreUpdates = false;
             } else if (position >= filtersStartRow && position < filtersEndRow) {
                 int filterPosition = position - filtersStartRow;
                 if (!showAllChats) {
