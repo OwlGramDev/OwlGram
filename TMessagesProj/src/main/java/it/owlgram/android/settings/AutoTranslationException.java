@@ -75,7 +75,7 @@ public class AutoTranslationException extends BaseSettingsActivity {
             presentFragment(new ProfileActivity(args));
         } else if (position == deleteAllExceptionsRow) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-            builder.setTitle(LocaleController.getString("EditDeleteException", R.string.EditDeleteException));
+            builder.setTitle(LocaleController.getString("NotificationsDeleteAllException", R.string.NotificationsDeleteAllException));
             String message;
             if (isAllow) {
                 message = LocaleController.getString("DeleteAllAllowExceptions", R.string.DeleteAllAllowExceptions);
