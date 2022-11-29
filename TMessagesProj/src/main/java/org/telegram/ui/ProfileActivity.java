@@ -233,6 +233,7 @@ import it.owlgram.android.components.DcStyleSelector;
 import it.owlgram.android.components.dynamic.SimpleActionCell;
 import it.owlgram.android.helpers.ActionButtonManager;
 import it.owlgram.android.helpers.DCHelper;
+import it.owlgram.android.settings.BaseSettingsActivity;
 import it.owlgram.android.settings.DoNotTranslateSettings;
 import it.owlgram.android.settings.OwlgramSettings;
 import it.owlgram.android.translator.AutoTranslatePopupWrapper;
@@ -8224,7 +8225,21 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     }
     private void createAutoTranslateItem(Context context, long dialogId, int topicId) {
         if (LanguageDetector.hasSupport() && TranslatorHelper.isSupportAutoTranslate()) {
-            AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, topicId, getResourceProvider());
+            AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, topicId, arguments.getBoolean("isAlwaysShare", false), getResourceProvider());
+            if (arguments.getBoolean("isSettings")) {
+                BaseFragment parentFragment = parentLayout.getFragmentStack().get(parentLayout.getFragmentStack().size() - 2);
+                autoTranslatePopupWrapper.setDelegate(new AutoTranslatePopupWrapper.FragmentDelegate() {
+                    @Override
+                    public void hideLastFragment() {
+                        BaseSettingsActivity.hideLastFragment(parentFragment, parentLayout);
+                    }
+
+                    @Override
+                    public void showLastFragment() {
+                        BaseSettingsActivity.showLastFragment(parentFragment, parentLayout);
+                    }
+                });
+            }
             otherItem.addSwipeBackItem(R.drawable.msg_translate, null, LocaleController.getString("AutoTranslate", R.string.AutoTranslate), autoTranslatePopupWrapper.windowLayout);
         }
         otherItem.addColoredGap();

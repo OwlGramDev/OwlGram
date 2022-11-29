@@ -16,11 +16,14 @@ import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextCheckCell;
 
+import java.util.ArrayList;
+
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.BlurIntensityCell;
 import it.owlgram.android.components.DrawerProfilePreviewCell;
 import it.owlgram.android.components.DynamicButtonSelector;
 import it.owlgram.android.components.ThemeSelectorDrawerCell;
+import it.owlgram.android.helpers.PopupHelper;
 
 public class OwlgramAppearanceSettings extends BaseSettingsActivity {
     private DrawerProfilePreviewCell profilePreviewCell;
@@ -58,6 +61,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
     private int searchIconInActionBarRow;
     private int appearanceDividerRow;
     private int showPencilIconRow;
+    private int showInActionBarRow;
 
     @Override
     protected String getActionBarTitle() {
@@ -189,6 +193,12 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.showPencilIcon);
             }
+        } else if (position == showInActionBarRow) {
+            OwlConfig.toggleShowNameInActionBar();
+            getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(OwlConfig.showNameInActionBar);
+            }
         }
     }
 
@@ -246,6 +256,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
         smartButtonsRow = rowCount++;
         appBarShadowRow = rowCount++;
         slidingTitleRow = rowCount++;
+        showInActionBarRow = rowCount++;
         searchIconInActionBarRow = rowCount++;
         appearanceDividerRow = rowCount++;
     }
@@ -313,6 +324,8 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                         textCheckCell.setTextAndCheck(LocaleController.getString("SearchIconTitleBar", R.string.SearchIconTitleBar), OwlConfig.searchIconInActionBar, true);
                     } else if (position == showPencilIconRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ShowPencilIcon", R.string.ShowPencilIcon), OwlConfig.showPencilIcon, true);
+                    } else if (position == showInActionBarRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("AccountNameTitleBar", R.string.AccountNameTitleBar), OwlConfig.showNameInActionBar, true);
                     }
                     break;
                 case PROFILE_PREVIEW:
@@ -321,8 +334,8 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                     break;
                 case TEXT_CELL:
                     TextCell textCell = (TextCell) holder.itemView;
-                    textCell.setColors(Theme.key_windowBackgroundWhiteBlueText4, Theme.key_windowBackgroundWhiteBlueText4);
                     if (position == menuItemsRow) {
+                        textCell.setColors(Theme.key_windowBackgroundWhiteBlueText4, Theme.key_windowBackgroundWhiteBlueText4);
                         textCell.setTextAndIcon(LocaleController.getString("MenuItems", R.string.MenuItems), R.drawable.msg_newfilter, false);
                     }
                     break;
@@ -405,7 +418,8 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                     position == drawerDarkenBackgroundRow || position == drawerBlurBackgroundRow || position == showGradientRow ||
                     position == showAvatarRow || position == forcePacmanRow || position == smartButtonsRow ||
                     position == appBarShadowRow || position == showSantaHatRow || position == showFallingSnowRow ||
-                    position == slidingTitleRow || position == searchIconInActionBarRow || position == showPencilIconRow) {
+                    position == slidingTitleRow || position == searchIconInActionBarRow || position == showPencilIconRow ||
+                    position == showInActionBarRow) {
                 return ViewType.SWITCH;
             } else if (position == drawerRow) {
                 return ViewType.PROFILE_PREVIEW;

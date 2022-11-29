@@ -91,6 +91,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import it.owlgram.android.OwlConfig;
 import it.owlgram.android.entities.EntitiesHelper;
 
 public class SendMessagesHelper extends BaseController implements NotificationCenter.NotificationCenterDelegate {
@@ -3825,7 +3826,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                         reqSend.top_msg_id = replyToTopMsg.getId();
                         reqSend.flags |= 512;
                     }
-                    if (updateStickersOreder) {
+                    if (!OwlConfig.disableStickersAutoReorder && updateStickersOreder) {
                         reqSend.update_stickersets_order = true;
                     }
                     if (newMsg.from_id != null) {
@@ -4211,7 +4212,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                             request.schedule_date = scheduleDate;
                             request.flags |= 1024;
                         }
-                        if (updateStickersOreder) {
+                        if (!OwlConfig.disableStickersAutoReorder && updateStickersOreder) {
                             request.update_stickersets_order = true;
                         }
 
