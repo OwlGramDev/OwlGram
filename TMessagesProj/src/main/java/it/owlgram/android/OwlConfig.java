@@ -22,10 +22,6 @@ public class OwlConfig extends SettingsManager {
     public static final int TAB_TYPE_MIX = 1;
     public static final int TAB_TYPE_ICON = 2;
 
-    public static final int ACTIONBAR_DEFAULT = 0;
-    public static final int ACTIONBAR_USERNAME = 1;
-    public static final int ACTIONBAR_TAB_NAME = 2;
-
     public static final int DOWNLOAD_BOOST_DEFAULT = 0;
     public static final int DOWNLOAD_BOOST_FAST = 1;
     public static final int DOWNLOAD_BOOST_EXTREME = 2;
@@ -92,6 +88,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean unlockedChupa;
     public static boolean hideAllTab;
     public static boolean hideSendAsChannel;
+    public static boolean showNameInActionBar;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -118,7 +115,6 @@ public class OwlConfig extends SettingsManager {
     public static long lastUpdateCheck = 0;
     public static int downloadSpeedBoost;
     public static int unlockedSecretIcon;
-    public static int showInActionBar;
 
     static {
         loadConfig(true);
@@ -222,7 +218,7 @@ public class OwlConfig extends SettingsManager {
             unlockedChupa = getBoolean("unlockedChupa", false);
             hideAllTab = getBoolean("hideAllTab", false);
             hideSendAsChannel = getBoolean("hideSendAsChannel", false);
-            showInActionBar = getInt("showInActionBar", ACTIONBAR_DEFAULT);
+            showNameInActionBar = getBoolean("showNameInActionBar", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -240,10 +236,6 @@ public class OwlConfig extends SettingsManager {
     private static void migrate() {
         if (translationProvider == Translator.PROVIDER_NIU) {
             setTranslationProvider(Translator.PROVIDER_GOOGLE);
-        }
-        if (getBoolean("showNameInActionBar", false)) {
-            setShowInActionBar(ACTIONBAR_USERNAME);
-            remove("showNameInActionBar");
         }
         AutoTranslateConfig.migrate();
     }
@@ -468,6 +460,10 @@ public class OwlConfig extends SettingsManager {
         putValue("hideSendAsChannel", hideSendAsChannel ^= true);
     }
 
+    public static void toggleShowNameInActionBar() {
+        putValue("showNameInActionBar", showNameInActionBar ^= true);
+    }
+
     public static void unlockChupa() {
         putValue("unlockedChupa", unlockedChupa = true);
     }
@@ -575,10 +571,6 @@ public class OwlConfig extends SettingsManager {
 
     public static void setMaxRecentStickers(int size) {
         putValue("maxRecentStickers", maxRecentStickers = size);
-    }
-
-    public static void setShowInActionBar(int type) {
-        putValue("showInActionBar", showInActionBar = type);
     }
 
     public static void setUpdateData(String data) {

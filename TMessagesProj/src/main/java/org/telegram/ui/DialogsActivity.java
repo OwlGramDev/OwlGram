@@ -2415,7 +2415,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             } else {
                 statusDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(null, AndroidUtilities.dp(26));
                 statusDrawable.center = true;
-                if (OwlConfig.showInActionBar == OwlConfig.ACTIONBAR_USERNAME) {
+                if (OwlConfig.showNameInActionBar) {
                     TLRPC.User selfUser = UserConfig.getInstance(currentAccount).getCurrentUser();
                     actionBar.setTitle(actionBarDefaultTitle = (selfUser.first_name + " " + (selfUser.last_name != null ? selfUser.last_name : "")), statusDrawable);
                 } else {
@@ -2827,20 +2827,22 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     showDeleteAlert(getMessagesController().dialogFilters.get(id));
                 }
 
-                private int lastTitleType = OwlConfig.showInActionBar;
+                private int lastTabType = OwlConfig.tabMode;
+                private boolean lastNameStatus = OwlConfig.showNameInActionBar;
 
                 @Override
                 public void onTabSelected(FilterTabsView.Tab tab, boolean forward, boolean animated) {
-                    if (lastTitleType != OwlConfig.showInActionBar) {
-                        if (OwlConfig.showInActionBar == OwlConfig.ACTIONBAR_USERNAME) {
+                    if (OwlConfig.tabMode != OwlConfig.TAB_TYPE_ICON || lastNameStatus != OwlConfig.showNameInActionBar) {
+                        if (OwlConfig.showNameInActionBar) {
                             TLRPC.User selfUser = UserConfig.getInstance(currentAccount).getCurrentUser();
                             actionBar.setTitle(actionBarDefaultTitle = (selfUser.first_name + " " + (selfUser.last_name != null ? selfUser.last_name : "")), statusDrawable);
                         } else {
                             actionBar.setTitle(actionBarDefaultTitle = LocaleController.getString("BuildAppName", R.string.BuildAppName), statusDrawable);
                         }
-                        lastTitleType = OwlConfig.showInActionBar;
+                        lastTabType = OwlConfig.tabMode;
+                        lastNameStatus = OwlConfig.showNameInActionBar;
+                        if (OwlConfig.tabMode != OwlConfig.TAB_TYPE_ICON) return;
                     }
-                    if (OwlConfig.showInActionBar != OwlConfig.ACTIONBAR_TAB_NAME) return;
                     if (!selectedDialogs.isEmpty()) {
                         return;
                     }
