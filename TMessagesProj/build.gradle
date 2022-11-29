@@ -4,8 +4,6 @@ import java.nio.file.Paths
 
 plugins {
     id 'com.android.library'
-    id 'com.google.gms.google-services'
-    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
 configurations.all {
@@ -109,12 +107,6 @@ android {
     externalNativeBuild {
         cmake {
             path 'jni/CMakeLists.txt'
-        }
-    }
-
-    packagingOptions {
-        resources {
-            excludes += '**'
         }
     }
 
