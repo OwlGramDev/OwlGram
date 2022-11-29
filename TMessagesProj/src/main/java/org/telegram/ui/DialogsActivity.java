@@ -2125,6 +2125,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 getNotificationCenter().removeObserver(this, NotificationCenter.filterSettingsUpdated);
                 getNotificationCenter().removeObserver(this, NotificationCenter.dialogFiltersUpdated);
                 getNotificationCenter().removeObserver(this, NotificationCenter.dialogsUnreadCounterChanged);
+                getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
             }
             getNotificationCenter().removeObserver(this, NotificationCenter.updateInterfaces);
             getNotificationCenter().removeObserver(this, NotificationCenter.encryptedChatUpdated);
@@ -4778,9 +4779,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     ViewPage[] viewPageArr4 = viewPages;
                     viewPageArr4[1].selectedType = viewPageArr4[0].selectedType;
                     viewPages[0].selectedType = newPage;
-                    switchToCurrentSelectedMode(false);
-                    updateCounters(false);
                 }
+                switchToCurrentSelectedMode(false);
+                updateCounters(false);
             }
         } else {
             if (filterTabsView.getVisibility() != View.GONE) {
