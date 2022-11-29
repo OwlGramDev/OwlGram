@@ -2417,7 +2417,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 statusDrawable.center = true;
                 if (OwlConfig.showInActionBar == OwlConfig.ACTIONBAR_USERNAME) {
                     TLRPC.User selfUser = UserConfig.getInstance(currentAccount).getCurrentUser();
-                    actionBar.setTitle(selfUser.first_name + " " + (selfUser.last_name != null ? selfUser.last_name : ""), statusDrawable);
+                    actionBar.setTitle(actionBarDefaultTitle = (selfUser.first_name + " " + (selfUser.last_name != null ? selfUser.last_name : "")), statusDrawable);
                 } else {
                     actionBar.setTitle(actionBarDefaultTitle = LocaleController.getString("BuildAppName", R.string.BuildAppName), statusDrawable);
                 }
@@ -2831,13 +2831,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                 @Override
                 public void onTabSelected(FilterTabsView.Tab tab, boolean forward, boolean animated) {
-                    if (OwlConfig.showInActionBar != OwlConfig.ACTIONBAR_TAB_NAME) {
-                        if (lastTitleType == OwlConfig.ACTIONBAR_TAB_NAME) {
-                            actionBar.setTitle(actionBarDefaultTitle);
-                            lastTitleType = OwlConfig.showInActionBar;
+                    if (lastTitleType != OwlConfig.showInActionBar) {
+                        if (OwlConfig.showInActionBar == OwlConfig.ACTIONBAR_USERNAME) {
+                            TLRPC.User selfUser = UserConfig.getInstance(currentAccount).getCurrentUser();
+                            actionBar.setTitle(actionBarDefaultTitle = (selfUser.first_name + " " + (selfUser.last_name != null ? selfUser.last_name : "")), statusDrawable);
+                        } else {
+                            actionBar.setTitle(actionBarDefaultTitle = LocaleController.getString("BuildAppName", R.string.BuildAppName), statusDrawable);
                         }
-                        return;
+                        lastTitleType = OwlConfig.showInActionBar;
                     }
+                    if (OwlConfig.showInActionBar != OwlConfig.ACTIONBAR_TAB_NAME) return;
                     if (!selectedDialogs.isEmpty()) {
                         return;
                     }
