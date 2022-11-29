@@ -2415,7 +2415,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             } else {
                 statusDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(null, AndroidUtilities.dp(26));
                 statusDrawable.center = true;
-                if (OwlConfig.showInActionBar == OwlConfig.ACTIONBAR_TAB_NAME) {
+                if (OwlConfig.showInActionBar == OwlConfig.ACTIONBAR_USERNAME) {
                     TLRPC.User selfUser = UserConfig.getInstance(currentAccount).getCurrentUser();
                     actionBar.setTitle(selfUser.first_name + " " + (selfUser.last_name != null ? selfUser.last_name : ""), statusDrawable);
                 } else {
