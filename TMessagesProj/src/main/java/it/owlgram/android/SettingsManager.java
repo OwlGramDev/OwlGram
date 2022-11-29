@@ -16,6 +16,8 @@ import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.ui.ActionBar.ActionBarLayout;
@@ -52,6 +54,7 @@ public class SettingsManager extends SharedPreferencesHelper {
     public static final int NEED_RECREATE_SHADOW = 2;
     public static final int NEED_FRAGMENT_REBASE_WITH_LAST = 4;
     public static final int NEED_FRAGMENT_REBASE = 8;
+    public static final int NEED_NOTIFICATION_INTERFACE_CHAT = 16;
 
     private static boolean isBackupAvailable(String key) {
         switch (key) {
@@ -77,6 +80,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "NEED_RECREATE_SHADOW":
             case "NEED_FRAGMENT_REBASE_WITH_LAST":
             case "NEED_FRAGMENT_REBASE":
+            case "NEED_NOTIFICATION_INTERFACE_CHAT":
             case "INVALID_CONFIGURATION":
             case "VALID_CONFIGURATION":
             case "NEED_UPDATE_CONFIGURATION":
@@ -382,8 +386,9 @@ public class SettingsManager extends SharedPreferencesHelper {
                     returnStatus = addWithCheck(returnStatus, NEED_RECREATE_SHADOW);
                 case "roundedNumbers":
                 case "showPencilIcon":
-                case "hideSendAsChannel":
                     returnStatus = addWithCheck(returnStatus, NEED_FRAGMENT_REBASE_WITH_LAST);
+                case "hideSendAsChannel":
+                    returnStatus = addWithCheck(returnStatus, NEED_NOTIFICATION_INTERFACE_CHAT);
                     break;
             }
         }
@@ -408,6 +413,9 @@ public class SettingsManager extends SharedPreferencesHelper {
             parentLayout.rebuildAllFragmentViews(false, false);
         } else if ((difference & OwlConfig.NEED_FRAGMENT_REBASE_WITH_LAST) > 0) {
             parentLayout.rebuildAllFragmentViews(true, true);
+        }
+        if ((difference & OwlConfig.NEED_NOTIFICATION_INTERFACE_CHAT) > 0) {
+            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_CHAT);
         }
     }
 
