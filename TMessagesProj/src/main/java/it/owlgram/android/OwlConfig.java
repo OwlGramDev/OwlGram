@@ -89,6 +89,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean hideAllTab;
     public static boolean hideSendAsChannel;
     public static boolean showNameInActionBar;
+    public static boolean disableStickersAutoReorder;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -219,6 +220,7 @@ public class OwlConfig extends SettingsManager {
             hideAllTab = getBoolean("hideAllTab", false);
             hideSendAsChannel = getBoolean("hideSendAsChannel", false);
             showNameInActionBar = getBoolean("showNameInActionBar", false);
+            disableStickersAutoReorder = getBoolean("disableStickersAutoReorder", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -462,6 +464,10 @@ public class OwlConfig extends SettingsManager {
 
     public static void toggleShowNameInActionBar() {
         putValue("showNameInActionBar", showNameInActionBar ^= true);
+    }
+
+    public static void toggleStickersAutoReorder() {
+        putValue("stickersAutoReorder", disableStickersAutoReorder ^= true);
     }
 
     public static void unlockChupa() {
