@@ -144,11 +144,8 @@
     <string name="NeverTranslate">Never translate</string>
     <string name="EditExceptionTitle">Do you want to edit topics exceptions?</string>
     <string name="EditExceptionHint">You can disable auto-translate for specific topics in this group.</string>
-    <string name="EditRemoveAlwaysText">Are you sure you want to delete \"%1$s\" from always auto-translate exceptions?</string>
-    <string name="EditRemoveNeverText">Are you sure you want to delete \"%1$s\" from never auto-translate exceptions?</string>
+    <string name="EditRemoveExceptionText">Are you sure you want to delete \"%1$s\" from auto-translate exceptions?</string>
     <string name="EditDeleteException">Delete exception</string>
-    <string name="DeleteAllAllowExceptions">Are you sure you want to delete all always allowed exceptions?</string>
-    <string name="DeleteAllNeverExceptions">Are you sure you want to delete all never allowed exceptions?</string>
     <string name="EditTopicsException">Edit topics exceptions</string>
     <string name="MessageAlreadyInX">You cannot translate 1 message since it is already in %1$s.</string>
     <string name="MessagesAlreadyInX">You cannot translate %1$d messages since they are already in %2$s.</string>
@@ -302,8 +299,9 @@
     <string name="KeepMarkdownDesc" comment="KeepMarkdownDesc">When translating a message, keep the markdown formatting.</string>
     <string name="ThemeMonetLight">Monet Light</string>
     <string name="ThemeMonetDark">Monet Dark</string>
+    <string name="Patpat">Patpat</string>
     <string name="PrivacyPolicyLogin">By continuing,\nyou agree to the *Privacy Policy*.</string>
     <string name="OwlPrivacyPolicy">OwlGram Privacy Policy</string>
-    <string name="HideSendAsChannel">Hide Send as Channel</string>
-    <string name="DisableStickersAutoReorder">Disable sticker packs auto-reorder</string>
+    <string name="HideSendAsChannel">Hide "Send as Channel"</string>
+    <string name="DisableStickersAutoReorder">Disable stickers packs auto-reorder</string>
 </resources>
