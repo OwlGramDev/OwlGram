@@ -1531,7 +1531,8 @@ public class FilterTabsView extends FrameLayout {
         invalidate();
         scrollToChild(position);
 
-        if (progress >= 0.7f && oldAnimatedTab != position && manualScrollingToPosition != currentPosition) {
+        if ((((progress >= 0.5f && oldAnimatedTab != position) || (progress <= 0.5f && oldAnimatedTab != currentPosition)) && manualScrollingToPosition != currentPosition)) {
+            position = progress >= 0.5f ? position : currentPosition;
             delegate.onTabSelected(tabs.get(position), currentPosition < position, true);
             oldAnimatedTab = position;
         }

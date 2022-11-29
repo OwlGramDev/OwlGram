@@ -2827,7 +2827,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     showDeleteAlert(getMessagesController().dialogFilters.get(id));
                 }
 
-                private int lastTabType = OwlConfig.tabMode;
                 private boolean lastNameStatus = OwlConfig.showNameInActionBar;
 
                 @Override
@@ -2839,7 +2838,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         } else {
                             actionBar.setTitle(actionBarDefaultTitle = LocaleController.getString("BuildAppName", R.string.BuildAppName), statusDrawable);
                         }
-                        lastTabType = OwlConfig.tabMode;
                         lastNameStatus = OwlConfig.showNameInActionBar;
                         if (OwlConfig.tabMode != OwlConfig.TAB_TYPE_ICON) return;
                     }
