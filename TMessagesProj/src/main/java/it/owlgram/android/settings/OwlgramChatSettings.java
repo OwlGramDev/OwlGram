@@ -73,6 +73,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
     private int hideTimeOnStickerRow;
     private int onlineStatusRow;
     private int hideSendAsChannelRow;
+    private int disableStickersReorderRow;
 
     @Override
     public boolean onFragmentCreate() {
@@ -232,6 +233,11 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                 ((TextCheckCell) view).setChecked(OwlConfig.hideSendAsChannel);
             }
             parentLayout.rebuildAllFragmentViews(true, true);
+        } else if (position == disableStickersReorderRow) {
+            OwlConfig.toggleStickersAutoReorder();
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(OwlConfig.disableStickersAutoReorder);
+            }
         }
     }
 
@@ -288,6 +294,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
         mediaSwipeByTapRow = rowCount++;
         jumpChannelRow = rowCount++;
         showGreetings = rowCount++;
+        disableStickersReorderRow = rowCount++;
         playGifAsVideoRow = rowCount++;
         hideKeyboardRow = rowCount++;
         hideSendAsChannelRow = rowCount++;
@@ -390,6 +397,8 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("OnlineStatus", R.string.OnlineStatus), LocaleController.getString("OnlineStatusDesc", R.string.OnlineStatusDesc), OwlConfig.showStatusInChat, true, false);
                     } else if (position == hideSendAsChannelRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("HideSendAsChannel", R.string.HideSendAsChannel), OwlConfig.hideSendAsChannel, true);
+                    } else if (position == disableStickersReorderRow) {
+                        textCheckCell.setTextAndCheck(LocaleController.getString("DisableStickersAutoReorder", R.string.DisableStickersAutoReorder), OwlConfig.disableStickersAutoReorder, true);
                     }
                     break;
                 case TEXT_HINT_WITH_PADDING:
@@ -502,7 +511,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                     position == cameraXOptimizeRow || position == proximitySensorRow || position == suppressionRow ||
                     position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow || position == confirmStickersGIFsRow ||
                     position == hideTimeOnStickerRow || position == onlineStatusRow || position == hideAllTabRow ||
-                    position == hideSendAsChannelRow) {
+                    position == hideSendAsChannelRow || position == disableStickersReorderRow) {
                 return ViewType.SWITCH;
             } else if (position == stickerSizeRow) {
                 return ViewType.STICKER_SIZE;

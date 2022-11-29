@@ -310,4 +310,5 @@
     <string name="DeleteAllAllowExceptions">Are you sure you want to delete all always allowed exceptions?</string>
     <string name="DeleteAllNeverExceptions">Are you sure you want to delete all never allowed exceptions?</string>
     <string name="EditTopicsException">Edit topics exception</string>
+    <string name="DisableStickersAutoReorder">Disable sticker packs auto-reorder</string>
 </resources>
