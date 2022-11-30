@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.LocaleController;
-import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
@@ -52,13 +51,13 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
             } else {
                 menuItem.showSubItem(2);
             }
-            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            reloadMainInfo();
         } else if (id == 2) {
             MenuOrderManager.resetToDefaultPosition();
             updateRowsId();
             listAdapter.notifyDataSetChanged();
             menuItem.hideSubItem(2);
-            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            reloadMainInfo();
         }
     }
 
@@ -202,7 +201,7 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
                             } else {
                                 menuItem.showSubItem(2);
                             }
-                            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                            reloadMainInfo();
                         }
                     });
                     view = swapOrderCell;
@@ -234,7 +233,7 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
                             } else {
                                 menuItem.showSubItem(2);
                             }
-                            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                            reloadMainInfo();
                         }
                     });
                     view = addItemCell;
@@ -273,7 +272,7 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
             } else {
                 menuItem.showSubItem(2);
             }
-            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            reloadMainInfo();
         }
     }
 

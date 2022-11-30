@@ -170,7 +170,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.hideAllTab);
             }
-            getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
+            reloadDialogs();
         } else if (position == showPatpatRow) {
             OwlConfig.toggleShowPatpat();
             if (view instanceof TextCheckbox2Cell) {

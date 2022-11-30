@@ -2,6 +2,7 @@ package it.owlgram.android.settings;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBar;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
@@ -301,5 +303,26 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         } else {
             return String.format("%s - %s", AndroidUtilities.capitalize(locale.getDisplayName()), AndroidUtilities.capitalize(locale.getDisplayName(locale)));
         }
+    }
+
+    protected void reloadInterface() {
+        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
+    }
+
+    protected void reloadMainInfo() {
+        getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+    }
+
+    protected void reloadDialogs() {
+        getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
+    }
+
+    protected void rebuildAllFragmentsWithLast() {
+        Parcelable recyclerViewState = null;
+        if (listView.getLayoutManager() != null) {
+            recyclerViewState = listView.getLayoutManager().onSaveInstanceState();
+        }
+        parentLayout.rebuildFragments(INavigationLayout.REBUILD_FLAG_REBUILD_LAST);
+        listView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
     }
 }
