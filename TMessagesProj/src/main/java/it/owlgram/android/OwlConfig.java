@@ -108,7 +108,7 @@ public class OwlConfig extends SettingsManager {
     public static int buttonStyleType = 0;
     public static int translatorStyle = 0;
     public static int cameraType;
-    public static int cameraXFps;
+    public static int cameraResolution;
     public static int maxRecentStickers;
     public static int stickerSizeStack = 0;
     public static int dcStyleType;
@@ -192,7 +192,7 @@ public class OwlConfig extends SettingsManager {
             showSantaHat = getBoolean("showSantaHat", true);
             showSnowFalling = getBoolean("showSnowFalling", true);
             cameraType = getInt("cameraType", CameraXUtilities.getDefault());
-            cameraXFps = getInt("cameraXFps", SharedConfig.getDevicePerformanceClass() == SharedConfig.PERFORMANCE_CLASS_HIGH ? 60 : 30);
+            cameraResolution = getInt("cameraResolution", -1);
             useCameraXOptimizedMode = getBoolean("useCameraXOptimizedMode", SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_HIGH);
             disableProximityEvents = getBoolean("disableProximityEvents", false);
             verifyLinkTip = getBoolean("verifyLinkTip", false);
@@ -571,8 +571,8 @@ public class OwlConfig extends SettingsManager {
         putValue("cameraType", cameraType = type);
     }
 
-    public static void saveCameraXFps(int fps) {
-        putValue("cameraXFps", cameraXFps = fps);
+    public static void saveCameraResolution(int fps) {
+        putValue("cameraResolution", cameraResolution = fps);
     }
 
     public static void setMaxRecentStickers(int size) {
