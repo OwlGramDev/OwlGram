@@ -11,7 +11,6 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
-import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.browser.Browser;
 import org.telegram.ui.ActionBar.ActionBarMenu;
@@ -74,8 +73,8 @@ public class OwlgramSettings extends BaseSettingsActivity {
                 OwlConfig.resetSettings();
                 Theme.lastHolidayCheckTime = 0;
                 Theme.dialogs_holidayDrawable = null;
-                getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
-                getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                reloadDialogs();
+                reloadMainInfo();
                 OwlConfig.doRebuildUIWithDiff(differenceUI, parentLayout);
                 BulletinFactory.of(OwlgramSettings.this).createSimpleBulletin(R.raw.forward, LocaleController.getString("ResetSettingsHint", R.string.ResetSettingsHint)).show();
             });

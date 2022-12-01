@@ -57,7 +57,7 @@ public class AccountProtectionSettings extends BaseSettingsActivity {
                     .setPositiveButton(LocaleController.getString(R.string.DisablePasscodeTurnOff), (dialog, which) -> {
                         PasscodeHelper.disableAccountProtection();
                         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetPasscode);
-                        NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.mainUserInfoChanged);
+                        reloadMainInfo();
                         finishFragment();
                     }).create();
             alertDialog.show();
@@ -88,7 +88,7 @@ public class AccountProtectionSettings extends BaseSettingsActivity {
                                 .setPositiveButton(LocaleController.getString(R.string.DisablePasscodeTurnOff), (dialog, which) -> {
                                     PasscodeHelper.removePasscodeForAccount(user.id);
                                     NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.didSetPasscode);
-                                    NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.mainUserInfoChanged);
+                                    reloadMainInfo();
                                     updateRowsId();
                                     if (!PasscodeHelper.existAtLeastOnePasscode())
                                         finishFragment();

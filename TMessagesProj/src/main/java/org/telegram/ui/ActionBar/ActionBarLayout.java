@@ -297,7 +297,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         }
     }
 
-    public static Drawable headerShadowDrawable;
+    private static Drawable headerShadowDrawable;
     private static Drawable layerShadowDrawable;
     private static Paint scrimPaint;
 
@@ -471,6 +471,11 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             headerShadowDrawable.setBounds(0, y, getMeasuredWidth(), y + headerShadowDrawable.getIntrinsicHeight());
             headerShadowDrawable.draw(canvas);
         }
+    }
+
+    @Override
+    public void setHeaderShadow(Drawable drawable) {
+        headerShadowDrawable = drawable;
     }
 
     @Keep
