@@ -11,20 +11,39 @@ import static android.hardware.camera2.CameraCharacteristics.LENS_INFO_AVAILABLE
 import static android.hardware.camera2.CameraMetadata.LENS_FACING_BACK;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.hardware.camera2.CameraCharacteristics;
+import android.util.Size;
 
 import androidx.camera.camera2.interop.Camera2CameraInfo;
 import androidx.camera.core.CameraInfo;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ZoomState;
 import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.video.Quality;
+import androidx.camera.video.QualitySelector;
+import androidx.core.content.ContextCompat;
 
+import com.google.common.util.concurrent.ListenableFuture;
+
+import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.SharedConfig;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import it.owlgram.android.OwlConfig;
 
 public class CameraXUtilities {
+
+    private static Map<Quality, Size> qualityToSize;
+    private static Exception qualityException;
 
     public static boolean isCameraXSupported() {
         return SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_AVERAGE;
@@ -57,6 +76,109 @@ public class CameraXUtilities {
         throw new IllegalArgumentException("This device doesn't support wide camera! "
                 + "isWideAngleAvailable should be checked first before calling "
                 + "getDefaultWideAngleCamera.");
+    }
+
+    public static Map<Quality, Size> getAvailableVideoSizes() throws IllegalStateException {
+        if (qualityException != null) {
+            throw new IllegalStateException("CameraX sizes failed to load!", qualityException);
+        }
+        return qualityToSize == null ? new HashMap<>() : qualityToSize;
+    }
+
+    public static void loadCameraXSizes() {
+        if (qualityToSize != null || qualityException != null) {
+            return;
+        }
+        Context context = ApplicationLoader.applicationContext;
+        ListenableFuture<ProcessCameraProvider> providerFtr = ProcessCameraProvider.getInstance(context);
+        providerFtr.addListener(() -> {
+            ProcessCameraProvider provider = null;
+            try {
+                CameraSelector.Builder cameraBuilder = new CameraSelector.Builder();
+                provider = providerFtr.get();
+                CameraSelector camera = cameraBuilder.build();
+                qualityToSize = getAvailableVideoSizes(camera, provider);
+                loadSuggestedResolution();
+            } catch (Exception e) {
+                qualityException = e;
+            } finally {
+                if (provider != null) {
+                    provider.unbindAll();
+                }
+            }
+        }, ContextCompat.getMainExecutor(context));
+    }
+
+    private static Map<Quality, Size> getAvailableVideoSizes(CameraSelector cameraSelector, ProcessCameraProvider provider) {
+        return cameraSelector.filter(provider.getAvailableCameraInfos()).stream()
+                .findFirst()
+                .map(camInfo ->
+                        QualitySelector.getSupportedQualities(camInfo).stream().collect(
+                                Collectors.toMap(
+                                        Function.identity(),
+                                        quality -> Optional.ofNullable(QualitySelector.getResolution(camInfo, quality))
+                                                .orElse(new Size(0, 0))
+                                )
+                        )
+                ).orElse(new HashMap<>());
+    }
+
+    private static void loadSuggestedResolution() {
+        int suggestedRes = getSuggestedResolution(false);
+        int maxRes = getAvailableVideoSizes().values().stream()
+                .mapToInt(Size::getHeight)
+                .max().orElse(0);
+        getAvailableVideoSizes().values().stream()
+                .sorted(Comparator.comparingInt(Size::getHeight).reversed())
+                .mapToInt(Size::getHeight)
+                .filter(height -> height <= suggestedRes)
+                .findFirst()
+                .ifPresent(height -> {
+                    if (OwlConfig.cameraResolution == -1 || OwlConfig.cameraResolution > maxRes) {
+                        OwlConfig.saveCameraResolution(height);
+                    }
+                });
+    }
+
+    public static Size getPreviewBestSize() {
+        int suggestedRes = getSuggestedResolution(true);
+        return getAvailableVideoSizes().values().stream()
+                .filter(size -> size.getHeight() <= OwlConfig.cameraResolution && size.getHeight() < suggestedRes)
+                .findFirst()
+                .orElse(new Size(0, 0));
+    }
+
+    public static Quality getVideoQuality() {
+        return getAvailableVideoSizes().entrySet().stream()
+                .filter(entry -> entry.getValue().getHeight() == OwlConfig.cameraResolution)
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse(Quality.HIGHEST);
+    }
+
+    private static int getSuggestedResolution(boolean isPreview) {
+        int suggestedRes;
+        switch (SharedConfig.getDevicePerformanceClass()) {
+            case SharedConfig.PERFORMANCE_CLASS_LOW:
+                suggestedRes = 720;
+                break;
+            case SharedConfig.PERFORMANCE_CLASS_AVERAGE:
+                suggestedRes = 1080;
+                break;
+            case SharedConfig.PERFORMANCE_CLASS_HIGH:
+            default:
+                suggestedRes = OwlConfig.useCameraXOptimizedMode && isPreview ? 1080 : 2160;
+                break;
+        }
+        return suggestedRes;
+    }
+
+    public int getCurrentResolution() {
+        return getAvailableVideoSizes().values().stream()
+                .mapToInt(Size::getHeight)
+                .filter(size -> size == OwlConfig.cameraResolution)
+                .findFirst()
+                .orElse(-1);
     }
 
     @SuppressLint({"RestrictedApi", "UnsafeOptInUsageError"})
