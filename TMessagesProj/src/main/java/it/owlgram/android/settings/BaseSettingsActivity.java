@@ -168,13 +168,6 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         }
     }
 
-    @Override
-    public boolean onFragmentCreate() {
-        super.onFragmentCreate();
-        updateRowsId();
-        return true;
-    }
-
     protected void updateRowsId() {
         rowCount = 0;
     }
