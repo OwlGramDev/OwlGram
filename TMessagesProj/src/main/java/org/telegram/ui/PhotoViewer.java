@@ -5787,9 +5787,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             compressItem.setImageResource(R.drawable.video_quality1);
         } else if (selectedCompression == 2) {
             compressItem.setImageResource(R.drawable.video_quality2);
+        } else if (selectedCompression == 3) {
+            compressItem.setImageResource(R.drawable.video_quality3);
         } else {
             selectedCompression = compressionsCount - 1;
-            compressItem.setImageResource(R.drawable.video_quality3);
+            compressItem.setImageResource(R.drawable.video_quality4);
         }
         compressItem.setContentDescription(LocaleController.getString("AccDescrVideoQuality", R.string.AccDescrVideoQuality));
         itemsLayout.addView(compressItem, LayoutHelper.createLinear(48, 48));
@@ -16628,6 +16630,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             compressItem.setImageResource(R.drawable.video_quality2);
         } else if (selectedCompression == 3) {
             compressItem.setImageResource(R.drawable.video_quality3);
+        } else if (selectedCompression == 4) {
+            compressItem.setImageResource(R.drawable.video_quality4);
         }
         itemsLayout.requestLayout();
 
