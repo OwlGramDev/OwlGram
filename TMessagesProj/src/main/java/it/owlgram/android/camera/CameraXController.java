@@ -41,7 +41,9 @@ import androidx.camera.core.internal.compat.workaround.ExifRotationAvailability;
 import androidx.camera.extensions.ExtensionMode;
 import androidx.camera.extensions.ExtensionsManager;
 import androidx.camera.lifecycle.ProcessCameraProvider;
+import androidx.camera.video.FallbackStrategy;
 import androidx.camera.video.FileOutputOptions;
+import androidx.camera.video.Quality;
 import androidx.camera.video.QualitySelector;
 import androidx.camera.video.Recorder;
 import androidx.camera.video.Recording;
@@ -317,7 +319,8 @@ public class CameraXController {
             }
         }
 
-        QualitySelector selector = QualitySelector.from(CameraXUtilities.getVideoQuality());
+        Quality quality = CameraXUtilities.getVideoQuality();
+        QualitySelector selector = QualitySelector.from(quality, FallbackStrategy.higherQualityOrLowerThan(quality));
         Recorder recorder = new Recorder.Builder()
                 .setQualitySelector(selector)
                 .build();
