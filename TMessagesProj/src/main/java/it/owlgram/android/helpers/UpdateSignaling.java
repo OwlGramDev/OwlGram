@@ -1,6 +1,7 @@
 package it.owlgram.android.helpers;
 
 import org.telegram.messenger.AccountInstance;
+import org.telegram.messenger.BuildConfig;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.ConnectionsManager;
@@ -24,7 +25,7 @@ public class UpdateSignaling {
                 }
             }
         }
-        if (oldBuildVersion != null && oldBuildVersion.equals(OwlConfig.currentNotificationVersion())) {
+        if ((oldBuildVersion != null && oldBuildVersion.equals(OwlConfig.currentNotificationVersion())) || BuildConfig.DEBUG_PRIVATE_VERSION) {
             return;
         }
         UpdateManager.getChangelogs(updateResult -> {
