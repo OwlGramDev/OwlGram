@@ -571,8 +571,8 @@ public class OwlConfig extends SettingsManager {
         putValue("cameraType", cameraType = type);
     }
 
-    public static void saveCameraResolution(int fps) {
-        putValue("cameraResolution", cameraResolution = fps);
+    public static void saveCameraResolution(int resolution) {
+        putValue("cameraResolution", cameraResolution = resolution);
     }
 
     public static void setMaxRecentStickers(int size) {
