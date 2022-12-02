@@ -35,16 +35,18 @@ public class DatacenterCell extends LinearLayout {
     private final CardView mainCardView;
     private boolean withBackground = false;
     private boolean needDivider = false;
+    private final Theme.ResourcesProvider resourcesProvider;
 
     @SuppressLint("SetTextI18n")
-    public DatacenterCell(Context context) {
+    public DatacenterCell(Context context, Theme.ResourcesProvider resourcesProvider) {
         super(context);
+        this.resourcesProvider = resourcesProvider;
         setWillNotDraw(false);
         setPadding(AndroidUtilities.dp(23), AndroidUtilities.dp(8), AndroidUtilities.dp(23), AndroidUtilities.dp(8));
         setGravity(Gravity.CENTER_VERTICAL);
 
-        int colorText = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText);
-        int colorText2 = Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2);
+        int colorText = Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, resourcesProvider);
+        int colorText2 = Theme.getColor(Theme.key_windowBackgroundWhiteGrayText2, resourcesProvider);
 
         shimmerFrameLayout = new ShimmerFrameLayout(context);
         Shimmer.AlphaHighlightBuilder shimmer = new Shimmer.AlphaHighlightBuilder();
@@ -90,7 +92,7 @@ public class DatacenterCell extends LinearLayout {
             public void invalidate() {
                 super.invalidate();
                 if (iv.getBackground() != null) {
-                    iv.getBackground().setColorFilter(Theme.getColor(Theme.key_switch2TrackChecked), PorterDuff.Mode.SRC_ATOP);
+                    iv.getBackground().setColorFilter(Theme.getColor(Theme.key_switch2TrackChecked, resourcesProvider), PorterDuff.Mode.SRC_ATOP);
                 }
             }
         };
@@ -146,7 +148,7 @@ public class DatacenterCell extends LinearLayout {
         cardView.setLayoutParams(new LinearLayout.LayoutParams(AndroidUtilities.dp(50), AndroidUtilities.dp(50)));
         cardView.setCardElevation(0);
         cardView.setRadius(AndroidUtilities.dp(10));
-        cardView.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        cardView.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, resourcesProvider));
 
         LinearLayout textLayout = new LinearLayout(context);
         textLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -158,7 +160,7 @@ public class DatacenterCell extends LinearLayout {
         tv1.setLayoutParams(new LinearLayout.LayoutParams(AndroidUtilities.dp(150), AndroidUtilities.dp(17)));
         tv1.setCardElevation(0);
         tv1.setRadius(AndroidUtilities.dp(3));
-        tv1.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        tv1.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, resourcesProvider));
 
         CardView tv2 = new CardView(context);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(AndroidUtilities.dp(100), AndroidUtilities.dp(14));
@@ -166,7 +168,7 @@ public class DatacenterCell extends LinearLayout {
         tv2.setLayoutParams(layoutParams);
         tv2.setCardElevation(0);
         tv2.setRadius(AndroidUtilities.dp(3));
-        tv2.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        tv2.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText, resourcesProvider));
 
         container.addView(cardView);
         container.addView(textLayout);
@@ -195,7 +197,7 @@ public class DatacenterCell extends LinearLayout {
         tv.setText(tInfo.longDcName);
         tv2.setText(String.valueOf(tInfo.tID));
         Drawable d = ContextCompat.getDrawable(getContext(), DCHelper.getDcIcon(tInfo.dcID));
-        Objects.requireNonNull(d).setColorFilter(Theme.getColor(Theme.key_switch2TrackChecked), PorterDuff.Mode.SRC_ATOP);
+        Objects.requireNonNull(d).setColorFilter(Theme.getColor(Theme.key_switch2TrackChecked, resourcesProvider), PorterDuff.Mode.SRC_ATOP);
         iv.setBackground(d);
         needDivider = divider;
         setWillNotDraw(!needDivider);

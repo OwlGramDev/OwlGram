@@ -8,6 +8,7 @@ import android.widget.LinearLayout;
 import androidx.cardview.widget.CardView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RLottieImageView;
 
@@ -24,9 +25,11 @@ public class ActionPanelCell extends LinearLayout {
     private int currId;
     private final LinearLayout mainLayout;
     private final ShimmerFrameLayout shimmerFrameLayout;
+    private final Theme.ResourcesProvider resourcesProvider;
 
-    public ActionPanelCell(Context context) {
+    public ActionPanelCell(Context context, Theme.ResourcesProvider resourcesProvider) {
         super(context);
+        this.resourcesProvider = resourcesProvider;
         currId = -1;
         setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8), 0);
         mainLayout = new LinearLayout(context) {
@@ -100,7 +103,7 @@ public class ActionPanelCell extends LinearLayout {
         int myId = currId;
         switch (OwlConfig.buttonStyleType) {
             case 1:
-                return new RoundedButtonCell(context, text, iconId, color, myId) {
+                return new RoundedButtonCell(context, resourcesProvider, text, iconId, color, myId) {
                     @Override
                     protected void onItemClick(int id) {
                         super.onItemClick(id);
@@ -108,7 +111,7 @@ public class ActionPanelCell extends LinearLayout {
                     }
                 };
             case 2:
-                return new IceledButtonCell(context, text, iconId, color, myId) {
+                return new IceledButtonCell(context, resourcesProvider, text, iconId, color, myId) {
                     @Override
                     protected void onItemClick(int id) {
                         super.onItemClick(id);
@@ -116,7 +119,7 @@ public class ActionPanelCell extends LinearLayout {
                     }
                 };
             case 3:
-                return new PillsButtonCell(context, text, iconId, color, myId) {
+                return new PillsButtonCell(context, resourcesProvider, text, iconId, color, myId) {
                     @Override
                     protected void onItemClick(int id) {
                         super.onItemClick(id);
@@ -124,7 +127,7 @@ public class ActionPanelCell extends LinearLayout {
                     }
                 };
             case 4:
-                return new LinearButtonCell(context, text, iconId, color, myId) {
+                return new LinearButtonCell(context, resourcesProvider, text, iconId, color, myId) {
                     @Override
                     protected void onItemClick(int id) {
                         super.onItemClick(id);
@@ -132,7 +135,7 @@ public class ActionPanelCell extends LinearLayout {
                     }
                 };
             default:
-                return new SquaredButtonCell(context, text, iconId, color, myId) {
+                return new SquaredButtonCell(context, resourcesProvider, text, iconId, color, myId) {
                     @Override
                     protected void onItemClick(int id) {
                         super.onItemClick(id);

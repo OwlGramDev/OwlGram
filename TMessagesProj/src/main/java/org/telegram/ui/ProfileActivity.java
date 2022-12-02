@@ -9024,7 +9024,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     break;
                 }
                 case VIEW_TYPE_ACTIONS_BUTTON:
-                    view = actionPanelCell = new ActionPanelCell(mContext) {
+                    view = actionPanelCell = new ActionPanelCell(mContext, resourcesProvider) {
                         @Override
                         protected void onItemClick(int itemId) {
                             ActionButtonManager.ActionButtonInfo actionButtonInfo = actionButtonManager.getItemAt(itemId);
@@ -9099,7 +9099,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     view.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(infoHeaderRow != -1 || numberSectionRow != -1 ? 12:4), AndroidUtilities.dp(16), 0);
                     break;
                 case VIEW_TYPE_DATACENTER_INFO:
-                    view = datacenterCell = new DatacenterCell(mContext);
+                    view = datacenterCell = new DatacenterCell(mContext, resourcesProvider);
                     break;
                 case VIEW_TYPE_PREMIUM_TEXT_CELL:
                     view = new ProfilePremiumCell(mContext, resourcesProvider);
@@ -9293,7 +9293,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         tInfo = DCHelper.getTInfo(currentUser, currentChat);
                         Drawable drawable = ContextCompat.getDrawable(detailCell.getContext(), DCHelper.getDcIconLittle(tInfo.dcID));
                         if (drawable != null) {
-                            drawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_switch2TrackChecked), PorterDuff.Mode.SRC_IN));
+                            drawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_switch2TrackChecked, resourcesProvider), PorterDuff.Mode.SRC_IN));
                             detailCell.setImage(drawable);
                         }
                         boolean withDivider = (currentChat != null && !TextUtils.isEmpty(currentChat.username)) || currentUser != null && (UserObject.isUserSelf(currentUser) || !TextUtils.isEmpty(currentUser.username));

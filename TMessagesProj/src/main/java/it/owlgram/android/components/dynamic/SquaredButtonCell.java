@@ -35,8 +35,8 @@ public class SquaredButtonCell extends SimpleActionCell {
     private final ImageView mt;
 
     @SuppressLint("ClickableViewAccessibility")
-    public SquaredButtonCell(Context context, String text, int iconId, String color, int myId) {
-        super(context);
+    public SquaredButtonCell(Context context, Theme.ResourcesProvider resourcesProvider, String text, int iconId, String color, int myId) {
+        super(context, resourcesProvider);
         colors = new String[]{
                 color,
                 Theme.key_windowBackgroundWhiteBlackText,
@@ -81,15 +81,15 @@ public class SquaredButtonCell extends SimpleActionCell {
         if (iconId == R.raw.camera_outline) {
             cameraDrawable = new RLottieDrawable(R.raw.camera_outline, String.valueOf(R.raw.camera_outline), AndroidUtilities.dp(26 * 2), AndroidUtilities.dp(26 * 2), false, null);
             iv.setAnimation(cameraDrawable);
-            iv.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
             iv.setScaleType(ImageView.ScaleType.CENTER);
         } else {
             iv.setBackground(ContextCompat.getDrawable(context, iconId));
-            iv.getBackground().setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.getBackground().setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
         }
 
         tv = new TextView(context);
-        tv.setTextColor(Theme.getColor(colors[1]));
+        tv.setTextColor(getThemedColor(colors[1]));
         tv.setText(text);
         tv.setLines(1);
         tv.setMaxLines(1);
@@ -109,11 +109,11 @@ public class SquaredButtonCell extends SimpleActionCell {
 
     @Override
     public void updateColors() {
-        tv.setTextColor(Theme.getColor(colors[1]));
+        tv.setTextColor(getThemedColor(colors[1]));
         if (iv.getBackground() != null) {
-            iv.getBackground().setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.getBackground().setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
         } else {
-            iv.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
         }
         cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), getBackgroundAlpha()));
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
@@ -129,14 +129,14 @@ public class SquaredButtonCell extends SimpleActionCell {
         cardView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, AndroidUtilities.dp(80)));
         cardView.setCardElevation(0);
         cardView.setRadius(AndroidUtilities.dp(10.0f));
-        cardView.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        cardView.setCardBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
 
         mainLayout.addView(cardView);
         return mainLayout;
     }
 
     public static void drawButtonPreview(Canvas canvas, int x, int y, int w) {
-        int color = Theme.getColor(Theme.key_switchTrack);
+        int color = getThemedColor(Theme.key_switchTrack);
         RectF rectF = new RectF(x, y, x + w, y + w);
         int rad1 = Math.round((w * 14.77F) / 100F);
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);

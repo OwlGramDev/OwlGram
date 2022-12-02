@@ -35,13 +35,13 @@ public class PillsButtonCell extends SimpleActionCell {
     private final ImageView mt;
 
     @SuppressLint("ClickableViewAccessibility")
-    public PillsButtonCell(Context context, String text, int iconId, String color, int myId) {
-        super(context);
+    public PillsButtonCell(Context context, Theme.ResourcesProvider resourcesProvider, String text, int iconId, String color, int myId) {
+        super(context, resourcesProvider);
         colors = new String[]{
                 color,
                 Theme.key_windowBackgroundWhiteBlackText,
         };
-        int colorWhite = Theme.getColor(colors[1]);
+        int colorWhite = getThemedColor(colors[1]);
 
         setLayoutParams(new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f));
         setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8));
@@ -77,11 +77,11 @@ public class PillsButtonCell extends SimpleActionCell {
         if (iconId == R.raw.camera_outline) {
             cameraDrawable = new RLottieDrawable(R.raw.camera_outline, String.valueOf(R.raw.camera_outline), AndroidUtilities.dp(25 * 2), AndroidUtilities.dp(25 * 2), false, null);
             iv.setAnimation(cameraDrawable);
-            iv.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
             iv.setScaleType(ImageView.ScaleType.CENTER);
         } else {
             iv.setBackground(ContextCompat.getDrawable(context, iconId));
-            iv.getBackground().setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.getBackground().setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
         }
 
         tv = new TextView(context);
@@ -104,11 +104,11 @@ public class PillsButtonCell extends SimpleActionCell {
 
     @Override
     public void updateColors() {
-        tv.setTextColor(Theme.getColor(colors[1]));
+        tv.setTextColor(getThemedColor(colors[1]));
         if (iv.getBackground() != null) {
-            iv.getBackground().setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.getBackground().setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
         } else {
-            iv.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
         }
         cardView.setCardBackgroundColor(AndroidUtilities.getTransparentColor(getBackColor(), getBackgroundAlpha()));
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
@@ -125,13 +125,13 @@ public class PillsButtonCell extends SimpleActionCell {
         cardView.setLayoutParams(new LayoutParams(AndroidUtilities.dp(70), AndroidUtilities.dp(50)));
         cardView.setCardElevation(0);
         cardView.setRadius(AndroidUtilities.dp(25));
-        cardView.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        cardView.setCardBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
 
         CardView cardView2 = new CardView(context);
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, AndroidUtilities.dp(10));
         layoutParams.setMargins(AndroidUtilities.dp(10), AndroidUtilities.dp(10), AndroidUtilities.dp(10), 0);
         cardView2.setLayoutParams(layoutParams);
-        cardView2.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        cardView2.setCardBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
         cardView2.setRadius(AndroidUtilities.dp(5));
         cardView2.setCardElevation(0);
 
@@ -141,7 +141,7 @@ public class PillsButtonCell extends SimpleActionCell {
     }
 
     public static void drawButtonPreview(Canvas canvas, int x, int y, int w) {
-        int color = Theme.getColor(Theme.key_switchTrack);
+        int color = getThemedColor(Theme.key_switchTrack);
 
         int topTextMargin = Math.round((w * 15F) / 100F);
         int textWidth = Math.round((w * 100F) / 100F);

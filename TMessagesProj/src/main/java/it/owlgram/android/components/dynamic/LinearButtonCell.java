@@ -39,8 +39,8 @@ public class LinearButtonCell extends SimpleActionCell {
 
 
     @SuppressLint("ClickableViewAccessibility")
-    public LinearButtonCell(Context context, String text, int iconId, String color, int myId) {
-        super(context);
+    public LinearButtonCell(Context context, Theme.ResourcesProvider resourcesProvider, String text, int iconId, String color, int myId) {
+        super(context, resourcesProvider);
         colors = new String[]{
                 color,
                 Theme.key_windowBackgroundWhiteBlackText,
@@ -80,18 +80,18 @@ public class LinearButtonCell extends SimpleActionCell {
         if (iconId == R.raw.camera_outline) {
             cameraDrawable = new RLottieDrawable(R.raw.camera_outline, String.valueOf(R.raw.camera_outline), AndroidUtilities.dp(27 * 2), AndroidUtilities.dp(27 * 2), false, null);
             iv.setAnimation(cameraDrawable);
-            iv.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
             iv.setScaleType(ImageView.ScaleType.CENTER);
         } else {
             iv.setBackground(ContextCompat.getDrawable(context, iconId));
-            iv.getBackground().setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.getBackground().setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
         }
 
         tv = new TextView(context);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(0, AndroidUtilities.dp(5), 0, 0);
         tv.setLayoutParams(layoutParams);
-        tv.setTextColor(Theme.getColor(colors[0]));
+        tv.setTextColor(getThemedColor(colors[0]));
         tv.setText(text);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
         tv.setGravity(Gravity.CENTER);
@@ -107,11 +107,11 @@ public class LinearButtonCell extends SimpleActionCell {
 
     @Override
     public void updateColors() {
-        tv.setTextColor(Theme.getColor(colors[0]));
+        tv.setTextColor(getThemedColor(colors[0]));
         if (iv.getBackground() != null) {
-            iv.getBackground().setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.getBackground().setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
         } else {
-            iv.setColorFilter(new PorterDuffColorFilter(Theme.getColor(colors[0]), PorterDuff.Mode.MULTIPLY));
+            iv.setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
         }
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
     }
@@ -144,14 +144,14 @@ public class LinearButtonCell extends SimpleActionCell {
                 break;
         }
         Drawable d = ContextCompat.getDrawable(context, iconId);
-        Objects.requireNonNull(d).setColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText), PorterDuff.Mode.SRC_ATOP);
+        Objects.requireNonNull(d).setColorFilter(getThemedColor(Theme.key_windowBackgroundWhiteBlackText), PorterDuff.Mode.SRC_ATOP);
         iv.setBackground(d);
 
         CardView cardView2 = new CardView(context);
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, AndroidUtilities.dp(10));
         layoutParams.setMargins(AndroidUtilities.dp(10), AndroidUtilities.dp(11), AndroidUtilities.dp(10), 0);
         cardView2.setLayoutParams(layoutParams);
-        cardView2.setCardBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+        cardView2.setCardBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
         cardView2.setRadius(AndroidUtilities.dp(5));
         cardView2.setCardElevation(0);
 
@@ -161,7 +161,7 @@ public class LinearButtonCell extends SimpleActionCell {
     }
 
     public static void drawButtonPreview(Canvas canvas, int x, int y, int w, int pos, Context context) {
-        int color = Theme.getColor(Theme.key_switchTrack);
+        int color = getThemedColor(Theme.key_switchTrack);
 
         int topTextMargin = Math.round((w * 15F) / 100F);
         int textWidth = Math.round((w * 100F) / 100F);

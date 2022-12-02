@@ -1,5 +1,6 @@
 package it.owlgram.android.components.dynamic;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.widget.LinearLayout;
 
@@ -9,16 +10,23 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RLottieImageView;
 
+@SuppressLint("ViewConstructor")
 public class SimpleActionCell extends LinearLayout {
     protected RLottieDrawable cameraDrawable;
     protected RLottieImageView iv;
+    private static Theme.ResourcesProvider resourcesProvider;
 
-    public SimpleActionCell(Context context) {
+    public SimpleActionCell(Context context, Theme.ResourcesProvider resourcesProvider) {
         super(context);
+        SimpleActionCell.resourcesProvider = resourcesProvider;
     }
 
     public ThemeInfo getTheme() {
         return null;
+    }
+
+    protected static int getThemedColor(String key) {
+        return Theme.getColor(key, resourcesProvider);
     }
 
     public void updateColors() {
