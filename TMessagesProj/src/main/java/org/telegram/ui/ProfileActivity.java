@@ -177,6 +177,7 @@ import org.telegram.ui.Components.CombinedDrawable;
 import org.telegram.ui.Components.CrossfadeDrawable;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.EmojiPacksAlert;
+import org.telegram.ui.Components.FlickerLoadingView;
 import org.telegram.ui.Components.FloatingDebug.FloatingDebugController;
 import org.telegram.ui.Components.Forum.ForumUtilities;
 import org.telegram.ui.Components.FragmentContextView;
@@ -230,7 +231,7 @@ import it.owlgram.android.StoreUtils;
 import it.owlgram.android.components.ActionPanelCell;
 import it.owlgram.android.components.DatacenterCell;
 import it.owlgram.android.components.DcStyleSelector;
-import it.owlgram.android.components.dynamic.SimpleActionCell;
+import it.owlgram.android.components.dynamic.ThemeInfo;
 import it.owlgram.android.helpers.ActionButtonManager;
 import it.owlgram.android.helpers.DCHelper;
 import it.owlgram.android.settings.BaseSettingsActivity;
@@ -467,8 +468,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private int setAvatarRow;
     private int setAvatarSectionRow;
     private int actionsSectionRow;
+    private int actionsSectionPlaceHolderRow;
     private int actionsSectionDivider;
     private int datacenterRow;
+    private int datacenterPlaceholderRow;
     private int owlSettingsRow;
     private int numberSectionRow;
     private int numberRow;
@@ -6940,6 +6943,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         setAvatarRow = -1;
         setAvatarSectionRow = -1;
         actionsSectionRow = -1;
+        actionsSectionPlaceHolderRow = -1;
+        datacenterPlaceholderRow = -1;
         actionsSectionDivider = -1;
         datacenterRow = -1;
         owlSettingsRow = -1;
@@ -7108,13 +7113,21 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 boolean hasPhone = user != null && (!TextUtils.isEmpty(user.phone) || !TextUtils.isEmpty(vcardPhone));
 
                 if (OwlConfig.buttonStyleType != 5) {
-                    actionsSectionRow = rowCount++;
+                    if(userInfo != null) {
+                        actionsSectionRow = rowCount++;
+                    } else {
+                        actionsSectionPlaceHolderRow = rowCount++;
+                    }
                     actionsSectionDivider = rowCount++;
                 }
                 infoHeaderRow = rowCount++;
 
                 if (OwlConfig.showIDAndDC && DcStyleSelector.getStyleSelected() == DcStyleSelector.OWLGRAM_DC) {
-                    datacenterRow = rowCount++;
+                    if (currentUser != null || currentChat != null) {
+                        datacenterRow = rowCount++;
+                    } else {
+                        datacenterPlaceholderRow = rowCount++;
+                    }
                 }
                 if (!isBot && (hasPhone || !hasInfo)) {
                     phoneRow = rowCount++;
@@ -7188,14 +7201,22 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             }
         } else if (chatId != 0) {
             if (OwlConfig.buttonStyleType != 5) {
-                actionsSectionRow = rowCount++;
+                if(currentChat != null) {
+                    actionsSectionRow = rowCount++;
+                }else {
+                    actionsSectionPlaceHolderRow = rowCount++;
+                }
                 actionsSectionDivider = rowCount++;
             }
             if (OwlConfig.showIDAndDC) {
                 infoHeaderRow = rowCount++;
             }
             if (OwlConfig.showIDAndDC && DcStyleSelector.getStyleSelected() == DcStyleSelector.OWLGRAM_DC) {
-                datacenterRow = rowCount++;
+                if (currentUser != null || currentChat != null) {
+                    datacenterRow = rowCount++;
+                } else {
+                    datacenterPlaceholderRow = rowCount++;
+                }
             }
             if (chatInfo != null && (!TextUtils.isEmpty(chatInfo.about) || chatInfo.location instanceof TLRPC.TL_channelLocation) || ChatObject.isPublic(currentChat)) {
                 if (LocaleController.isRTL && ChatObject.isChannel(currentChat) && chatInfo != null && !currentChat.megagroup && chatInfo.linked_chat_id != 0) {
@@ -8824,7 +8845,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 VIEW_TYPE_NOTIFICATIONS_CHECK_SIMPLE = 20,
                 VIEW_TYPE_ACTIONS_BUTTON = 200,
                 VIEW_TYPE_ACTIONS_BUTTON_DIVIDER = 201,
-                VIEW_TYPE_DATACENTER_INFO = 202;
+                VIEW_TYPE_DATACENTER_INFO = 202,
+                VIEW_TYPE_PLACEHOLDER = 203;
 
         private Context mContext;
 
@@ -9024,75 +9046,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     break;
                 }
                 case VIEW_TYPE_ACTIONS_BUTTON:
-                    view = actionPanelCell = new ActionPanelCell(mContext, resourcesProvider) {
-                        @Override
-                        protected void onItemClick(int itemId) {
-                            ActionButtonManager.ActionButtonInfo actionButtonInfo = actionButtonManager.getItemAt(itemId);
-                            if (actionButtonInfo != null) {
-                                switch (actionButtonInfo.id) {
-                                    case "camera":
-                                    case "send_message":
-                                        onWriteButtonClick();
-                                        break;
-                                    case "edit_name":
-                                        actionBar.actionBarMenuOnItemClick.onItemClick(edit_name);
-                                        break;
-                                    case "logout":
-                                        presentFragment(new LogoutActivity());
-                                        break;
-                                    case "video_call":
-                                        actionBar.actionBarMenuOnItemClick.onItemClick(video_call_item);
-                                        break;
-                                    case "call":
-                                    case "join_call":
-                                        actionBar.actionBarMenuOnItemClick.onItemClick(call_item);
-                                        break;
-                                    case "restart":
-                                    case "unblock":
-                                    case "stop":
-                                    case "block":
-                                        actionBar.actionBarMenuOnItemClick.onItemClick(block_contact);
-                                        break;
-                                    case "add_bot":
-                                        actionBar.actionBarMenuOnItemClick.onItemClick(invite_to_group);
-                                        break;
-                                    case "share":
-                                        actionBar.actionBarMenuOnItemClick.onItemClick(share);
-                                        break;
-                                    case "share_contact":
-                                        actionBar.actionBarMenuOnItemClick.onItemClick(share_contact);
-                                        break;
-                                    case "join":
-                                        getMessagesController().addUserToChat(currentChat.id, getUserConfig().getCurrentUser(), 0, null, ProfileActivity.this, null);
-                                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.closeSearchByActiveAction);
-                                        break;
-                                    case "add_user":
-                                        openAddMember();
-                                        break;
-                                    case "search":
-                                        actionBar.actionBarMenuOnItemClick.onItemClick(search_members);
-                                        break;
-                                    case "edit":
-                                    case "info":
-                                        actionBar.actionBarMenuOnItemClick.onItemClick(edit_channel);
-                                        break;
-                                    case "add_home":
-                                        actionBar.actionBarMenuOnItemClick.onItemClick(add_shortcut);
-                                        break;
-                                    case "report":
-                                        AlertsCreator.createReportAlert(getParentActivity(), getDialogId(), 0, ProfileActivity.this, null);
-                                        break;
-                                    case "open_discussion":
-                                    case "open_channel":
-                                        openDiscussion();
-                                        break;
-                                    case "leave":
-                                        leaveChatPressed();
-                                        break;
-                                }
-                            }
-                        }
-                    };
+                    view = actionPanelCell = new ActionPanelCell(mContext, resourcesProvider);
+                    break;
+                case VIEW_TYPE_PLACEHOLDER:
+                    view = new FlickerLoadingView(mContext, resourcesProvider);
                     break;
                 case VIEW_TYPE_ACTIONS_BUTTON_DIVIDER:
                     view = new DividerCell(mContext);
@@ -9591,17 +9548,92 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     break;
                 case VIEW_TYPE_ACTIONS_BUTTON:
                     actionPanelCell = (ActionPanelCell) holder.itemView;
+                    actionPanelCell.setOnItemClickListener(id -> {
+                        ActionButtonManager.ActionButtonInfo actionButtonInfo = actionButtonManager.getItemAt(id);
+                        if (actionButtonInfo != null) {
+                            switch (actionButtonInfo.id) {
+                                case "camera":
+                                case "send_message":
+                                    onWriteButtonClick();
+                                    break;
+                                case "edit_name":
+                                    actionBar.actionBarMenuOnItemClick.onItemClick(edit_name);
+                                    break;
+                                case "logout":
+                                    presentFragment(new LogoutActivity());
+                                    break;
+                                case "video_call":
+                                    actionBar.actionBarMenuOnItemClick.onItemClick(video_call_item);
+                                    break;
+                                case "call":
+                                case "join_call":
+                                    actionBar.actionBarMenuOnItemClick.onItemClick(call_item);
+                                    break;
+                                case "restart":
+                                case "unblock":
+                                case "stop":
+                                case "block":
+                                    actionBar.actionBarMenuOnItemClick.onItemClick(block_contact);
+                                    break;
+                                case "add_bot":
+                                    actionBar.actionBarMenuOnItemClick.onItemClick(invite_to_group);
+                                    break;
+                                case "share":
+                                    actionBar.actionBarMenuOnItemClick.onItemClick(share);
+                                    break;
+                                case "share_contact":
+                                    actionBar.actionBarMenuOnItemClick.onItemClick(share_contact);
+                                    break;
+                                case "join":
+                                    getMessagesController().addUserToChat(currentChat.id, getUserConfig().getCurrentUser(), 0, null, ProfileActivity.this, null);
+                                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.closeSearchByActiveAction);
+                                    break;
+                                case "add_user":
+                                    openAddMember();
+                                    break;
+                                case "search":
+                                    actionBar.actionBarMenuOnItemClick.onItemClick(search_members);
+                                    break;
+                                case "edit":
+                                case "info":
+                                    actionBar.actionBarMenuOnItemClick.onItemClick(edit_channel);
+                                    break;
+                                case "add_home":
+                                    actionBar.actionBarMenuOnItemClick.onItemClick(add_shortcut);
+                                    break;
+                                case "report":
+                                    AlertsCreator.createReportAlert(getParentActivity(), getDialogId(), 0, ProfileActivity.this, null);
+                                    break;
+                                case "open_discussion":
+                                case "open_channel":
+                                    openDiscussion();
+                                    break;
+                                case "leave":
+                                    leaveChatPressed();
+                                    break;
+                            }
+                        }
+                    });
                     loadConfigActionButton(false);
+                    break;
+                case VIEW_TYPE_PLACEHOLDER:
+                    FlickerLoadingView flickerLoadingView = (FlickerLoadingView) holder.itemView;
+                    if (position == actionsSectionPlaceHolderRow) {
+                        flickerLoadingView.setViewType(FlickerLoadingView.ACTION_BUTTONS_TYPE);
+                    } else if (position == datacenterPlaceholderRow) {
+                        flickerLoadingView.setViewType(FlickerLoadingView.DATACENTER_CELL_TYPE);
+                    }
+                    flickerLoadingView.setIsSingleCell(true);
                     break;
                 case VIEW_TYPE_DATACENTER_INFO:
                     DatacenterCell dc = (DatacenterCell) holder.itemView;
                     if (ActionButtonManager.canShowButtons(isTopic)) {
-                        dc.setTheme(new SimpleActionCell.ThemeInfo(
+                        dc.setTheme(new ThemeInfo(
                                 false,
                                 0
                         ));
                     } else if (actionPanelCell != null) {
-                        SimpleActionCell.ThemeInfo theme = actionPanelCell.getTheme();
+                        ThemeInfo theme = actionPanelCell.getTheme();
                         if (theme != null) {
                             dc.setTheme(theme);
                         }
@@ -9725,7 +9757,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             int type = holder.getItemViewType();
             return type != VIEW_TYPE_HEADER && type != VIEW_TYPE_DIVIDER && type != VIEW_TYPE_SHADOW &&
                     type != VIEW_TYPE_EMPTY && type != VIEW_TYPE_BOTTOM_PADDING && type != VIEW_TYPE_SHARED_MEDIA &&
-                    type != 9 && type != 10 && type != VIEW_TYPE_ACTIONS_BUTTON && type != VIEW_TYPE_ACTIONS_BUTTON_DIVIDER; // These are legacy ones, left for compatibility
+                    type != 9 && type != 10 && type != VIEW_TYPE_ACTIONS_BUTTON && type != VIEW_TYPE_ACTIONS_BUTTON_DIVIDER &&
+                    type != VIEW_TYPE_PLACEHOLDER; // These are legacy ones, left for compatibility
         }
 
         @Override
@@ -9781,6 +9814,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 return VIEW_TYPE_SUGGESTION;
             } else if(position == actionsSectionRow){
                 return VIEW_TYPE_ACTIONS_BUTTON;
+            } else if(position == actionsSectionPlaceHolderRow || position == datacenterPlaceholderRow){
+                return VIEW_TYPE_PLACEHOLDER;
             } else if(position == actionsSectionDivider){
                 return VIEW_TYPE_ACTIONS_BUTTON_DIVIDER;
             } else if (position == datacenterRow && DcStyleSelector.getStyleSelected() == DcStyleSelector.OWLGRAM_DC) {
@@ -9812,6 +9847,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 canSearchMembers,
                 getMessagesController().maxMegagroupCount
         );
+        if (userInfo != null || (chatId != 0 && currentChat != null)) {
+            if (actionsSectionPlaceHolderRow != -1) listAdapter.notifyItemChanged(actionsSectionPlaceHolderRow);
+            if (datacenterPlaceholderRow != -1) listAdapter.notifyItemChanged(datacenterPlaceholderRow);
+            updateRowsIds();
+        }
         if (actionPanelCell == null) {
             return;
         }
@@ -9822,14 +9862,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 actionPanelCell.addItem(actionButtonInfo.text, actionButtonInfo.icon, actionButtonInfo.color);
             }
         }
-        SimpleActionCell.ThemeInfo themeInfo = actionPanelCell.getTheme();
+        ThemeInfo themeInfo = actionPanelCell.getTheme();
         if (datacenterCell != null && themeInfo != null && OwlConfig.showIDAndDC && DcStyleSelector.getStyleSelected() == DcStyleSelector.OWLGRAM_DC) {
             datacenterCell.setTheme(themeInfo);
-        }
-        if(userInfo != null) {
-            actionPanelCell.setLoaded();
-        }else if(chatId != 0 && currentChat != null) {
-            actionPanelCell.setLoaded();
         }
         RLottieDrawable photoAnimationDrawable = actionPanelCell.getPhotoAnimationDrawable();
         if (photoAnimationDrawable != null) {
@@ -10944,8 +10979,10 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             put(++pointer, switchBackendRow, sparseIntArray);
             put(++pointer, versionRow, sparseIntArray);
             put(++pointer, actionsSectionRow, sparseIntArray);
+            put(++pointer, actionsSectionPlaceHolderRow, sparseIntArray);
             put(++pointer, actionsSectionDivider, sparseIntArray);
             put(++pointer, datacenterRow, sparseIntArray);
+            put(++pointer, datacenterPlaceholderRow, sparseIntArray);
             put(++pointer, owlSettingsRow, sparseIntArray);
             put(++pointer, emptyRow, sparseIntArray);
             put(++pointer, bottomPaddingRow, sparseIntArray);

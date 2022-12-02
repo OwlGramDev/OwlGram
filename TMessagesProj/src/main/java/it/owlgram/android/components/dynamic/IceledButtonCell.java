@@ -11,10 +11,7 @@ import android.graphics.RectF;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -28,20 +25,19 @@ import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RLottieImageView;
 
 @SuppressLint("ViewConstructor")
-public class IceledButtonCell extends SimpleActionCell {
+public class IceledButtonCell extends BaseButtonCell {
     private final String[] colors;
     private final TextView tv;
     private final CardView cardView;
     private final ImageView mt;
 
     @SuppressLint("ClickableViewAccessibility")
-    public IceledButtonCell(Context context, Theme.ResourcesProvider resourcesProvider, String text, int iconId, String color, int myId) {
+    public IceledButtonCell(Context context, Theme.ResourcesProvider resourcesProvider, String text, int iconId, String color) {
         super(context, resourcesProvider);
         colors = new String[]{
                 color,
                 Theme.key_windowBackgroundWhiteBlackText,
         };
-        int colorWhite = getThemedColor(colors[1]);
 
         setLayoutParams(new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f));
         setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8));
@@ -60,12 +56,7 @@ public class IceledButtonCell extends SimpleActionCell {
         mt = new ImageView(context);
         mt.setScaleType(ImageView.ScaleType.FIT_CENTER);
         mt.setClickable(true);
-        mt.setOnTouchListener((View view, MotionEvent motionEvent) -> {
-            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                onItemClick(myId);
-            }
-            return false;
-        });
+        mt.setOnTouchListener(this::delegateOnClick);
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
         mt.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
@@ -77,19 +68,15 @@ public class IceledButtonCell extends SimpleActionCell {
         if (iconId == R.raw.camera_outline) {
             cameraDrawable = new RLottieDrawable(R.raw.camera_outline, String.valueOf(R.raw.camera_outline), AndroidUtilities.dp(25 * 2), AndroidUtilities.dp(25 * 2), false, null);
             iv.setAnimation(cameraDrawable);
-            iv.setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
             iv.setScaleType(ImageView.ScaleType.CENTER);
         } else {
             iv.setBackground(ContextCompat.getDrawable(context, iconId));
-            iv.getBackground().setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
         }
-        iv.setColorFilter(new PorterDuffColorFilter(getThemedColor(colors[0]), PorterDuff.Mode.MULTIPLY));
 
         tv = new TextView(context);
         LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(0, AndroidUtilities.dp(10), 0, 0);
         tv.setLayoutParams(layoutParams);
-        tv.setTextColor(colorWhite);
         tv.setText(text);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
         tv.setGravity(Gravity.CENTER);
@@ -101,6 +88,7 @@ public class IceledButtonCell extends SimpleActionCell {
         rl.addView(mt);
         rl.addView(iv);
         addView(tv);
+        updateColors();
     }
 
     @Override
@@ -115,34 +103,16 @@ public class IceledButtonCell extends SimpleActionCell {
         mt.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, Color.TRANSPARENT, AndroidUtilities.getTransparentColor(getBackColor(), 0.2f)));
     }
 
-    public static LinearLayout getShimmerButton(Context context) {
-        LinearLayout mainLayout = new LinearLayout(context);
-        mainLayout.setLayoutParams(new LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f));
-        mainLayout.setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8));
-        mainLayout.setGravity(Gravity.CENTER);
-        mainLayout.setOrientation(VERTICAL);
-
-        CardView cardView = new CardView(context);
-        cardView.setLayoutParams(new LayoutParams(AndroidUtilities.dp(70), AndroidUtilities.dp(50)));
-        cardView.setCardElevation(0);
-        cardView.setRadius(AndroidUtilities.dp(10));
-        cardView.setCardBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
-
-        CardView cardView2 = new CardView(context);
-        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, AndroidUtilities.dp(10));
-        layoutParams.setMargins(AndroidUtilities.dp(10), AndroidUtilities.dp(10), AndroidUtilities.dp(10), 0);
-        cardView2.setLayoutParams(layoutParams);
-        cardView2.setCardBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhiteBlackText));
-        cardView2.setRadius(AndroidUtilities.dp(5));
-        cardView2.setCardElevation(0);
-
-        mainLayout.addView(cardView);
-        mainLayout.addView(cardView2);
-        return mainLayout;
+    public static int getPreviewHeight() {
+        return AndroidUtilities.dp(8 + 50 + 10 + 10 + 10 + 8);
     }
 
-    public static void drawButtonPreview(Canvas canvas, int x, int y, int w) {
+    public static void getPreview(Canvas canvas, int x, int y, int w, Paint paint) {
         int color = getThemedColor(Theme.key_switchTrack);
+        if (paint == null) {
+            paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            paint.setColor(AndroidUtilities.getTransparentColor(color, 0.5f));
+        }
 
         int topTextMargin = Math.round((w * 15F) / 100F);
         int textWidth = Math.round((w * 100F) / 100F);
@@ -158,12 +128,10 @@ public class IceledButtonCell extends SimpleActionCell {
 
         RectF rectF = new RectF(x, totalYMiddle, x + w, totalYMiddle + buttonHeight);
         int rad1 = Math.round((w * 14.77F) / 100F);
-        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(AndroidUtilities.getTransparentColor(color, 0.5f));
-        canvas.drawRoundRect(rectF, rad1, rad1, p);
+        canvas.drawRoundRect(rectF, rad1, rad1, paint);
 
         RectF rectText = new RectF(xText, yText, xText + textWidth, yText + textHeight);
-        canvas.drawRoundRect(rectText, textHeight >> 1, textHeight >> 1, p);
+        canvas.drawRoundRect(rectText, textHeight >> 1, textHeight >> 1, paint);
     }
 
     public ThemeInfo getTheme() {
@@ -171,8 +139,5 @@ public class IceledButtonCell extends SimpleActionCell {
                 true,
                 AndroidUtilities.dp(10)
         );
-    }
-
-    protected void onItemClick(int id) {
     }
 }
