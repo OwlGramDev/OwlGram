@@ -111,6 +111,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "scrollableChatPreview":
             case "showNameInActionBar":
             case "showInActionBar":
+            case "cameraXFps":
                 return false;
             default:
                 return true;
@@ -222,8 +223,8 @@ public class SettingsManager extends SharedPreferencesHelper {
                 case "idType":
                 case "translatorStyle":
                     return integerValue >= 0 && integerValue <= 1;
-                case "cameraXFps":
-                    return integerValue == 30 || integerValue == 60;
+                case "cameraResolution":
+                    return true;
                 case "maxRecentStickers":
                     return integerValue >= 20 && integerValue <= 200;
                 case "stickerSizeStack":
