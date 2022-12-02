@@ -10,8 +10,8 @@ public class LerpedLayoutParams extends ViewGroup.MarginLayoutParams {
     private ViewGroup.LayoutParams from;
     private ViewGroup.LayoutParams to;
     public LerpedLayoutParams(
-            ViewGroup.LayoutParams from,
-            ViewGroup.LayoutParams to
+        ViewGroup.LayoutParams from,
+        ViewGroup.LayoutParams to
     ) {
         super(from == null ? to : from);
         this.from = from;

@@ -6875,12 +6875,12 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         return 0;
     }
 
-    private int getRightInset() {
-        if (lastInsets != null && Build.VERSION.SDK_INT >= 21) {
-            return ((WindowInsets) lastInsets).getSystemWindowInsetRight();
-        }
-        return 0;
-    }
+	private int getRightInset() {
+		if (lastInsets != null && Build.VERSION.SDK_INT >= 21) {
+			return ((WindowInsets) lastInsets).getSystemWindowInsetRight();
+		}
+		return 0;
+	}
 
     private void dismissInternal() {
         try {

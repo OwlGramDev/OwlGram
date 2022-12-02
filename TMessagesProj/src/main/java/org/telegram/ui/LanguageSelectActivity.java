@@ -44,7 +44,6 @@ import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.LanguageCell;
 import org.telegram.ui.Cells.ShadowSectionCell;
 import org.telegram.ui.Cells.TextCheckCell;
-import org.telegram.ui.Cells.TextDetailCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextRadioCell;
 import org.telegram.ui.Cells.TextSettingsCell;
@@ -59,9 +58,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Timer;
 
-import it.owlgram.android.OwlConfig;
 import it.owlgram.android.settings.OwlgramGeneralSettings;
-import it.owlgram.android.settings.OwlgramSettings;
 
 public class LanguageSelectActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
@@ -614,6 +611,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             });
             updateHeight();
         }
+
         @Override
         protected void onDetachedFromWindow() {
             super.onDetachedFromWindow();
