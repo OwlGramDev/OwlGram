@@ -467,7 +467,7 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static void toggleStickersAutoReorder() {
-        putValue("stickersAutoReorder", disableStickersAutoReorder ^= true);
+        putValue("disableStickersAutoReorder", disableStickersAutoReorder ^= true);
     }
 
     public static void unlockChupa() {

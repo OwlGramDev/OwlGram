@@ -112,6 +112,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "showNameInActionBar":
             case "showInActionBar":
             case "cameraXFps":
+            case "stickersAutoReorder":
                 return false;
             default:
                 return true;
