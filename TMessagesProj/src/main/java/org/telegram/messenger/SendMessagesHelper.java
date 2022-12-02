@@ -3826,7 +3826,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                         reqSend.top_msg_id = replyToTopMsg.getId();
                         reqSend.flags |= 512;
                     }
-                    if (!OwlConfig.disableStickersAutoReorder && updateStickersOreder) {
+                    if (OwlConfig.stickersSorting && updateStickersOreder) {
                         reqSend.update_stickersets_order = true;
                     }
                     if (newMsg.from_id != null) {
@@ -4212,7 +4212,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                             request.schedule_date = scheduleDate;
                             request.flags |= 1024;
                         }
-                        if (!OwlConfig.disableStickersAutoReorder && updateStickersOreder) {
+                        if (OwlConfig.stickersSorting && updateStickersOreder) {
                             request.update_stickersets_order = true;
                         }
 
