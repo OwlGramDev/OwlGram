@@ -16783,8 +16783,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     maxSize = 1280.0f;
                     break;
                 case 3:
-                default:
                     maxSize = 1920.0f;
+                    break;
+                case 4:
+                default:
+                    maxSize = 3840.0f;
                     break;
             }
             float scale = originalWidth > originalHeight ? maxSize / originalWidth : maxSize / originalHeight;
@@ -17016,7 +17019,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
     private void updateCompressionsCount(int h, int w) {
         int maxSize = Math.max(h, w);
-        if (maxSize > 1280) {
+        if (maxSize > 1920) {
+            compressionsCount = 5;
+        } else if (maxSize > 1280) {
             compressionsCount = 4;
         } else if (maxSize > 854) {
             compressionsCount = 3;

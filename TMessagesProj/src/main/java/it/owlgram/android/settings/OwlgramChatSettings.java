@@ -2,9 +2,11 @@ package it.owlgram.android.settings;
 
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.util.Size;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.camera.video.Quality;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
@@ -23,6 +25,10 @@ import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.UndoView;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.camera.CameraXUtilities;
@@ -64,7 +70,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
     private int cameraTypeHeaderRow;
     private int cameraTypeSelectorRow;
     private int cameraXOptimizeRow;
-    private int cameraXFpsRow;
+    private int cameraXQualityRow;
     private int cameraAdviseRow;
     private int proximitySensorRow;
     private int suppressionRow;
@@ -181,16 +187,14 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.useCameraXOptimizedMode);
             }
-        } else if (position == cameraXFpsRow) {
-            ArrayList<String> arrayList = new ArrayList<>();
-            ArrayList<Integer> types = new ArrayList<>();
-            arrayList.add("60 Fps");
-            types.add(60);
-            arrayList.add("30 Fps");
-            types.add(30);
-            PopupHelper.show(arrayList, LocaleController.getString("MotionSmoothness", R.string.MotionSmoothness), types.indexOf(OwlConfig.cameraXFps), context, i -> {
-                OwlConfig.saveCameraXFps(types.get(i));
-                listAdapter.notifyItemChanged(cameraXFpsRow, PARTIAL);
+        } else if (position == cameraXQualityRow) {
+            Map<Quality, Size> availableSizes = CameraXUtilities.getAvailableVideoSizes();
+            Stream<Integer> tmp = availableSizes.values().stream().sorted(Comparator.comparingInt(Size::getWidth).reversed()).map(Size::getHeight);
+            ArrayList<Integer> types = tmp.collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<String> arrayList = types.stream().map(p -> p + "p").collect(Collectors.toCollection(ArrayList::new));
+            PopupHelper.show(arrayList, LocaleController.getString("CameraQuality", R.string.CameraQuality), types.indexOf(OwlConfig.cameraResolution), context, i -> {
+                OwlConfig.saveCameraResolution(types.get(i));
+                listAdapter.notifyItemChanged(cameraXQualityRow, PARTIAL);
             });
         } else if (position == proximitySensorRow) {
             OwlConfig.toggleDisableProximityEvents();
@@ -273,7 +277,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
         cameraTypeHeaderRow = -1;
         cameraTypeSelectorRow = -1;
         cameraXOptimizeRow = -1;
-        cameraXFpsRow = -1;
+        cameraXQualityRow = -1;
         cameraAdviseRow = -1;
         suppressionRow = -1;
 
@@ -286,7 +290,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
             cameraTypeSelectorRow = rowCount++;
             if (OwlConfig.cameraType == 1) {
                 cameraXOptimizeRow = rowCount++;
-                cameraXFpsRow = rowCount++;
+                cameraXQualityRow = rowCount++;
             }
             cameraAdviseRow = rowCount++;
         }
@@ -425,8 +429,8 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                 case SETTINGS:
                     TextSettingsCell textSettingsCell = (TextSettingsCell) holder.itemView;
                     textSettingsCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-                    if (position == cameraXFpsRow) {
-                        textSettingsCell.setTextAndValue(LocaleController.getString("MotionSmoothness", R.string.MotionSmoothness), OwlConfig.cameraXFps + " Fps", partial,false);
+                    if (position == cameraXQualityRow) {
+                        textSettingsCell.setTextAndValue(LocaleController.getString("CameraQuality", R.string.CameraQuality), OwlConfig.cameraResolution + "p", partial,false);
                     }
                     break;
                 case CHECKBOX:
@@ -482,11 +486,11 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                             if (cameraSelected == 1) {
                                 updateRowsId();
                                 listAdapter.notifyItemInserted(cameraXOptimizeRow);
-                                listAdapter.notifyItemInserted(cameraXFpsRow);
+                                listAdapter.notifyItemInserted(cameraXQualityRow);
                                 listAdapter.notifyItemChanged(cameraAdviseRow);
                             } else {
                                 listAdapter.notifyItemRemoved(cameraXOptimizeRow);
-                                listAdapter.notifyItemRemoved(cameraXFpsRow);
+                                listAdapter.notifyItemRemoved(cameraXQualityRow);
                                 listAdapter.notifyItemChanged(cameraAdviseRow - 1);
                                 updateRowsId();
                             }
@@ -520,7 +524,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                 return ViewType.CAMERA_SELECTOR;
             } else if (position == cameraAdviseRow) {
                 return ViewType.TEXT_HINT_WITH_PADDING;
-            } else if (position == cameraXFpsRow) {
+            } else if (position == cameraXQualityRow) {
                 return ViewType.SETTINGS;
             } else if (position == showDeleteRow || position == showNoQuoteForwardRow || position == showAddToSMRow ||
                     position == showRepeatRow || position == showReportRow ||
