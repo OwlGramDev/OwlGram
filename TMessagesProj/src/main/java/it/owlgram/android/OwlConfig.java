@@ -192,7 +192,7 @@ public class OwlConfig extends SettingsManager {
             showSantaHat = getBoolean("showSantaHat", true);
             showSnowFalling = getBoolean("showSnowFalling", true);
             cameraType = getInt("cameraType", CameraXUtilities.getDefault());
-            cameraResolution = getInt("cameraResolution", -1);
+            cameraResolution = getInt("cameraResolution", CameraXUtilities.getCameraResolution());
             useCameraXOptimizedMode = getBoolean("useCameraXOptimizedMode", SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_HIGH);
             disableProximityEvents = getBoolean("disableProximityEvents", false);
             verifyLinkTip = getBoolean("verifyLinkTip", false);

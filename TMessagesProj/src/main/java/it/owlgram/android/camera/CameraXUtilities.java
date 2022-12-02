@@ -44,6 +44,7 @@ public class CameraXUtilities {
 
     private static Map<Quality, Size> qualityToSize;
     private static Exception qualityException;
+    private static int cameraResolution = -1;
 
     public static boolean isCameraXSupported() {
         return SharedConfig.getDevicePerformanceClass() >= SharedConfig.PERFORMANCE_CLASS_AVERAGE;
@@ -134,10 +135,15 @@ public class CameraXUtilities {
                 .filter(height -> height <= suggestedRes)
                 .findFirst()
                 .ifPresent(height -> {
+                    cameraResolution = height;
                     if (OwlConfig.cameraResolution == -1 || OwlConfig.cameraResolution > maxRes) {
                         OwlConfig.saveCameraResolution(height);
                     }
                 });
+    }
+
+    public static int getCameraResolution() {
+        return cameraResolution;
     }
 
     public static Size getPreviewBestSize() {
