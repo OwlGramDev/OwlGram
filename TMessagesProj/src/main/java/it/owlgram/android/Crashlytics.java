@@ -114,6 +114,7 @@ public class Crashlytics implements Thread.UncaughtExceptionHandler {
             default:
                 CameraName = "Unknown";
         }
+        String source = StoreUtils.isFromPlayStore() ? "Play Store" : StoreUtils.isFromHuaweiStore() ? "Huawei Store" : "APK";
         return "Steps to reproduce\n" +
                 "Write here the steps to reproduce\n\n" +
                 "Details\n" +
@@ -124,6 +125,7 @@ public class Crashlytics implements Thread.UncaughtExceptionHandler {
                 "Google Play Services: " + ApplicationLoader.hasPlayServices + "\n" +
                 "Performance Class: " + getPerformanceClassString() + "\n" +
                 "Locale: " + LocaleController.getSystemLocaleStringIso639() + "\n" +
+                "Download Source: " + source + "\n" +
                 "Camera: " + CameraName;
     }
 
