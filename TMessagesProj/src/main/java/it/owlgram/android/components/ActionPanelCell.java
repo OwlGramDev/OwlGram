@@ -5,174 +5,80 @@ import android.content.Context;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 
-import androidx.cardview.widget.CardView;
-
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RLottieImageView;
 
-import it.owlgram.android.OwlConfig;
-import it.owlgram.android.components.dynamic.IceledButtonCell;
-import it.owlgram.android.components.dynamic.LinearButtonCell;
-import it.owlgram.android.components.dynamic.PillsButtonCell;
-import it.owlgram.android.components.dynamic.RoundedButtonCell;
-import it.owlgram.android.components.dynamic.SimpleActionCell;
-import it.owlgram.android.components.dynamic.SquaredButtonCell;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+import it.owlgram.android.components.dynamic.BaseButtonCell;
+import it.owlgram.android.components.dynamic.ButtonCell;
+import it.owlgram.android.components.dynamic.ThemeInfo;
 
 @SuppressLint("ViewConstructor")
 public class ActionPanelCell extends LinearLayout {
-    private int currId;
-    private final LinearLayout mainLayout;
-    private final ShimmerFrameLayout shimmerFrameLayout;
+    private final Theme.ResourcesProvider resourcesProvider;
+    private OnItemClickListener onItemClickListener;
 
-    public ActionPanelCell(Context context) {
+    public ActionPanelCell(Context context, Theme.ResourcesProvider resourcesProvider) {
         super(context);
-        currId = -1;
+        this.resourcesProvider = resourcesProvider;
         setPadding(AndroidUtilities.dp(8), AndroidUtilities.dp(8), AndroidUtilities.dp(8), 0);
-        mainLayout = new LinearLayout(context) {
-            @Override
-            public void invalidate() {
-                super.invalidate();
-                for (int i = 0; i < mainLayout.getChildCount(); i++) {
-                    if (mainLayout.getChildAt(i) instanceof SimpleActionCell) {
-                        SimpleActionCell contents = ((SimpleActionCell) mainLayout.getChildAt(i));
-                        contents.updateColors();
-                    }
-                }
-            }
-        };
-        mainLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        mainLayout.setGravity(Gravity.CENTER_HORIZONTAL);
-
-        shimmerFrameLayout = new ShimmerFrameLayout(context);
-        Shimmer.AlphaHighlightBuilder shimmer = new Shimmer.AlphaHighlightBuilder();
-        shimmer.setBaseAlpha(0.05f);
-        shimmer.setHighlightAlpha(0.1f);
-        shimmer.setDuration(1500);
-        shimmerFrameLayout.setShimmer(shimmer.build());
-        shimmerFrameLayout.setLayoutParams(new CardView.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        LinearLayout placeholderLayout = new LinearLayout(context);
-        placeholderLayout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-        placeholderLayout.addView(getShimmerButton(context, 0));
-        placeholderLayout.addView(getShimmerButton(context, 1));
-        placeholderLayout.addView(getShimmerButton(context, 2));
-        placeholderLayout.addView(getShimmerButton(context, 3));
-        mainLayout.setVisibility(GONE);
-        addView(mainLayout);
-        shimmerFrameLayout.addView(placeholderLayout);
-        addView(shimmerFrameLayout);
+        setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+        setGravity(Gravity.CENTER_HORIZONTAL);
     }
 
-    public void setLoaded() {
-        mainLayout.setVisibility(VISIBLE);
-        removeView(shimmerFrameLayout);
+    @Override
+    public void invalidate() {
+        super.invalidate();
+        getButtons().forEach(BaseButtonCell::updateColors);
     }
 
     public void addItem(String text, int icon, String color) {
-        mainLayout.addView(getButton(getContext(), text, icon, color));
+        addView(getButton(getContext(), text, icon, color));
     }
 
     public void clear() {
-        mainLayout.removeAllViews();
-        currId = -1;
+        removeAllViews();
     }
 
-    protected void onItemClick(int itemId) {
+    public BaseButtonCell getButton(Context context, String text, int iconId, String color) {
+        BaseButtonCell buttonCell = ButtonCell.getCurrentButtonCell(context, resourcesProvider, text, iconId, color);
+        int buttonId = (int) getButtons().count();
+        buttonCell.setOnClickDelegate(() -> {
+            if (onItemClickListener != null) onItemClickListener.onItemClick(buttonId);
+        });
+        return buttonCell;
     }
 
-    public LinearLayout getShimmerButton(Context context, int pos) {
-        switch (OwlConfig.buttonStyleType) {
-            case 1:
-                return RoundedButtonCell.getShimmerButton(context);
-            case 2:
-                return IceledButtonCell.getShimmerButton(context);
-            case 3:
-                return PillsButtonCell.getShimmerButton(context);
-            case 4:
-                return LinearButtonCell.getShimmerButton(context, pos);
-            default:
-                return SquaredButtonCell.getShimmerButton(context);
-        }
-    }
-
-    public SimpleActionCell getButton(Context context, String text, int iconId, String color) {
-        currId++;
-        int myId = currId;
-        switch (OwlConfig.buttonStyleType) {
-            case 1:
-                return new RoundedButtonCell(context, text, iconId, color, myId) {
-                    @Override
-                    protected void onItemClick(int id) {
-                        super.onItemClick(id);
-                        ActionPanelCell.this.onItemClick(id);
-                    }
-                };
-            case 2:
-                return new IceledButtonCell(context, text, iconId, color, myId) {
-                    @Override
-                    protected void onItemClick(int id) {
-                        super.onItemClick(id);
-                        ActionPanelCell.this.onItemClick(id);
-                    }
-                };
-            case 3:
-                return new PillsButtonCell(context, text, iconId, color, myId) {
-                    @Override
-                    protected void onItemClick(int id) {
-                        super.onItemClick(id);
-                        ActionPanelCell.this.onItemClick(id);
-                    }
-                };
-            case 4:
-                return new LinearButtonCell(context, text, iconId, color, myId) {
-                    @Override
-                    protected void onItemClick(int id) {
-                        super.onItemClick(id);
-                        ActionPanelCell.this.onItemClick(id);
-                    }
-                };
-            default:
-                return new SquaredButtonCell(context, text, iconId, color, myId) {
-                    @Override
-                    protected void onItemClick(int id) {
-                        super.onItemClick(id);
-                        ActionPanelCell.this.onItemClick(id);
-                    }
-                };
-        }
+    private Stream<BaseButtonCell> getButtons() {
+        return IntStream.iterate(0, i -> i + 1)
+                .limit(getChildCount())
+                .mapToObj(this::getChildAt)
+                .filter(child -> child instanceof BaseButtonCell)
+                .map(child -> (BaseButtonCell) child);
     }
 
     public RLottieDrawable getPhotoAnimationDrawable() {
-        try {
-            SimpleActionCell simpleActionCell = (SimpleActionCell) mainLayout.getChildAt(0);
-            if (simpleActionCell != null) {
-                return simpleActionCell.getAnimatedDrawable();
-            }
-        } catch (Exception ignored) {
-        }
-        return null;
+        return getButtons().findFirst().map(BaseButtonCell::getAnimatedDrawable).orElse(null);
     }
 
     public RLottieImageView getPhotoImageView() {
-        try {
-            SimpleActionCell simpleActionCell = (SimpleActionCell) mainLayout.getChildAt(0);
-            if (simpleActionCell != null) {
-                return simpleActionCell.getLottieImageView();
-            }
-        } catch (Exception ignored) {
-        }
-        return null;
+        return getButtons().findFirst().map(BaseButtonCell::getLottieImageView).orElse(null);
     }
 
-    public SimpleActionCell.ThemeInfo getTheme() {
-        try {
-            SimpleActionCell simpleActionCell = (SimpleActionCell) mainLayout.getChildAt(0);
-            if (simpleActionCell != null) {
-                return simpleActionCell.getTheme();
-            }
-        } catch (Exception ignored) {
-        }
-        return null;
+    public ThemeInfo getTheme() {
+        return getButtons().findFirst().map(BaseButtonCell::getTheme).orElse(null);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int id);
     }
 
     @Override
