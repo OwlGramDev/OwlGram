@@ -17,6 +17,8 @@ import org.telegram.ui.ActionBar.Theme;
 
 import java.util.Random;
 
+import it.owlgram.android.components.dynamic.ButtonCell;
+
 public class FlickerLoadingView extends View {
 
     public final static int DIALOG_TYPE = 1;
@@ -42,7 +44,9 @@ public class FlickerLoadingView extends View {
     public final static int LIMIT_REACHED_LINKS = 22;
     public final static int REACTED_TYPE_WITH_EMOJI_HINT = 23;
     public static final int TOPIC_CELL_TYPE = 24;
-    public static final int EDIT_TOPIC_CELL_TYPE = 25;
+    public static final int EDIT_TOPIC_CELL_TYPE = 200;
+    public static final int ACTION_BUTTONS_TYPE = 201;
+    public static final int DATACENTER_CELL_TYPE = 202;
 
     private int gradientWidth;
     private LinearGradient gradient;
@@ -233,7 +237,6 @@ public class FlickerLoadingView extends View {
             int r = AndroidUtilities.dp(14);
             int childH = getCellHeight(getMeasuredWidth());
             canvas.drawCircle(checkRtl(AndroidUtilities.dp(24) + r), childH >> 1, r, paint);
-            canvas.save();
 
             int x = AndroidUtilities.dp(80);
             int height = AndroidUtilities.dp(18);
@@ -246,6 +249,41 @@ public class FlickerLoadingView extends View {
             height = AndroidUtilities.dp(16);
             y = (childH - height) >> 1;
             rectF.set(x - AndroidUtilities.dp(35), y, x, y + height);
+            checkRtl(rectF);
+            canvas.drawRoundRect(rectF, AndroidUtilities.dp(10), AndroidUtilities.dp(10), paint);
+        } else if (getViewType() == ACTION_BUTTONS_TYPE) {
+            int width = (getMeasuredWidth() >> 2) * 4;
+            int height = width >> 2;
+            int padding = AndroidUtilities.dp(26);
+            height += padding;
+            int left = (getMeasuredWidth() >> 1) - (width >> 1);
+            int top = (getCellHeight(getMeasuredWidth()) >> 1) - (height >> 1);
+            int sizeContainer = width - padding;
+            int xContainer = left + (width >> 1) - (sizeContainer >> 1);
+            int hItem = sizeContainer >> 2;
+            int yContainer = top + (height >> 1) - (hItem >> 1);
+            for (int i = 0; i < 4; i++) {
+                int x = xContainer + (hItem * i);
+                int wSubItem = hItem - padding;
+                int xMiddle = x + (hItem >> 1) - (wSubItem >> 1);
+                int yMiddle = yContainer + (hItem >> 1) - (wSubItem >> 1);
+                ButtonCell.drawFlickerPreview(canvas, xMiddle, yMiddle, wSubItem, i, getContext(), paint);
+            }
+        } else if (getViewType() == DATACENTER_CELL_TYPE) {
+            int r = AndroidUtilities.dp(25);
+            int childH = getCellHeight(getMeasuredWidth());
+            int x = AndroidUtilities.dp(24);
+            canvas.drawCircle(checkRtl(AndroidUtilities.dp(24) + r), childH >> 1, r, paint);
+            x += AndroidUtilities.dp(50 + 16);
+
+            int height = AndroidUtilities.dp(18);
+            int padding = AndroidUtilities.dp(10);
+            int y = (childH - (height * 2) - padding) >> 1;
+            rectF.set(x, y, x + AndroidUtilities.dp(180), y + height);
+            checkRtl(rectF);
+            canvas.drawRoundRect(rectF, AndroidUtilities.dp(10), AndroidUtilities.dp(10), paint);
+            y += height + padding;
+            rectF.set(x, y, x + AndroidUtilities.dp(75), y + height);
             checkRtl(rectF);
             canvas.drawRoundRect(rectF, AndroidUtilities.dp(10), AndroidUtilities.dp(10), paint);
         } else if (getViewType() == CONTACT_TYPE) {
@@ -790,10 +828,13 @@ public class FlickerLoadingView extends View {
             case CONTACT_TYPE:
                 return AndroidUtilities.dp(64);
             case INVITE_LINKS_TYPE:
+            case DATACENTER_CELL_TYPE:
                 return AndroidUtilities.dp(66);
             case USERS2_TYPE:
             case EDIT_TOPIC_CELL_TYPE:
                 return AndroidUtilities.dp(58);
+            case ACTION_BUTTONS_TYPE:
+                return ButtonCell.getPreviewHeight() + AndroidUtilities.dp(16);
             case CALL_LOG_TYPE:
                 return AndroidUtilities.dp(61);
             case BOTS_MENU_TYPE:

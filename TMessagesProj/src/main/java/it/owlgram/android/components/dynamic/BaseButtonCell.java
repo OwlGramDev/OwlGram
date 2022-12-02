@@ -1,6 +1,8 @@
 package it.owlgram.android.components.dynamic;
 
 import android.content.Context;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.LinearLayout;
 
 import androidx.core.graphics.ColorUtils;
@@ -9,29 +11,22 @@ import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RLottieImageView;
 
-public class SimpleActionCell extends LinearLayout {
+abstract public class BaseButtonCell extends LinearLayout {
     protected RLottieDrawable cameraDrawable;
     protected RLottieImageView iv;
+    private static Theme.ResourcesProvider resourcesProvider;
+    protected OnClickDelegate onClickDelegate;
 
-    public SimpleActionCell(Context context) {
+    public BaseButtonCell(Context context, Theme.ResourcesProvider resourcesProvider) {
         super(context);
+        BaseButtonCell.resourcesProvider = resourcesProvider;
     }
 
-    public ThemeInfo getTheme() {
-        return null;
-    }
+    abstract public ThemeInfo getTheme();
+    abstract public void updateColors();
 
-    public void updateColors() {
-    }
-
-    public static class ThemeInfo {
-        public final int radius;
-        public final boolean withBackground;
-
-        public ThemeInfo(boolean withBackground, int radius) {
-            this.withBackground = withBackground;
-            this.radius = radius;
-        }
+    protected static int getThemedColor(String key) {
+        return Theme.getColor(key, resourcesProvider);
     }
 
     public RLottieDrawable getAnimatedDrawable() {
@@ -43,7 +38,7 @@ public class SimpleActionCell extends LinearLayout {
     }
 
     public static float getBackgroundAlpha() {
-        int colorBack = Theme.getColor(Theme.key_windowBackgroundWhite);
+        int colorBack = getThemedColor(Theme.key_windowBackgroundWhite);
         float alphaColor = 0;
         for (int ratio = 20; ratio > 0; ratio -= 1) {
             try {
@@ -60,6 +55,21 @@ public class SimpleActionCell extends LinearLayout {
     }
 
     public static int getBackColor() {
-        return ColorUtils.calculateLuminance(Theme.getColor(Theme.key_windowBackgroundWhite)) > 0.5f ? 0xFF000000 : 0xFFFFFFFF;
+        return ColorUtils.calculateLuminance(getThemedColor(Theme.key_windowBackgroundWhite)) > 0.5f ? 0xFF000000 : 0xFFFFFFFF;
+    }
+
+    protected boolean delegateOnClick(View ignored, MotionEvent motionEvent) {
+        if (motionEvent.getAction() == MotionEvent.ACTION_UP && onClickDelegate != null) {
+            onClickDelegate.onClick();
+        }
+        return false;
+    }
+
+    public void setOnClickDelegate(OnClickDelegate onClickDelegate) {
+        this.onClickDelegate = onClickDelegate;
+    }
+
+    public interface OnClickDelegate {
+        void onClick();
     }
 }
