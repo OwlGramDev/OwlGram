@@ -376,7 +376,13 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                         @Override
                         protected void onSelectedEvent(int eventSelected) {
                             super.onSelectedEvent(eventSelected);
+                            int previousEvent = OwlConfig.eventType;
                             OwlConfig.saveEventType(eventSelected);
+                            if (previousEvent == 1 && eventSelected != 1) {
+                                listAdapter.notifyItemRangeRemoved(forcePacmanRow + 1, 2);
+                            } else if (previousEvent != 1 && eventSelected == 1) {
+                                listAdapter.notifyItemRangeInserted(forcePacmanRow + 1, 2);
+                            }
                             listAdapter.notifyItemChanged(drawerRow, PARTIAL);
                             Theme.lastHolidayCheckTime = 0;
                             Theme.dialogs_holidayDrawable = null;
