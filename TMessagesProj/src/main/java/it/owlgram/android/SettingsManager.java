@@ -216,7 +216,8 @@ public class SettingsManager extends SharedPreferencesHelper {
                             integerValue == Translator.PROVIDER_YANDEX ||
                             integerValue == Translator.PROVIDER_DEEPL ||
                             integerValue == Translator.PROVIDER_NIU ||
-                            integerValue == Translator.PROVIDER_DUCKDUCKGO;
+                            integerValue == Translator.PROVIDER_DUCKDUCKGO ||
+                            integerValue == Translator.PROVIDER_TELEGRAM;
                 case "blurIntensity":
                     return integerValue >= 0 && integerValue <= 100;
                 case "eventType":
