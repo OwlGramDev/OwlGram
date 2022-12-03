@@ -1890,6 +1890,7 @@ public class LoginActivity extends BaseFragment {
             linearLayout.addView(codeDividerView, params);
 
             phoneField = new AnimatedPhoneNumberEditText(context) {
+
                 @Override
                 public boolean onKeyDown(int keyCode, KeyEvent event) {
                     if (keyCode == KeyEvent.KEYCODE_DEL && phoneField.length() == 0) {
@@ -1899,6 +1900,7 @@ public class LoginActivity extends BaseFragment {
                     }
                     return super.onKeyDown(keyCode, event);
                 }
+
 
                 @Override
                 public boolean onTouchEvent(MotionEvent event) {
@@ -2514,6 +2516,7 @@ public class LoginActivity extends BaseFragment {
                         if (preferences.getBoolean("firstlogin", true) || getParentActivity().shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE) || getParentActivity().shouldShowRequestPermissionRationale(Manifest.permission.READ_CALL_LOG)) {
                             preferences.edit().putBoolean("firstlogin", false).commit();
                             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+
                             builder.setPositiveButton(LocaleController.getString("Continue", R.string.Continue), null);
                             int resId;
                             if (!allowCall && (!allowCancelCall || !allowReadCallLog)) {
@@ -3666,6 +3669,7 @@ public class LoginActivity extends BaseFragment {
                 FileLog.e(e);
             }
         }
+
 
         @Override
         public void onNextPressed(String code) {

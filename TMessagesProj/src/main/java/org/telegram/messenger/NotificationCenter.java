@@ -9,7 +9,6 @@
 package org.telegram.messenger;
 
 import android.os.SystemClock;
-import android.util.Log;
 import android.util.SparseArray;
 
 import androidx.annotation.UiThread;
