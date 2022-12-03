@@ -71,6 +71,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import it.owlgram.android.OwlConfig;
+
 public class LNavigation extends FrameLayout implements INavigationLayout, FloatingDebugProvider {
     private final static boolean ALLOW_OPEN_STIFFNESS_CONTROL = false;
     private final static boolean USE_ACTIONBAR_CROSSFADE = false;
@@ -300,7 +302,7 @@ public class LNavigation extends FrameLayout implements INavigationLayout, Float
         overlayLayout = new FrameLayout(context);
         addView(overlayLayout);
 
-        headerShadowDrawable = getResources().getDrawable(R.drawable.header_shadow).mutate();
+        headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : getResources().getDrawable(R.drawable.header_shadow).mutate();
         layerShadowDrawable = getResources().getDrawable(R.drawable.layer_shadow).mutate();
 
         dimmPaint.setColor(0x7a000000);
@@ -2002,6 +2004,11 @@ public class LNavigation extends FrameLayout implements INavigationLayout, Float
             headerShadowDrawable.setBounds(0, y, getMeasuredWidth(), y + headerShadowDrawable.getIntrinsicHeight());
             headerShadowDrawable.draw(canvas);
         }
+    }
+
+    @Override
+    public void setHeaderShadow(Drawable drawable) {
+        headerShadowDrawable = drawable;
     }
 
     @Override

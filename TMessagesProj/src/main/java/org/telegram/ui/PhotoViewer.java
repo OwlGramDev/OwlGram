@@ -5787,9 +5787,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             compressItem.setImageResource(R.drawable.video_quality1);
         } else if (selectedCompression == 2) {
             compressItem.setImageResource(R.drawable.video_quality2);
+        } else if (selectedCompression == 3) {
+            compressItem.setImageResource(R.drawable.video_quality3);
         } else {
             selectedCompression = compressionsCount - 1;
-            compressItem.setImageResource(R.drawable.video_quality3);
+            compressItem.setImageResource(R.drawable.video_quality4);
         }
         compressItem.setContentDescription(LocaleController.getString("AccDescrVideoQuality", R.string.AccDescrVideoQuality));
         itemsLayout.addView(compressItem, LayoutHelper.createLinear(48, 48));
@@ -6873,12 +6875,12 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         return 0;
     }
 
-    private int getRightInset() {
-        if (lastInsets != null && Build.VERSION.SDK_INT >= 21) {
-            return ((WindowInsets) lastInsets).getSystemWindowInsetRight();
-        }
-        return 0;
-    }
+	private int getRightInset() {
+		if (lastInsets != null && Build.VERSION.SDK_INT >= 21) {
+			return ((WindowInsets) lastInsets).getSystemWindowInsetRight();
+		}
+		return 0;
+	}
 
     private void dismissInternal() {
         try {
@@ -16628,6 +16630,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             compressItem.setImageResource(R.drawable.video_quality2);
         } else if (selectedCompression == 3) {
             compressItem.setImageResource(R.drawable.video_quality3);
+        } else if (selectedCompression == 4) {
+            compressItem.setImageResource(R.drawable.video_quality4);
         }
         itemsLayout.requestLayout();
 
@@ -16783,8 +16787,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     maxSize = 1280.0f;
                     break;
                 case 3:
-                default:
                     maxSize = 1920.0f;
+                    break;
+                case 4:
+                default:
+                    maxSize = 3840.0f;
                     break;
             }
             float scale = originalWidth > originalHeight ? maxSize / originalWidth : maxSize / originalHeight;
@@ -17016,7 +17023,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
 
     private void updateCompressionsCount(int h, int w) {
         int maxSize = Math.max(h, w);
-        if (maxSize > 1280) {
+        if (maxSize > 1920) {
+            compressionsCount = 5;
+        } else if (maxSize > 1280) {
             compressionsCount = 4;
         } else if (maxSize > 854) {
             compressionsCount = 3;

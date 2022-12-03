@@ -2,22 +2,22 @@ package it.owlgram.android.helpers;
 
 import android.text.TextUtils;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
 
+import java.util.ArrayList;
+
 import it.owlgram.android.OwlConfig;
 
 public class ActionButtonManager {
 
-    private JSONArray data;
+    private final ArrayList<String> data = new ArrayList<>();
 
     public void reset() {
-        data = new JSONArray();
+        data.clear();
     }
 
     public void load(
@@ -37,44 +37,44 @@ public class ActionButtonManager {
     ) {
         if (userInfo != null) {
             if (isSelf) {
-                data.put("camera");
-                data.put("edit_name");
-                data.put("logout");
+                data.add("camera");
+                data.add("edit_name");
+                data.add("logout");
             } else {
                 boolean isTgUser = userId == 777000 || userId == 42777;
-                data.put("send_message");
+                data.add("send_message");
                 if (isBot || isTgUser) {
                     if (isBot && !user.bot_nochats) {
-                        data.put("add_bot");
+                        data.add("add_bot");
                     }
                 } else {
-                    data.put("call");
+                    data.add("call");
                 }
 
                 if (userInfo.video_calls_available) {
-                    data.put("video_call");
+                    data.add("video_call");
                 }
 
-                if (data.length() < 3) {
+                if (data.size() < 3) {
                     if (!isBot && !TextUtils.isEmpty(user.phone)) {
-                        data.put("share_contact");
+                        data.add("share_contact");
                     } else if (!TextUtils.isEmpty(user.username)) {
-                        data.put("share");
+                        data.add("share");
                     }
                 }
 
                 if (!isTgUser) {
                     if (userBlocked) {
                         if (isBot) {
-                            data.put("restart");
+                            data.add("restart");
                         } else {
-                            data.put("unblock");
+                            data.add("unblock");
                         }
                     } else {
                         if (isBot) {
-                            data.put("stop");
+                            data.add("stop");
                         } else {
-                            data.put("block");
+                            data.add("block");
                         }
                     }
                 }
@@ -102,66 +102,56 @@ public class ActionButtonManager {
             }
 
             if (chat.left && !chat.kicked) {
-                data.put("join");
+                data.add("join");
             } else if (canAddUsers) {
-                data.put("add_user");
+                data.add("add_user");
             }
 
             if (existGroupCall) {
-                data.put("join_call");
+                data.add("join_call");
             }
 
             if (isGroup) {
-                if (data.length() <= 1 && canSearchMembers) {
-                    data.put("search");
+                if (data.size() <= 1 && canSearchMembers) {
+                    data.add("search");
                 }
                 if (!canEdit || !hasAdminRights) {
-                    data.put("info");
+                    data.add("info");
                 }
             }
 
             if (canEdit && hasAdminRights) {
-                data.put("edit");
+                data.add("edit");
             }
 
-            if ((data.length() + (discuss_available ? 1 : 0) + (canLeave ? 1 : 0)) < 4 - (canShare ? 1 : 0) && !isCreator) {
-                data.put("report");
+            if ((data.size() + (discuss_available ? 1 : 0) + (canLeave ? 1 : 0)) < 4 - (canShare ? 1 : 0) && !isCreator) {
+                data.add("report");
             }
 
-            if ((data.length() + (discuss_available ? 1 : 0) + (canLeave ? 1 : 0)) < 4 && canShare) {
-                data.put("share");
+            if ((data.size() + (discuss_available ? 1 : 0) + (canLeave ? 1 : 0)) < 4 && canShare) {
+                data.add("share");
             }
 
-            if (discuss_available && data.length() < 3 + (canLeave ? 0 : 1)) {
+            if (discuss_available && data.size() < 3 + (canLeave ? 0 : 1)) {
                 if (isGroup) {
-                    data.put("open_channel");
+                    data.add("open_channel");
                 } else {
-                    data.put("open_discussion");
+                    data.add("open_discussion");
                 }
             }
 
             if (canLeave) {
-                data.put("leave");
+                data.add("leave");
             }
         }
     }
 
     public boolean hasItem(String id) {
-        if (data != null) {
-            for (int i = 0; i < data.length(); i++) {
-                try {
-                    if (data.getString(i).equals(id)) {
-                        return true;
-                    }
-                } catch (JSONException ignored) {
-                }
-            }
-        }
-        return false;
+        return data.contains(id);
     }
 
     public int size() {
-        return data.length();
+        return data.size();
     }
 
     private String getColor(String id) {
@@ -179,11 +169,7 @@ public class ActionButtonManager {
     }
 
     public ActionButtonInfo getItemAt(int index) {
-        String id = null;
-        try {
-            id = data.getString(index);
-        } catch (JSONException ignored) {
-        }
+        String id = index >= data.size() ? null:data.get(index);
         String text = null;
         int icon = -1;
         if (id != null) {

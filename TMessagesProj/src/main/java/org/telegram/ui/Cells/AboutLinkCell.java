@@ -171,10 +171,10 @@ public class AboutLinkCell extends FrameLayout {
         showMoreBackgroundDrawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider), PorterDuff.Mode.MULTIPLY));
         showMoreTextBackgroundView.setBackground(showMoreBackgroundDrawable);
         showMoreTextBackgroundView.setPadding(
-                showMoreTextBackgroundView.getPaddingLeft() + AndroidUtilities.dp(4),
-                AndroidUtilities.dp(1),
-                0,
-                AndroidUtilities.dp(3)
+            showMoreTextBackgroundView.getPaddingLeft() + AndroidUtilities.dp(4),
+            AndroidUtilities.dp(1),
+            0,
+            AndroidUtilities.dp(3)
         );
         showMoreTextBackgroundView.addView(showMoreTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
         addView(showMoreTextBackgroundView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.RIGHT | Gravity.BOTTOM, 22 - showMoreTextBackgroundView.getPaddingLeft() / AndroidUtilities.density, 0, 22 - showMoreTextBackgroundView.getPaddingRight() / AndroidUtilities.density, 6));
@@ -288,7 +288,7 @@ public class AboutLinkCell extends FrameLayout {
                 int lastLine = firstThreeLinesLayout.getLineCount() - 1;
                 float top = firstThreeLinesLayout.getLineTop(lastLine) + firstThreeLinesLayout.getTopPadding();
                 float x = firstThreeLinesLayout.getLineRight(lastLine) + (needSpace ? SPACE : 0),
-                        y = firstThreeLinesLayout.getLineBottom(lastLine) - firstThreeLinesLayout.getLineTop(lastLine) - firstThreeLinesLayout.getBottomPadding();
+                      y = firstThreeLinesLayout.getLineBottom(lastLine) - firstThreeLinesLayout.getLineTop(lastLine) - firstThreeLinesLayout.getBottomPadding();
                 float t = easeInOutCubic(1f - (float) Math.pow(expandT, 0.25f));
                 if (nextLinesLayouts != null) {
                     for (int line = 0; line < nextLinesLayouts.length; ++line) {
@@ -514,8 +514,8 @@ public class AboutLinkCell extends FrameLayout {
 
         private void step(float delta) {
             final float acceleration = (
-                    -tension * 0.000001f * (position - 1f) + // spring force
-                            -friction * 0.001f * velocity // damping force
+                -tension * 0.000001f * (position - 1f) + // spring force
+                -friction * 0.001f * velocity // damping force
             ) / mass; // pt/ms^2
 
             velocity = velocity + acceleration * delta; // pt/ms
@@ -534,7 +534,7 @@ public class AboutLinkCell extends FrameLayout {
         }
 
         float fromValue = expandT,
-                toValue   = value ? 1f : 0f;
+              toValue   = value ? 1f : 0f;
         if (animated) {
             if (toValue > 0) {
                 didExtend();
@@ -666,7 +666,7 @@ public class AboutLinkCell extends FrameLayout {
                 }
                 for (int line = 3; line < textLayout.getLineCount(); ++line) {
                     int s = textLayout.getLineStart(line),
-                            e = textLayout.getLineEnd(line);
+                        e = textLayout.getLineEnd(line);
                     final StaticLayout layout = makeTextLayout(stringBuilder.subSequence(Math.min(s, e), Math.max(s, e)), maxWidth);
                     nextLinesLayouts[line - 3] = layout;
                     nextLinesLayoutsPositions[line - 3] = new Point();

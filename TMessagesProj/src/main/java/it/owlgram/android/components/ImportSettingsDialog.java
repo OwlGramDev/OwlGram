@@ -29,7 +29,7 @@ public class ImportSettingsDialog extends BottomSheet {
     private final BaseFragment fragment;
 
     public ImportSettingsDialog(BaseFragment fragment, MessageObject messageObject) {
-        super(fragment.getParentActivity(), false);
+        super(fragment.getParentActivity(), false, fragment.getResourceProvider());
         this.fragment = fragment;
         Activity activity = fragment.getParentActivity();
         difference = OwlConfig.getDifferenceBetweenCurrentConfig(messageObject).size();
@@ -46,7 +46,7 @@ public class ImportSettingsDialog extends BottomSheet {
 
         TextView title = new TextView(activity);
         title.setGravity(Gravity.CENTER_HORIZONTAL);
-        title.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
+        title.setTextColor(getThemedColor(Theme.key_dialogTextBlack));
         title.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
         title.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
         title.setText(LocaleController.getString("ImportSettingsAlert", R.string.ImportSettingsAlert));
@@ -55,7 +55,7 @@ public class ImportSettingsDialog extends BottomSheet {
         TextView description = new TextView(activity);
         description.setGravity(Gravity.CENTER_HORIZONTAL);
         description.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
-        description.setTextColor(Theme.getColor(Theme.key_dialogTextGray3));
+        description.setTextColor(getThemedColor(Theme.key_dialogTextGray3));
         if (difference == 1) {
             description.setText(AndroidUtilities.replaceTags(LocaleController.getString("ImportingChangesOne", R.string.ImportingChangesOne)));
         } else {
@@ -80,8 +80,8 @@ public class ImportSettingsDialog extends BottomSheet {
             BulletinFactory.of(fragment).createSimpleBulletin(R.raw.forward, LocaleController.getString("SettingsImported", R.string.SettingsImported)).show();
         });
 
-        buttonTextView.setTextColor(Theme.getColor(Theme.key_featuredStickers_buttonText));
-        buttonTextView.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(6), Theme.getColor(Theme.key_featuredStickers_addButton), ColorUtils.setAlphaComponent(Theme.getColor(Theme.key_windowBackgroundWhite), 120)));
+        buttonTextView.setTextColor(getThemedColor(Theme.key_featuredStickers_buttonText));
+        buttonTextView.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(6), getThemedColor(Theme.key_featuredStickers_addButton), ColorUtils.setAlphaComponent(getThemedColor(Theme.key_windowBackgroundWhite), 120)));
 
         linearLayout.addView(buttonTextView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, 0, 16, 15, 16, 8));
 
@@ -89,7 +89,7 @@ public class ImportSettingsDialog extends BottomSheet {
         textView.setGravity(Gravity.CENTER);
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
         textView.setText(LocaleController.getString("Cancel", R.string.Cancel));
-        textView.setTextColor(Theme.getColor(Theme.key_featuredStickers_addButton));
+        textView.setTextColor(getThemedColor(Theme.key_featuredStickers_addButton));
         textView.setOnClickListener(view -> dismiss());
         linearLayout.addView(textView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, 0, 16, 0, 16, 0));
 

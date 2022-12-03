@@ -89,7 +89,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean hideAllTab;
     public static boolean hideSendAsChannel;
     public static boolean showNameInActionBar;
-    public static boolean disableStickersAutoReorder;
+    public static boolean stickersSorting;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -108,7 +108,7 @@ public class OwlConfig extends SettingsManager {
     public static int buttonStyleType = 0;
     public static int translatorStyle = 0;
     public static int cameraType;
-    public static int cameraXFps;
+    public static int cameraResolution;
     public static int maxRecentStickers;
     public static int stickerSizeStack = 0;
     public static int dcStyleType;
@@ -192,7 +192,7 @@ public class OwlConfig extends SettingsManager {
             showSantaHat = getBoolean("showSantaHat", true);
             showSnowFalling = getBoolean("showSnowFalling", true);
             cameraType = getInt("cameraType", CameraXUtilities.getDefault());
-            cameraXFps = getInt("cameraXFps", SharedConfig.getDevicePerformanceClass() == SharedConfig.PERFORMANCE_CLASS_HIGH ? 60 : 30);
+            cameraResolution = getInt("cameraResolution", CameraXUtilities.getCameraResolution());
             useCameraXOptimizedMode = getBoolean("useCameraXOptimizedMode", SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_HIGH);
             disableProximityEvents = getBoolean("disableProximityEvents", false);
             verifyLinkTip = getBoolean("verifyLinkTip", false);
@@ -220,7 +220,7 @@ public class OwlConfig extends SettingsManager {
             hideAllTab = getBoolean("hideAllTab", false);
             hideSendAsChannel = getBoolean("hideSendAsChannel", false);
             showNameInActionBar = getBoolean("showNameInActionBar", false);
-            disableStickersAutoReorder = getBoolean("disableStickersAutoReorder", false);
+            stickersSorting = getBoolean("stickersSorting", true);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -466,8 +466,8 @@ public class OwlConfig extends SettingsManager {
         putValue("showNameInActionBar", showNameInActionBar ^= true);
     }
 
-    public static void toggleStickersAutoReorder() {
-        putValue("stickersAutoReorder", disableStickersAutoReorder ^= true);
+    public static void toggleStickersSorting() {
+        putValue("stickersSorting", stickersSorting ^= true);
     }
 
     public static void unlockChupa() {
@@ -571,8 +571,8 @@ public class OwlConfig extends SettingsManager {
         putValue("cameraType", cameraType = type);
     }
 
-    public static void saveCameraXFps(int fps) {
-        putValue("cameraXFps", cameraXFps = fps);
+    public static void saveCameraResolution(int resolution) {
+        putValue("cameraResolution", cameraResolution = resolution);
     }
 
     public static void setMaxRecentStickers(int size) {

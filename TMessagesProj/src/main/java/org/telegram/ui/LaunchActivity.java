@@ -34,7 +34,6 @@ import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.Shader;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -2201,7 +2200,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                     } else if (url.startsWith("tg:resolve") || url.startsWith("tg://resolve")) {
                                         url = url.replace("tg:resolve", "tg://telegram.org").replace("tg://resolve", "tg://telegram.org");
                                         data = Uri.parse(url);
-                                        String number = data.getQueryParameter("phone");
                                         username = data.getQueryParameter("domain");
                                         if (username == null) {
                                             username = data.getQueryParameter("phone");

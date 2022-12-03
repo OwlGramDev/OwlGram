@@ -48,7 +48,6 @@ public class ForwardingMessagesParams {
             message.media = messageObject.messageOwner.media;
             message.action =  messageObject.messageOwner.action;
             message.edit_date = 0;
-
             if (messageObject.messageOwner.entities != null) {
                 message.entities.addAll(messageObject.messageOwner.entities);
                 if (!hasSpoilers) {

@@ -267,6 +267,7 @@ public class ActionBar extends FrameLayout {
         if (supportsHolidayImage && !titleOverlayShown && !LocaleController.isRTL && (child == titleTextView[0] || child == titleTextView[1])) {
             Drawable drawable = Theme.getCurrentHolidayDrawable();
             if (drawable != null) {
+
                 SimpleTextView titleView = (SimpleTextView) child;
                 if (titleView.getVisibility() == View.VISIBLE && titleView.getText() instanceof String) {
                     TextPaint textPaint = titleView.getTextPaint();
@@ -283,7 +284,7 @@ public class ActionBar extends FrameLayout {
                     }
                 }
             }
-            if (((Theme.canStartHolidayAnimation() && OwlConfig.eventType == 0) || OwlConfig.eventType == 1) && OwlConfig.showSnowFalling) {
+            if (Theme.canStartHolidayAnimation() && (OwlConfig.eventType == 0 || (OwlConfig.eventType == 1 && OwlConfig.showSnowFalling))) {
                 if (snowflakesEffect == null) {
                     fireworksEffect = null;
                     snowflakesEffect = new SnowflakesEffect(0);

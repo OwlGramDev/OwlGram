@@ -8,22 +8,17 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
-import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
-import org.telegram.ui.ActionBar.ActionBarLayout;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextCheckCell;
-
-import java.util.ArrayList;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.BlurIntensityCell;
 import it.owlgram.android.components.DrawerProfilePreviewCell;
 import it.owlgram.android.components.DynamicButtonSelector;
 import it.owlgram.android.components.ThemeSelectorDrawerCell;
-import it.owlgram.android.helpers.PopupHelper;
 
 public class OwlgramAppearanceSettings extends BaseSettingsActivity {
     private DrawerProfilePreviewCell profilePreviewCell;
@@ -75,28 +70,28 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.showAvatarImage);
             }
-            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            reloadMainInfo();
             listAdapter.notifyItemChanged(drawerRow, PARTIAL);
         } else if (position == showGradientRow) {
             OwlConfig.toggleShowGradientColor();
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.showGradientColor);
             }
-            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            reloadMainInfo();
             listAdapter.notifyItemChanged(drawerRow, PARTIAL);
         } else if (position == drawerDarkenBackgroundRow) {
             OwlConfig.toggleAvatarBackgroundDarken();
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.avatarBackgroundDarken);
             }
-            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            reloadMainInfo();
             listAdapter.notifyItemChanged(drawerRow, PARTIAL);
         } else if (position == drawerBlurBackgroundRow) {
             OwlConfig.toggleAvatarBackgroundBlur();
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.avatarBackgroundBlur);
             }
-            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            reloadMainInfo();
             listAdapter.notifyItemChanged(drawerRow, PARTIAL);
             if (OwlConfig.avatarBackgroundBlur) {
                 listAdapter.notifyItemRangeInserted(drawerDividerRow, 3);
@@ -109,7 +104,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.avatarAsDrawerBackground);
             }
-            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            reloadMainInfo();
             TransitionManager.beginDelayedTransition(profilePreviewCell);
             listAdapter.notifyItemChanged(drawerRow, PARTIAL);
             if (OwlConfig.avatarAsDrawerBackground) {
@@ -124,7 +119,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
         } else if (position == useSystemFontRow) {
             OwlConfig.toggleUseSystemFont();
             AndroidUtilities.clearTypefaceCache();
-            parentLayout.rebuildAllFragmentViews(true, true);
+            rebuildAllFragmentsWithLast();
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.useSystemFont);
             }
@@ -145,8 +140,8 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
             }
         } else if (position == appBarShadowRow) {
             OwlConfig.toggleAppBarShadow();
-            ActionBarLayout.headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : parentLayout.getView().getResources().getDrawable(R.drawable.header_shadow).mutate();
-            parentLayout.rebuildAllFragmentViews(true, true);
+            parentLayout.setHeaderShadow(OwlConfig.disableAppBarShadow ? null : parentLayout.getView().getResources().getDrawable(R.drawable.header_shadow).mutate());
+            rebuildAllFragmentsWithLast();
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.disableAppBarShadow);
             }
@@ -157,7 +152,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
             }
             Theme.lastHolidayCheckTime = 0;
             Theme.dialogs_holidayDrawable = null;
-            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            reloadMainInfo();
         } else if (position == showFallingSnowRow) {
             OwlConfig.toggleShowSnowFalling();
             if (view instanceof TextCheckCell) {
@@ -165,7 +160,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
             }
             Theme.lastHolidayCheckTime = 0;
             Theme.dialogs_holidayDrawable = null;
-            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            reloadMainInfo();
         } else if (position == slidingTitleRow) {
             OwlConfig.toggleSlidingChatTitle();
             if (view instanceof TextCheckCell) {
@@ -195,7 +190,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
             }
         } else if (position == showInActionBarRow) {
             OwlConfig.toggleShowNameInActionBar();
-            getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
+            reloadDialogs();
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.showNameInActionBar);
             }
@@ -370,7 +365,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                                     cell.invalidate();
                                 }
                             }
-                            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                            reloadMainInfo();
                             listAdapter.notifyItemChanged(drawerRow, PARTIAL);
                         }
                     };
@@ -381,11 +376,17 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                         @Override
                         protected void onSelectedEvent(int eventSelected) {
                             super.onSelectedEvent(eventSelected);
+                            int previousEvent = OwlConfig.eventType;
                             OwlConfig.saveEventType(eventSelected);
+                            if (previousEvent == 1 && eventSelected != 1) {
+                                listAdapter.notifyItemRangeRemoved(forcePacmanRow + 1, 2);
+                            } else if (previousEvent != 1 && eventSelected == 1) {
+                                listAdapter.notifyItemRangeInserted(forcePacmanRow + 1, 2);
+                            }
                             listAdapter.notifyItemChanged(drawerRow, PARTIAL);
                             Theme.lastHolidayCheckTime = 0;
                             Theme.dialogs_holidayDrawable = null;
-                            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                            reloadMainInfo();
                             updateRowsId();
                         }
                     };
@@ -396,7 +397,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                         @Override
                         protected void onSelectionChange() {
                             super.onSelectionChange();
-                            parentLayout.rebuildAllFragmentViews(false, false);
+                            reloadInterface();
                         }
                     };
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));

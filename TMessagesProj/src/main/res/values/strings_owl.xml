@@ -184,7 +184,7 @@
     <string name="CameraXDesc">CameraX is only supported on <![CDATA[<a href="https://developer.android.com/training/camerax/devices">selected devices</a>]]>, effects and lenses support depends on your manufacturer.</string>
     <string name="PerformanceMode">Performance Mode</string>
     <string name="PerformanceModeDesc">CameraX\'s quality will be reduced in favor of performance</string>
-    <string name="MotionSmoothness">Motion Smoothness</string>
+    <string name="CameraQuality">Camera Quality</string>
     <string name="CameraTypeSystem">System</string>
     <string name="SystemCameraDesc">Access directly the system camera (not applicable for video messages).</string>
     <string name="MediaSettings">Media</string>
@@ -303,5 +303,6 @@
     <string name="PrivacyPolicyLogin">By continuing,\nyou agree to the *Privacy Policy*.</string>
     <string name="OwlPrivacyPolicy">OwlGram Privacy Policy</string>
     <string name="HideSendAsChannel">Hide "Send as Channel"</string>
-    <string name="DisableStickersAutoReorder">Disable stickers packs auto-reorder</string>
+    <string name="AutomaticSorting">Automatic Sorting</string>
+    <string name="AutomaticSortingDesc">Move recently used custom emoji and sticker sets to the first position</string>
 </resources>
