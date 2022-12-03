@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 
 import java.util.HashMap;
 
-import it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j;
+import io.noties.prism4j.Syntax;
 
 public abstract class Prism4jThemeBase implements Prism4jTheme {
 
@@ -44,7 +44,7 @@ public abstract class Prism4jThemeBase implements Prism4jTheme {
     protected abstract ColorHashMap init();
 
     @ColorInt
-    protected int color(@NonNull String type, @Nullable String alias) {
+    protected int color(@NonNull String ignored, @NonNull String type, @Nullable String alias) {
 
         Color color = colorHashMap.get(type);
         if (color == null
@@ -60,7 +60,7 @@ public abstract class Prism4jThemeBase implements Prism4jTheme {
     @Override
     public void apply(
             @NonNull String language,
-            @NonNull Prism4j.Syntax syntax,
+            @NonNull Syntax syntax,
             @NonNull Spannable spannable,
             int start,
             int end) {
@@ -68,7 +68,7 @@ public abstract class Prism4jThemeBase implements Prism4jTheme {
         final String type = syntax.type();
         final String alias = syntax.alias();
 
-        final int color = color(type, alias);
+        final int color = color(language, type, alias);
         if (color != 0) {
             applyColor(language, type, alias, color, spannable, start, end);
         }
