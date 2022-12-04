@@ -2195,7 +2195,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
             oldFragment = null;
             Runnable endRunnable = onCloseAnimationEndRunnable;
             onCloseAnimationEndRunnable = null;
-            endRunnable.run();
+            if (endRunnable != null) endRunnable.run();
             checkNeedRebuild();
             checkNeedRebuild();
         }
