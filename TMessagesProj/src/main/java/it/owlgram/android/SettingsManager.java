@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 
+import it.owlgram.android.camera.CameraXUtilities;
 import it.owlgram.android.components.FileSettingsNameDialog;
 import it.owlgram.android.helpers.MenuOrderManager;
 import it.owlgram.android.helpers.SharedPreferencesHelper;
@@ -54,6 +55,7 @@ public class SettingsManager extends SharedPreferencesHelper {
     public static final int NEED_RECREATE_SHADOW = 2;
     public static final int NEED_FRAGMENT_REBASE_WITH_LAST = 4;
     public static final int NEED_FRAGMENT_REBASE = 8;
+    public static final int NEED_UPDATE_CAMERAX = 16;
 
     private static boolean isBackupAvailable(String key) {
         switch (key) {
@@ -385,6 +387,9 @@ public class SettingsManager extends SharedPreferencesHelper {
                 case "showPencilIcon":
                     returnStatus = addWithCheck(returnStatus, NEED_FRAGMENT_REBASE);
                     break;
+                case "cameraResolution":
+                    returnStatus = addWithCheck(returnStatus, NEED_UPDATE_CAMERAX);
+                    break;
             }
         }
         return returnStatus;
@@ -408,6 +413,9 @@ public class SettingsManager extends SharedPreferencesHelper {
             parentLayout.rebuildAllFragmentViews(false, false);
         } else if ((difference & NEED_FRAGMENT_REBASE_WITH_LAST) > 0) {
             parentLayout.rebuildFragments(INavigationLayout.REBUILD_FLAG_REBUILD_LAST);
+        }
+        if ((difference & NEED_UPDATE_CAMERAX) > 0) {
+            CameraXUtilities.loadSuggestedResolution();
         }
         NotificationCenter currentAccount = AccountInstance.getInstance(UserConfig.selectedAccount).getNotificationCenter();
         currentAccount.postNotificationName(NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_CHAT);
