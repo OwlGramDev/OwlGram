@@ -559,6 +559,14 @@ public class ContentPreviewViewer {
     public void confirmSending() {
         withVibration = false;
         AndroidUtilities.runOnUIThread(() -> {
+            if (currentPreviewCell instanceof StickerEmojiCell) {
+                ((StickerEmojiCell) currentPreviewCell).setScaled(false);
+            } else if (currentPreviewCell instanceof StickerCell) {
+                ((StickerCell) currentPreviewCell).setScaled(false);
+            } else if (currentPreviewCell instanceof ContextLinkCell) {
+                ((ContextLinkCell) currentPreviewCell).setScaled(false);
+            }
+            currentMoveYProgress = 1f;
             if (isVisible()) {
                 if (showSheetRunnable != null && !isShowedRunnable) {
                     AndroidUtilities.cancelRunOnUIThread(showSheetRunnable);
