@@ -25285,7 +25285,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 messages.add(selectedObject);
                 TLRPC.ReplyMarkup botButtons = selectedObject.messageOwner.reply_markup;
                 long my_user_id = UserConfig.getInstance(currentAccount).getClientUserId();
-                int result_send = getSendMessagesHelper().sendMessage(messages, my_user_id, false, true, false, 0);
+                int result_send = getSendMessagesHelper().sendMessage(messages, my_user_id, false, false, false, 0);
                 AlertsCreator.showSendMediaAlert(result_send, this, themeDelegate);
                 selectedObject.messageOwner.reply_markup = botButtons;
                 if (result_send == 0) {

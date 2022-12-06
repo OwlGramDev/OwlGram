@@ -252,22 +252,20 @@ public class FlickerLoadingView extends View {
             checkRtl(rectF);
             canvas.drawRoundRect(rectF, AndroidUtilities.dp(10), AndroidUtilities.dp(10), paint);
         } else if (getViewType() == ACTION_BUTTONS_TYPE) {
-            int width = (getMeasuredWidth() >> 2) * 4;
-            int height = width >> 2;
-            int padding = AndroidUtilities.dp(26);
-            height += padding;
-            int left = (getMeasuredWidth() >> 1) - (width >> 1);
-            int top = (getCellHeight(getMeasuredWidth()) >> 1) - (height >> 1);
-            int sizeContainer = width - padding;
-            int xContainer = left + (width >> 1) - (sizeContainer >> 1);
-            int hItem = sizeContainer >> 2;
-            int yContainer = top + (height >> 1) - (hItem >> 1);
+            int cellWidth = getMeasuredWidth();
+            int cellHeight = getCellHeight(getMeasuredWidth());
+            int padding = AndroidUtilities.dp(16);
+            int margin = AndroidUtilities.dp(8);
+            int containerHeight = cellHeight - (padding >> 1);
+            int containerWidth = (cellWidth - padding) >> 2;
+            int x = (cellWidth >> 1) - ((containerWidth << 2) >> 1);
+            int y = cellHeight - containerHeight;
             for (int i = 0; i < 4; i++) {
-                int x = xContainer + (hItem * i);
-                int wSubItem = hItem - padding;
-                int xMiddle = x + (hItem >> 1) - (wSubItem >> 1);
-                int yMiddle = yContainer + (hItem >> 1) - (wSubItem >> 1);
-                ButtonCell.drawFlickerPreview(canvas, xMiddle, yMiddle, wSubItem, i, getContext(), paint);
+                int leftContainer = x + (containerWidth * i);
+                int itemHeight = containerHeight - (margin << 1);
+                int left = leftContainer + (containerWidth >> 1) - (itemHeight >> 1);
+                int top = y + (containerHeight >> 1) - (itemHeight >> 1);
+                ButtonCell.drawFlickerPreview(canvas, left, top, itemHeight, i, getContext(), paint);
             }
         } else if (getViewType() == DATACENTER_CELL_TYPE) {
             int r = AndroidUtilities.dp(25);

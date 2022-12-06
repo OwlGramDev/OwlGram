@@ -394,8 +394,8 @@ public class ContentPreviewViewer {
                         return;
                     }
                     int which = (int) v.getTag();
-                    if (actions.get(which) == 0) {
-                        delegate.sendGif(currentDocument != null ? currentDocument : inlineResult, parentObject, true, 0);
+                    if (actions.get(which) == 0 || actions.get(which) == 6) {
+                        delegate.sendGif(currentDocument != null ? currentDocument : inlineResult, parentObject, actions.get(which) == 0, 0);
                     } else if (actions.get(which) == 1) {
                         MediaDataController.getInstance(currentAccount).removeRecentGif(currentDocument);
                         delegate.gifAddedOrDeleted();
@@ -559,6 +559,14 @@ public class ContentPreviewViewer {
     public void confirmSending() {
         withVibration = false;
         AndroidUtilities.runOnUIThread(() -> {
+            if (currentPreviewCell instanceof StickerEmojiCell) {
+                ((StickerEmojiCell) currentPreviewCell).setScaled(false);
+            } else if (currentPreviewCell instanceof StickerCell) {
+                ((StickerCell) currentPreviewCell).setScaled(false);
+            } else if (currentPreviewCell instanceof ContextLinkCell) {
+                ((ContextLinkCell) currentPreviewCell).setScaled(false);
+            }
+            currentMoveYProgress = 1f;
             if (isVisible()) {
                 if (showSheetRunnable != null && !isShowedRunnable) {
                     AndroidUtilities.cancelRunOnUIThread(showSheetRunnable);
