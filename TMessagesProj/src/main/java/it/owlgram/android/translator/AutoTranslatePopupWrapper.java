@@ -45,14 +45,17 @@ public class AutoTranslatePopupWrapper {
         defaultItem = ActionBarMenuItem.addItem(windowLayout, 0, LocaleController.getString("Default", R.string.Default), true, resourcesProvider);
 
         defaultItem.setOnClickListener(view -> {
-            AutoTranslateConfig.setDefault(dialogId, topicId);
+            if (topicId == 0) {
+                AutoTranslateConfig.removeGroupException(dialogId);
+            } else {
+                AutoTranslateConfig.setDefault(dialogId, topicId);
+            }
             updateItems();
             updateLastFragment();
         });
 
         if (topicId == 0 || AutoTranslateConfig.isLastTopicAvailable(dialogId, topicId, false)) {
             enableItem = ActionBarMenuItem.addItem(windowLayout, 0, LocaleController.getString("Enable", R.string.Enable), true, resourcesProvider);
-            enableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
             enableItem.setOnClickListener(view -> {
                 AutoTranslateConfig.setEnabled(dialogId, topicId, true);
                 updateItems();
@@ -62,7 +65,6 @@ public class AutoTranslatePopupWrapper {
 
         if (topicId == 0 || AutoTranslateConfig.isLastTopicAvailable(dialogId, topicId, true)) {
             disableItem = ActionBarMenuItem.addItem(windowLayout, 0, LocaleController.getString("Disable", R.string.Disable), true, resourcesProvider);
-            disableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && !AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
             disableItem.setOnClickListener(view -> {
                 AutoTranslateConfig.setEnabled(dialogId, topicId, false);
                 updateItems();
@@ -86,9 +88,21 @@ public class AutoTranslatePopupWrapper {
     }
 
     public void updateItems() {
-        defaultItem.setChecked(!AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId));
-        if (enableItem != null) enableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
-        if (disableItem != null) disableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && !AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
+        if (topicId == 0) {
+            boolean allowed = AutoTranslateConfig.getExceptionsById(true, dialogId);
+            boolean disabled = AutoTranslateConfig.getExceptionsById(false, dialogId);
+            defaultItem.setChecked(!allowed && !disabled);
+            if (enableItem != null) {
+                enableItem.setChecked(allowed);
+            }
+            if (disableItem != null) {
+                disableItem.setChecked(disabled);
+            }
+        } else {
+            defaultItem.setChecked(AutoTranslateConfig.isDefault(dialogId, topicId));
+            if (enableItem != null) enableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
+            if (disableItem != null) disableItem.setChecked(AutoTranslateConfig.hasAutoTranslateConfig(dialogId, topicId) && !AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
+        }
     }
 
     private void updateLastFragment() {
