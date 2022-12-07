@@ -9405,11 +9405,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         tInfo = DCHelper.getTInfo(currentUser, currentChat);
                         Drawable drawable = ContextCompat.getDrawable(detailCell.getContext(), DCHelper.getDcIconLittle(tInfo.dcID));
                         if (drawable != null) {
-                            drawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_switch2TrackChecked, resourcesProvider), PorterDuff.Mode.SRC_IN));
+                            drawable.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_switch2TrackChecked), PorterDuff.Mode.SRC_IN));
                             detailCell.setImage(drawable);
                         }
                         boolean withDivider = (currentChat != null && !TextUtils.isEmpty(currentChat.username)) || currentUser != null && (UserObject.isUserSelf(currentUser) || !TextUtils.isEmpty(currentUser.username));
                         detailCell.setTextAndValue(String.valueOf(tInfo.tID), "ID", withDivider);
+                        detailCell.setImageClickListener(ProfileActivity.this::onTextDetailCellImageClicked);
                     }
                     detailCell.setTag(position);
                     break;
