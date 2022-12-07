@@ -13,10 +13,8 @@ import android.text.TextUtils;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.core.text.HtmlCompat;
 import androidx.core.util.Pair;
 
-import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BaseController;
 import org.telegram.messenger.ChatObject;
@@ -37,11 +35,11 @@ import org.telegram.ui.Components.ColoredImageSpan;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Objects;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.entities.EntitiesHelper;
+import it.owlgram.android.translator.TranslatorHelper;
 
 public class MessageHelper extends BaseController {
 
@@ -270,19 +268,13 @@ public class MessageHelper extends BaseController {
             arrowSpan = new SpannableStringBuilder("\u200B");
             arrowSpan.setSpan(new ColoredImageSpan(arrowDrawable), 0, 1, 0);
         }
-        Locale from = Locale.forLanguageTag(translatedLanguage.first);
-        Locale to = Locale.forLanguageTag(translatedLanguage.second);
-        String fromString = !TextUtils.isEmpty(from.getScript()) ? String.valueOf(HtmlCompat.fromHtml(from.getDisplayScript(), HtmlCompat.FROM_HTML_MODE_LEGACY)) : from.getDisplayName();
-        fromString = AndroidUtilities.capitalize(fromString);
-        String toString = !TextUtils.isEmpty(to.getScript()) ? String.valueOf(HtmlCompat.fromHtml(to.getDisplayScript(), HtmlCompat.FROM_HTML_MODE_LEGACY)) : to.getDisplayName();
-        toString = AndroidUtilities.capitalize(toString);
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
         spannableStringBuilder
-                .append(fromString)
+                .append(TranslatorHelper.languageName(translatedLanguage.first))
                 .append(' ')
                 .append(arrowSpan)
                 .append(' ')
-                .append(toString)
+                .append(TranslatorHelper.languageName(translatedLanguage.second))
                 .append(' ')
                 .append(LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000));
         return spannableStringBuilder;

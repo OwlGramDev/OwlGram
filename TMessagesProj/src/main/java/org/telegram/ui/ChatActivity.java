@@ -22661,9 +22661,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             pollText.append("\n\uD83D\uDD18 ").append(answer.text);
                         messageTextToTranslate = pollText.toString();
                     } catch (Exception e) {}
-                    if (messageTextToTranslate != null && Emoji.fullyConsistsOfEmojis(messageTextToTranslate)) {
-                        messageTextToTranslate = null; // message fully consists of emojis, do not translate
-                    }
+                }
+                if (messageTextToTranslate == null) {
+                    messageTextToTranslate = getMessageContent(selectedObject, 0, false);
+                }
+                if (messageTextToTranslate != null && Emoji.fullyConsistsOfEmojis(messageTextToTranslate)) {
+                    messageTextToTranslate = null; // message fully consists of emojis, do not translate
                 }
 
                 if (message.isSponsored() && !getMessagesController().premiumLocked) {
