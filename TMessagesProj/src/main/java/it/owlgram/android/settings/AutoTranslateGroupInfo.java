@@ -22,6 +22,7 @@ import org.telegram.ui.Cells.UserCell2;
 import org.telegram.ui.Components.FlickerLoadingView;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import it.owlgram.android.components.EditTopicCell;
 import it.owlgram.android.translator.AutoTranslateConfig;
@@ -51,7 +52,7 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
         this.chat = chat;
         ArrayList<TLRPC.TL_forumTopic> tmp = getMessagesController().getTopicsController().getTopics(chat.id);
         if (tmp != null) {
-            topics.addAll(tmp);
+            tmp.stream().sorted(Comparator.comparing(o -> o.title)).forEach(topics::add);
         }
         this.isAllow = isAllow;
     }
@@ -125,7 +126,8 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
             Long chatId = (Long) args[0];
             if (this.chat.id == chatId) {
                 topics.clear();
-                topics.addAll(getMessagesController().getTopicsController().getTopics(chat.id));
+                ArrayList<TLRPC.TL_forumTopic> tmp = getMessagesController().getTopicsController().getTopics(chat.id);
+                tmp.stream().sorted(Comparator.comparing(o -> o.title)).forEach(topics::add);
                 updateRowsId();
                 listAdapter.notifyDataSetChanged();
                 if (!getMessagesController().getTopicsController().endIsReached(chat.id)) {
