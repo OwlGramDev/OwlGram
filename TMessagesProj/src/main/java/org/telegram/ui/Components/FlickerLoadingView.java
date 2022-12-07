@@ -44,6 +44,7 @@ public class FlickerLoadingView extends View {
     public final static int LIMIT_REACHED_LINKS = 22;
     public final static int REACTED_TYPE_WITH_EMOJI_HINT = 23;
     public static final int TOPIC_CELL_TYPE = 24;
+    public static final int DIALOG_CACHE_CONTROL = 25;
     public static final int EDIT_TOPIC_CELL_TYPE = 200;
     public static final int ACTION_BUTTONS_TYPE = 201;
     public static final int DATACENTER_CELL_TYPE = 202;
@@ -68,8 +69,8 @@ public class FlickerLoadingView extends View {
     private int paddingTop;
     private int paddingLeft;
 
-    private String colorKey1 = Theme.key_windowBackgroundWhite;
-    private String colorKey2 = Theme.key_windowBackgroundGray;
+    private String colorKey1 = Theme.key_actionBarDefaultSubmenuBackground;
+    private String colorKey2 = Theme.key_listSelector;
     private String colorKey3;
     private int itemsCount = 1;
     private final Theme.ResourcesProvider resourcesProvider;
@@ -609,8 +610,8 @@ public class FlickerLoadingView extends View {
 
                 if (backgroundPaint == null) {
                     backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-                    backgroundPaint.setColor(Theme.getColor(Theme.key_dialogBackground));
                 }
+                backgroundPaint.setColor(Theme.getColor(Theme.key_dialogBackground, resourcesProvider));
 
                 AndroidUtilities.rectTmp.set(x + AndroidUtilities.dp(4), AndroidUtilities.dp(4), x + itemWidth - AndroidUtilities.dp(4), getMeasuredHeight() - AndroidUtilities.dp(4));
                 canvas.drawRoundRect(AndroidUtilities.rectTmp, AndroidUtilities.dp(6), AndroidUtilities.dp(6), paint);
@@ -707,7 +708,7 @@ public class FlickerLoadingView extends View {
                     break;
                 }
             }
-        }  else if (viewType == LIMIT_REACHED_LINKS) {
+        } else if (viewType == LIMIT_REACHED_LINKS) {
             int k = 0;
             while (h <= getMeasuredHeight()) {
                 int r = AndroidUtilities.dp(48) >> 1;
@@ -719,6 +720,22 @@ public class FlickerLoadingView extends View {
 
                 rectF.set(AndroidUtilities.dp(76), h + AndroidUtilities.dp(38), AndroidUtilities.dp(260), h + AndroidUtilities.dp(46));
                 checkRtl(rectF);
+                canvas.drawRoundRect(rectF, AndroidUtilities.dp(4), AndroidUtilities.dp(4), paint);
+
+                h += getCellHeight(getMeasuredWidth());
+                k++;
+                if (isSingleCell && k >= itemsCount) {
+                    break;
+                }
+            }
+        } else if (viewType == DIALOG_CACHE_CONTROL) {
+            int k = 0;
+            while (h <= getMeasuredHeight()) {
+                int r = AndroidUtilities.dp(38) >> 1;
+                canvas.drawCircle(AndroidUtilities.dp(17) + r, h + AndroidUtilities.dp(6) + r, r, paint);
+
+                rectF.set(AndroidUtilities.dp(76), h + AndroidUtilities.dp(21), AndroidUtilities.dp(220), h + AndroidUtilities.dp(29));
+               // checkRtl(rectF);
                 canvas.drawRoundRect(rectF, AndroidUtilities.dp(4), AndroidUtilities.dp(4), paint);
 
                 h += getCellHeight(getMeasuredWidth());
@@ -848,6 +865,8 @@ public class FlickerLoadingView extends View {
                 return AndroidUtilities.dp(58);
             case LIMIT_REACHED_LINKS:
                 return AndroidUtilities.dp(60);
+            case DIALOG_CACHE_CONTROL:
+                return AndroidUtilities.dp(51);
         }
         return 0;
     }
