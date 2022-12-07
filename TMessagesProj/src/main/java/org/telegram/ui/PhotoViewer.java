@@ -5793,9 +5793,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             compressItem.setImageResource(R.drawable.video_quality2);
         } else if (selectedCompression == 3) {
             compressItem.setImageResource(R.drawable.video_quality3);
+        } else if (selectedCompression == 4) {
+            compressItem.setImageResource(R.drawable.video_quality4);
         } else {
             selectedCompression = compressionsCount - 1;
-            compressItem.setImageResource(R.drawable.video_quality4);
+            compressItem.setImageResource(R.drawable.video_quality5);
         }
         compressItem.setContentDescription(LocaleController.getString("AccDescrVideoQuality", R.string.AccDescrVideoQuality));
         itemsLayout.addView(compressItem, LayoutHelper.createLinear(48, 48));
@@ -16640,6 +16642,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             compressItem.setImageResource(R.drawable.video_quality3);
         } else if (selectedCompression == 4) {
             compressItem.setImageResource(R.drawable.video_quality4);
+        } else if (selectedCompression == 5) {
+            compressItem.setImageResource(R.drawable.video_quality5);
         }
         itemsLayout.requestLayout();
 
@@ -16798,6 +16802,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     maxSize = 1920.0f;
                     break;
                 case 4:
+                    maxSize = 2560.0f;
+                    break;
+                case 5:
                 default:
                     maxSize = 3840.0f;
                     break;
@@ -17034,10 +17041,23 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     }
 
     private void updateCompressionsCount(int h, int w) {
-        int maxSize = Math.max(h, w);
-        if (maxSize > 1920) {
+        int newH = Math.max(h, w);
+        int newW = Math.min(h, w);
+        if (newW >= 2160 && newH >= 3840) {
+            compressionsCount = 6;
+        } else if (newW >= 1440 && newH >= 2560) {
             compressionsCount = 5;
-        } else if (maxSize > 1280) {
+        } else if (newW >= 1080 && newH >= 1920) {
+            compressionsCount = 4;
+        } else if (newW >= 720 && newH >= 1280) {
+            compressionsCount = 3;
+        } else if (newW >= 480 && newH >= 854) {
+            compressionsCount = 2;
+        } else {
+            compressionsCount = 1;
+        }
+        /*int maxSize = Math.max(h, w);
+        if (maxSize > 1280) {
             compressionsCount = 4;
         } else if (maxSize > 854) {
             compressionsCount = 3;
@@ -17045,7 +17065,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             compressionsCount = 2;
         } else {
             compressionsCount = 1;
-        }
+        }*/
     }
 
     private void setCompressItemEnabled(boolean enabled, boolean animated) {
