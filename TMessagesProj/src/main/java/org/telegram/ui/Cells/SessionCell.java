@@ -10,6 +10,7 @@ package org.telegram.ui.Cells;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
@@ -294,7 +295,8 @@ public class SessionCell extends FrameLayout {
         }
         String deviceModel = session.device_model.toLowerCase();
         int iconId;
-        String colorKey, colorKey2;
+        String colorKey = null, colorKey2 = null;
+        int colorValue = 0;
         if (deviceModel.contains("safari")) {
             iconId = R.drawable.device_web_safari;
             colorKey = Theme.key_avatar_backgroundPink;
@@ -333,8 +335,13 @@ public class SessionCell extends FrameLayout {
             colorKey2 = Theme.key_avatar_background2Cyan;
         } else if (platform.contains("android")) {
             iconId = deviceModel.contains("tab") ? R.drawable.device_tablet_android : R.drawable.device_phone_android;
-            colorKey = Theme.key_avatar_backgroundGreen;
-            colorKey2 = Theme.key_avatar_background2Green;
+            if (app_name.contains("owlgram")) {
+                colorValue = Color.parseColor("#4285F4");
+                iconId = R.drawable.device_phone_owlgram;
+            } else {
+                colorKey = Theme.key_avatar_backgroundGreen;
+                colorKey2 = Theme.key_avatar_background2Green;
+            }
         } else {
             if (session.app_name.toLowerCase().contains("desktop")) {
                 iconId = R.drawable.device_desktop_other;
@@ -348,7 +355,12 @@ public class SessionCell extends FrameLayout {
         }
         Drawable iconDrawable = ContextCompat.getDrawable(ApplicationLoader.applicationContext, iconId).mutate();
         iconDrawable.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_avatar_text), PorterDuff.Mode.SRC_IN));
-        Drawable bgDrawable = new CircleGradientDrawable(AndroidUtilities.dp(42), Theme.getColor(colorKey), Theme.getColor(colorKey2));
+        Drawable bgDrawable;
+        if (colorKey != null) {
+            bgDrawable = new CircleGradientDrawable(AndroidUtilities.dp(42), Theme.getColor(colorKey), Theme.getColor(colorKey2));
+        } else {
+            bgDrawable = new CircleGradientDrawable(AndroidUtilities.dp(42), colorValue, colorValue);
+        }
         CombinedDrawable combinedDrawable = new CombinedDrawable(bgDrawable, iconDrawable);
         return combinedDrawable;
     }

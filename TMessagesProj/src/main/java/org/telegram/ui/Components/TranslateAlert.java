@@ -908,13 +908,9 @@ public class TranslateAlert extends Dialog {
     }
 
     public void updateSourceLanguage() {
-        if (languageName(fromLanguage) != null) {
-            subtitleView.setAlpha(1);
-            if (!subtitleFromView.loaded) {
-                subtitleFromView.loaded(languageName(fromLanguage));
-            }
-        } else if (loaded) {
-            subtitleView.animate().alpha(0).setDuration(150).start();
+        subtitleView.setAlpha(1);
+        if (!subtitleFromView.loaded) {
+            subtitleFromView.loaded(TranslatorHelper.languageName(fromLanguage));
         }
     }
 

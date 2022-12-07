@@ -3,6 +3,7 @@ package org.telegram.ui;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
@@ -305,12 +306,14 @@ public class SessionBottomSheet extends BottomSheet {
 
     private void setAnimation(TLRPC.TL_authorization session, RLottieImageView imageView) {
         String platform = session.platform.toLowerCase();
+        String app_name = session.app_name.toLowerCase();
         if (platform.isEmpty()) {
             platform = session.system_version.toLowerCase();
         }
         String deviceModel = session.device_model.toLowerCase();
         int iconId;
-        String colorKey, colorKey2;
+        String colorKey = null, colorKey2 = null;
+        int colorValue = 0;
         boolean animation = true;
 
 
@@ -355,8 +358,14 @@ public class SessionBottomSheet extends BottomSheet {
             colorKey2 = Theme.key_avatar_background2Cyan;
         } else if (platform.contains("android")) {
             iconId = R.raw.android_30;
-            colorKey = Theme.key_avatar_backgroundGreen;
-            colorKey2 = Theme.key_avatar_background2Green;
+            if (app_name.contains("owlgram")) {
+                animation = false;
+                colorValue = Color.parseColor("#4285F4");
+                iconId = R.drawable.device_owlgram;
+            } else {
+                colorKey = Theme.key_avatar_backgroundGreen;
+                colorKey2 = Theme.key_avatar_background2Green;
+            }
         } else {
             if (session.app_name.toLowerCase().contains("desktop")) {
                 iconId = R.raw.windows_30;
@@ -368,11 +377,11 @@ public class SessionBottomSheet extends BottomSheet {
                 colorKey2 = Theme.key_avatar_background2Pink;
             }
         }
-
-        imageView.setBackground(Theme.createCircleDrawable(AndroidUtilities.dp(42), Theme.getColor(colorKey)));
+        int defaultColor = colorKey != null ? Theme.getColor(colorKey) : colorValue;
+        imageView.setBackground(Theme.createCircleDrawable(AndroidUtilities.dp(42), defaultColor));
 //        imageView.setBackground(new SessionCell.CircleGradientDrawable(AndroidUtilities.dp(42), Theme.getColor(colorKey), Theme.getColor(colorKey2)));
         if (animation) {
-            int[] colors = new int[]{0x000000, Theme.getColor(colorKey)};
+            int[] colors = new int[]{0x000000, defaultColor};
             imageView.setAnimation(iconId, 50, 50, colors);
         } else {
             imageView.setImageDrawable(ContextCompat.getDrawable(getContext(), iconId));
