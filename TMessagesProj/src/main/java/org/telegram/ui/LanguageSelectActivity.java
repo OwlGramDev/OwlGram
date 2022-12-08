@@ -795,7 +795,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                 case 2: {
                     TranslateSettings translateSettings = (TranslateSettings) holder.itemView;
                     translateSettings.setVisibility(searching ? View.GONE : View.VISIBLE);
-                    translateSettings.updateTranslations();
+                    //translateSettings.updateTranslations();
                     break;
                 }
                 case 3: {
