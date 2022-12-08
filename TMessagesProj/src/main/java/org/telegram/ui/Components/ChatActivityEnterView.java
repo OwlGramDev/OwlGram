@@ -3779,7 +3779,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
 
         boolean self = parentFragment != null && UserObject.isUserSelf(parentFragment.getCurrentUser());
         boolean checkMD = EntitiesHelper.containsMarkdown(messageEditText.getText());
-        boolean checkGames = MessageHelper.canSendAsDice(messageEditText.getText().toString(), parentFragment, dialog_id);
+        boolean checkGames = MessageHelper.canSendAsDice(messageEditText.getText(), parentFragment, dialog_id);
         if (sendPopupLayout == null || oldMDCheck != checkMD || oldSendGamesCheck != checkGames) {
             oldMDCheck = checkMD;
             oldSendGamesCheck = checkGames;
@@ -3851,7 +3851,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                         sendMessageInternal(true, 0, false, true);
                     });
                     sendPopupLayout.addView(sendWithoutMarkdownButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
-                } else if (MessageHelper.canSendAsDice(messageEditText.getText().toString(), parentFragment, dialog_id)) {
+                } else if (MessageHelper.canSendAsDice(messageEditText.getText(), parentFragment, dialog_id)) {
                     ActionBarMenuSubItem sendWithoutMarkdownButton = new ActionBarMenuSubItem(getContext(), false, false, resourcesProvider);
                     sendWithoutMarkdownButton.setTextAndIcon(LocaleController.getString("SendAsEmoji", R.string.SendAsEmoji), R.drawable.casino_icon);
                     sendWithoutMarkdownButton.setMinimumWidth(AndroidUtilities.dp(196));
@@ -5124,7 +5124,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 updateStickersOrder = SendMessagesHelper.checkUpdateStickersOrder(text);
 
 
-                SendMessagesHelper.getInstance(currentAccount).sendMessage(message[0].toString(), dialog_id, replyingMessageObject, getThreadMessage(), messageWebPage, messageWebPageSearch, entities, null, null, notify, scheduleDate, sendAnimationData, updateStickersOrder);
+                SendMessagesHelper.getInstance(currentAccount).sendMessage(message[0].toString(), dialog_id, replyingMessageObject, getThreadMessage(), messageWebPage, messageWebPageSearch, entities, null, null, notify, scheduleDate, sendAnimationData, updateStickersOrder, withGame);
                 start = end + 1;
             } while (end != text.length());
             return true;
