@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 
@@ -30,11 +31,16 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ChatActivity;
+import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.Components.ColoredImageSpan;
+import org.telegram.ui.Components.TextStyleSpan;
+import org.telegram.ui.Components.URLSpanReplacement;
+import org.telegram.ui.Components.URLSpanUserMention;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 
 import it.owlgram.android.OwlConfig;
@@ -359,12 +365,19 @@ public class MessageHelper extends BaseController {
         }
     }
 
-    public static boolean canSendAsDice(String text, ChatActivity parentFragment, long dialog_id) {
+    public static boolean canSendAsDice(CharSequence text, ChatActivity parentFragment, long dialog_id) {
         boolean canSendGames = true;
         if (DialogObject.isChatDialog(dialog_id)) {
             TLRPC.Chat chat = parentFragment.getMessagesController().getChat(-dialog_id);
             canSendGames = ChatObject.canSendStickers(chat);
         }
-        return canSendGames && parentFragment.getMessagesController().diceEmojies.contains(text.replace("\ufe0f", ""));
+        boolean containsGame = parentFragment.getMessagesController().diceEmojies.contains(text.toString().replace("\ufe0f", ""));
+        boolean containsSpans = false;
+        if (text instanceof Editable) {
+            containsSpans = Arrays.stream(((Editable) text).getSpans(0, text.length(), Object.class))
+                    .anyMatch(span -> span instanceof TextStyleSpan || span instanceof AnimatedEmojiSpan ||
+                            span instanceof URLSpanReplacement || span instanceof URLSpanUserMention);
+        }
+        return canSendGames && containsGame && !containsSpans;
     }
 }
