@@ -101,6 +101,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                 OwlConfig.toggleBetaUpdates();
                 ApkDownloader.cancel();
                 ApkDownloader.deleteUpdate();
+                listAdapter.notifyItemChanged(apkChannelRow, PARTIAL);
                 if (updateAvailable != null) {
                     OwlConfig.remindUpdate(updateAvailable.version);
                     NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
@@ -120,7 +121,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                 ((TextCheckCell) view).setChecked(OwlConfig.notifyUpdates);
             }
         } else if (position == apkChannelRow) {
-            MessagesController.getInstance(currentAccount).openByUserName("OwlGramAPKs", this, 1);
+            MessagesController.getInstance(currentAccount).openByUserName(UpdateManager.getApkChannel(), this, 1);
         }
     }
 
@@ -205,7 +206,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                 case TEXT_CELL:
                     TextCell textCell = (TextCell) holder.itemView;
                     if (position == apkChannelRow) {
-                        textCell.setTextAndValue(LocaleController.getString("APKsChannel", R.string.APKsChannel), "@OwlGramAPKs", false);
+                        textCell.setTextAndValue(LocaleController.getString("APKsChannel", R.string.APKsChannel), "@" + UpdateManager.getApkChannel(), partial, false);
                     }
                     break;
             }
