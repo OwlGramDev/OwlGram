@@ -36,9 +36,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Optional;
 
-import it.owlgram.android.entities.syntax_highlight.Prism4jGrammarLocator;
+import io.noties.prism4j.DefaultGrammarLocator;
+import io.noties.prism4j.Grammar;
+import io.noties.prism4j.Prism4j;
 import it.owlgram.android.entities.syntax_highlight.SyntaxHighlight;
-import it.owlgram.android.entities.syntax_highlight.prism4j.Prism4j;
 
 public class EntitiesHelper {
 
@@ -318,13 +319,13 @@ public class EntitiesHelper {
     public static CharSequence applySyntaxHighlight(CharSequence text, ArrayList<TLRPC.MessageEntity> entities) {
         Editable messSpan = new SpannableStringBuilder(text);
         applyTelegramSpannable(messSpan, (Editable) getSpannableString(text.toString(), entities), text.length());
-        Prism4j grammarCheck = new Prism4j(new Prism4jGrammarLocator());
+        Prism4j grammarCheck = new Prism4j(new DefaultGrammarLocator());
         TextStyleSpan[] result = messSpan.getSpans(0, messSpan.length(), TextStyleSpan.class);
         for (TextStyleSpan span : result) {
             if (span.isMono()) {
                 CharSequence language = extractLanguage(messSpan.subSequence(messSpan.getSpanStart(span), messSpan.getSpanEnd(span)));
                 String fixedLanguage = AndroidUtilities.getTrimmedString(language).toString().toLowerCase();
-                Optional<Prism4j.Grammar> grammar = grammarCheck.grammar(fixedLanguage);
+                Optional<Grammar> grammar = Optional.ofNullable(grammarCheck.grammar(fixedLanguage));
                 if (grammar.isPresent()) {
                     int start = messSpan.getSpanStart(span);
                     int end = messSpan.getSpanEnd(span);

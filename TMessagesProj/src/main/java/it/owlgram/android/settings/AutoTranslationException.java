@@ -64,7 +64,7 @@ public class AutoTranslationException extends BaseSettingsActivity {
             presentFragment(fragment);
         } else if (position >= exceptionsStartRow && position < exceptionsEndRow) {
             Bundle args = new Bundle();
-            long uid = AutoTranslateConfig.getExceptions(isAllow).get(position - exceptionsStartRow).dialog_id;
+            long uid = AutoTranslateConfig.getExceptions(isAllow).get(position - exceptionsStartRow).dialogId;
             if (DialogObject.isUserDialog(uid)) {
                 args.putLong("user_id", uid);
             } else {
@@ -189,9 +189,9 @@ public class AutoTranslationException extends BaseSettingsActivity {
             builder2.setMessage(LocaleController.formatString("EditRemoveExceptionText", R.string.EditRemoveExceptionText, chatTitle));
             builder2.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialogInterface2, i2) -> {
                 if (info.chat instanceof TLRPC.Chat) {
-                    AutoTranslateConfig.removeGroupException(info.dialog_id);
+                    AutoTranslateConfig.removeGroupException(info.dialogId);
                 } else {
-                    AutoTranslateConfig.setDefault(info.dialog_id, 0);
+                    AutoTranslateConfig.setDefault(info.dialogId, 0);
                 }
                 if (AutoTranslateConfig.getExceptions(isAllow).isEmpty()) {
                     finishFragment();

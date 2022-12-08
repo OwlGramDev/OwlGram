@@ -123,6 +123,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.VideoEditedInfo;
+import org.telegram.messenger.browser.Browser;
 import org.telegram.messenger.camera.CameraController;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
@@ -2032,13 +2033,13 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             public boolean onTextContextMenuItem(int id) {
                 if (id == android.R.id.paste) {
                     isPaste = true;
-                }
 
-                ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clipData = clipboard.getPrimaryClip();
-                if (clipData != null) {
-                    if (clipData.getItemCount() == 1 && clipData.getDescription().hasMimeType("image/*")) {
-                        editPhoto(clipData.getItemAt(0).getUri(), clipData.getDescription().getMimeType(0));
+                    ClipboardManager clipboard = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clipData = clipboard.getPrimaryClip();
+                    if (clipData != null) {
+                        if (clipData.getItemCount() == 1 && clipData.getDescription().hasMimeType("image/*")) {
+                            editPhoto(clipData.getItemAt(0).getUri(), clipData.getDescription().getMimeType(0));
+                        }
                     }
                 }
                 return super.onTextContextMenuItem(id);
@@ -3778,7 +3779,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
 
         boolean self = parentFragment != null && UserObject.isUserSelf(parentFragment.getCurrentUser());
         boolean checkMD = EntitiesHelper.containsMarkdown(messageEditText.getText());
-        boolean checkGames = MessageHelper.canSendAsDice(messageEditText.getText().toString(), parentFragment, dialog_id);
+        boolean checkGames = MessageHelper.canSendAsDice(messageEditText.getText(), parentFragment, dialog_id);
         if (sendPopupLayout == null || oldMDCheck != checkMD || oldSendGamesCheck != checkGames) {
             oldMDCheck = checkMD;
             oldSendGamesCheck = checkGames;
@@ -3850,7 +3851,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                         sendMessageInternal(true, 0, false, true);
                     });
                     sendPopupLayout.addView(sendWithoutMarkdownButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
-                } else if (MessageHelper.canSendAsDice(messageEditText.getText().toString(), parentFragment, dialog_id)) {
+                } else if (MessageHelper.canSendAsDice(messageEditText.getText(), parentFragment, dialog_id)) {
                     ActionBarMenuSubItem sendWithoutMarkdownButton = new ActionBarMenuSubItem(getContext(), false, false, resourcesProvider);
                     sendWithoutMarkdownButton.setTextAndIcon(LocaleController.getString("SendAsEmoji", R.string.SendAsEmoji), R.drawable.casino_icon);
                     sendWithoutMarkdownButton.setMinimumWidth(AndroidUtilities.dp(196));
@@ -4506,7 +4507,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         }
 
         int visibility = getVisibility();
-        if (showKeyboardOnResume && parentFragment.isLastFragment()) {
+        if (showKeyboardOnResume && parentFragment != null && parentFragment.isLastFragment()) {
             showKeyboardOnResume = false;
             if (searchingType == 0) {
                 messageEditText.requestFocus();
@@ -5123,7 +5124,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 updateStickersOrder = SendMessagesHelper.checkUpdateStickersOrder(text);
 
 
-                SendMessagesHelper.getInstance(currentAccount).sendMessage(message[0].toString(), dialog_id, replyingMessageObject, getThreadMessage(), messageWebPage, messageWebPageSearch, entities, null, null, notify, scheduleDate, sendAnimationData, updateStickersOrder);
+                SendMessagesHelper.getInstance(currentAccount).sendMessage(message[0].toString(), dialog_id, replyingMessageObject, getThreadMessage(), messageWebPage, messageWebPageSearch, entities, null, null, notify, scheduleDate, sendAnimationData, updateStickersOrder, withGame);
                 start = end + 1;
             } while (end != text.length());
             return true;
@@ -7324,7 +7325,11 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         if (button instanceof TLRPC.TL_keyboardButton) {
             SendMessagesHelper.getInstance(currentAccount).sendMessage(button.text, dialog_id, replyMessageObject, getThreadMessage(), null, false, null, null, null, true, 0, null, false);
         } else if (button instanceof TLRPC.TL_keyboardButtonUrl) {
-            AlertsCreator.showOpenUrlAlert(parentFragment, button.url, false, true, resourcesProvider);
+            if (Browser.urlMustNotHaveConfirmation(button.url)) {
+                Browser.openUrl(parentActivity, button.url);
+            } else {
+                AlertsCreator.showOpenUrlAlert(parentFragment, button.url, false, true, resourcesProvider);
+            }
         } else if (button instanceof TLRPC.TL_keyboardButtonRequestPhone) {
             parentFragment.shareMyContact(2, messageObject);
         } else if (button instanceof TLRPC.TL_keyboardButtonRequestPoll) {

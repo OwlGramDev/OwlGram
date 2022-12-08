@@ -120,7 +120,7 @@ public class UpdateManager {
                             abi = "universal";
                             break;
                     }
-                    String url = String.format(locale, "https://app.owlgram.org/version?lang=%s&beta=%s&abi=%s", locale.getLanguage(), betaMode, URLEncoder.encode(abi, StandardCharsets.UTF_8.toString()));
+                    String url = String.format(locale, "https://app.owlgram.org/version?lang=%s&beta=%s&abi=%s", locale.getLanguage(), betaMode, URLEncoder.encode(abi, StandardCharsets.UTF_8.name()));
                     JSONObject obj = new JSONObject(new StandardHTTPRequest(url).request());
                     String update_status = obj.getString("status");
                     if (update_status.equals("no_updates")) {
