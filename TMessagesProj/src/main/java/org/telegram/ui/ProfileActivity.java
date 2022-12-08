@@ -5136,8 +5136,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (LanguageDetector.hasSupport()) {
                     LanguageDetector.detectLanguage(finalText, (fromLang) -> {
                         fromLanguage[0] = fromLang;
-                        withTranslate[0] = fromLang != null && (!fromLang.equals(toLang) || fromLang.equals("und")) && (
-                            /*translateButtonEnabled && !RestrictedLanguagesSelectActivity.getRestrictedLanguages().contains(fromLang) ||
+                        withTranslate[0] = fromLang != null && (/*!fromLang.equals(toLang) || fromLang.equals("und")) && (
+                            translateButtonEnabled && !RestrictedLanguagesSelectActivity.getRestrictedLanguages().contains(fromLang) ||
                             (currentChat != null && (currentChat.has_link || ChatObject.isPublic(currentChat))) && ("uk".equals(fromLang) || "ru".equals(fromLang)));*/
                                 !DoNotTranslateSettings.getRestrictedLanguages().contains(fromLang));
                         showMenu.run();
