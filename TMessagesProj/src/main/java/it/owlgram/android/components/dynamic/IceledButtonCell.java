@@ -117,7 +117,8 @@ public class IceledButtonCell extends BaseButtonCell {
         int topTextMargin = Math.round((w * 15F) / 100F);
         int textWidth = Math.round((w * 100F) / 100F);
         int textHeight = Math.round((w * 19F) / 100F);
-        int buttonHeight = w - textHeight - topTextMargin;
+        int buttonWidth = Math.round((w * 80F) / 100F);
+        int buttonHeight = Math.round((w * 90F) / 100F) - textHeight - topTextMargin;
 
         int totalHeight = buttonHeight + topTextMargin + textHeight;
 
@@ -126,7 +127,8 @@ public class IceledButtonCell extends BaseButtonCell {
         int xText = x + (w >> 1) - (textWidth >> 1);
         int yText = totalYMiddle + buttonHeight + topTextMargin;
 
-        RectF rectF = new RectF(x, totalYMiddle, x + w, totalYMiddle + buttonHeight);
+        int xButton = x + (w >> 1) - (buttonWidth >> 1);
+        RectF rectF = new RectF(xButton, totalYMiddle, xButton + buttonWidth, totalYMiddle + buttonHeight);
         int rad1 = Math.round((w * 14.77F) / 100F);
         canvas.drawRoundRect(rectF, rad1, rad1, paint);
 

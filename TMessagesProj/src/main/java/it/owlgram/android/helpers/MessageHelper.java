@@ -8,15 +8,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.text.Editable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.core.text.HtmlCompat;
 import androidx.core.util.Pair;
 
-import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BaseController;
 import org.telegram.messenger.ChatObject;
@@ -32,16 +31,21 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ChatActivity;
+import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.Components.ColoredImageSpan;
+import org.telegram.ui.Components.TextStyleSpan;
+import org.telegram.ui.Components.URLSpanReplacement;
+import org.telegram.ui.Components.URLSpanUserMention;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.Arrays;
 import java.util.Objects;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.entities.EntitiesHelper;
+import it.owlgram.android.translator.TranslatorHelper;
 
 public class MessageHelper extends BaseController {
 
@@ -270,19 +274,13 @@ public class MessageHelper extends BaseController {
             arrowSpan = new SpannableStringBuilder("\u200B");
             arrowSpan.setSpan(new ColoredImageSpan(arrowDrawable), 0, 1, 0);
         }
-        Locale from = Locale.forLanguageTag(translatedLanguage.first);
-        Locale to = Locale.forLanguageTag(translatedLanguage.second);
-        String fromString = !TextUtils.isEmpty(from.getScript()) ? String.valueOf(HtmlCompat.fromHtml(from.getDisplayScript(), HtmlCompat.FROM_HTML_MODE_LEGACY)) : from.getDisplayName();
-        fromString = AndroidUtilities.capitalize(fromString);
-        String toString = !TextUtils.isEmpty(to.getScript()) ? String.valueOf(HtmlCompat.fromHtml(to.getDisplayScript(), HtmlCompat.FROM_HTML_MODE_LEGACY)) : to.getDisplayName();
-        toString = AndroidUtilities.capitalize(toString);
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
         spannableStringBuilder
-                .append(fromString)
+                .append(TranslatorHelper.languageName(translatedLanguage.first))
                 .append(' ')
                 .append(arrowSpan)
                 .append(' ')
-                .append(toString)
+                .append(TranslatorHelper.languageName(translatedLanguage.second))
                 .append(' ')
                 .append(LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000));
         return spannableStringBuilder;
@@ -367,12 +365,19 @@ public class MessageHelper extends BaseController {
         }
     }
 
-    public static boolean canSendAsDice(String text, ChatActivity parentFragment, long dialog_id) {
+    public static boolean canSendAsDice(CharSequence text, ChatActivity parentFragment, long dialog_id) {
         boolean canSendGames = true;
         if (DialogObject.isChatDialog(dialog_id)) {
             TLRPC.Chat chat = parentFragment.getMessagesController().getChat(-dialog_id);
             canSendGames = ChatObject.canSendStickers(chat);
         }
-        return canSendGames && parentFragment.getMessagesController().diceEmojies.contains(text.replace("\ufe0f", ""));
+        boolean containsGame = parentFragment.getMessagesController().diceEmojies.contains(text.toString().replace("\ufe0f", ""));
+        boolean containsSpans = false;
+        if (text instanceof Editable) {
+            containsSpans = Arrays.stream(((Editable) text).getSpans(0, text.length(), Object.class))
+                    .anyMatch(span -> span instanceof TextStyleSpan || span instanceof AnimatedEmojiSpan ||
+                            span instanceof URLSpanReplacement || span instanceof URLSpanUserMention);
+        }
+        return canSendGames && containsGame && !containsSpans;
     }
 }

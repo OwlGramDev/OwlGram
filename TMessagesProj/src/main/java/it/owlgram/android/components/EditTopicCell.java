@@ -63,7 +63,9 @@ public class EditTopicCell extends FrameLayout {
     public void setData(TLRPC.TL_forumTopic topic) {
         this.topic = topic;
         textView.setText(topic.title);
-        if (topic.icon_emoji_id != 0) {
+        if (topic.id == 1) {
+            imageView.setImageDrawable(ForumUtilities.createGeneralTopicDrawable(getContext(), 0.75f, Theme.getColor(Theme.key_chat_inMenu)));
+        } else if (topic.icon_emoji_id != 0) {
             imageView.setAnimatedEmojiDrawable(new AnimatedEmojiDrawable(AnimatedEmojiDrawable.CACHE_TYPE_MESSAGES, UserConfig.selectedAccount, topic.icon_emoji_id));
         } else {
             imageView.setImageDrawable(ForumUtilities.createTopicDrawable(topic));
