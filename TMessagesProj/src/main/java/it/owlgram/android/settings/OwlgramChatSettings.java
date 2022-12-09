@@ -483,16 +483,20 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                         @Override
                         protected void onSelectedCamera(int cameraSelected) {
                             super.onSelectedCamera(cameraSelected);
+                            int oldValue = OwlConfig.cameraType;
+                            OwlConfig.saveCameraType(cameraSelected);
                             if (cameraSelected == 1) {
                                 updateRowsId();
                                 listAdapter.notifyItemInserted(cameraXOptimizeRow);
                                 listAdapter.notifyItemInserted(cameraXQualityRow);
                                 listAdapter.notifyItemChanged(cameraAdviseRow);
-                            } else {
+                            } else if (oldValue == 1){
                                 listAdapter.notifyItemRemoved(cameraXOptimizeRow);
                                 listAdapter.notifyItemRemoved(cameraXQualityRow);
                                 listAdapter.notifyItemChanged(cameraAdviseRow - 1);
                                 updateRowsId();
+                            } else {
+                                listAdapter.notifyItemChanged(cameraAdviseRow);
                             }
                         }
                     };

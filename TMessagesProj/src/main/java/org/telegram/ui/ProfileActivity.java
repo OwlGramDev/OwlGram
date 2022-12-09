@@ -9271,10 +9271,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         String text;
                         TLRPC.User user = getMessagesController().getUser(userId);
                         String phoneNumber;
-                        if(OwlConfig.hideContactNumber){
-                            text = LocaleController.getString("MobileHidden",R.string.MobileHidden);
-                            phoneNumber = null;
-                        } else if (user != null && !TextUtils.isEmpty(vcardPhone)) {
+                        if (user != null && !TextUtils.isEmpty(vcardPhone)) {
                             text = PhoneFormat.getInstance().format("+" + vcardPhone);
                             phoneNumber = vcardPhone;
                         } else if (!TextUtils.isEmpty(user.phone)) {
@@ -9283,6 +9280,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         } else {
                             text = LocaleController.getString("PhoneHidden", R.string.PhoneHidden);
                             phoneNumber = null;
+                        }
+                        if(OwlConfig.hideContactNumber){
+                            text = LocaleController.getString("MobileHidden",R.string.MobileHidden);
                         }
                         isFragmentPhoneNumber = phoneNumber != null && phoneNumber.matches("888\\d{8}");
                         detailCell.setTextAndValue(text, LocaleController.getString(isFragmentPhoneNumber ? R.string.AnonymousNumber : R.string.PhoneMobile), false);
