@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 
-import it.owlgram.android.camera.CameraXUtilities;
+import it.owlgram.android.camera.CameraXUtils;
 import it.owlgram.android.components.FileSettingsNameDialog;
 import it.owlgram.android.helpers.MenuOrderManager;
 import it.owlgram.android.helpers.SharedPreferencesHelper;
@@ -415,7 +415,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             parentLayout.rebuildFragments(INavigationLayout.REBUILD_FLAG_REBUILD_LAST);
         }
         if ((difference & NEED_UPDATE_CAMERAX) > 0) {
-            CameraXUtilities.loadSuggestedResolution();
+            CameraXUtils.loadSuggestedResolution();
         }
         NotificationCenter currentAccount = AccountInstance.getInstance(UserConfig.selectedAccount).getNotificationCenter();
         currentAccount.postNotificationName(NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_CHAT);

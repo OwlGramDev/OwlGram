@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.camera.CameraXUtilities;
+import it.owlgram.android.camera.CameraXUtils;
 import it.owlgram.android.components.CameraTypeSelector;
 import it.owlgram.android.components.StickerSizeCell;
 import it.owlgram.android.entities.EntitiesHelper;
@@ -188,7 +188,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                 ((TextCheckCell) view).setChecked(OwlConfig.useCameraXOptimizedMode);
             }
         } else if (position == cameraXQualityRow) {
-            Map<Quality, Size> availableSizes = CameraXUtilities.getAvailableVideoSizes();
+            Map<Quality, Size> availableSizes = CameraXUtils.getAvailableVideoSizes();
             Stream<Integer> tmp = availableSizes.values().stream().sorted(Comparator.comparingInt(Size::getWidth).reversed()).map(Size::getHeight);
             ArrayList<Integer> types = tmp.collect(Collectors.toCollection(ArrayList::new));
             ArrayList<String> arrayList = types.stream().map(p -> p + "p").collect(Collectors.toCollection(ArrayList::new));
@@ -285,7 +285,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
         stickerSizeRow = rowCount++;
         stickerSizeDividerRow = rowCount++;
 
-        if (CameraXUtilities.isCameraXSupported()) {
+        if (CameraXUtils.isCameraXSupported()) {
             cameraTypeHeaderRow = rowCount++;
             cameraTypeSelectorRow = rowCount++;
             if (OwlConfig.cameraType == 1) {

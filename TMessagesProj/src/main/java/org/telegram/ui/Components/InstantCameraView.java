@@ -121,7 +121,7 @@ import javax.microedition.khronos.opengles.GL;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.camera.CameraXController;
-import it.owlgram.android.camera.CameraXUtilities;
+import it.owlgram.android.camera.CameraXUtils;
 
 @TargetApi(18)
 public class InstantCameraView extends FrameLayout implements NotificationCenter.NotificationCenterDelegate {
@@ -323,7 +323,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
         switchCameraButton.setContentDescription(LocaleController.getString("AccDescrSwitchCamera", R.string.AccDescrSwitchCamera));
         addView(switchCameraButton, LayoutHelper.createFrame(62, 62, Gravity.LEFT | Gravity.BOTTOM, 8, 0, 0, 0));
         switchCameraButton.setOnClickListener(v -> {
-            if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+            if (!CameraXUtils.isCameraXSupported() || OwlConfig.cameraType != 1) {
                 if (!cameraReady || cameraSession == null || !cameraSession.isInitied() || cameraThread == null) {
                     return;
                 }
@@ -487,7 +487,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
     }
 
     public void destroy(boolean async, final Runnable beforeDestroyRunnable) {
-        if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+        if (!CameraXUtils.isCameraXSupported() || OwlConfig.cameraType != 1) {
             if (cameraSession != null) {
                 cameraSession.destroy();
                 CameraController.getInstance().close(cameraSession, !async ? new CountDownLatch(1) : null, beforeDestroyRunnable);
@@ -657,7 +657,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                     cameraThread.shutdown(0);
                     cameraThread = null;
                 }
-                if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+                if (!CameraXUtils.isCameraXSupported() || OwlConfig.cameraType != 1) {
                     if (cameraSession != null) {
                         CameraController.getInstance().close(cameraSession, null, null);
                     }
@@ -1069,7 +1069,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             }
 
             surfaceTexture.setDefaultBufferSize(previewSize.getWidth(), previewSize.getHeight());
-            if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+            if (!CameraXUtils.isCameraXSupported() || OwlConfig.cameraType != 1) {
                 cameraSession = new CameraSession(selectedCamera, previewSize, pictureSize, ImageFormat.JPEG, true);
                 cameraThread.setCurrentSession(cameraSession);
                 CameraController.getInstance().openRound(cameraSession, surfaceTexture, () -> {
@@ -1494,7 +1494,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
                 videoEncoder.startRecording(cameraFile, EGL14.eglGetCurrentContext());
                 recording = true;
                 int orientation = 0;
-                if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+                if (!CameraXUtils.isCameraXSupported() || OwlConfig.cameraType != 1) {
                     orientation = currentSession.getCurrentOrientation();
                 } else {
                     float temp = scaleX;
@@ -2903,7 +2903,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             pinchScale = (float) Math.hypot(ev.getX(index2) - ev.getX(index1), ev.getY(index2) - ev.getY(index1)) / pinchStartDistance;
             float zoom = Math.min(1f, Math.max(0, pinchScale - 1f));
 
-            if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+            if (!CameraXUtils.isCameraXSupported() || OwlConfig.cameraType != 1) {
                 cameraSession.setZoom(zoom);
             } else {
                 cameraXController.setZoom(zoom);
@@ -2928,7 +2928,7 @@ public class InstantCameraView extends FrameLayout implements NotificationCenter
             finishZoomTransition = ValueAnimator.ofFloat(zoom, 0);
             finishZoomTransition.addUpdateListener(valueAnimator -> {
                 if (cameraSession != null) {
-                    if (!CameraXUtilities.isCameraXSupported() || OwlConfig.cameraType != 1) {
+                    if (!CameraXUtils.isCameraXSupported() || OwlConfig.cameraType != 1) {
                         cameraSession.setZoom((float) valueAnimator.getAnimatedValue());
                     } else {
                         cameraXController.setZoom((float) valueAnimator.getAnimatedValue());
