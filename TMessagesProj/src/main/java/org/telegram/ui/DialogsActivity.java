@@ -3020,7 +3020,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                     for (TLRPC.Dialog dialog : dialogFilter.dialogs) {
                                         if (dialog.unread_count == 0 && dialog.unread_mentions_count == 0)
                                             continue;
-                                        getMessagesController().markDialogAsRead(dialog.id, dialog.top_message, dialog.top_message, dialog.last_message_date, false, 0, dialog.unread_count, true, 0);
+                                        if (getMessagesController().isForum(dialog.id)) {
+                                            getMessagesController().markAllTopicsAsRead(dialog.id);
+                                        } else {
+                                            getMessagesController().markDialogAsRead(dialog.id, dialog.top_message, dialog.top_message, dialog.last_message_date, false, 0, dialog.unread_count, true, 0);
+                                        }
                                     }
                                 }
                             } else {
