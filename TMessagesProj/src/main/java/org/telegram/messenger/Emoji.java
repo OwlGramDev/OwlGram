@@ -260,7 +260,7 @@ public class Emoji {
 
         @Override
         public void draw(Canvas canvas) {
-            if (!isLoaded()) {
+            if (!OwlConfig.useSystemEmoji &&!isLoaded()) {
                 loadEmoji(info.page, info.page2);
                 placeholderPaint.setColor(placeholderColor);
                 Rect bounds = getBounds();
