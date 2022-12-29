@@ -32,6 +32,7 @@ import org.telegram.messenger.SharedConfig;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,7 +41,7 @@ import java.util.stream.Collectors;
 
 import it.owlgram.android.OwlConfig;
 
-public class CameraXUtilities {
+public class CameraXUtils {
 
     private static Map<Quality, Size> qualityToSize;
     private static Exception qualityException;
@@ -126,12 +127,9 @@ public class CameraXUtilities {
 
     public static void loadSuggestedResolution() {
         int suggestedRes = getSuggestedResolution(false);
-        int maxRes = getAvailableVideoSizes().values().stream()
+        IntSummaryStatistics stats = getAvailableVideoSizes().values().stream()
                 .mapToInt(Size::getHeight)
-                .max().orElse(0);
-        int lowRes = getAvailableVideoSizes().values().stream()
-                .mapToInt(Size::getHeight)
-                .min().orElse(0);
+                .summaryStatistics();
         getAvailableVideoSizes().values().stream()
                 .sorted(Comparator.comparingInt(Size::getHeight).reversed())
                 .mapToInt(Size::getHeight)
@@ -139,7 +137,7 @@ public class CameraXUtilities {
                 .findFirst()
                 .ifPresent(height -> {
                     cameraResolution = height;
-                    if (OwlConfig.cameraResolution == -1 || OwlConfig.cameraResolution > maxRes || OwlConfig.cameraResolution < lowRes) {
+                    if (OwlConfig.cameraResolution == -1 || OwlConfig.cameraResolution > stats.getMax() || OwlConfig.cameraResolution < stats.getMin()) {
                         OwlConfig.saveCameraResolution(height);
                     }
                 });
