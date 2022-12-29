@@ -258,6 +258,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.camera.VideoUtils;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.MessageHelper;
 import it.owlgram.android.settings.DoNotTranslateSettings;
@@ -16787,7 +16788,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             resultWidth = Math.round(originalWidth * scale / 2) * 2;
             resultHeight = Math.round(originalHeight * scale / 2) * 2;
         } else {
-            float maxSize;
+            /*float maxSize;
             switch (selectedCompression) {
                 case 0:
                     maxSize = 480.0f;
@@ -16799,16 +16800,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                     maxSize = 1280.0f;
                     break;
                 case 3:
+                default:
                     maxSize = 1920.0f;
                     break;
-                case 4:
-                    maxSize = 2560.0f;
-                    break;
-                case 5:
-                default:
-                    maxSize = 3840.0f;
-                    break;
-            }
+            }*/
+            float maxSize = VideoUtils.getMaxSize(originalWidth, originalHeight, selectedCompression);
             float scale = originalWidth > originalHeight ? maxSize / originalWidth : maxSize / originalHeight;
             if (selectedCompression == compressionsCount - 1 && scale >= 1f) {
                 resultWidth = originalWidth;
@@ -17041,21 +17037,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     }
 
     private void updateCompressionsCount(int h, int w) {
-        int newH = Math.max(h, w);
-        int newW = Math.min(h, w);
-        if (newW >= 2160 && newH >= 3840) {
-            compressionsCount = 6;
-        } else if (newW >= 1440 && newH >= 2560) {
-            compressionsCount = 5;
-        } else if (newW >= 1080 && newH >= 1920) {
-            compressionsCount = 4;
-        } else if (newW >= 720 && newH >= 1280) {
-            compressionsCount = 3;
-        } else if (newW >= 480 && newH >= 854) {
-            compressionsCount = 2;
-        } else {
-            compressionsCount = 1;
-        }
+        compressionsCount = VideoUtils.getCompressionsCount(w, h);
         /*int maxSize = Math.max(h, w);
         if (maxSize > 1280) {
             compressionsCount = 4;

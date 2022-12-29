@@ -44,6 +44,10 @@ public class UpdateManager {
         void onResult(boolean result);
     }
 
+    public static String getApkChannel() {
+        return OwlConfig.betaUpdates ? "OwlGramBeta" : "OwlGramAPKs";
+    }
+
     public static void getChangelogs(ChangelogCallback changelogCallback) {
         if (checkingForChangelogs) return;
         checkingForChangelogs = true;

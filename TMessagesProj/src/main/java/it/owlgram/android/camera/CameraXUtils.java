@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 
 import it.owlgram.android.OwlConfig;
 
-public class CameraXUtilities {
+public class CameraXUtils {
 
     private static Map<Quality, Size> qualityToSize;
     private static Exception qualityException;

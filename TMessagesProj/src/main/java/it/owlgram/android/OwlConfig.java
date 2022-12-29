@@ -10,7 +10,7 @@ import org.telegram.ui.ActionBar.Theme;
 import java.util.Calendar;
 import java.util.Date;
 
-import it.owlgram.android.camera.CameraXUtilities;
+import it.owlgram.android.camera.CameraXUtils;
 import it.owlgram.android.helpers.MonetIconsHelper;
 import it.owlgram.android.translator.AutoTranslateConfig;
 import it.owlgram.android.translator.BaseTranslator;
@@ -191,8 +191,8 @@ public class OwlConfig extends SettingsManager {
             translationProvider = getInt("translationProvider", Translator.PROVIDER_GOOGLE);
             showSantaHat = getBoolean("showSantaHat", true);
             showSnowFalling = getBoolean("showSnowFalling", true);
-            cameraType = getInt("cameraType", CameraXUtilities.getDefault());
-            cameraResolution = getInt("cameraResolution", CameraXUtilities.getCameraResolution());
+            cameraType = getInt("cameraType", CameraXUtils.getDefault());
+            cameraResolution = getInt("cameraResolution", CameraXUtils.getCameraResolution());
             useCameraXOptimizedMode = getBoolean("useCameraXOptimizedMode", SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_HIGH);
             disableProximityEvents = getBoolean("disableProximityEvents", false);
             verifyLinkTip = getBoolean("verifyLinkTip", false);

@@ -4976,7 +4976,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         if(updateResult instanceof UpdateManager.UpdateAvailable) {
                             UpdateManager.UpdateAvailable updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
                             long passed_time = (new Date().getTime() - OwlConfig.lastUpdateCheck) / 1000;
-                            if(passed_time >= 3600 * 8 || OwlConfig.lastUpdateStatus != 1 && !updateAvailable.isReminded() || force) {
+                            if(passed_time >= 3600 * 2 || OwlConfig.lastUpdateStatus != 1 && !updateAvailable.isReminded() || force) {
                                 OwlConfig.setUpdateData(updateResult.toString());
                                 OwlConfig.remindUpdate(-1);
                                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
@@ -4986,6 +4986,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                     new UpdateAlertDialog(LaunchActivity.this, updateAvailable).show();
                                 }
                                 OwlConfig.saveUpdateStatus(1);
+                                OwlConfig.saveLastUpdateCheck();
                                 updateAppUpdateViews();
                             }
                         } else {
@@ -4994,7 +4995,6 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                             }
                             OwlConfig.saveUpdateStatus(0);
                         }
-                        OwlConfig.saveLastUpdateCheck();
                     }
 
                     @Override
@@ -5167,6 +5167,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             final ChatActivity fragment;
             if (dids.size() <= 1) {
                 final long did = dids.get(0).dialogId;
+                final int topicId = dids.get(0).topicId;
 
                 Bundle args = new Bundle();
                 args.putBoolean("scrollToTopOnResume", true);
@@ -5187,6 +5188,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     return;
                 }
                 fragment = new ChatActivity(args);
+                ForumUtilities.applyTopic(fragment, dids.get(0));
             } else {
                 fragment = null;
             }
