@@ -32,7 +32,6 @@ import org.telegram.messenger.SharedConfig;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -127,9 +126,16 @@ public class CameraXUtils {
 
     public static void loadSuggestedResolution() {
         int suggestedRes = getSuggestedResolution(false);
-        IntSummaryStatistics stats = getAvailableVideoSizes().values().stream()
+        Map<Quality, Size> sizes = getAvailableVideoSizes();
+
+        int min = sizes.values().stream()
                 .mapToInt(Size::getHeight)
-                .summaryStatistics();
+                .min().orElse(0);
+
+        int max = sizes.values().stream()
+                .mapToInt(Size::getHeight)
+                .max().orElse(0);
+
         getAvailableVideoSizes().values().stream()
                 .sorted(Comparator.comparingInt(Size::getHeight).reversed())
                 .mapToInt(Size::getHeight)
@@ -137,7 +143,7 @@ public class CameraXUtils {
                 .findFirst()
                 .ifPresent(height -> {
                     cameraResolution = height;
-                    if (OwlConfig.cameraResolution == -1 || OwlConfig.cameraResolution > stats.getMax() || OwlConfig.cameraResolution < stats.getMin()) {
+                    if (OwlConfig.cameraResolution == -1 || OwlConfig.cameraResolution > max || OwlConfig.cameraResolution < min) {
                         OwlConfig.saveCameraResolution(height);
                     }
                 });
