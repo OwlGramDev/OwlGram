@@ -44,7 +44,7 @@ import org.telegram.ui.LauncherIconController;
 
 import java.io.File;
 
-import it.owlgram.android.camera.CameraXUtilities;
+import it.owlgram.android.camera.CameraXUtils;
 
 public class ApplicationLoader extends Application {
 
@@ -205,7 +205,7 @@ public class ApplicationLoader extends Application {
         }
         hasPlayServices = checkPlayServices();
         SharedConfig.loadConfig();
-        CameraXUtilities.loadCameraXSizes();
+        CameraXUtils.loadCameraXSizes();
         SharedPrefsHelper.init(applicationContext);
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) { //TODO improve account
             UserConfig.getInstance(a).loadConfig();
