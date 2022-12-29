@@ -1,5 +1,61 @@
-FROM gradle:7.0.2-jdk11
+FROM eclipse-temurin:11-jdk-jammy
 
+CMD ["gradle"]
+
+ENV GRADLE_HOME /opt/gradle
+
+RUN set -o errexit -o nounset \
+    && echo "Adding gradle user and group" \
+    && groupadd --system --gid 1000 gradle \
+    && useradd --system --gid gradle --uid 1000 --shell /bin/bash --create-home gradle \
+    && mkdir /home/gradle/.gradle \
+    && chown --recursive gradle:gradle /home/gradle \
+    \
+    && echo "Symlinking root Gradle cache to gradle Gradle cache" \
+    && ln --symbolic /home/gradle/.gradle /root/.gradle
+
+VOLUME /home/gradle/.gradle
+
+WORKDIR /home/gradle
+
+RUN set -o errexit -o nounset \
+    && apt-get update \
+    && apt-get install --yes --no-install-recommends \
+        unzip \
+        wget \
+        \
+        bzr \
+        git \
+        git-lfs \
+        mercurial \
+        openssh-client \
+        subversion \
+    && rm --recursive --force /var/lib/apt/lists/* \
+    \
+    && echo "Testing VCSes" \
+    && which bzr \
+    && which git \
+    && which git-lfs \
+    && which hg \
+    && which svn
+
+ENV GRADLE_VERSION "8.0-milestone-3"
+ARG GRADLE_DOWNLOAD_SHA256=ad9460264653b6ed16cc8aebf9ee4dc12d1a301351323233eb905fce5d522ab4
+RUN set -o errexit -o nounset \
+    && echo "Downloading Gradle" \
+    && wget --no-verbose --output-document=gradle.zip "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" \
+    \
+    && echo "Checking download hash" \
+    && echo "${GRADLE_DOWNLOAD_SHA256} *gradle.zip" | sha256sum --check - \
+    \
+    && echo "Installing Gradle" \
+    && unzip gradle.zip \
+    && rm gradle.zip \
+    && mv "gradle-${GRADLE_VERSION}" "${GRADLE_HOME}/" \
+    && ln --symbolic "${GRADLE_HOME}/bin/gradle" /usr/bin/gradle \
+    \
+    && echo "Testing Gradle installation" \
+    && gradle --version
 ENV ANDROID_SDK_URL https://dl.google.com/android/repository/commandlinetools-linux-7302050_latest.zip
 ENV ANDROID_API_LEVEL android-33
 ENV ANDROID_BUILD_TOOLS_VERSION 33.0.0
@@ -27,17 +83,8 @@ RUN cp $ANDROID_HOME/build-tools/30.0.3/lib/dx.jar $ANDROID_HOME/build-tools/33.
 ENV PATH ${ANDROID_NDK_HOME}:$PATH
 ENV PATH ${ANDROID_NDK_HOME}/prebuilt/linux-x86_64/bin/:$PATH
 
-CMD mkdir -p /home/source/TMessagesProj/build/outputs/apk && \
-    mkdir -p /home/gradle/TMessagesProj/build/outputs/bundle && \
-    mkdir -p /home/source/TMessagesProj/build/outputs/native-debug-symbols && \
-    cp -R /home/source/. /home/gradle && \
+CMD cp -R /home/source/. /home/gradle && \
     cd /home/gradle && \
-    gradle :TMessagesProj_App:bundleBundleAfat_SDK23Release && \
-    gradle :TMessagesProj_App:bundleBundleAfatRelease && \
-    gradle :TMessagesProj_App:assembleAfatStandalone && \
-    gradle :TMessagesProj_App:assembleAfatRelease && \
-    gradle :TMessagesProj_AppHuawei:assembleAfatRelease && \
-    cp -R /home/gradle/TMessagesProj_App/build/outputs/apk/. /home/source/TMessagesProj/build/outputs/apk && \
-    cp -R /home/gradle/TMessagesProj_AppHuawei/build/outputs/apk/. /home/source/TMessagesProj/build/outputs/apk && \
-    cp -R /home/gradle/TMessagesProj_App/build/outputs/bundle/. /home/source/TMessagesProj/build/outputs/bundle && \
-    cp -R /home/gradle/TMessagesProj_App/build/outputs/native-debug-symbols/. /home/source/TMessagesProj/build/outputs/native-debug-symbols
+    git config --global --add safe.directory /home/gradle && \
+    ./gradlew :TMessagesProj_App:assembleDebug && \
+    cp -R /home/gradle/TMessagesProj_App/build/outputs/apk/. /home/source/TMessagesProj/build/outputs/apk
