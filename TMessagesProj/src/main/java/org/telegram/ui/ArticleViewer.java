@@ -3689,7 +3689,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         textSelectionHelper.setParentView(listView[0]);
         if (MessagesController.getGlobalMainSettings().getBoolean("translate_button2", false)) {
             textSelectionHelper.setOnTranslate((text, fromLang, toLang, onAlertDismiss) -> {
-                TranslateAlert.showAlert(parentActivity, parentFragment, fromLang, toLang, text, false, null, onAlertDismiss);
+                TranslateAlert.showAlert(parentActivity, parentFragment, currentAccount, fromLang, toLang, text, false, null, onAlertDismiss);
             });
         }
         textSelectionHelper.layoutManager = layoutManager[0];
@@ -3711,7 +3711,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             @Override
             public void startTranslate(CharSequence text, Runnable onAlertDismiss) {
                 super.startTranslate(text, onAlertDismiss);
-                TranslateAlert alert = TranslateAlert.showAlert(activity, parentFragment, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], text, false, null, onAlertDismiss);
+                TranslateAlert alert = TranslateAlert.showAlert(activity, parentFragment, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], text, false, null, onAlertDismiss);
                 alert.showDim(false);
             }
         });
