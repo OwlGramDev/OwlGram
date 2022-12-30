@@ -415,7 +415,7 @@ public class SizeNotifierFrameLayout extends FrameLayout {
     }
 
     private void checkSnowflake(Canvas canvas) {
-        if (Theme.canStartHolidayAnimation() && (OwlConfig.showSnowFalling || OwlConfig.eventType != 1) && !SharedConfig.getLiteMode().enabled()) {
+        if ((Theme.canStartHolidayAnimation() || OwlConfig.eventType == 1) && OwlConfig.showSnowFalling && !SharedConfig.getLiteMode().enabled()) {
             if (snowflakesEffect == null) {
                 snowflakesEffect = new SnowflakesEffect(1);
             }
