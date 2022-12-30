@@ -319,7 +319,7 @@ public class ActionBar extends FrameLayout {
                     }
                 }
             }
-            if (Theme.canStartHolidayAnimation() && (OwlConfig.eventType == 0 || (OwlConfig.eventType == 1 && OwlConfig.showSnowFalling))) {
+            if (Theme.canStartHolidayAnimation() && (OwlConfig.eventType == 0 || OwlConfig.eventType == 1)) {
                 if (snowflakesEffect == null) {
                     fireworksEffect = null;
                     snowflakesEffect = new SnowflakesEffect(0);
