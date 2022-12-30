@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
@@ -55,9 +56,11 @@ import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.LaunchActivity;
 import org.telegram.ui.PaymentFormActivity;
 
 import java.util.ArrayList;
+import it.owlgram.android.helpers.AppRestartHelper;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class UndoView extends FrameLayout {
@@ -185,6 +188,8 @@ public class UndoView extends FrameLayout {
     public final static int ACTION_PREMIUM_ALL_FOLDER = 86;
 
     public final static int ACTION_PROXY_ADDED = 87;
+
+    public final static int ACTION_NEED_RESTART = 200;
 
     private CharSequence infoText;
     private int hideAnimationType = 1;
@@ -327,7 +332,7 @@ public class UndoView extends FrameLayout {
     }
 
     private boolean isTooltipAction() {
-        return currentAction == ACTION_ARCHIVE_HIDDEN || currentAction == ACTION_ARCHIVE_HINT || currentAction == ACTION_ARCHIVE_FEW_HINT ||
+        return currentAction == ACTION_NEED_RESTART || currentAction == ACTION_ARCHIVE_HIDDEN || currentAction == ACTION_ARCHIVE_HINT || currentAction == ACTION_ARCHIVE_FEW_HINT ||
                 currentAction == ACTION_ARCHIVE_PINNED || currentAction == ACTION_CONTACT_ADDED || currentAction == ACTION_PROXY_ADDED || currentAction == ACTION_OWNER_TRANSFERED_CHANNEL ||
                 currentAction == ACTION_OWNER_TRANSFERED_GROUP || currentAction == ACTION_QUIZ_CORRECT || currentAction == ACTION_QUIZ_INCORRECT || currentAction == ACTION_CACHE_WAS_CLEARED ||
                 currentAction == ACTION_ADDED_TO_FOLDER || currentAction == ACTION_REMOVED_FROM_FOLDER || currentAction == ACTION_PROFILE_PHOTO_CHANGED ||
@@ -497,7 +502,29 @@ public class UndoView extends FrameLayout {
 
         infoTextView.setMovementMethod(null);
 
-        if (isTooltipAction()) {
+        if (currentAction == ACTION_NEED_RESTART) {
+            infoTextView.setText(LocaleController.formatString("RestartAppToApplyChanges", R.string.RestartAppToApplyChanges));
+            undoTextView.setText(LocaleController.getString("BotUnblock", R.string.BotUnblock));
+
+            layoutParams.leftMargin = AndroidUtilities.dp(58);
+            layoutParams.topMargin = AndroidUtilities.dp(13);
+            layoutParams.rightMargin = (int) Math.ceil(undoTextView.getPaint().measureText(undoTextView.getText().toString())) + AndroidUtilities.dp(26);
+
+            infoTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
+            undoButton.setVisibility(VISIBLE);
+            infoTextView.setTypeface(Typeface.DEFAULT);
+            subinfoTextView.setVisibility(GONE);
+
+            leftImageView.setVisibility(VISIBLE);
+            leftImageView.setAnimation(R.raw.chats_infotip, 36, 36);
+            leftImageView.setProgress(0);
+            leftImageView.playAnimation();
+            undoImageView.setVisibility(GONE);
+
+            currentCancelRunnable = () -> {
+                AppRestartHelper.triggerRebirth(getContext(), new Intent(getContext(), LaunchActivity.class));
+            };
+        } else if (isTooltipAction()) {
             CharSequence infoText;
             CharSequence subInfoText;
             @DrawableRes
