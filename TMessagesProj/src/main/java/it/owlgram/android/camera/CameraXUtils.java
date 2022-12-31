@@ -126,12 +126,16 @@ public class CameraXUtils {
 
     public static void loadSuggestedResolution() {
         int suggestedRes = getSuggestedResolution(false);
-        int maxRes = getAvailableVideoSizes().values().stream()
-                .mapToInt(Size::getHeight)
-                .max().orElse(0);
-        int lowRes = getAvailableVideoSizes().values().stream()
+        Map<Quality, Size> sizes = getAvailableVideoSizes();
+
+        int min = sizes.values().stream()
                 .mapToInt(Size::getHeight)
                 .min().orElse(0);
+
+        int max = sizes.values().stream()
+                .mapToInt(Size::getHeight)
+                .max().orElse(0);
+
         getAvailableVideoSizes().values().stream()
                 .sorted(Comparator.comparingInt(Size::getHeight).reversed())
                 .mapToInt(Size::getHeight)
@@ -139,7 +143,7 @@ public class CameraXUtils {
                 .findFirst()
                 .ifPresent(height -> {
                     cameraResolution = height;
-                    if (OwlConfig.cameraResolution == -1 || OwlConfig.cameraResolution > maxRes || OwlConfig.cameraResolution < lowRes) {
+                    if (OwlConfig.cameraResolution == -1 || OwlConfig.cameraResolution > max || OwlConfig.cameraResolution < min) {
                         OwlConfig.saveCameraResolution(height);
                     }
                 });

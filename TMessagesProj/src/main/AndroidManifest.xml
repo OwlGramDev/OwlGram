@@ -475,6 +475,12 @@
                   android:excludeFromRecents="true"
                   android:exported="true"
                 android:theme="@style/Theme.TMessages.TransparentWithAlerts"/>
+        <activity
+            android:name="it.owlgram.android.helpers.AppRestartHelper"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:process=":owlgram"
+            android:exported="false"
+            />
 
         <receiver
             android:name=".AutoMessageHeardReceiver"

@@ -689,7 +689,7 @@ public class DrawerProfileCell extends FrameLayout implements NotificationCenter
             }
             invalidate();
         }
-        if ((Theme.getEventType() == 0 && OwlConfig.eventType == 0) || (OwlConfig.eventType == 1 && OwlConfig.showSnowFalling)) {
+        if (((Theme.getEventType() == 0 && OwlConfig.eventType == 0) || OwlConfig.eventType == 1) && OwlConfig.showSnowFalling) {
             snowflakesEffect.onDraw(this, canvas);
         }
     }

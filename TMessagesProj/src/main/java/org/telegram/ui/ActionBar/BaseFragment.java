@@ -300,6 +300,10 @@ public abstract class BaseFragment {
         }
     }
 
+    public void setFinishing(boolean finishing) {
+        this.finishing = finishing;
+    }
+
     public void finishFragment(boolean animated) {
         if (isFinished || parentLayout == null) {
             return;
@@ -877,6 +881,15 @@ public abstract class BaseFragment {
     public void setPreviewDelegate(PreviewDelegate previewDelegate) {
         this.previewDelegate = previewDelegate;
     }
+
+    public void resetFragment() {
+        if (isFinished) {
+            clearViews();
+            isFinished = false;
+            finishing = false;
+        }
+    }
+
 
     public interface PreviewDelegate {
         void finishFragment();
