@@ -8269,7 +8269,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (topicId == 0 && ChatObject.canUserDoAdminAction(chat, ChatObject.ACTION_DELETE_MESSAGES)) {
                 createAutoDeleteItem(context);
             }
-            createAutoTranslateItem(context, -chatId, topicId);
+            createAutoTranslateItem(context, -chatId, topicId, chat);
             if (ChatObject.isChannel(chat)) {
                 /*if (isTopic) {
                     if (ChatObject.canManageTopic(currentAccount, chat, topicId)) {
@@ -8572,9 +8572,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     }
 
     private void createAutoTranslateItem(Context context, long dialogId) {
-        createAutoTranslateItem(context, dialogId, 0);
+        createAutoTranslateItem(context, dialogId, 0, null);
     }
-    private void createAutoTranslateItem(Context context, long dialogId, int topicId) {
+    private void createAutoTranslateItem(Context context, long dialogId, int topicId, TLRPC.Chat chat) {
         if (LanguageDetector.hasSupport() && TranslatorHelper.isSupportAutoTranslate()) {
             AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, topicId, arguments.getBoolean("isAlwaysShare", false), getResourceProvider());
             if (arguments.getBoolean("isSettings")) {
@@ -8593,7 +8593,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             }
             otherItem.addSwipeBackItem(R.drawable.msg_translate, null, LocaleController.getString("AutoTranslate", R.string.AutoTranslate), autoTranslatePopupWrapper.windowLayout);
         }
-        otherItem.addColoredGap();
+        if (chatInfo == null || !chatInfo.participants_hidden || ChatObject.hasAdminRights(chat) || !isTopic) {
+            otherItem.addColoredGap();
+        }
     }
 
     @Override
@@ -9430,7 +9432,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 case VIEW_TYPE_HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == infoHeaderRow) {
-                        if (ChatObject.isChannel(currentChat) && !currentChat.megagroup && channelInfoRow != -1) {
+                        if (ChatObject.isChannelAndNotMegaGroup(currentChat) && channelInfoRow != -1) {
                             headerCell.setText(LocaleController.getString("ReportChatDescription", R.string.ReportChatDescription));
                         } else {
                             headerCell.setText(LocaleController.getString("Info", R.string.Info));
