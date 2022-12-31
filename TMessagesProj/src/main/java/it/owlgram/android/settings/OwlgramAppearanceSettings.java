@@ -378,6 +378,13 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                             super.onSelectedEvent(eventSelected);
                             int previousEvent = OwlConfig.eventType;
                             OwlConfig.saveEventType(eventSelected);
+                            if (Theme.getEventType() == 0) {
+                                if (previousEvent == 0) {
+                                    previousEvent = 1;
+                                } else if (eventSelected == 0) {
+                                    eventSelected = 1;
+                                }
+                            }
                             if (previousEvent == 1 && eventSelected != 1) {
                                 listAdapter.notifyItemRangeRemoved(forcePacmanRow + 1, 2);
                             } else if (previousEvent != 1 && eventSelected == 1) {

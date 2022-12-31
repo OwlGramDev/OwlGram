@@ -122,7 +122,6 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         }
 
         restartTooltip = new UndoView(context);
-        restartTooltip.setInfoText(LocaleController.formatString("RestartAppToApplyChanges", R.string.RestartAppToApplyChanges));
         frameLayout.addView(restartTooltip, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.LEFT, 8, 0, 8, 8));
         parentFragment = parentLayout.getLastFragment();
         return fragmentView;

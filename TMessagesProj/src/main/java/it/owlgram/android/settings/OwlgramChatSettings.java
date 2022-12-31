@@ -201,7 +201,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.disableProximityEvents);
             }
-            restartTooltip.showWithAction(0, UndoView.ACTION_CACHE_WAS_CLEARED, null, null);
+            restartTooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
         } else if (position == suppressionRow) {
             OwlConfig.toggleVoicesAgc();
             if (view instanceof TextCheckCell) {
