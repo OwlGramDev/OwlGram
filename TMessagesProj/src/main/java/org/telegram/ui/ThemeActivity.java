@@ -626,10 +626,10 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             distanceRow = rowCount++;
             settings2Row = rowCount++;
 
-            if (SharedConfig.getDevicePerformanceClass() == SharedConfig.PERFORMANCE_CLASS_LOW || BuildVars.DEBUG_VERSION) {
+            //if (SharedConfig.getDevicePerformanceClass() == SharedConfig.PERFORMANCE_CLASS_LOW || BuildVars.DEBUG_VERSION) {
                 lightModeRow = rowCount++;
                 lightModeTopInfoRow = rowCount++;
-            }
+            //}
         } else {
             nightDisabledRow = rowCount++;
             nightScheduledRow = rowCount++;
