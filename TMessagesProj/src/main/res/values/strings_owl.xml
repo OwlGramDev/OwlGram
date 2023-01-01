@@ -305,4 +305,5 @@
     <string name="HideSendAsChannel">Hide "Send as Channel"</string>
     <string name="AutomaticSorting">Automatic Sorting</string>
     <string name="AutomaticSortingDesc">Move recently used custom emoji and sticker sets to the first position</string>
+    <string name="EmojiPack">Emoji Pack</string>
 </resources>
