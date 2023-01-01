@@ -86,6 +86,7 @@ public class CustomEmojiHelper {
             return;
         }
         loadingPack = true;
+        emojiPacksInfo.clear();
         new Thread() {
             @Override
             public void run() {
@@ -131,11 +132,6 @@ public class CustomEmojiHelper {
         return packs.stream()
                 .sorted(Comparator.comparing(EmojiPackInfo::getPackName))
                 .collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    public interface EmojiPacksInfoLoadedListener {
-        void onEmojiPackInfoLoaded(ArrayList<EmojiPackInfo> emojiPackInfos);
-        void onEmojiPackInfoLoadFailed();
     }
 
     public static class EmojiPackInfo {
