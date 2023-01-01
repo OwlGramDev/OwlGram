@@ -8,19 +8,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextCheckCell;
+import org.telegram.ui.Cells.TextSettingsCell;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.BlurIntensityCell;
 import it.owlgram.android.components.DrawerProfilePreviewCell;
 import it.owlgram.android.components.DynamicButtonSelector;
 import it.owlgram.android.components.ThemeSelectorDrawerCell;
+import it.owlgram.android.helpers.CustomEmojiHelper;
 
-public class OwlgramAppearanceSettings extends BaseSettingsActivity {
+public class OwlgramAppearanceSettings extends BaseSettingsActivity implements NotificationCenter.NotificationCenterDelegate {
     private DrawerProfilePreviewCell profilePreviewCell;
 
     private int drawerRow;
@@ -57,10 +60,24 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
     private int appearanceDividerRow;
     private int showPencilIconRow;
     private int showInActionBarRow;
+    private int chooseEmojiPackRow;
 
     @Override
     protected String getActionBarTitle() {
         return LocaleController.getString("Appearance", R.string.Appearance);
+    }
+
+    @Override
+    public boolean onFragmentCreate() {
+        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.emojiLoaded);
+        CustomEmojiHelper.loadEmojisInfo();
+        return super.onFragmentCreate();
+    }
+
+    @Override
+    public void onFragmentDestroy() {
+        super.onFragmentDestroy();
+        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
     }
 
     @Override
@@ -235,6 +252,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
         dynamicDividerRow = rowCount++;
 
         fontsAndEmojiHeaderRow = rowCount++;
+        chooseEmojiPackRow = rowCount++;
         useSystemFontRow = rowCount++;
         useSystemEmojiRow = rowCount++;
         fontsAndEmojiDividerRow = rowCount++;
@@ -259,6 +277,17 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
     @Override
     protected BaseListAdapter createAdapter() {
         return new ListAdapter();
+    }
+
+    @Override
+    public void didReceivedNotification(int id, int account, Object... args) {
+        if (id == NotificationCenter.emojiLoaded) {
+            if (!CustomEmojiHelper.loadedPackInfo()) {
+                CustomEmojiHelper.loadEmojisInfo();
+            } else if (listAdapter != null) {
+                listAdapter.notifyItemChanged(chooseEmojiPackRow, PARTIAL);
+            }
+        }
     }
 
     private class ListAdapter extends BaseListAdapter {
@@ -334,12 +363,21 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                         textCell.setTextAndIcon(LocaleController.getString("MenuItems", R.string.MenuItems), R.drawable.msg_newfilter, false);
                     }
                     break;
+                case SETTINGS:
+                    TextSettingsCell textSettingsCell = (TextSettingsCell) holder.itemView;
+                    textSettingsCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+                    if (position == chooseEmojiPackRow) {
+                        textSettingsCell.setDrawLoading(!CustomEmojiHelper.loadedPackInfo(), 30, partial);
+                        String emojiPack = CustomEmojiHelper.getSelectedPackName();
+                        textSettingsCell.setTextAndValue(LocaleController.getString("EmojiPack", R.string.EmojiPack), emojiPack, true);
+                    }
+                    break;
             }
         }
 
         @Override
         protected boolean isEnabled(ViewType viewType, int position) {
-            return viewType == ViewType.SWITCH || viewType == ViewType.TEXT_CELL;
+            return viewType == ViewType.SWITCH || viewType == ViewType.TEXT_CELL || viewType == ViewType.SETTINGS;
         }
 
         @Override
@@ -439,6 +477,8 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity {
                 return ViewType.THEME_SELECTOR;
             } else if (position == dynamicButtonRow) {
                 return ViewType.DYNAMIC_BUTTON_SELECTOR;
+            } else if (position == chooseEmojiPackRow) {
+                return ViewType.SETTINGS;
             }
             throw new IllegalArgumentException("Invalid position");
         }
