@@ -101,7 +101,7 @@ public class CustomEmojiHelper {
                     SystemClock.sleep(1000);
                 } finally {
                     loadingPack = false;
-                    AndroidUtilities.runOnUIThread(() -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded));
+                    AndroidUtilities.runOnUIThread(() -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiPacksLoaded));
                 }
             }
         }.start();

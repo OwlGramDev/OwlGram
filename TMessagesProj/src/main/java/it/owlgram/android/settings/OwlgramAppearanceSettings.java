@@ -69,7 +69,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
 
     @Override
     public boolean onFragmentCreate() {
-        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.emojiLoaded);
+        NotificationCenter.getGlobalInstance().addObserver(this, NotificationCenter.emojiPacksLoaded);
         CustomEmojiHelper.loadEmojisInfo();
         return super.onFragmentCreate();
     }
@@ -77,7 +77,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
     @Override
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
-        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
+        NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiPacksLoaded);
     }
 
     @Override
@@ -281,7 +281,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
 
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
-        if (id == NotificationCenter.emojiLoaded) {
+        if (id == NotificationCenter.emojiPacksLoaded) {
             if (!CustomEmojiHelper.loadedPackInfo()) {
                 CustomEmojiHelper.loadEmojisInfo();
             } else if (listAdapter != null) {
