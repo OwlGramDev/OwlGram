@@ -248,6 +248,7 @@ import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
 import it.owlgram.android.translator.TranslatorHelper;
 import it.owlgram.android.helpers.FileDownloadHelper;
+import it.owlgram.android.updates.UpdateManager;
 
 public class ProfileActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, SharedMediaLayout.SharedMediaPreloaderDelegate, ImageUpdater.ImageUpdaterDelegate, SharedMediaLayout.Delegate {
     private final static int PHONE_OPTION_CALL = 0,
