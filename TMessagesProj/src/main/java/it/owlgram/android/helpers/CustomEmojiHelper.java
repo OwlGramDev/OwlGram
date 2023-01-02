@@ -113,7 +113,7 @@ public class CustomEmojiHelper {
     }
 
     private static void updateLastUpdate() {
-        preferences.edit().putLong("emoji_packs_last_update", System.currentTimeMillis()).apply();
+        preferences.edit().putLong("last_update", System.currentTimeMillis()).apply();
     }
 
     private static ArrayList<EmojiPackInfo> loadFromJson(String json) throws JSONException {
