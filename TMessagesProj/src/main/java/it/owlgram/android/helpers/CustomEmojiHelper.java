@@ -71,9 +71,9 @@ public class CustomEmojiHelper {
     public static String getSelectedPackName() {
         return emojiPacksInfo
                 .stream()
-                .map(EmojiPackInfo::getPackName)
-                .filter(emojiPackInfo -> Objects.equals(emojiPackInfo, OwlConfig.emojiPackSelected))
+                .filter(emojiPackInfo -> Objects.equals(emojiPackInfo.getPackId(), OwlConfig.emojiPackSelected))
                 .findFirst()
+                .map(EmojiPackInfo::getPackName)
                 .orElse("Apple");
     }
 
@@ -132,6 +132,10 @@ public class CustomEmojiHelper {
         return packs.stream()
                 .sorted(Comparator.comparing(EmojiPackInfo::getPackName))
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public static ArrayList<EmojiPackInfo> getEmojiPacksInfo() {
+        return emojiPacksInfo;
     }
 
     public static class EmojiPackInfo {
