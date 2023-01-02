@@ -3,21 +3,15 @@ package it.owlgram.android.updates;
 import android.app.Activity;
 
 import it.owlgram.android.StoreUtils;
+import it.owlgram.android.helpers.FileDownloadHelper;
 
 public class AppDownloader {
-    public static void setDownloadMainListener(UpdateListener downloadMainListener) {
-        if (StoreUtils.isFromPlayStore()) {
-            PlayStoreAPI.setDownloadMainListener(downloadMainListener);
-        } else {
-            ApkDownloader.setDownloadMainListener(downloadMainListener);
-        }
-    }
 
     public static int getDownloadProgress() {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.getDownloadProgress();
         } else {
-            return ApkDownloader.getDownloadProgress();
+            return FileDownloadHelper.getDownloadProgress(UpdateManager.apkFile());
         }
     }
 
@@ -25,7 +19,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.isRunningDownload();
         } else {
-            return ApkDownloader.isRunningDownload();
+            return FileDownloadHelper.isRunningDownload(UpdateManager.apkFile());
         }
     }
 
@@ -33,7 +27,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.updateDownloaded();
         } else {
-            return ApkDownloader.updateDownloaded();
+            return UpdateManager.updateDownloaded();
         }
     }
 
@@ -41,7 +35,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.downloadedBytes();
         } else {
-            return ApkDownloader.downloadedBytes();
+            return FileDownloadHelper.downloadedBytes(UpdateManager.apkFile());
         }
     }
 
@@ -49,23 +43,15 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.totalBytes();
         } else {
-            return ApkDownloader.totalBytes();
+            return FileDownloadHelper.totalBytes(UpdateManager.apkFile());
         }
     }
 
-    public static void setDownloadListener(UpdateListener downloadListener) {
+    public static void setListener(String id, UpdateListener listener) {
         if (StoreUtils.isFromPlayStore()) {
-            PlayStoreAPI.setDownloadListener(downloadListener);
+            PlayStoreAPI.addListener(id, listener);
         } else {
-            ApkDownloader.setDownloadListener(downloadListener);
-        }
-    }
-
-    public static void setDownloadDialogsListener(UpdateListener listener) {
-        if (StoreUtils.isFromPlayStore()) {
-            PlayStoreAPI.setDownloadDialogsListener(listener);
-        } else {
-            ApkDownloader.setDownloadDialogsListener(listener);
+            FileDownloadHelper.addListener(id, listener);
         }
     }
 
@@ -73,7 +59,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             PlayStoreAPI.installUpdate();
         } else {
-            ApkDownloader.installUpdate(activity);
+            UpdateManager.installUpdate(activity);
         }
     }
 

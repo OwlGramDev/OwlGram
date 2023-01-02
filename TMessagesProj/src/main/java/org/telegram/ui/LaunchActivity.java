@@ -177,7 +177,6 @@ import org.telegram.ui.Components.StickersAlert;
 import org.telegram.ui.Components.TermsOfServiceView;
 import org.telegram.ui.Components.ThemeEditorView;
 import org.telegram.ui.Components.UndoView;
-import org.telegram.ui.Components.UpdateAppAlertDialog;
 import org.telegram.ui.Components.voip.VoIPHelper;
 import org.webrtc.voiceengine.WebRtcAudioTrack;
 
@@ -214,7 +213,7 @@ import it.owlgram.android.settings.OwlgramExperimentalSettings;
 import it.owlgram.android.settings.OwlgramGeneralSettings;
 import it.owlgram.android.settings.OwlgramSettings;
 import it.owlgram.android.ui.DatacenterActivity;
-import it.owlgram.android.updates.ApkDownloader;
+import it.owlgram.android.helpers.FileDownloadHelper;
 import it.owlgram.android.updates.ApkInstaller;
 import it.owlgram.android.updates.AppDownloader;
 import it.owlgram.android.updates.PlayStoreAPI;
@@ -4833,17 +4832,17 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         updateLayout.setOnClickListener(v -> {
             if (!UpdateManager.isAvailableUpdate()) return;
             if (!StoreUtils.isDownloadedFromAnyStore()) {
-                if(ApkDownloader.isRunningDownload()) {
-                    ApkDownloader.cancel();
-                } else if(ApkDownloader.updateDownloaded()) {
-                    ApkDownloader.installUpdate(LaunchActivity.this);
+                if(FileDownloadHelper.isRunningDownload(UpdateManager.apkFile())) {
+                    FileDownloadHelper.cancel(UpdateManager.apkFile());
+                } else if(UpdateManager.updateDownloaded()) {
+                    UpdateManager.installUpdate(LaunchActivity.this);
                 } else {
                     try {
                         String data = OwlConfig.updateData;
                         if(data.length() > 0) {
                             JSONObject jsonObject = new JSONObject(data);
                             UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(jsonObject);
-                            ApkDownloader.downloadAPK(LaunchActivity.this, update.link_file, update.version);
+                            FileDownloadHelper.downloadFile(LaunchActivity.this, UpdateManager.apkFile(), update.link_file, update.version);
                         }
                     } catch (Exception ignored){}
                 }
@@ -5029,7 +5028,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         UpdateManager.isDownloadedUpdate(result -> {
             updateAppUpdateViews();
-            AppDownloader.setDownloadMainListener(new AppDownloader.UpdateListener() {
+            AppDownloader.setListener("main_page", new AppDownloader.UpdateListener() {
                 @Override
                 public void onPreStart() {
                     updateAppUpdateViews();

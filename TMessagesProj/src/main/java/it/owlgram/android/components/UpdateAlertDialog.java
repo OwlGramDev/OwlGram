@@ -36,7 +36,7 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.LaunchActivity;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.updates.ApkDownloader;
+import it.owlgram.android.helpers.FileDownloadHelper;
 import it.owlgram.android.updates.UpdateManager;
 
 public class UpdateAlertDialog extends BottomSheet {
@@ -131,7 +131,7 @@ public class UpdateAlertDialog extends BottomSheet {
         BottomSheetCell doneButton = new BottomSheetCell(activity, false);
         doneButton.setText(LocaleController.formatString("AppUpdateDownloadNow", R.string.AppUpdateDownloadNow), false);
         doneButton.background.setOnClickListener(v -> {
-            ApkDownloader.downloadAPK(activity, updateAvailable.link_file, updateAvailable.version);
+            FileDownloadHelper.downloadFile(activity, UpdateManager.apkFile(), updateAvailable.link_file, updateAvailable.version);
             dismiss();
         });
         linearLayout.addView(doneButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50, 0, AndroidUtilities.dp(8), 0, 0));
