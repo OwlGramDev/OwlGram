@@ -1,5 +1,9 @@
 package it.owlgram.android.settings;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Parcelable;
@@ -7,6 +11,7 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
@@ -48,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 
 import it.owlgram.android.components.EditTopicCell;
+import it.owlgram.android.components.EmojiPackCell;
 
 public abstract class BaseSettingsActivity extends BaseFragment {
     protected static final Object PARTIAL = new Object();
@@ -255,6 +261,10 @@ public abstract class BaseSettingsActivity extends BaseFragment {
                 case PLACEHOLDER:
                     view = new FlickerLoadingView(parent.getContext());
                     break;
+                case EMOJI_PACK_SET_CELL:
+                    view = new EmojiPackCell(parent.getContext());
+                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    break;
                 default:
                     view = onCreateViewHolder(type);
                     canSetBackground = false;
@@ -316,5 +326,64 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         }
         parentLayout.rebuildFragments(INavigationLayout.REBUILD_FLAG_REBUILD_LAST);
         listView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
+    }
+
+    protected void showItemsAnimated() {
+        if (isPaused) {
+            return;
+        }
+        View progressView = null;
+        for (int i = 0; i < listView.getChildCount(); i++) {
+            View child = listView.getChildAt(i);
+            if (child instanceof FlickerLoadingView) {
+                progressView = child;
+            }
+        }
+        final View finalProgressView = progressView;
+        if (progressView != null) {
+            listView.removeView(progressView);
+        }
+        listView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override
+            public boolean onPreDraw() {
+                listView.getViewTreeObserver().removeOnPreDrawListener(this);
+                int n = listView.getChildCount();
+                AnimatorSet animatorSet = new AnimatorSet();
+                for (int i = 0; i < n; i++) {
+                    View child = listView.getChildAt(i);
+                    if (child == finalProgressView) {
+                        continue;
+                    }
+                    child.setAlpha(0);
+                    int s = Math.min(listView.getMeasuredHeight(), Math.max(0, child.getTop()));
+                    int delay = (int) ((s / (float) listView.getMeasuredHeight()) * 100);
+                    ObjectAnimator a = ObjectAnimator.ofFloat(child, View.ALPHA, 0, 1f);
+                    a.setStartDelay(delay);
+                    a.setDuration(200);
+                    animatorSet.playTogether(a);
+                }
+
+                if (finalProgressView != null && finalProgressView.getParent() == null) {
+                    listView.addView(finalProgressView);
+                    RecyclerView.LayoutManager layoutManager = listView.getLayoutManager();
+                    if (layoutManager != null) {
+                        layoutManager.ignoreView(finalProgressView);
+                        Animator animator = ObjectAnimator.ofFloat(finalProgressView, View.ALPHA, finalProgressView.getAlpha(), 0);
+                        animator.addListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                finalProgressView.setAlpha(1f);
+                                layoutManager.stopIgnoringView(finalProgressView);
+                                listView.removeView(finalProgressView);
+                            }
+                        });
+                        animator.start();
+                    }
+                }
+
+                animatorSet.start();
+                return true;
+            }
+        });
     }
 }
