@@ -51,7 +51,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             PlayStoreAPI.addListener(id, listener);
         } else {
-            FileDownloadHelper.addListener(id, listener);
+            FileDownloadHelper.addListener("appUpdate", id, listener);
         }
     }
 

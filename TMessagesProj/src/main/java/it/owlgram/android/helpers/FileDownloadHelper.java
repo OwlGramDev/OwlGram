@@ -14,7 +14,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import it.owlgram.android.updates.AppDownloader;
 
@@ -28,7 +30,7 @@ public class FileDownloadHelper {
         if (downloadThreads.get(id) != null) return false;
         if (output.exists())
             output.delete();
-        DownloadThread downloadThread = new DownloadThread(context, output);
+        DownloadThread downloadThread = new DownloadThread(context, output, id);
         downloadThread.downloadFile(link);
         downloadThreads.put(id, downloadThread);
         return true;
@@ -77,10 +79,12 @@ public class FileDownloadHelper {
         public long fileLength = 0;
         public int percentage = 0;
         private boolean isDownloadCanceled = false;
+        private final String id;
 
-        public DownloadThread(Context context, File targetFile) {
+        public DownloadThread(Context context, File targetFile, String id) {
             this.mContext = context;
             this.mTargetFile = targetFile;
+            this.id = id;
         }
 
         public void cancel() {
@@ -150,7 +154,7 @@ public class FileDownloadHelper {
 
         private void onProgressUpdate(int percentage, long downBytes, long totBytes) {
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoadProgressChanged);
-            onProgressChange(percentage, downBytes, totBytes);
+            onProgressChange(id, percentage, downBytes, totBytes);
         }
 
         private void onPreExecute() {
@@ -158,7 +162,7 @@ public class FileDownloadHelper {
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     getClass().getName());
             mWakeLock.acquire(10 * 60 * 1000L);
-            onPreStart();
+            onPreStart(id);
         }
 
         @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -167,30 +171,53 @@ public class FileDownloadHelper {
             if (isCanceled) {
                mTargetFile.delete();
             }
-            downloadThreads.remove(mTargetFile.getAbsolutePath());
-            onFinished();
+            downloadThreads.remove(id);
+            onFinished(id);
         }
     }
 
-    public static void addListener(String key, AppDownloader.UpdateListener listener) {
-        listeners.put(key, listener);
+    public static void addListener(String downloadID, String key, AppDownloader.UpdateListener listener) {
+        listeners.put(downloadID + "_" + key, listener);
     }
 
-    private static void onPreStart() {
-        for (AppDownloader.UpdateListener value : listeners.values()) {
-            if (value != null) value.onPreStart();
+    private static void onPreStart(String id) {
+        for (Map.Entry<String, AppDownloader.UpdateListener> value : listeners.entrySet()) {
+            if (value != null) {
+                String lId = value.getKey().split("_")[0];
+                if (lId.equals(id)) value.getValue().onPreStart();
+            }
         }
     }
 
-    private static void onProgressChange(int percentage, long downBytes, long totBytes) {
-        for (AppDownloader.UpdateListener value : listeners.values()) {
-            if (value != null) value.onProgressChange(percentage, downBytes, totBytes);
+    private static void onProgressChange(String id, int percentage, long downBytes, long totBytes) {
+        for (Map.Entry<String, AppDownloader.UpdateListener> value : listeners.entrySet()) {
+            if (value != null) {
+                String lId = value.getKey().split("_")[0];
+                if (lId.equals(id)) {
+                    value.getValue().onProgressChange(percentage, downBytes, totBytes);
+                }
+            }
         }
     }
 
-    private static void onFinished() {
-        for (AppDownloader.UpdateListener value : listeners.values()) {
-            if (value != null) value.onFinished();
+    private static void onFinished(String id) {
+        for (Map.Entry<String, AppDownloader.UpdateListener> value : listeners.entrySet()) {
+            if (value != null) {
+                String lId = value.getKey().split("_")[0];
+                if (lId.equals(id)) {
+                    value.getValue().onFinished();
+                }
+            }
         }
+    }
+
+    public ArrayList<String> getActiveDownloads() {
+        ArrayList<String> activeDownloads = new ArrayList<>();
+        for (Map.Entry<String, DownloadThread> value : downloadThreads.entrySet()) {
+            if (value != null) {
+                activeDownloads.add(value.getKey());
+            }
+        }
+        return activeDownloads;
     }
 }
