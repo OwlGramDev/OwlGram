@@ -202,6 +202,7 @@ import it.owlgram.android.StoreUtils;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateAlertDialog;
 import it.owlgram.android.Crashlytics;
+import it.owlgram.android.helpers.CustomEmojiHelper;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.LanguageHelper;
 import it.owlgram.android.helpers.MonetHelper;
@@ -949,6 +950,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             MonetHelper.registerReceiver(this);
         }
+        CustomEmojiHelper.checkEmojiPacks();
     }
 
     @Override

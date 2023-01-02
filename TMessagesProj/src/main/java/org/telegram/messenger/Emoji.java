@@ -33,6 +33,8 @@ import it.owlgram.android.helpers.CustomEmojiHelper;
 
 import org.telegram.ui.Components.AnimatedEmojiSpan;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -68,6 +70,18 @@ public class Emoji {
     public static boolean emojiDrawingUseAlpha = true;
 
     private final static int MAX_RECENT_EMOJI_COUNT = 48;
+
+    public static void reloadEmoji() {
+        for (int a = 0; a < emojiBmp.length; a++) {
+            emojiBmp[a] = new Bitmap[emojiCounts[a]];
+            loadingEmoji[a] = new boolean[emojiCounts[a]];
+        }
+        for (int j = 0; j < EmojiData.data.length; j++) {
+            for (int i = 0; i < EmojiData.data[j].length; i++) {
+                rects.put(EmojiData.data[j][i], new DrawableInfo((byte) j, (short) i, i));
+            }
+        }
+    }
 
     static {
         drawImgSize = AndroidUtilities.dp(20);
@@ -118,7 +132,14 @@ public class Emoji {
 
             Bitmap bitmap = null;
             try {
-                InputStream is = ApplicationLoader.applicationContext.getAssets().open("emoji/" + String.format(Locale.US, "%d_%d.png", page, page2));
+                InputStream is;
+                CustomEmojiHelper.EmojiPackInfo packInfo = CustomEmojiHelper.getEmojiPackInfo(OwlConfig.emojiPackSelected);
+                File file = packInfo != null ? CustomEmojiHelper.emojiDir(packInfo.getPackId(), packInfo.getPackVersion()):null;
+                if (file != null && file.exists() && !OwlConfig.emojiPackSelected.equals("default")) {
+                    is = new FileInputStream(new File(file, String.format(Locale.US, "%d_%d.png", page, page2)));
+                } else {
+                    is = ApplicationLoader.applicationContext.getAssets().open("emoji/" + String.format(Locale.US, "%d_%d.png", page, page2));
+                }
                 BitmapFactory.Options opts = new BitmapFactory.Options();
                 opts.inJustDecodeBounds = false;
                 opts.inSampleSize = imageResize;
