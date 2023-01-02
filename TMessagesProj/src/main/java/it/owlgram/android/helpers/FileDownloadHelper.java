@@ -18,12 +18,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import it.owlgram.android.updates.AppDownloader;
-
 public class FileDownloadHelper {
     @SuppressLint("StaticFieldLeak")
     private static final HashMap<String, DownloadThread> downloadThreads = new HashMap<>();
-    private final static HashMap<String, AppDownloader.UpdateListener> listeners = new HashMap<>();
+    private final static HashMap<String, FileDownloadListener> listeners = new HashMap<>();
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static boolean downloadFile(Context context, String id, File output, String link) {
@@ -176,36 +174,36 @@ public class FileDownloadHelper {
         }
     }
 
-    public static void addListener(String downloadID, String key, AppDownloader.UpdateListener listener) {
+    public static void addListener(String downloadID, String key, FileDownloadListener listener) {
         listeners.put(downloadID + "_" + key, listener);
     }
 
     private static void onPreStart(String id) {
-        for (Map.Entry<String, AppDownloader.UpdateListener> value : listeners.entrySet()) {
+        for (Map.Entry<String, FileDownloadListener> value : listeners.entrySet()) {
             if (value != null) {
                 String lId = value.getKey().split("_")[0];
-                if (lId.equals(id)) value.getValue().onPreStart();
+                if (lId.equals(id)) value.getValue().onPreStart(id);
             }
         }
     }
 
     private static void onProgressChange(String id, int percentage, long downBytes, long totBytes) {
-        for (Map.Entry<String, AppDownloader.UpdateListener> value : listeners.entrySet()) {
+        for (Map.Entry<String, FileDownloadListener> value : listeners.entrySet()) {
             if (value != null) {
                 String lId = value.getKey().split("_")[0];
                 if (lId.equals(id)) {
-                    value.getValue().onProgressChange(percentage, downBytes, totBytes);
+                    value.getValue().onProgressChange(id, percentage, downBytes, totBytes);
                 }
             }
         }
     }
 
     private static void onFinished(String id) {
-        for (Map.Entry<String, AppDownloader.UpdateListener> value : listeners.entrySet()) {
+        for (Map.Entry<String, FileDownloadListener> value : listeners.entrySet()) {
             if (value != null) {
                 String lId = value.getKey().split("_")[0];
                 if (lId.equals(id)) {
-                    value.getValue().onFinished();
+                    value.getValue().onFinished(id);
                 }
             }
         }
@@ -219,5 +217,13 @@ public class FileDownloadHelper {
             }
         }
         return activeDownloads;
+    }
+
+    public interface FileDownloadListener {
+        void onPreStart(String id);
+
+        void onProgressChange(String id, int percentage, long downBytes, long totBytes);
+
+        void onFinished(String id);
     }
 }
