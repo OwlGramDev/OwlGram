@@ -11,7 +11,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.getDownloadProgress();
         } else {
-            return FileDownloadHelper.getDownloadProgress(UpdateManager.apkFile());
+            return FileDownloadHelper.getDownloadProgress("appUpdate");
         }
     }
 
@@ -19,7 +19,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.isRunningDownload();
         } else {
-            return FileDownloadHelper.isRunningDownload(UpdateManager.apkFile());
+            return FileDownloadHelper.isRunningDownload("appUpdate");
         }
     }
 
@@ -35,7 +35,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.downloadedBytes();
         } else {
-            return FileDownloadHelper.downloadedBytes(UpdateManager.apkFile());
+            return FileDownloadHelper.downloadedBytes("appUpdate");
         }
     }
 
@@ -43,7 +43,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.totalBytes();
         } else {
-            return FileDownloadHelper.totalBytes(UpdateManager.apkFile());
+            return FileDownloadHelper.totalBytes("appUpdate");
         }
     }
 

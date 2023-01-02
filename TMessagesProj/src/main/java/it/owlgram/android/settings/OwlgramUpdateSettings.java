@@ -99,7 +99,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
         if (position == betaUpdatesRow) {
             if (!UpdateManager.updateDownloaded() && !checkingUpdates) {
                 OwlConfig.toggleBetaUpdates();
-                FileDownloadHelper.cancel(UpdateManager.apkFile());
+                FileDownloadHelper.cancel("appUpdate");
                 UpdateManager.deleteUpdate();
                 listAdapter.notifyItemChanged(apkChannelRow, PARTIAL);
                 if (updateAvailable != null) {
@@ -232,8 +232,9 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                         @Override
                         protected void onConfirmUpdate() {
                             super.onConfirmUpdate();
-                            if (!FileDownloadHelper.isRunningDownload(UpdateManager.apkFile())) {
-                                FileDownloadHelper.downloadFile(context, UpdateManager.apkFile(), updateAvailable.link_file, updateAvailable.version);
+                            if (!FileDownloadHelper.isRunningDownload("appUpdate")) {
+                                if (FileDownloadHelper.downloadFile(context, "appUpdate", UpdateManager.apkFile(), updateAvailable.link_file))
+                                    OwlConfig.saveOldVersion(updateAvailable.version);
                                 updateCell.setDownloadMode();
                             }
                         }

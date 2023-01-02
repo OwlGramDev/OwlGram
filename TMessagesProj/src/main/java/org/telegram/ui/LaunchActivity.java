@@ -4832,8 +4832,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         updateLayout.setOnClickListener(v -> {
             if (!UpdateManager.isAvailableUpdate()) return;
             if (!StoreUtils.isDownloadedFromAnyStore()) {
-                if(FileDownloadHelper.isRunningDownload(UpdateManager.apkFile())) {
-                    FileDownloadHelper.cancel(UpdateManager.apkFile());
+                if(FileDownloadHelper.isRunningDownload("appUpdate")) {
+                    FileDownloadHelper.cancel("appUpdate");
                 } else if(UpdateManager.updateDownloaded()) {
                     UpdateManager.installUpdate(LaunchActivity.this);
                 } else {
@@ -4842,7 +4842,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         if(data.length() > 0) {
                             JSONObject jsonObject = new JSONObject(data);
                             UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(jsonObject);
-                            FileDownloadHelper.downloadFile(LaunchActivity.this, UpdateManager.apkFile(), update.link_file, update.version);
+                            if (FileDownloadHelper.downloadFile(LaunchActivity.this, "appUpdate", UpdateManager.apkFile(), update.link_file))
+                                OwlConfig.saveOldVersion(update.version);
                         }
                     } catch (Exception ignored){}
                 }

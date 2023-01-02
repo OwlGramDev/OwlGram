@@ -16,7 +16,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 
-import it.owlgram.android.OwlConfig;
 import it.owlgram.android.updates.AppDownloader;
 
 public class FileDownloadHelper {
@@ -25,46 +24,45 @@ public class FileDownloadHelper {
     private final static HashMap<String, AppDownloader.UpdateListener> listeners = new HashMap<>();
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void downloadFile(Context context, File output, String link, int version) {
-        String abs = output.getAbsolutePath();
-        if (downloadThreads.get(abs) != null) return;
+    public static boolean downloadFile(Context context, String id, File output, String link) {
+        if (downloadThreads.get(id) != null) return false;
         if (output.exists())
             output.delete();
-        OwlConfig.saveOldVersion(version);
         DownloadThread downloadThread = new DownloadThread(context, output);
         downloadThread.downloadFile(link);
-        downloadThreads.put(abs, downloadThread);
+        downloadThreads.put(id, downloadThread);
+        return true;
     }
 
-    public static void cancel(File output) {
-        DownloadThread downloadThread = downloadThreads.get(output.getAbsolutePath());
+    public static void cancel(String id) {
+        DownloadThread downloadThread = downloadThreads.get(id);
         if (downloadThread != null) {
             downloadThread.cancel();
         }
     }
 
-    public static boolean isRunningDownload(File output) {
-        return downloadThreads.get(output.getAbsolutePath()) != null;
+    public static boolean isRunningDownload(String id) {
+        return downloadThreads.get(id) != null;
     }
 
-    public static long downloadedBytes(File output) {
-        DownloadThread downloadThread = downloadThreads.get(output.getAbsolutePath());
+    public static long downloadedBytes(String id) {
+        DownloadThread downloadThread = downloadThreads.get(id);
         if (downloadThread != null) {
             return downloadThread.total;
         }
         return 0;
     }
 
-    public static long totalBytes(File output) {
-        DownloadThread downloadThread = downloadThreads.get(output.getAbsolutePath());
+    public static long totalBytes(String id) {
+        DownloadThread downloadThread = downloadThreads.get(id);
         if (downloadThread != null) {
             return downloadThread.fileLength;
         }
         return 0;
     }
 
-    public static int getDownloadProgress(File output) {
-        DownloadThread downloadThread = downloadThreads.get(output.getAbsolutePath());
+    public static int getDownloadProgress(String id) {
+        DownloadThread downloadThread = downloadThreads.get(id);
         if (downloadThread != null) {
             return downloadThread.percentage;
         }

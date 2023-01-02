@@ -131,7 +131,8 @@ public class UpdateAlertDialog extends BottomSheet {
         BottomSheetCell doneButton = new BottomSheetCell(activity, false);
         doneButton.setText(LocaleController.formatString("AppUpdateDownloadNow", R.string.AppUpdateDownloadNow), false);
         doneButton.background.setOnClickListener(v -> {
-            FileDownloadHelper.downloadFile(activity, UpdateManager.apkFile(), updateAvailable.link_file, updateAvailable.version);
+            if (FileDownloadHelper.downloadFile(activity, "appUpdate", UpdateManager.apkFile(), updateAvailable.link_file))
+                OwlConfig.saveOldVersion(updateAvailable.version);
             dismiss();
         });
         linearLayout.addView(doneButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 50, 0, AndroidUtilities.dp(8), 0, 0));
