@@ -1,6 +1,7 @@
 package it.owlgram.android.helpers;
 
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.SystemClock;
 import android.text.TextUtils;
 
@@ -34,6 +35,12 @@ public class CustomEmojiHelper {
     private static final ArrayList<EmojiPackInfo> emojiPacksInfo = new ArrayList<>();
     private final static String EMOJI_PACKS_CACHE_DIR = AndroidUtilities.getCacheDir().getAbsolutePath() + "/emojis/";
     private static final Runnable invalidateUiRunnable = () -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
+    private static final String previewEmojis[] = {
+            "\uD83D\uDE00",
+            "\uD83D\uDE09",
+            "\uD83D\uDE14",
+            "\uD83D\uDE28"
+    };
 
     public static Typeface getSystemEmojiTypeface() {
         if (!loadSystemEmojiFailed && systemEmojiTypeface == null) {
@@ -345,5 +352,16 @@ public class CustomEmojiHelper {
                 .filter(emojiPackInfo -> emojiPackInfo.packId.equals(emojiPackId))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public static boolean isValidEmojiPack(File path) {
+        Typeface typeface;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            typeface = new Typeface.Builder(path)
+                    .build();
+        } else {
+            typeface = Typeface.createFromFile(path);
+        }
+        return typeface != null && !typeface.equals(Typeface.DEFAULT);
     }
 }
