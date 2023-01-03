@@ -1,9 +1,8 @@
 package it.owlgram.android.helpers;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.SystemClock;
+import android.text.TextUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +30,6 @@ public class CustomEmojiHelper {
     private static Typeface systemEmojiTypeface;
     private static boolean loadSystemEmojiFailed = false;
     private static final String EMOJI_FONT_AOSP = "NotoColorEmoji.ttf";
-    private static final SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("EmojiPackConfig", Context.MODE_PRIVATE);
     private static boolean loadingPack = false;
     private static final ArrayList<EmojiPackInfo> emojiPacksInfo = new ArrayList<>();
     private final static String EMOJI_PACKS_CACHE_DIR = AndroidUtilities.getCacheDir().getAbsolutePath() + "/emojis/";
@@ -75,9 +73,9 @@ public class CustomEmojiHelper {
     public static String getSelectedPackName() {
         return emojiPacksInfo
                 .stream()
-                .filter(emojiPackInfo -> Objects.equals(emojiPackInfo.getPackId(), OwlConfig.emojiPackSelected))
+                .filter(emojiPackInfo -> Objects.equals(emojiPackInfo.packId, OwlConfig.emojiPackSelected))
                 .findFirst()
-                .map(EmojiPackInfo::getPackName)
+                .map(e -> e.packName)
                 .orElse("Apple");
     }
 
@@ -99,29 +97,17 @@ public class CustomEmojiHelper {
             @Override
             public void run() {
                 try {
-                    String json = preferences.getString("emoji_packs", null);
-                    if (json == null || System.currentTimeMillis() - getLastUpdate() > 10 * 60 * 1000) {
-                        json = new StandardHTTPRequest("https://app.owlgram.org/emoji_packs").request();
-                        preferences.edit().putString("emoji_packs", json).apply();
-                        updateLastUpdate();
-                    }
+                    String json = new StandardHTTPRequest(String.format("https://app.owlgram.org/emoji_packs?noCache=%s",  Math.random() * 10000)).request();
                     emojiPacksInfo.addAll(loadFromJson(json));
-                } catch (Exception ignored) {
+                } catch (Exception e) {
                     SystemClock.sleep(1000);
+                    FileLog.e("Error loading emoji packs", e);
                 } finally {
                     loadingPack = false;
                     AndroidUtilities.runOnUIThread(listener::onLoaded);
                 }
             }
         }.start();
-    }
-
-    private static Long getLastUpdate() {
-        return preferences.getLong("last_update", 0);
-    }
-
-    private static void updateLastUpdate() {
-        preferences.edit().putLong("last_update", System.currentTimeMillis()).apply();
     }
 
     private static ArrayList<EmojiPackInfo> loadFromJson(String json) throws JSONException {
@@ -135,11 +121,12 @@ public class CustomEmojiHelper {
                     obj.getString("preview"),
                     obj.getString("id"),
                     obj.getLong("file_size"),
-                    obj.getInt("version")
+                    obj.getInt("version"),
+                    obj.getString("md5")
             ));
         }
         return packs.stream()
-                .sorted(Comparator.comparing(EmojiPackInfo::getPackName))
+                .sorted(Comparator.comparing(e -> e.packName))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -154,14 +141,16 @@ public class CustomEmojiHelper {
         private final String packId;
         private final Long packSize;
         private final Integer packVersion;
+        private final String versionWithMd5;
 
-        public EmojiPackInfo(String packName, String fileLink, String previewLink, String packId, Long packSize, Integer packVersion) {
+        public EmojiPackInfo(String packName, String fileLink, String previewLink, String packId, Long packSize, Integer packVersion, String md5) {
             this.packName = packName;
             this.fileLink = fileLink;
             this.previewLink = previewLink;
             this.packId = Objects.equals(packId, "apple") ? "default" : packId;
             this.packSize = packSize;
             this.packVersion = packVersion;
+            this.versionWithMd5 = String.format("%s_%s", packVersion, md5);
         }
 
         public String getPackName() {
@@ -187,18 +176,22 @@ public class CustomEmojiHelper {
         public Integer getPackVersion() {
             return packVersion;
         }
+
+        public String getVersionWithMd5() {
+            return versionWithMd5;
+        }
     }
 
-    public static boolean isInstalledOldVersion(String emojiID, int version) {
-        return getAllVersions(emojiID, version).size() > 0;
+    public static boolean isInstalledOldVersion(String emojiID, String versionWithMd5) {
+        return getAllVersions(emojiID, versionWithMd5).size() > 0;
     }
 
     public static boolean isInstalledOffline(String emojiID) {
-        return getAllVersions(emojiID, -1).size() > 0;
+        return getAllVersions(emojiID, null).size() > 0;
     }
 
     public static ArrayList<File> getAllVersions(String emojiID) {
-        return getAllVersions(emojiID, -1);
+        return getAllVersions(emojiID, null);
     }
 
     public static ArrayList<File> getAllEmojis() {
@@ -217,10 +210,10 @@ public class CustomEmojiHelper {
         return emojis;
     }
 
-    public static ArrayList<File> getAllVersions(String emojiID, int version) {
+    public static ArrayList<File> getAllVersions(String emojiID, String versionWithMd5) {
         return getAllEmojis().stream()
                 .filter(file -> file.getName().startsWith(emojiID))
-                .filter(file -> version == -1 || !file.getName().endsWith("_v" + version))
+                .filter(file -> TextUtils.isEmpty(versionWithMd5) || !file.getName().endsWith("_v" + versionWithMd5))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -252,14 +245,14 @@ public class CustomEmojiHelper {
                 .forEach(FileUnzipHelper::deleteFolder);
     }
 
-    public static void deleteOldVersions(String emojiID, int version) {
-        for (File oldVersion : getAllVersions(emojiID, version)) {
+    public static void deleteOldVersions(String emojiID, String versionWithMd5) {
+        for (File oldVersion : getAllVersions(emojiID, versionWithMd5)) {
            FileUnzipHelper.deleteFolder(oldVersion);
         }
     }
 
-    public static File emojiDir(String emojiID, int version) {
-        return new File(EMOJI_PACKS_CACHE_DIR + emojiID + "_v" + version);
+    public static File emojiDir(String emojiID, String versionWithMd5) {
+        return new File(EMOJI_PACKS_CACHE_DIR + emojiID + "_v" + versionWithMd5);
     }
 
     public static File emojiTmp(String emojiID) {
@@ -271,9 +264,9 @@ public class CustomEmojiHelper {
         try {
             long neededLength = getEmojiPacksInfo()
                     .stream()
-                    .filter(emojiPackInfo -> Objects.equals(emojiPackInfo.getPackId(), id))
+                    .filter(emojiPackInfo -> Objects.equals(emojiPackInfo.packId, id))
                     .findFirst()
-                    .map(EmojiPackInfo::getPackSize)
+                    .map(e -> e.packSize)
                     .orElse(0L);
             if (emojiTmp(id).length() == neededLength && neededLength != 0) {
                 isCorrupted = false;
@@ -307,8 +300,8 @@ public class CustomEmojiHelper {
                 return;
             }
             for (EmojiPackInfo emojiPackInfo : emojiPacksInfo) {
-                boolean isUpdate = isInstalledOldVersion(emojiPackInfo.getPackId(), emojiPackInfo.getPackVersion());
-                if (!emojiDir(emojiPackInfo.packId, emojiPackInfo.packVersion).exists() && OwlConfig.emojiPackSelected.equals(emojiPackInfo.packId)) {
+                boolean isUpdate = isInstalledOldVersion(emojiPackInfo.packId, emojiPackInfo.versionWithMd5);
+                if (!emojiDir(emojiPackInfo.packId, emojiPackInfo.versionWithMd5).exists() && OwlConfig.emojiPackSelected.equals(emojiPackInfo.packId)) {
                     CustomEmojiHelper.mkDirs();
                     FileDownloadHelper.downloadFile(ApplicationLoader.applicationContext, emojiPackInfo.packId, CustomEmojiHelper.emojiTmp(emojiPackInfo.packId), emojiPackInfo.fileLink);
                     FileDownloadHelper.addListener(emojiPackInfo.packId, "checkListener", new FileDownloadHelper.FileDownloadListener() {
@@ -322,11 +315,11 @@ public class CustomEmojiHelper {
                         @Override
                         public void onFinished(String id) {
                             if (CustomEmojiHelper.emojiTmpDownloaded(id)) {
-                                FileUnzipHelper.unzipFile(ApplicationLoader.applicationContext, id, CustomEmojiHelper.emojiTmp(id), CustomEmojiHelper.emojiDir(id, emojiPackInfo.packVersion));
+                                FileUnzipHelper.unzipFile(ApplicationLoader.applicationContext, id, CustomEmojiHelper.emojiTmp(id), CustomEmojiHelper.emojiDir(id, emojiPackInfo.versionWithMd5));
                                 FileUnzipHelper.addListener(id, "checkListener", id1 -> {
                                     CustomEmojiHelper.emojiTmp(id).delete();
-                                    if (CustomEmojiHelper.emojiDir(id, emojiPackInfo.packVersion).exists()) {
-                                        deleteOldVersions(emojiPackInfo.getPackId(), emojiPackInfo.getPackVersion());
+                                    if (CustomEmojiHelper.emojiDir(id, emojiPackInfo.versionWithMd5).exists()) {
+                                        deleteOldVersions(emojiPackInfo.packId, emojiPackInfo.versionWithMd5);
                                     }
                                     Emoji.reloadEmoji();
                                     AndroidUtilities.cancelRunOnUIThread(invalidateUiRunnable);
@@ -349,7 +342,7 @@ public class CustomEmojiHelper {
 
     public static EmojiPackInfo getEmojiPackInfo(String emojiPackId) {
         return emojiPacksInfo.stream()
-                .filter(emojiPackInfo -> emojiPackInfo.getPackId().equals(emojiPackId))
+                .filter(emojiPackInfo -> emojiPackInfo.packId.equals(emojiPackId))
                 .findFirst()
                 .orElse(null);
     }

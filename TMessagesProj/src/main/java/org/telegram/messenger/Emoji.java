@@ -134,7 +134,7 @@ public class Emoji {
             try {
                 InputStream is;
                 CustomEmojiHelper.EmojiPackInfo packInfo = CustomEmojiHelper.getEmojiPackInfo(OwlConfig.emojiPackSelected);
-                File file = packInfo != null ? CustomEmojiHelper.emojiDir(packInfo.getPackId(), packInfo.getPackVersion()):null;
+                File file = packInfo != null ? CustomEmojiHelper.emojiDir(packInfo.getPackId(), packInfo.getVersionWithMd5()):null;
                 if (file != null && file.exists() && !OwlConfig.emojiPackSelected.equals("default")) {
                     is = new FileInputStream(new File(file, String.format(Locale.US, "%d_%d.png", page, page2)));
                 } else {
