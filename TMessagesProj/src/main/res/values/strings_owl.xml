@@ -75,6 +75,7 @@
     <string name="FontsAndEmojis">Fonts and Emoji</string>
     <string name="UseSystemFonts">Use System Fonts</string>
     <string name="UseSystemEmojis">Use System Emoji</string>
+    <string name="UseSystemEmojisDesc">Use the system\'s emoji instead of the chosen one.</string>
     <string name="PacManAnimation">Pac-Man Animation when Archive</string>
     <string name="ChristmasHat">Christmas Hat</string>
     <string name="FallingSnow">Falling Snow</string>
@@ -305,5 +306,16 @@
     <string name="HideSendAsChannel">Hide "Send as Channel"</string>
     <string name="AutomaticSorting">Automatic Sorting</string>
     <string name="AutomaticSortingDesc">Move recently used custom emoji and sticker sets to the first position</string>
-    <string name="EmojiPack">Emoji Pack</string>
+    <string name="EmojiSets">Emoji Sets</string>
+    <string name="MyEmojiSets">My Emoji Sets</string>
+    <string name="InstalledEmojiSet">Installed</string>
+    <string name="InstallingEmojiSet">Installing…</string>
+    <string name="UpdateEmojiSet">Update</string>
+    <string name="ChooseEmojiSetHeader">Choose emoji set</string>
+    <string name="EmojiSetHint">These are the emoji sets that you have downloaded and you can select one of them to use in the app.</string>
+    <string name="CustomEmojiSet">Custom Emoji Set</string>
+    <string name="CustomEmojiSetHint">Above you can set a custom emoji set that you have downloaded.</string>
+    <string name="AddEmojiSet">Add Emoji Set</string>
+    <string name="AddEmojiSetHint">You can add a custom emoji set by tapping the button above.</string>
+    <string name="ErrorEmojiFontInvalidFormat">File must be and emoji font file.</string>
 </resources>
