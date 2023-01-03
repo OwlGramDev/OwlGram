@@ -1,8 +1,13 @@
 package it.owlgram.android.helpers;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.SystemClock;
+import android.text.TextPaint;
 import android.text.TextUtils;
 
 import org.json.JSONArray;
@@ -17,7 +22,10 @@ import org.telegram.messenger.NotificationCenter;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
@@ -32,17 +40,23 @@ public class CustomEmojiHelper {
     private static boolean loadSystemEmojiFailed = false;
     private static final String EMOJI_FONT_AOSP = "NotoColorEmoji.ttf";
     private static boolean loadingPack = false;
-    private static final ArrayList<EmojiPackInfo> emojiPacksInfo = new ArrayList<>();
+    private static final ArrayList<EmojiPackBase> emojiPacksInfo = new ArrayList<>();
+
     private final static String EMOJI_PACKS_CACHE_DIR = AndroidUtilities.getCacheDir().getAbsolutePath() + "/emojis/";
     private static final Runnable invalidateUiRunnable = () -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
-    private static final String previewEmojis[] = {
+    private static final String[] previewEmojis = {
             "\uD83D\uDE00",
             "\uD83D\uDE09",
             "\uD83D\uDE14",
             "\uD83D\uDE28"
     };
 
-    public static Typeface getSystemEmojiTypeface() {
+    public static Typeface getCurrentTypeface() {
+        if (OwlConfig.useSystemEmoji) return getSystemEmojiTypeface();
+        return getSelectedTypeface();
+    }
+
+    private static Typeface getSystemEmojiTypeface() {
         if (!loadSystemEmojiFailed && systemEmojiTypeface == null) {
             try {
                 Pattern p = Pattern.compile(">(.*emoji.*)</font>", Pattern.CASE_INSENSITIVE);
@@ -77,6 +91,21 @@ public class CustomEmojiHelper {
         return systemEmojiTypeface;
     }
 
+    private static Typeface getSelectedTypeface() {
+        return getEmojiCustomPacksInfo()
+                .stream()
+                .filter(emojiPackInfo -> emojiPackInfo.packId.equals(OwlConfig.emojiPackSelected))
+                .map(emojiPackInfo -> {
+                    File emojiFile = new File(emojiPackInfo.fileLocation);
+                    if (emojiFile.exists()) {
+                        return Typeface.createFromFile(emojiFile);
+                    }
+                    return null;
+                })
+                .findFirst()
+                .orElse(null);
+    }
+
     public static String getSelectedPackName() {
         return emojiPacksInfo
                 .stream()
@@ -106,6 +135,7 @@ public class CustomEmojiHelper {
                 try {
                     String json = new StandardHTTPRequest(String.format("https://app.owlgram.org/emoji_packs?noCache=%s",  Math.random() * 10000)).request();
                     emojiPacksInfo.addAll(loadFromJson(json));
+                    loadCustomEmojiPacks();
                 } catch (Exception e) {
                     SystemClock.sleep(1000);
                     FileLog.e("Error loading emoji packs", e);
@@ -137,47 +167,82 @@ public class CustomEmojiHelper {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public static ArrayList<EmojiPackInfo> getEmojiPacksInfo() {
+    public static ArrayList<EmojiPackBase> getEmojiPacks() {
         return emojiPacksInfo;
     }
 
-    public static class EmojiPackInfo {
-        private final String packName;
-        private final String fileLink;
-        private final String previewLink;
-        private final String packId;
-        private final Long packSize;
-        private final Integer packVersion;
-        private final String versionWithMd5;
+    public static ArrayList<EmojiPackBase> getEmojiPacksInfo() {
+        return emojiPacksInfo.stream()
+                .filter(e -> e instanceof EmojiPackInfo)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
 
-        public EmojiPackInfo(String packName, String fileLink, String previewLink, String packId, Long packSize, Integer packVersion, String md5) {
+    public static ArrayList<EmojiPackBase> getEmojiCustomPacksInfo() {
+        return emojiPacksInfo.stream()
+                .filter(e -> !(e instanceof EmojiPackInfo))
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public static class EmojiPackBase {
+        protected String packName;
+        protected String packId;
+        protected String fileLocation;
+        protected String preview;
+        protected long fileSize;
+
+        public EmojiPackBase() {
+            this(null, null, null, null, 0);
+        }
+
+        public void loadFromFile(File file) {
+            String fileName = file.getName();
+            packName = fileName;
+            int versionSep = packName.lastIndexOf("_v");
+            packName = packName.substring(0, versionSep);
+            packId = fileName.substring(versionSep);
+            File fileFont = new File(file,"/font.ttf");
+            fileLocation = fileFont.getAbsolutePath();
+            preview = file.getAbsolutePath() + "/preview.png";
+            fileSize = fileFont.length();
+        }
+
+        public EmojiPackBase(String packName, String packId, String fileLocation, String preview, long fileSize) {
             this.packName = packName;
-            this.fileLink = fileLink;
-            this.previewLink = previewLink;
-            this.packId = Objects.equals(packId, "apple") ? "default" : packId;
-            this.packSize = packSize;
-            this.packVersion = packVersion;
-            this.versionWithMd5 = String.format("%s_%s", packVersion, md5);
+            this.packId = packId;
+            this.fileLocation = fileLocation;
+            this.preview = preview;
+            this.fileSize = fileSize;
         }
 
         public String getPackName() {
             return packName;
         }
 
-        public String getFileLink() {
-            return fileLink;
-        }
-
-        public String getPreviewLink() {
-            return previewLink;
-        }
-
         public String getPackId() {
             return packId;
         }
 
-        public Long getPackSize() {
-            return packSize;
+        public String getFileLocation() {
+            return fileLocation;
+        }
+
+        public String getPreview() {
+            return preview;
+        }
+
+        public Long getFileSize() {
+            return fileSize;
+        }
+    }
+
+    public static class EmojiPackInfo extends EmojiPackBase {
+        private final Integer packVersion;
+        private final String versionWithMd5;
+
+        public EmojiPackInfo(String packName, String fileLink, String previewLink, String packId, Long packSize, Integer packVersion, String md5) {
+            super(packName, Objects.equals(packId, "apple") ? "default" : packId, fileLink, previewLink, packSize);
+            this.packVersion = packVersion;
+            this.versionWithMd5 = String.format("%s_%s", packVersion, md5);
         }
 
         public Integer getPackVersion() {
@@ -273,7 +338,7 @@ public class CustomEmojiHelper {
                     .stream()
                     .filter(emojiPackInfo -> Objects.equals(emojiPackInfo.packId, id))
                     .findFirst()
-                    .map(e -> e.packSize)
+                    .map(e -> e.fileSize)
                     .orElse(0L);
             if (emojiTmp(id).length() == neededLength && neededLength != 0) {
                 isCorrupted = false;
@@ -306,42 +371,45 @@ public class CustomEmojiHelper {
                 AndroidUtilities.runOnUIThread(invalidateUiRunnable);
                 return;
             }
-            for (EmojiPackInfo emojiPackInfo : emojiPacksInfo) {
-                boolean isUpdate = isInstalledOldVersion(emojiPackInfo.packId, emojiPackInfo.versionWithMd5);
-                if (!emojiDir(emojiPackInfo.packId, emojiPackInfo.versionWithMd5).exists() && OwlConfig.emojiPackSelected.equals(emojiPackInfo.packId)) {
-                    CustomEmojiHelper.mkDirs();
-                    FileDownloadHelper.downloadFile(ApplicationLoader.applicationContext, emojiPackInfo.packId, CustomEmojiHelper.emojiTmp(emojiPackInfo.packId), emojiPackInfo.fileLink);
-                    FileDownloadHelper.addListener(emojiPackInfo.packId, "checkListener", new FileDownloadHelper.FileDownloadListener() {
-                        @Override
-                        public void onPreStart(String id) {}
+            for (EmojiPackBase emojiPackBase : emojiPacksInfo) {
+                if (emojiPackBase instanceof EmojiPackInfo) {
+                    EmojiPackInfo emojiPackInfo = (EmojiPackInfo) emojiPackBase;
+                    boolean isUpdate = isInstalledOldVersion(emojiPackInfo.packId, emojiPackInfo.versionWithMd5);
+                    if (!emojiDir(emojiPackInfo.packId, emojiPackInfo.versionWithMd5).exists() && OwlConfig.emojiPackSelected.equals(emojiPackInfo.packId)) {
+                        CustomEmojiHelper.mkDirs();
+                        FileDownloadHelper.downloadFile(ApplicationLoader.applicationContext, emojiPackInfo.packId, CustomEmojiHelper.emojiTmp(emojiPackInfo.packId), emojiPackInfo.fileLocation);
+                        FileDownloadHelper.addListener(emojiPackInfo.packId, "checkListener", new FileDownloadHelper.FileDownloadListener() {
+                            @Override
+                            public void onPreStart(String id) {}
 
-                        @Override
-                        public void onProgressChange(String id, int percentage, long downBytes, long totBytes) {}
+                            @Override
+                            public void onProgressChange(String id, int percentage, long downBytes, long totBytes) {}
 
-                        @SuppressWarnings("ResultOfMethodCallIgnored")
-                        @Override
-                        public void onFinished(String id) {
-                            if (CustomEmojiHelper.emojiTmpDownloaded(id)) {
-                                FileUnzipHelper.unzipFile(ApplicationLoader.applicationContext, id, CustomEmojiHelper.emojiTmp(id), CustomEmojiHelper.emojiDir(id, emojiPackInfo.versionWithMd5));
-                                FileUnzipHelper.addListener(id, "checkListener", id1 -> {
+                            @SuppressWarnings("ResultOfMethodCallIgnored")
+                            @Override
+                            public void onFinished(String id) {
+                                if (CustomEmojiHelper.emojiTmpDownloaded(id)) {
+                                    FileUnzipHelper.unzipFile(ApplicationLoader.applicationContext, id, CustomEmojiHelper.emojiTmp(id), CustomEmojiHelper.emojiDir(id, emojiPackInfo.versionWithMd5));
+                                    FileUnzipHelper.addListener(id, "checkListener", id1 -> {
+                                        CustomEmojiHelper.emojiTmp(id).delete();
+                                        if (CustomEmojiHelper.emojiDir(id, emojiPackInfo.versionWithMd5).exists()) {
+                                            deleteOldVersions(emojiPackInfo.packId, emojiPackInfo.versionWithMd5);
+                                        }
+                                        Emoji.reloadEmoji();
+                                        AndroidUtilities.cancelRunOnUIThread(invalidateUiRunnable);
+                                        AndroidUtilities.runOnUIThread(invalidateUiRunnable);
+                                    });
+                                } else {
                                     CustomEmojiHelper.emojiTmp(id).delete();
-                                    if (CustomEmojiHelper.emojiDir(id, emojiPackInfo.versionWithMd5).exists()) {
-                                        deleteOldVersions(emojiPackInfo.packId, emojiPackInfo.versionWithMd5);
-                                    }
+                                    if (!isUpdate) OwlConfig.setEmojiPackSelected("default");
                                     Emoji.reloadEmoji();
                                     AndroidUtilities.cancelRunOnUIThread(invalidateUiRunnable);
                                     AndroidUtilities.runOnUIThread(invalidateUiRunnable);
-                                });
-                            } else {
-                                CustomEmojiHelper.emojiTmp(id).delete();
-                                if (!isUpdate) OwlConfig.setEmojiPackSelected("default");
-                                Emoji.reloadEmoji();
-                                AndroidUtilities.cancelRunOnUIThread(invalidateUiRunnable);
-                                AndroidUtilities.runOnUIThread(invalidateUiRunnable);
+                                }
                             }
-                        }
-                    });
-                    break;
+                        });
+                        break;
+                    }
                 }
             }
         });
@@ -349,7 +417,9 @@ public class CustomEmojiHelper {
 
     public static EmojiPackInfo getEmojiPackInfo(String emojiPackId) {
         return emojiPacksInfo.stream()
+                .filter(emojiPackInfo -> emojiPackInfo instanceof EmojiPackInfo)
                 .filter(emojiPackInfo -> emojiPackInfo.packId.equals(emojiPackId))
+                .map(emojiPackInfo -> (EmojiPackInfo) emojiPackInfo)
                 .findFirst()
                 .orElse(null);
     }
@@ -363,5 +433,87 @@ public class CustomEmojiHelper {
             typeface = Typeface.createFromFile(path);
         }
         return typeface != null && !typeface.equals(Typeface.DEFAULT);
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static boolean installEmoji(File emojiFile) {
+        try {
+            String fontName = emojiFile.getName();
+            fontName = fontName.substring(0, fontName.lastIndexOf("."));
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            try (FileInputStream fis = new FileInputStream(emojiFile)) {
+                byte[] dataBytes = new byte[1024];
+                int nread;
+                while ((nread = fis.read(dataBytes)) != -1) {
+                    md.update(dataBytes, 0, nread);
+                }
+            }
+
+            byte[] mdBytes = md.digest();
+            StringBuilder sb = new StringBuilder();
+            for (byte mdByte : mdBytes) {
+                sb.append(Integer.toString((mdByte & 0xff) + 0x100, 16).substring(1));
+            }
+            File emojiDir = new File(EMOJI_PACKS_CACHE_DIR + fontName + "_v" + sb);
+            if (emojiDir.exists()) {
+                return false;
+            }
+            emojiDir.mkdirs();
+            File emojiFont = new File(emojiDir, "font.ttf");
+            FileInputStream inputStream = new FileInputStream(emojiFile);
+            FileOutputStream outputStream = new FileOutputStream(emojiFont);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+            int emojiSize = 73;
+            Bitmap bitmap = Bitmap.createBitmap(emojiSize * 2, emojiSize * 2, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+            textPaint.setTypeface(Typeface.createFromFile(emojiFont));
+            for (int x = 0; x < 2; x++) {
+                for (int y = 0; y < 2; y++) {
+                    int xPos = x * emojiSize;
+                    int yPos = y * emojiSize;
+                    String emoji = previewEmojis[x + y * 2];
+                    Rect rect = new Rect(xPos, yPos, xPos + emojiSize, yPos + emojiSize);
+                    textPaint.setTextSize(rect.height() * 0.8f);
+                    canvas.drawText(emoji,  0, emoji.length(), rect.left, rect.bottom - rect.height() * 0.2f, textPaint);
+                }
+            }
+            File emojiPreview = new File(emojiDir, "preview.png");
+            FileOutputStream out = new FileOutputStream(emojiPreview);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            out.close();
+            inputStream.close();
+            outputStream.close();
+            EmojiPackBase emojiPackBase = new EmojiPackBase();
+            emojiPackBase.loadFromFile(emojiDir);
+            emojiPacksInfo.add(emojiPackBase);
+            return true;
+        } catch (Exception e) {
+            FileLog.e(e);
+            return false;
+        }
+    }
+
+    private static void loadCustomEmojiPacks() {
+        getAllEmojis().stream()
+                .filter(file -> new File(file, "font.ttf").exists())
+                .filter(file -> new File(file, "preview.png").exists())
+                .sorted(Comparator.comparingLong(File::lastModified))
+                .map(file -> {
+                    EmojiPackBase emojiPackBase = new EmojiPackBase();
+                    emojiPackBase.loadFromFile(file);
+                    return emojiPackBase;
+                })
+                .forEach(emojiPacksInfo::add);
+    }
+
+    public static boolean isSelectedCustomEmojiPack() {
+        return getEmojiCustomPacksInfo()
+                .stream()
+                .anyMatch(emojiPackInfo -> emojiPackInfo.packId.equals(OwlConfig.emojiPackSelected));
     }
 }

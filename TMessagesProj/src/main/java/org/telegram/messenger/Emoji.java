@@ -281,7 +281,7 @@ public class Emoji {
 
         @Override
         public void draw(Canvas canvas) {
-            if (!OwlConfig.useSystemEmoji && !isLoaded()) {
+            if (!OwlConfig.useSystemEmoji && !isLoaded() && !CustomEmojiHelper.isSelectedCustomEmojiPack()) {
                 loadEmoji(info.page, info.page2);
                 placeholderPaint.setColor(placeholderColor);
                 Rect bounds = getBounds();
@@ -296,10 +296,10 @@ public class Emoji {
                 b = getBounds();
             }
 
-            if (OwlConfig.useSystemEmoji) {
+            if (OwlConfig.useSystemEmoji || CustomEmojiHelper.isSelectedCustomEmojiPack()) {
                 String emoji = fixEmoji(EmojiData.data[info.page][info.emojiIndex]);
                 textPaint.setTextSize(b.height() * 0.8f);
-                textPaint.setTypeface(CustomEmojiHelper.getSystemEmojiTypeface());
+                textPaint.setTypeface(CustomEmojiHelper.getCurrentTypeface());
                 canvas.drawText(emoji,  0, emoji.length(), b.left, b.bottom - b.height() * 0.225f, textPaint);
                 return;
             }
@@ -537,7 +537,7 @@ public class Emoji {
     }
 
     public static CharSequence replaceEmoji(CharSequence cs, Paint.FontMetricsInt fontMetrics, boolean createNew, int[] emojiOnly, int alignment) {
-        if (SharedConfig.useSystemEmoji || cs == null || cs.length() == 0) {
+        if (SharedConfig.useSystemEmoji || CustomEmojiHelper.isSelectedCustomEmojiPack() || cs == null || cs.length() == 0) {
             return cs;
         }
         Spannable s;
