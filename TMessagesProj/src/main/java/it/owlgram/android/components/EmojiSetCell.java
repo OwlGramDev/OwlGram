@@ -55,6 +55,7 @@ public class EmojiSetCell extends FrameLayout {
         optionsButton.setScaleType(ImageView.ScaleType.CENTER);
         optionsButton.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_featuredStickers_addedIcon), PorterDuff.Mode.MULTIPLY));
         optionsButton.setImageResource(R.drawable.floating_check);
+        optionsButton.setVisibility(GONE);
         addView(optionsButton, LayoutHelper.createFrame(40, 40, (LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT) | Gravity.TOP, (LocaleController.isRTL ? 10 : 0), 9, (LocaleController.isRTL ? 0 : 10), 0));
 
         radialProgress = new RadialProgressView(context);
@@ -92,16 +93,18 @@ public class EmojiSetCell extends FrameLayout {
         addView(valueTextView, LayoutHelper.createFrameRelatively(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.START, 71, 25, 70, 0));
     }
 
-    public void setData(CustomEmojiHelper.EmojiPackInfo emojiPackInfo, boolean animated, boolean divider) {
+    public void setData(CustomEmojiHelper.EmojiPackBase emojiPackInfo, boolean animated, boolean divider) {
         needDivider = divider;
         textView.setText(emojiPackInfo.getPackName());
-        packFileSize = emojiPackInfo.getPackSize();
+        packFileSize = emojiPackInfo.getFileSize();
         packId = emojiPackInfo.getPackId();
-        versionWithMD5 = emojiPackInfo.getVersionWithMd5();
-        packFileLink = emojiPackInfo.getFileLink();
+        if (emojiPackInfo instanceof CustomEmojiHelper.EmojiPackInfo) {
+            versionWithMD5 = ((CustomEmojiHelper.EmojiPackInfo) emojiPackInfo).getVersionWithMd5();
+        }
+        packFileLink = emojiPackInfo.getFileLocation();
         if (Objects.equals(packId, "default")) {
             valueTextView.setText(LocaleController.getString("Default", R.string.Default), animated);
-        } else if (CustomEmojiHelper.emojiDir(packId, versionWithMD5).exists()) {
+        } else if (CustomEmojiHelper.emojiDir(packId, versionWithMD5).exists() || TextUtils.isEmpty(versionWithMD5)) {
             valueTextView.setText(LocaleController.getString("InstalledEmojiSet", R.string.InstalledEmojiSet), animated);
         } else {
             String status = LocaleController.getString("DownloadUpdate", R.string.DownloadUpdate);
@@ -115,7 +118,7 @@ public class EmojiSetCell extends FrameLayout {
             ), animated);
         }
         textView.setTranslationY(0);
-        imageView.setImage(emojiPackInfo.getPreviewLink(), null, null);
+        imageView.setImage(emojiPackInfo.getPreview(), null, null);
     }
 
     public void setChecked(boolean checked, boolean animated) {

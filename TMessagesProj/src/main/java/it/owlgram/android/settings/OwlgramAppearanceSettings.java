@@ -45,7 +45,6 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
     private int dynamicDividerRow;
     private int fontsAndEmojiHeaderRow;
     private int useSystemFontRow;
-    private int useSystemEmojiRow;
     private int fontsAndEmojiDividerRow;
     private int appearanceHeaderRow;
     private int forcePacmanRow;
@@ -140,11 +139,6 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.useSystemFont);
             }
-        } else if (position == useSystemEmojiRow) {
-            OwlConfig.toggleUseSystemEmoji();
-            if (view instanceof TextCheckCell) {
-                ((TextCheckCell) view).setChecked(OwlConfig.useSystemEmoji);
-            }
         } else if (position == forcePacmanRow) {
             OwlConfig.togglePacmanForced();
             if (view instanceof TextCheckCell) {
@@ -211,6 +205,8 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.showNameInActionBar);
             }
+        } else if (position == chooseEmojiPackRow) {
+            presentFragment(new EmojiPackSettings());
         }
     }
 
@@ -254,7 +250,6 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
         fontsAndEmojiHeaderRow = rowCount++;
         chooseEmojiPackRow = rowCount++;
         useSystemFontRow = rowCount++;
-        useSystemEmojiRow = rowCount++;
         fontsAndEmojiDividerRow = rowCount++;
 
         appearanceHeaderRow = rowCount++;
@@ -326,8 +321,6 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
                         textCheckCell.setTextAndCheck(LocaleController.getString("AvatarDarken", R.string.AvatarDarken), OwlConfig.avatarBackgroundDarken, true);
                     } else if (position == useSystemFontRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("UseSystemFonts", R.string.UseSystemFonts), OwlConfig.useSystemFont, true);
-                    } else if (position == useSystemEmojiRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("UseSystemEmojis", R.string.UseSystemEmojis), OwlConfig.useSystemEmoji, true);
                     } else if (position == messageTimeSwitchRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("FormatTimeSeconds", R.string.FormatTimeSeconds), LocaleController.getString("FormatTimeSecondsDesc", R.string.FormatTimeSecondsDesc), OwlConfig.fullTime, true, true);
                     } else if (position == roundedNumberSwitchRow) {
@@ -369,7 +362,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
                     if (position == chooseEmojiPackRow) {
                         textSettingsCell.setDrawLoading(!CustomEmojiHelper.loadedPackInfo(), 30, partial);
                         String emojiPack = CustomEmojiHelper.getSelectedPackName();
-                        textSettingsCell.setTextAndValue(LocaleController.getString("EmojiPack", R.string.EmojiPack), emojiPack, true);
+                        textSettingsCell.setTextAndValue(LocaleController.getString("EmojiSets", R.string.EmojiSets), emojiPack, true);
                     }
                     break;
             }
@@ -460,7 +453,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
                     position == fontsAndEmojiHeaderRow || position == appearanceHeaderRow) {
                 return ViewType.HEADER;
             } else if (position == roundedNumberSwitchRow || position == messageTimeSwitchRow ||
-                    position == useSystemFontRow || position == useSystemEmojiRow || position == drawerAvatarAsBackgroundRow ||
+                    position == useSystemFontRow || position == drawerAvatarAsBackgroundRow ||
                     position == drawerDarkenBackgroundRow || position == drawerBlurBackgroundRow || position == showGradientRow ||
                     position == showAvatarRow || position == forcePacmanRow || position == smartButtonsRow ||
                     position == appBarShadowRow || position == showSantaHatRow || position == showFallingSnowRow ||
