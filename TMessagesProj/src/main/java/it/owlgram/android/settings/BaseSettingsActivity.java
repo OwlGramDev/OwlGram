@@ -29,6 +29,7 @@ import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Cells.CreationTextCell;
 import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.ManageChatTextCell;
 import org.telegram.ui.Cells.ManageChatUserCell;
@@ -53,7 +54,7 @@ import java.util.List;
 import java.util.Locale;
 
 import it.owlgram.android.components.EditTopicCell;
-import it.owlgram.android.components.EmojiPackCell;
+import it.owlgram.android.components.EmojiSetCell;
 
 public abstract class BaseSettingsActivity extends BaseFragment {
     protected static final Object PARTIAL = new Object();
@@ -262,8 +263,13 @@ public abstract class BaseSettingsActivity extends BaseFragment {
                     view = new FlickerLoadingView(parent.getContext());
                     break;
                 case EMOJI_PACK_SET_CELL:
-                    view = new EmojiPackCell(parent.getContext());
+                    view = new EmojiSetCell(parent.getContext());
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    break;
+                case CREATION_TEXT_CELL:
+                    CreationTextCell creationTextCell = new CreationTextCell(context);
+                    creationTextCell.startPadding = 61;
+                    view = creationTextCell;
                     break;
                 default:
                     view = onCreateViewHolder(type);

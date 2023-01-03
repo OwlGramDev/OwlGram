@@ -30,7 +30,7 @@ import java.util.Objects;
 
 import it.owlgram.android.helpers.CustomEmojiHelper;
 
-public class EmojiPackCell extends FrameLayout {
+public class EmojiSetCell extends FrameLayout {
     private final TextView textView;
     private final AnimatedTextView valueTextView;
     private final BackupImageView imageView;
@@ -42,7 +42,7 @@ public class EmojiPackCell extends FrameLayout {
     public String versionWithMD5;
     private final RadialProgressView radialProgress;
 
-    public EmojiPackCell(Context context) {
+    public EmojiSetCell(Context context) {
         super(context);
 
         imageView = new BackupImageView(context);
@@ -102,11 +102,11 @@ public class EmojiPackCell extends FrameLayout {
         if (Objects.equals(packId, "default")) {
             valueTextView.setText(LocaleController.getString("Default", R.string.Default), animated);
         } else if (CustomEmojiHelper.emojiDir(packId, versionWithMD5).exists()) {
-            valueTextView.setText(LocaleController.getString("InstalledPack", R.string.InstalledPack), animated);
+            valueTextView.setText(LocaleController.getString("InstalledEmojiSet", R.string.InstalledEmojiSet), animated);
         } else {
             String status = LocaleController.getString("DownloadUpdate", R.string.DownloadUpdate);
             if (CustomEmojiHelper.isInstalledOldVersion(packId, versionWithMD5)) {
-                status = LocaleController.getString("UpdatePack", R.string.UpdatePack);
+                status = LocaleController.getString("UpdateEmojiSet", R.string.UpdateEmojiSet);
             }
             valueTextView.setText(String.format(
                     "%s %s",
@@ -194,17 +194,17 @@ public class EmojiPackCell extends FrameLayout {
         if (CustomEmojiHelper.emojiTmpDownloaded(packId) || CustomEmojiHelper.emojiDir(packId, versionWithMD5).exists()) {
             setProgress(false, true);
             if (CustomEmojiHelper.emojiDir(packId, versionWithMD5).exists()) {
-                valueTextView.setText(LocaleController.getString("InstalledPack", R.string.InstalledPack));
+                valueTextView.setText(LocaleController.getString("InstalledEmojiSet", R.string.InstalledEmojiSet));
                 setChecked(true, true);
             } else {
-                valueTextView.setText(LocaleController.getString("InstallingPack", R.string.InstallingPack));
+                valueTextView.setText(LocaleController.getString("InstallingEmojiSet", R.string.InstallingEmojiSet));
             }
         } else {
             setProgress(false, true);
             setChecked(false, false);
             String status = LocaleController.getString("DownloadUpdate", R.string.DownloadUpdate);
             if (CustomEmojiHelper.isInstalledOldVersion(packId, versionWithMD5)) {
-                status = LocaleController.getString("UpdatePack", R.string.UpdatePack);
+                status = LocaleController.getString("UpdateEmojiSet", R.string.UpdateEmojiSet);
             }
             valueTextView.setText(String.format(
                     "%s %s",
