@@ -81,6 +81,10 @@ public class Emoji {
         isSelectedEmojiPack = !OwlConfig.emojiPackSelected.equals("default") && emojiFile != null && emojiFile.exists();
     }
 
+    public static boolean isSelectedCustomPack() {
+        return isSelectedCustomEmojiPack || isSelectedEmojiPack || OwlConfig.useSystemEmoji;
+    }
+
     public static void reloadEmoji() {
         reloadCache();
         for (int a = 0; a < emojiBmp.length; a++) {
