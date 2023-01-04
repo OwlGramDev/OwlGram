@@ -312,9 +312,9 @@
     <string name="InstallingEmojiSet">Installing…</string>
     <string name="UpdateEmojiSet">Update</string>
     <string name="ChooseEmojiSetHeader">Choose emoji set</string>
-    <string name="EmojiSetHint">These are the emoji sets that you have downloaded and you can select one of them to use in the app.</string>
+    <string name="EmojiSetHint">This affects emoji appearance only for you. Others see them based on their preferences.</string>
     <string name="CustomEmojiSet">Custom Emoji Set</string>
-    <string name="CustomEmojiSetHint">Above you can set a custom emoji set that you have downloaded.</string>
+    <string name="CustomEmojiSetHint">Import and choose emoji sets from your internal storage.</string>
     <string name="AddEmojiSet">Add Emoji Set</string>
     <string name="AddEmojiSetHint">You can add a custom emoji set by tapping the button above.</string>
     <string name="ErrorEmojiFontInvalidFormat">File must be and emoji font file.</string>
