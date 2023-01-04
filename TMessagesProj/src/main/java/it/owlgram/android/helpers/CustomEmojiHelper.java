@@ -619,6 +619,8 @@ public class CustomEmojiHelper {
                 @Override
                 public void run() {
                     deleteEmojiPack(emojiPackBase);
+                    Emoji.reloadEmoji();
+                    AndroidUtilities.runOnUIThread(() -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded));
                 }
             }.start();
         });

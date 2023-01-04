@@ -521,6 +521,8 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                                         clearSelected();
                                         notifyItemRangeRemoved(customEmojiStartRow, count);
                                         updateRowsId();
+                                        Emoji.reloadEmoji();
+                                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
                                     });
                                 }
                             }.start();
