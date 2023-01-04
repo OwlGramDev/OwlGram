@@ -269,6 +269,13 @@ public class CustomEmojiHelper {
         return getAllVersions(emojiID, null);
     }
 
+    public static File getCurrentEmojiPackOffline() {
+        return getAllVersions(OwlConfig.emojiPackSelected)
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
+
     public static ArrayList<File> getAllEmojis() {
         ArrayList<File> emojis = new ArrayList<>();
         File emojiDir = new File(EMOJI_PACKS_CACHE_DIR);
@@ -378,39 +385,47 @@ public class CustomEmojiHelper {
                 if (emojiPackBase instanceof EmojiPackInfo) {
                     EmojiPackInfo emojiPackInfo = (EmojiPackInfo) emojiPackBase;
                     boolean isUpdate = isInstalledOldVersion(emojiPackInfo.packId, emojiPackInfo.versionWithMd5);
-                    if (!emojiDir(emojiPackInfo.packId, emojiPackInfo.versionWithMd5).exists() && OwlConfig.emojiPackSelected.equals(emojiPackInfo.packId)) {
-                        CustomEmojiHelper.mkDirs();
-                        FileDownloadHelper.downloadFile(ApplicationLoader.applicationContext, emojiPackInfo.packId, CustomEmojiHelper.emojiTmp(emojiPackInfo.packId), emojiPackInfo.fileLocation);
-                        FileDownloadHelper.addListener(emojiPackInfo.packId, "checkListener", new FileDownloadHelper.FileDownloadListener() {
-                            @Override
-                            public void onPreStart(String id) {}
+                    if (OwlConfig.emojiPackSelected.equals(emojiPackInfo.packId)) {
+                        if (!emojiDir(emojiPackInfo.packId, emojiPackInfo.versionWithMd5).exists()) {
+                            CustomEmojiHelper.mkDirs();
+                            FileDownloadHelper.downloadFile(ApplicationLoader.applicationContext, emojiPackInfo.packId, CustomEmojiHelper.emojiTmp(emojiPackInfo.packId), emojiPackInfo.fileLocation);
+                            FileDownloadHelper.addListener(emojiPackInfo.packId, "checkListener", new FileDownloadHelper.FileDownloadListener() {
+                                @Override
+                                public void onPreStart(String id) {
+                                }
 
-                            @Override
-                            public void onProgressChange(String id, int percentage, long downBytes, long totBytes) {}
+                                @Override
+                                public void onProgressChange(String id, int percentage, long downBytes, long totBytes) {
+                                }
 
-                            @SuppressWarnings("ResultOfMethodCallIgnored")
-                            @Override
-                            public void onFinished(String id) {
-                                if (CustomEmojiHelper.emojiTmpDownloaded(id)) {
-                                    FileUnzipHelper.unzipFile(ApplicationLoader.applicationContext, id, CustomEmojiHelper.emojiTmp(id), CustomEmojiHelper.emojiDir(id, emojiPackInfo.versionWithMd5));
-                                    FileUnzipHelper.addListener(id, "checkListener", id1 -> {
+                                @SuppressWarnings("ResultOfMethodCallIgnored")
+                                @Override
+                                public void onFinished(String id) {
+                                    if (CustomEmojiHelper.emojiTmpDownloaded(id)) {
+                                        FileUnzipHelper.unzipFile(ApplicationLoader.applicationContext, id, CustomEmojiHelper.emojiTmp(id), CustomEmojiHelper.emojiDir(id, emojiPackInfo.versionWithMd5));
+                                        FileUnzipHelper.addListener(id, "checkListener", id1 -> {
+                                            CustomEmojiHelper.emojiTmp(id).delete();
+                                            if (CustomEmojiHelper.emojiDir(id, emojiPackInfo.versionWithMd5).exists()) {
+                                                deleteOldVersions(emojiPackInfo.packId, emojiPackInfo.versionWithMd5);
+                                            }
+                                            Emoji.reloadEmoji();
+                                            AndroidUtilities.cancelRunOnUIThread(invalidateUiRunnable);
+                                            AndroidUtilities.runOnUIThread(invalidateUiRunnable);
+                                        });
+                                    } else {
                                         CustomEmojiHelper.emojiTmp(id).delete();
-                                        if (CustomEmojiHelper.emojiDir(id, emojiPackInfo.versionWithMd5).exists()) {
-                                            deleteOldVersions(emojiPackInfo.packId, emojiPackInfo.versionWithMd5);
-                                        }
+                                        if (!isUpdate) OwlConfig.setEmojiPackSelected("default");
                                         Emoji.reloadEmoji();
                                         AndroidUtilities.cancelRunOnUIThread(invalidateUiRunnable);
                                         AndroidUtilities.runOnUIThread(invalidateUiRunnable);
-                                    });
-                                } else {
-                                    CustomEmojiHelper.emojiTmp(id).delete();
-                                    if (!isUpdate) OwlConfig.setEmojiPackSelected("default");
-                                    Emoji.reloadEmoji();
-                                    AndroidUtilities.cancelRunOnUIThread(invalidateUiRunnable);
-                                    AndroidUtilities.runOnUIThread(invalidateUiRunnable);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            Emoji.reloadEmoji();
+                            AndroidUtilities.cancelRunOnUIThread(invalidateUiRunnable);
+                            AndroidUtilities.runOnUIThread(invalidateUiRunnable);
+                        }
                         break;
                     }
                 }

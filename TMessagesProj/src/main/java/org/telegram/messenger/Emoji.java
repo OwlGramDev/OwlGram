@@ -71,7 +71,18 @@ public class Emoji {
 
     private final static int MAX_RECENT_EMOJI_COUNT = 48;
 
+    private static boolean isSelectedCustomEmojiPack;
+    private static File emojiFile;
+    private static boolean isSelectedEmojiPack;
+
+    private static void reloadCache() {
+        isSelectedCustomEmojiPack = CustomEmojiHelper.isSelectedCustomEmojiPack();
+        emojiFile = CustomEmojiHelper.getCurrentEmojiPackOffline();
+        isSelectedEmojiPack = !OwlConfig.emojiPackSelected.equals("default") && emojiFile != null && emojiFile.exists();
+    }
+
     public static void reloadEmoji() {
+        reloadCache();
         for (int a = 0; a < emojiBmp.length; a++) {
             emojiBmp[a] = new Bitmap[emojiCounts[a]];
             loadingEmoji[a] = new boolean[emojiCounts[a]];
@@ -99,6 +110,7 @@ public class Emoji {
         }
         placeholderPaint = new Paint();
         placeholderPaint.setColor(0x00000000);
+        reloadCache();
     }
 
     public static void preloadEmoji(CharSequence code) {
@@ -132,7 +144,7 @@ public class Emoji {
 
             Bitmap bitmap = null;
             try {
-                if (OwlConfig.useSystemEmoji || CustomEmojiHelper.isSelectedCustomEmojiPack()) {
+                if (OwlConfig.useSystemEmoji || isSelectedCustomEmojiPack) {
                     int emojiSize = 66;
                     bitmap = Bitmap.createBitmap(emojiSize, emojiSize, Bitmap.Config.ARGB_8888);
                     Canvas canvas = new Canvas(bitmap);
@@ -146,10 +158,8 @@ public class Emoji {
                     );
                 } else {
                     InputStream is;
-                    CustomEmojiHelper.EmojiPackInfo packInfo = CustomEmojiHelper.getEmojiPackInfo(OwlConfig.emojiPackSelected);
-                    File file = packInfo != null ? CustomEmojiHelper.emojiDir(packInfo.getPackId(), packInfo.getVersionWithMd5()):null;
-                    if (file != null && file.exists() && !OwlConfig.emojiPackSelected.equals("default")) {
-                        is = new FileInputStream(new File(file, String.format(Locale.US, "%d_%d.png", page, page2)));
+                    if (isSelectedEmojiPack) {
+                        is = new FileInputStream(new File(emojiFile, String.format(Locale.US, "%d_%d.png", page, page2)));
                     } else {
                         is = ApplicationLoader.applicationContext.getAssets().open("emoji/" + String.format(Locale.US, "%d_%d.png", page, page2));
                     }
