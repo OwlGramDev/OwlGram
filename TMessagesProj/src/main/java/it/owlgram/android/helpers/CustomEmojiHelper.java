@@ -470,16 +470,20 @@ public class CustomEmojiHelper {
             int emojiSize = 73;
             Bitmap bitmap = Bitmap.createBitmap(emojiSize * 2, emojiSize * 2, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
-            TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-            textPaint.setTypeface(Typeface.createFromFile(emojiFont));
+            Typeface typeface = Typeface.createFromFile(emojiFont);
             for (int x = 0; x < 2; x++) {
                 for (int y = 0; y < 2; y++) {
                     int xPos = x * emojiSize;
                     int yPos = y * emojiSize;
                     String emoji = previewEmojis[x + y * 2];
-                    Rect rect = new Rect(xPos, yPos, xPos + emojiSize, yPos + emojiSize);
-                    textPaint.setTextSize(rect.height() * 0.8f);
-                    canvas.drawText(emoji,  0, emoji.length(), rect.left, rect.bottom - rect.height() * 0.2f, textPaint);
+                    CustomEmojiHelper.drawEmojiFont(
+                            canvas,
+                            xPos,
+                            yPos,
+                            typeface,
+                            emoji,
+                            emojiSize
+                    );
                 }
             }
             File emojiPreview = new File(emojiDir, "preview.png");
@@ -496,6 +500,16 @@ public class CustomEmojiHelper {
             FileLog.e(e);
             return false;
         }
+    }
+
+    public static void drawEmojiFont(Canvas canvas, int x, int y, Typeface typeface, String emoji, int emojiSize) {
+        int fontSize = (int)(emojiSize * 0.9f);
+        Rect areaRect = new Rect(0, 0, emojiSize, emojiSize);
+        TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+        textPaint.setTypeface(typeface);
+        textPaint.setTextSize(fontSize);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText(emoji, areaRect.centerX() + x, areaRect.bottom - textPaint.descent() + y, textPaint);
     }
 
     private static void loadCustomEmojiPacks() {

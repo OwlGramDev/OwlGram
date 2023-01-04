@@ -132,19 +132,33 @@ public class Emoji {
 
             Bitmap bitmap = null;
             try {
-                InputStream is;
-                CustomEmojiHelper.EmojiPackInfo packInfo = CustomEmojiHelper.getEmojiPackInfo(OwlConfig.emojiPackSelected);
-                File file = packInfo != null ? CustomEmojiHelper.emojiDir(packInfo.getPackId(), packInfo.getVersionWithMd5()):null;
-                if (file != null && file.exists() && !OwlConfig.emojiPackSelected.equals("default")) {
-                    is = new FileInputStream(new File(file, String.format(Locale.US, "%d_%d.png", page, page2)));
+                if (OwlConfig.useSystemEmoji || CustomEmojiHelper.isSelectedCustomEmojiPack()) {
+                    int emojiSize = 66;
+                    bitmap = Bitmap.createBitmap(emojiSize, emojiSize, Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(bitmap);
+                    CustomEmojiHelper.drawEmojiFont(
+                            canvas,
+                            0,
+                            0,
+                            CustomEmojiHelper.getCurrentTypeface(),
+                            fixEmoji(EmojiData.data[page][page2]),
+                            emojiSize
+                    );
                 } else {
-                    is = ApplicationLoader.applicationContext.getAssets().open("emoji/" + String.format(Locale.US, "%d_%d.png", page, page2));
+                    InputStream is;
+                    CustomEmojiHelper.EmojiPackInfo packInfo = CustomEmojiHelper.getEmojiPackInfo(OwlConfig.emojiPackSelected);
+                    File file = packInfo != null ? CustomEmojiHelper.emojiDir(packInfo.getPackId(), packInfo.getVersionWithMd5()):null;
+                    if (file != null && file.exists() && !OwlConfig.emojiPackSelected.equals("default")) {
+                        is = new FileInputStream(new File(file, String.format(Locale.US, "%d_%d.png", page, page2)));
+                    } else {
+                        is = ApplicationLoader.applicationContext.getAssets().open("emoji/" + String.format(Locale.US, "%d_%d.png", page, page2));
+                    }
+                    BitmapFactory.Options opts = new BitmapFactory.Options();
+                    opts.inJustDecodeBounds = false;
+                    opts.inSampleSize = imageResize;
+                    bitmap = BitmapFactory.decodeStream(is, null, opts);
+                    is.close();
                 }
-                BitmapFactory.Options opts = new BitmapFactory.Options();
-                opts.inJustDecodeBounds = false;
-                opts.inSampleSize = imageResize;
-                bitmap = BitmapFactory.decodeStream(is, null, opts);
-                is.close();
             } catch (Throwable e) {
                 FileLog.e(e);
             }
@@ -281,7 +295,7 @@ public class Emoji {
 
         @Override
         public void draw(Canvas canvas) {
-            if (!OwlConfig.useSystemEmoji && !isLoaded() && !CustomEmojiHelper.isSelectedCustomEmojiPack()) {
+            if (!isLoaded()) {
                 loadEmoji(info.page, info.page2);
                 placeholderPaint.setColor(placeholderColor);
                 Rect bounds = getBounds();
@@ -294,14 +308,6 @@ public class Emoji {
                 b = getDrawRect();
             } else {
                 b = getBounds();
-            }
-
-            if (OwlConfig.useSystemEmoji || CustomEmojiHelper.isSelectedCustomEmojiPack()) {
-                String emoji = fixEmoji(EmojiData.data[info.page][info.emojiIndex]);
-                textPaint.setTextSize(b.height() * 0.8f);
-                textPaint.setTypeface(CustomEmojiHelper.getCurrentTypeface());
-                canvas.drawText(emoji,  0, emoji.length(), b.left, b.bottom - b.height() * 0.225f, textPaint);
-                return;
             }
 
             if (!isLoaded()) {
@@ -537,7 +543,7 @@ public class Emoji {
     }
 
     public static CharSequence replaceEmoji(CharSequence cs, Paint.FontMetricsInt fontMetrics, boolean createNew, int[] emojiOnly, int alignment) {
-        if (SharedConfig.useSystemEmoji || CustomEmojiHelper.isSelectedCustomEmojiPack() || cs == null || cs.length() == 0) {
+        if (cs == null || cs.length() == 0) {
             return cs;
         }
         Spannable s;
