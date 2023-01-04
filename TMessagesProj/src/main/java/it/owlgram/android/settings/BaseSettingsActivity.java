@@ -15,6 +15,7 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
+import androidx.collection.LongSparseArray;
 import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -91,7 +92,9 @@ public abstract class BaseSettingsActivity extends BaseFragment {
             @Override
             public void onItemClick(int id) {
                 if (id == -1) {
-                    finishFragment();
+                    if (onBackPressed()) {
+                        finishFragment();
+                    }
                 } else {
                     onMenuItemClick(id);
                 }
@@ -110,6 +113,7 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         listView.setOnItemClickListener(this::onItemClick);
+        listView.setOnItemLongClickListener(this::onItemLongClick);
 
         if (haveEmptyView()) {
             emptyView = new EmptyTextProgressView(context);
@@ -158,6 +162,10 @@ public abstract class BaseSettingsActivity extends BaseFragment {
 
     protected void onItemClick(View view, int position, float x, float y) {
 
+    }
+
+    protected boolean onItemLongClick(View view, int position, float x, float y) {
+        return false;
     }
 
     protected void onMenuItemClick(int id) {
