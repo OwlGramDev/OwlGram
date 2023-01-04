@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,6 +37,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.helpers.fonts.FontFileReader;
 
 public class CustomEmojiHelper {
     private static Typeface systemEmojiTypeface;
@@ -472,6 +474,12 @@ public class CustomEmojiHelper {
             for (byte mdByte : mdBytes) {
                 sb.append(Integer.toString((mdByte & 0xff) + 0x100, 16).substring(1));
             }
+            try {
+                String tmpFontName = FontFileReader.readTTF(emojiFile.getAbsolutePath()).getFullName();
+                if (tmpFontName != null) {
+                    fontName = tmpFontName;
+                }
+            } catch (IOException ignored) {}
             File emojiDir = new File(EMOJI_PACKS_CACHE_DIR + fontName + "_v" + sb);
             boolean isAlreadyInstalled = getAllEmojis().stream()
                     .filter(file -> new File(file, "font.ttf").exists())
