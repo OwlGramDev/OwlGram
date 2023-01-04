@@ -1,12 +1,13 @@
 package it.owlgram.android.helpers;
 
+import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.os.SystemClock;
 import android.text.TextPaint;
 import android.text.TextUtils;
 
@@ -45,6 +46,7 @@ public class CustomEmojiHelper {
     private static final String EMOJI_FONT_AOSP = "NotoColorEmoji.ttf";
     private static boolean loadingPack = false;
     private static final ArrayList<EmojiPackBase> emojiPacksInfo = new ArrayList<>();
+    private static final SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("customEmojiCache", Activity.MODE_PRIVATE);
 
     private final static String EMOJI_PACKS_CACHE_DIR = AndroidUtilities.getCacheDir().getAbsolutePath() + "/emojis/";
     private final static String EMOJI_PACKS_FILE_DIR = ApplicationLoader.applicationContext.getExternalFilesDir(null).getAbsolutePath() + "/emojis/";
@@ -128,22 +130,15 @@ public class CustomEmojiHelper {
     }
 
     public static String getSelectedEmojiPackId() {
-        return emojiPacksInfo
+        return getAllEmojis()
                 .stream()
-                .filter(e -> {
-                    if (e instanceof EmojiPackInfo) {
-                        return emojiDir(e.packId, ((EmojiPackInfo) e).versionWithMd5).exists();
-                    }
-                    return true;
-                })
-                .map(e -> e.packId)
-                .filter(packId -> Objects.equals(packId, OwlConfig.emojiPackSelected))
-                .findFirst()
-                .orElse("default");
+                .map(File::getName)
+                .anyMatch(name -> name.startsWith(OwlConfig.emojiPackSelected) || name.endsWith(OwlConfig.emojiPackSelected))
+                ? OwlConfig.emojiPackSelected : "default";
     }
 
     public static boolean loadedPackInfo() {
-        return !emojiPacksInfo.isEmpty();
+        return emojiPacksInfo.stream().anyMatch(e -> e instanceof EmojiPackInfo);
     }
 
     public static void loadEmojisInfo() {
@@ -156,15 +151,19 @@ public class CustomEmojiHelper {
         }
         loadingPack = true;
         emojiPacksInfo.clear();
+        loadCustomEmojiPacks();
         new Thread() {
             @Override
             public void run() {
                 try {
                     String json = new StandardHTTPRequest(String.format("https://app.owlgram.org/emoji_packs?noCache=%s",  Math.random() * 10000)).request();
+                    preferences.edit().putString("emoji_packs", json).apply();
                     emojiPacksInfo.addAll(loadFromJson(json));
-                    loadCustomEmojiPacks();
                 } catch (Exception e) {
-                    SystemClock.sleep(1000);
+                    try {
+                        emojiPacksInfo.addAll(loadFromJson(preferences.getString("emoji_packs", "[]")));
+                    } catch (JSONException ignored) {
+                    }
                     FileLog.e("Error loading emoji packs", e);
                 } finally {
                     loadingPack = false;

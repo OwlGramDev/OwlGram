@@ -278,7 +278,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.emojiPacksLoaded) {
             if (!CustomEmojiHelper.loadedPackInfo()) {
-                CustomEmojiHelper.loadEmojisInfo();
+                AndroidUtilities.runOnUIThread(CustomEmojiHelper::loadEmojisInfo, 1000);
             } else if (listAdapter != null) {
                 listAdapter.notifyItemChanged(chooseEmojiPackRow, PARTIAL);
             }

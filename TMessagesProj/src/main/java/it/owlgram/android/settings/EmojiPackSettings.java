@@ -8,7 +8,6 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.view.View;
-import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,9 +29,7 @@ import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Components.ChatAttachAlert;
 import org.telegram.ui.Components.ChatAttachAlertDocumentLayout;
 import org.telegram.ui.Components.CombinedDrawable;
-import org.telegram.ui.Components.EmptyTextProgressView;
 import org.telegram.ui.Components.FlickerLoadingView;
-import org.telegram.ui.Components.LayoutHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,6 +51,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
     private int customEmojiEndRow;
     private int customEmojiAddRow;
     private int emojiPackHeaderRow;
+    private int placeHolderRow;
     private int emojiPacksStartRow;
     private int emojiPacksEndRow;
     private int emojiHintRow;
@@ -63,15 +61,6 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
     @Override
     public View createView(Context context) {
         View v = super.createView(context);
-
-        FlickerLoadingView flickerLoadingView = new FlickerLoadingView(context, getResourceProvider());
-        flickerLoadingView.setViewType(FlickerLoadingView.STICKERS_TYPE);
-        flickerLoadingView.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
-
-        emptyView = new EmptyTextProgressView(context, flickerLoadingView);
-        ((FrameLayout) fragmentView).addView(emptyView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        listView.setEmptyView(emptyView);
-        emptyView.showProgress(false);
         return v;
     }
 
@@ -256,35 +245,27 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
     @Override
     protected void updateRowsId() {
         super.updateRowsId();
-        generalHeaderRow = -1;
-        useSystemEmojiRow = -1;
-        emojiDividerRow = -1;
-        useCustomEmojiHeaderRow = -1;
-        customEmojiAddRow = -1;
-        customEmojiStartRow = -1;
-        customEmojiEndRow = -1;
-        customEmojiHintRow = -1;
-        emojiPackHeaderRow = -1;
-        emojiPacksStartRow = -1;
-        emojiPacksEndRow = -1;
-        emojiHintRow = -1;
-        if (CustomEmojiHelper.loadedPackInfo()) {
-            generalHeaderRow =  rowCount++;
-            useSystemEmojiRow = rowCount++;
-            emojiDividerRow = rowCount++;
-            useCustomEmojiHeaderRow = rowCount++;
-            customEmojiStartRow = rowCount;
-            rowCount += CustomEmojiHelper.getEmojiCustomPacksInfo().size();
-            customEmojiEndRow = rowCount;
-            customEmojiAddRow = rowCount++;
-            customEmojiHintRow = rowCount++;
+        generalHeaderRow =  rowCount++;
+        useSystemEmojiRow = rowCount++;
+        emojiDividerRow = rowCount++;
+        useCustomEmojiHeaderRow = rowCount++;
+        customEmojiStartRow = rowCount;
+        rowCount += CustomEmojiHelper.getEmojiCustomPacksInfo().size();
+        customEmojiEndRow = rowCount;
+        customEmojiAddRow = rowCount++;
+        customEmojiHintRow = rowCount++;
 
-            emojiPackHeaderRow = rowCount++;
+        emojiPackHeaderRow = rowCount++;
+        if (CustomEmojiHelper.loadedPackInfo()) {
             emojiPacksStartRow = rowCount;
             rowCount += CustomEmojiHelper.getEmojiPacksInfo().size();
             emojiPacksEndRow = rowCount;
-            emojiHintRow = rowCount++;
+        } else {
+            emojiPacksStartRow = -1;
+            emojiPacksEndRow = -1;
+            placeHolderRow = rowCount++;
         }
+        emojiHintRow = rowCount++;
     }
 
     @Override
@@ -297,11 +278,11 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.emojiPacksLoaded) {
             if (!CustomEmojiHelper.loadedPackInfo()) {
-                CustomEmojiHelper.loadEmojisInfo();
+                AndroidUtilities.runOnUIThread(CustomEmojiHelper::loadEmojisInfo, 1000);
             } else {
                 if (listAdapter != null) {
                     updateRowsId();
-                    showItemsAnimated();
+                    showItemsAnimated(emojiPacksStartRow + 1);
                     listAdapter.notifyDataSetChanged();
                 }
             }
@@ -380,6 +361,11 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                         creationTextCell.setTextAndIcon(LocaleController.getString("AddEmojiSet", R.string.AddEmojiSet), combinedDrawable, false);
                     }
                     break;
+                case PLACEHOLDER:
+                    FlickerLoadingView flickerLoadingView = (FlickerLoadingView) holder.itemView;
+                    flickerLoadingView.setViewType(FlickerLoadingView.STICKERS_TYPE);
+                    flickerLoadingView.setIsSingleCell(true);
+                    break;
             }
         }
 
@@ -397,6 +383,8 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                 return ViewType.SHADOW;
             } else if (position == customEmojiAddRow) {
                 return ViewType.CREATION_TEXT_CELL;
+            } else if (position == placeHolderRow) {
+                return ViewType.PLACEHOLDER;
             }
             throw new IllegalArgumentException("Invalid position");
         }
