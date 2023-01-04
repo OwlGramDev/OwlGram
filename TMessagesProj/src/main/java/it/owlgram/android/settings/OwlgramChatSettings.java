@@ -342,7 +342,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
 
     private class ListAdapter extends BaseListAdapter {
         @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
+        protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
             switch (ViewType.fromInt(holder.getItemViewType())) {
                 case SHADOW:
                     holder.itemView.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
