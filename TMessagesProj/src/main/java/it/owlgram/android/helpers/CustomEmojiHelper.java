@@ -47,6 +47,7 @@ public class CustomEmojiHelper {
     private static final ArrayList<EmojiPackBase> emojiPacksInfo = new ArrayList<>();
 
     private final static String EMOJI_PACKS_CACHE_DIR = AndroidUtilities.getCacheDir().getAbsolutePath() + "/emojis/";
+    private final static String EMOJI_PACKS_FILE_DIR = ApplicationLoader.applicationContext.getExternalFilesDir(null).getAbsolutePath() + "/emojis/";
     private static final Runnable invalidateUiRunnable = () -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
     private static final String[] previewEmojis = {
             "\uD83D\uDE00",
@@ -299,9 +300,16 @@ public class CustomEmojiHelper {
                 .orElse(null);
     }
 
-    public static ArrayList<File> getAllEmojis() {
+    private static ArrayList<File> getAllEmojis() {
         ArrayList<File> emojis = new ArrayList<>();
-        File emojiDir = new File(EMOJI_PACKS_CACHE_DIR);
+        emojis.addAll(getAllEmojis(EMOJI_PACKS_CACHE_DIR));
+        emojis.addAll(getAllEmojis(EMOJI_PACKS_FILE_DIR));
+        return emojis;
+    }
+
+    private static ArrayList<File> getAllEmojis(String path) {
+        ArrayList<File> emojis = new ArrayList<>();
+        File emojiDir = new File(path);
         if (emojiDir.exists()) {
             File[] files = emojiDir.listFiles();
             if (files != null) {
@@ -480,7 +488,7 @@ public class CustomEmojiHelper {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void installEmoji(File emojiFile) {
+    public static boolean installEmoji(File emojiFile) {
         try {
             String fontName = emojiFile.getName();
             fontName = fontName.substring(0, fontName.lastIndexOf("."));
@@ -504,13 +512,13 @@ public class CustomEmojiHelper {
                     fontName = tmpFontName;
                 }
             } catch (IOException ignored) {}
-            File emojiDir = new File(EMOJI_PACKS_CACHE_DIR + fontName + "_v" + sb);
+            File emojiDir = new File(EMOJI_PACKS_FILE_DIR + fontName + "_v" + sb);
             boolean isAlreadyInstalled = getAllEmojis().stream()
                     .filter(file -> new File(file, "font.ttf").exists())
                     .filter(file -> new File(file, "preview.png").exists())
                     .anyMatch(file -> file.getName().endsWith(sb.toString()));
             if (isAlreadyInstalled) {
-                return;
+                return false;
             }
             emojiDir.mkdirs();
             File emojiFont = new File(emojiDir, "font.ttf");
@@ -549,8 +557,10 @@ public class CustomEmojiHelper {
             EmojiPackBase emojiPackBase = new EmojiPackBase();
             emojiPackBase.loadFromFile(emojiDir);
             emojiPacksInfo.add(emojiPackBase);
+            return true;
         } catch (Exception e) {
             FileLog.e(e);
+            return false;
         }
     }
 
