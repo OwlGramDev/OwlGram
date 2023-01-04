@@ -3,11 +3,14 @@ package it.owlgram.android.settings;
 import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.util.SparseBooleanArray;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,7 +23,9 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
+import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.AlertDialog;
+import org.telegram.ui.ActionBar.BackDrawable;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.CreationTextCell;
 import org.telegram.ui.Cells.HeaderCell;
@@ -30,6 +35,8 @@ import org.telegram.ui.Components.ChatAttachAlert;
 import org.telegram.ui.Components.ChatAttachAlertDocumentLayout;
 import org.telegram.ui.Components.CombinedDrawable;
 import org.telegram.ui.Components.FlickerLoadingView;
+import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.Components.NumberTextView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -56,20 +63,43 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
     private int emojiPacksEndRow;
     private int emojiHintRow;
 
-    ChatAttachAlert chatAttachAlert;
+    private ChatAttachAlert chatAttachAlert;
+    private NumberTextView selectedCountTextView;
+
+    private static final int MENU_DELETE = 0;
+    private static final int MENU_SHARE = 1;
 
     @Override
     public View createView(Context context) {
-        View v = super.createView(context);
-        return v;
+        View view = super.createView(context);
+        actionBar.setBackButtonDrawable(new BackDrawable(false));
+        ActionBarMenu actionMode = actionBar.createActionMode();
+        selectedCountTextView = new NumberTextView(actionMode.getContext());
+        selectedCountTextView.setTextSize(18);
+        selectedCountTextView.setTypeface(AndroidUtilities.getTypeface("fonts/rmedium.ttf"));
+        selectedCountTextView.setTextColor(Theme.getColor(Theme.key_actionBarActionModeDefaultIcon));
+        actionMode.addView(selectedCountTextView, LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1.0f, 72, 0, 0, 0));
+        actionMode.addItemWithWidth(MENU_SHARE, R.drawable.msg_share, AndroidUtilities.dp(54));
+        actionMode.addItemWithWidth(MENU_DELETE, R.drawable.msg_delete, AndroidUtilities.dp(54));
+        return view;
+    }
+
+    @Override
+    protected boolean onItemLongClick(View view, int position, float x, float y) {
+        if (position >= customEmojiStartRow && position < customEmojiEndRow) {
+            ((ListAdapter) listAdapter).toggleSelected(position);
+            return true;
+        }
+        return super.onItemLongClick(view, position, x, y);
     }
 
     @Override
     protected void onItemClick(View view, int position, float x, float y) {
         super.onItemClick(view, position, x, y);
+        ListAdapter adapter = (ListAdapter) listAdapter;
         if (position >= emojiPacksStartRow && position < emojiPacksEndRow) {
             EmojiSetCell cell = (EmojiSetCell) view;
-            if (cell.isSelected()) return;
+            if (cell.isChecked() || adapter.hasSelected()) return;
             int selectedOld = getSelectedOld();
             if (selectedOld != -1) {
                 String currentDownloading = getCurrentDownloading();
@@ -121,20 +151,24 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
             chatAttachAlert.show();
         } else if (position >= customEmojiStartRow && position < customEmojiEndRow) {
             EmojiSetCell cell = (EmojiSetCell) view;
-            if (cell.isSelected()) return;
-            cell.setChecked(true, true);
-            int selectedOld = getSelectedOld();
-            if (selectedOld != position) {
-                listAdapter.notifyItemChanged(selectedOld, PARTIAL);
-            }
-            OwlConfig.setEmojiPackSelected(cell.packId);
-            FileDownloadHelper.cancel(getCurrentDownloading());
-            FileUnzipHelper.cancel(getCurrentUnzipping());
-            Emoji.reloadEmoji();
-            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
-            if (OwlConfig.useSystemEmoji) {
-                OwlConfig.toggleUseSystemEmoji();
-                listAdapter.notifyItemChanged(useSystemEmojiRow, PARTIAL);
+            if (adapter.hasSelected()) {
+                adapter.toggleSelected(position);
+            } else {
+                if (cell.isChecked()) return;
+                cell.setChecked(true, true);
+                int selectedOld = getSelectedOld();
+                if (selectedOld != position) {
+                    listAdapter.notifyItemChanged(selectedOld, PARTIAL);
+                }
+                OwlConfig.setEmojiPackSelected(cell.packId);
+                FileDownloadHelper.cancel(getCurrentDownloading());
+                FileUnzipHelper.cancel(getCurrentUnzipping());
+                Emoji.reloadEmoji();
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
+                if (OwlConfig.useSystemEmoji) {
+                    OwlConfig.toggleUseSystemEmoji();
+                    listAdapter.notifyItemChanged(useSystemEmojiRow, PARTIAL);
+                }
             }
         }
     }
@@ -302,6 +336,8 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
     }
 
     private class ListAdapter extends BaseListAdapter {
+        private final SparseBooleanArray selectedItems = new SparseBooleanArray();
+
         @Override
         protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
             switch (ViewType.fromInt(holder.getItemViewType())) {
@@ -322,9 +358,10 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                         emojiPackInfo = CustomEmojiHelper.getEmojiPacksInfo().get(position - emojiPacksStartRow);
                     } else if (position >= customEmojiStartRow && position < customEmojiEndRow) {
                         emojiPackInfo = CustomEmojiHelper.getEmojiCustomPacksInfo().get(position - customEmojiStartRow);
+                        emojiPackSetCell.setSelected(selectedItems.get(position, false), partial);
                     }
                     if (emojiPackInfo != null) {
-                        emojiPackSetCell.setChecked(emojiPackInfo.getPackId().equals(CustomEmojiHelper.getSelectedEmojiPackId()) && getCurrentDownloading() == null && !OwlConfig.useSystemEmoji, partial);
+                        emojiPackSetCell.setChecked(!hasSelected() && emojiPackInfo.getPackId().equals(CustomEmojiHelper.getSelectedEmojiPackId()) && getCurrentDownloading() == null && !OwlConfig.useSystemEmoji, partial);
                         emojiPackSetCell.setData(
                                 emojiPackInfo,
                                 partial,
@@ -392,6 +429,114 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         @Override
         protected boolean isEnabled(ViewType viewType, int position) {
             return viewType == ViewType.EMOJI_PACK_SET_CELL || viewType == ViewType.SWITCH || viewType == ViewType.CREATION_TEXT_CELL;
+        }
+
+        public void toggleSelected(int position) {
+            selectedItems.put(position, !selectedItems.get(position, false));
+            notifyEmojiSetsChanged();
+            checkActionMode();
+        }
+
+        public boolean hasSelected() {
+            return selectedItems.indexOfValue(true) != -1;
+        }
+
+        public void clearSelected() {
+            selectedItems.clear();
+            notifyEmojiSetsChanged();
+            checkActionMode();
+        }
+
+        public int getSelectedCount() {
+            int count = 0;
+            for (int i = 0, size = selectedItems.size(); i < size; i++) {
+                if (selectedItems.valueAt(i)) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        private void notifyEmojiSetsChanged() {
+            notifyItemRangeChanged(customEmojiStartRow, customEmojiEndRow - customEmojiStartRow, PARTIAL);
+            notifyItemRangeChanged(emojiPacksStartRow, emojiPacksEndRow - emojiPacksStartRow, PARTIAL);
+        }
+
+        private void checkActionMode() {
+            int selectedCount = getSelectedCount();
+            boolean actionModeShowed = actionBar.isActionModeShowed();
+            if (selectedCount > 0) {
+                selectedCountTextView.setNumber(selectedCount, actionModeShowed);
+                if (!actionModeShowed) {
+                    actionBar.showActionMode();
+                }
+            } else if (actionModeShowed) {
+                actionBar.hideActionMode();
+            }
+        }
+
+        private void processSelectionMenu(int which) {
+            if (which == MENU_SHARE) {
+
+            } else if (which == MENU_DELETE) {
+                ArrayList<CustomEmojiHelper.EmojiPackBase> stickerSetList = new ArrayList<>(selectedItems.size());
+                ArrayList<CustomEmojiHelper.EmojiPackBase> packs = CustomEmojiHelper.getEmojiCustomPacksInfo();
+                for (int i = 0, size = packs.size(); i < size; i++) {
+                    CustomEmojiHelper.EmojiPackBase pack = packs.get(i);
+                    if (selectedItems.get(customEmojiStartRow + i, false)) {
+                        stickerSetList.add(pack);
+                    }
+                }
+                int count = stickerSetList.size();
+                switch (count) {
+                    case 0:
+                        break;
+                    case 1:
+                        CustomEmojiHelper.EmojiPackBase pack = stickerSetList.get(0);
+                        int position = customEmojiStartRow + packs.indexOf(pack);
+                        CustomEmojiHelper.cancelableDelete(EmojiPackSettings.this, pack, () -> {
+                            notifyItemInserted(position);
+                            updateRowsId();
+                            notifyEmojiSetsChanged();
+                        });
+                        notifyItemRemoved(customEmojiStartRow + packs.indexOf(pack));
+                        notifyEmojiSetsChanged();
+                        updateRowsId();
+                        clearSelected();
+                        break;
+                    default:
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+                        builder.setTitle(LocaleController.formatString("DeleteStickerSetsAlertTitle", R.string.DeleteStickerSetsAlertTitle, LocaleController.formatString("DeleteEmojiSets", R.string.DeleteEmojiSets, count)));
+                        builder.setMessage(LocaleController.getString("DeleteEmojiSetsMessage", R.string.DeleteEmojiSetsMessage));
+                        builder.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialog, which1) -> {
+                            AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    for (int i = 0, size = stickerSetList.size(); i < size; i++) {
+                                        CustomEmojiHelper.deleteEmojiPack(stickerSetList.get(i));
+                                    }
+                                    AndroidUtilities.runOnUIThread(() -> {
+                                        progressDialog.dismiss();
+                                        clearSelected();
+                                        notifyItemRangeRemoved(customEmojiStartRow, count);
+                                        updateRowsId();
+                                    });
+                                }
+                            }.start();
+                            progressDialog.setCanCancel(false);
+                            progressDialog.showDelayed(300);
+                        });
+                        builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+                        AlertDialog dialog = builder.create();
+                        showDialog(dialog);
+                        TextView button = (TextView) dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                        if (button != null) {
+                            button.setTextColor(Theme.getColor(Theme.key_dialogTextRed2));
+                        }
+                        break;
+                }
+            }
         }
     }
 
@@ -466,6 +611,25 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
             });
         }).start();
         progressDialog.setCanCancel(false);
-        progressDialog.show();
+        progressDialog.showDelayed(300);
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        ListAdapter adapter = (ListAdapter) listAdapter;
+        if (adapter.hasSelected()) {
+            adapter.clearSelected();
+            return false;
+        }
+        return super.onBackPressed();
+    }
+
+    @Override
+    protected void onMenuItemClick(int id) {
+        super.onMenuItemClick(id);
+        if (id == MENU_DELETE || id == MENU_SHARE) {
+            ListAdapter adapter = (ListAdapter) listAdapter;
+            adapter.processSelectionMenu(id);
+        }
     }
 }

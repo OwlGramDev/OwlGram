@@ -22,6 +22,7 @@ import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.AnimatedTextView;
 import org.telegram.ui.Components.BackupImageView;
+import org.telegram.ui.Components.CheckBox2;
 import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RadialProgressView;
@@ -34,13 +35,14 @@ public class EmojiSetCell extends FrameLayout {
     private final TextView textView;
     private final AnimatedTextView valueTextView;
     private final BackupImageView imageView;
-    private boolean needDivider;
     private final ImageView optionsButton;
+    private final RadialProgressView radialProgress;
+    private final CheckBox2 checkBox;
     public String packId;
     public String packFileLink;
-    private Long packFileSize;
     public String versionWithMD5;
-    private final RadialProgressView radialProgress;
+    private Long packFileSize;
+    private boolean needDivider;
 
     public EmojiSetCell(Context context) {
         super(context);
@@ -91,6 +93,12 @@ public class EmojiSetCell extends FrameLayout {
         valueTextView.setTextSize(AndroidUtilities.dp(13));
         valueTextView.setGravity(LayoutHelper.getAbsoluteGravityStart());
         addView(valueTextView, LayoutHelper.createFrameRelatively(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.START, 71, 25, 70, 0));
+
+        checkBox = new CheckBox2(context, 21);
+        checkBox.setColor(null, Theme.key_windowBackgroundWhite, Theme.key_checkboxCheck);
+        checkBox.setDrawUnchecked(false);
+        checkBox.setDrawBackgroundAsArc(3);
+        addView(checkBox, LayoutHelper.createFrameRelatively(24, 24, Gravity.START, 34, 30, 0, 0));
     }
 
     public void setData(CustomEmojiHelper.EmojiPackBase emojiPackInfo, boolean animated, boolean divider) {
@@ -141,14 +149,17 @@ public class EmojiSetCell extends FrameLayout {
             }).alpha(checked ? 1 : 0).scaleX(checked ? 1 : 0.1f).scaleY(checked ? 1 : 0.1f).setDuration(150).start();
         } else {
             optionsButton.setVisibility(checked ? VISIBLE : INVISIBLE);
-            if (!checked) {
-                optionsButton.setScaleX(0.1f);
-                optionsButton.setScaleY(0.1f);
-            }
+            optionsButton.setScaleX(checked ? 1f:0.1f);
+            optionsButton.setScaleY(checked ? 1f:0.1f);
+            optionsButton.setAlpha(checked ? 1f:0f);
         }
     }
 
-    public boolean isSelected() {
+    public void setSelected(boolean selected, boolean animated) {
+        checkBox.setChecked(selected, animated);
+    }
+
+    public boolean isChecked() {
         return optionsButton.getVisibility() == VISIBLE;
     }
 

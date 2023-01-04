@@ -22,6 +22,8 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
+import org.telegram.ui.ActionBar.BaseFragment;
+import org.telegram.ui.Components.Bulletin;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,6 +40,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.components.EmojiSetBulletinLayout;
 import it.owlgram.android.helpers.fonts.FontFileReader;
 
 public class CustomEmojiHelper {
@@ -45,6 +48,7 @@ public class CustomEmojiHelper {
     private static boolean loadSystemEmojiFailed = false;
     private static final String EMOJI_FONT_AOSP = "NotoColorEmoji.ttf";
     private static boolean loadingPack = false;
+    private static String pendingDeleteEmojiPackId;
     private static final ArrayList<EmojiPackBase> emojiPacksInfo = new ArrayList<>();
     private static final SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("customEmojiCache", Activity.MODE_PRIVATE);
 
@@ -206,6 +210,7 @@ public class CustomEmojiHelper {
     public static ArrayList<EmojiPackBase> getEmojiCustomPacksInfo() {
         return emojiPacksInfo.stream()
                 .filter(e -> !(e instanceof EmojiPackInfo))
+                .filter(e -> !e.getPackId().equals(pendingDeleteEmojiPackId))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -593,5 +598,53 @@ public class CustomEmojiHelper {
                 .filter(file -> new File(file, "font.ttf").exists())
                 .filter(file -> new File(file, "preview.png").exists())
                 .anyMatch(file -> file.getName().endsWith(OwlConfig.emojiPackSelected));
+    }
+
+    public static void cancelableDelete(BaseFragment fragment, EmojiPackBase emojiPackBase, OnBulletinAction onUndoBulletinAction) {
+        pendingDeleteEmojiPackId = emojiPackBase.getPackId();
+        boolean wasSelected = emojiPackBase.getPackId().equals(OwlConfig.emojiPackSelected);
+        if (wasSelected) {
+            OwlConfig.setEmojiPackSelected("default");
+        }
+        EmojiSetBulletinLayout bulletinLayout = new EmojiSetBulletinLayout(fragment.getParentActivity(), emojiPackBase);
+        Bulletin.UndoButton undoButton = new Bulletin.UndoButton(fragment.getParentActivity(), false).setUndoAction(() -> {
+            if (wasSelected) {
+                OwlConfig.setEmojiPackSelected(pendingDeleteEmojiPackId);
+            }
+            pendingDeleteEmojiPackId = null;
+            onUndoBulletinAction.onUndo();
+        }).setDelayedAction(() -> {
+            pendingDeleteEmojiPackId = null;
+            new Thread() {
+                @Override
+                public void run() {
+                    deleteEmojiPack(emojiPackBase);
+                }
+            }.start();
+        });
+        bulletinLayout.setButton(undoButton);
+        Bulletin.make(fragment, bulletinLayout, Bulletin.DURATION_LONG).show();
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static void deleteEmojiPack(EmojiPackBase emojiPackBase) {
+        File emojiDir = new File(emojiPackBase.getFileLocation());
+        if (emojiDir.exists()) {
+            File[] files = emojiDir.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    file.delete();
+                }
+            }
+            emojiDir.delete();
+        }
+        emojiPacksInfo.remove(emojiPackBase);
+        if (emojiPackBase.getPackId().equals(OwlConfig.emojiPackSelected)) {
+            OwlConfig.setEmojiPackSelected("default");
+        }
+    }
+
+    public interface OnBulletinAction {
+        void onUndo();
     }
 }
