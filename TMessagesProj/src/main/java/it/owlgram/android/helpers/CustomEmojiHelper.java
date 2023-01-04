@@ -18,7 +18,9 @@ import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLog;
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
+import org.telegram.messenger.R;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -107,6 +109,7 @@ public class CustomEmojiHelper {
     }
 
     public static String getSelectedPackName() {
+        if (OwlConfig.useSystemEmoji) return LocaleController.getString("CameraTypeSystem", R.string.CameraTypeSystem);
         return emojiPacksInfo
                 .stream()
                 .filter(emojiPackInfo -> Objects.equals(emojiPackInfo.packId, OwlConfig.emojiPackSelected))
@@ -507,7 +510,7 @@ public class CustomEmojiHelper {
     }
 
     public static void drawEmojiFont(Canvas canvas, int x, int y, Typeface typeface, String emoji, int emojiSize) {
-        int fontSize = (int)(emojiSize * 0.9f);
+        int fontSize = (int)(emojiSize * 0.85f);
         Rect areaRect = new Rect(0, 0, emojiSize, emojiSize);
         TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setTypeface(typeface);
