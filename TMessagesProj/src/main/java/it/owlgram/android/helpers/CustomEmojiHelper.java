@@ -570,7 +570,9 @@ public class CustomEmojiHelper {
         textPaint.setTypeface(typeface);
         textPaint.setTextSize(fontSize);
         textPaint.setTextAlign(Paint.Align.CENTER);
-        canvas.drawText(emoji, areaRect.centerX() + x, areaRect.bottom - textPaint.descent() + y, textPaint);
+        Rect textRect = new Rect();
+        textPaint.getTextBounds(emoji, 0, emoji.length(), textRect);
+        canvas.drawText(emoji, areaRect.centerX() + x,-textRect.top + y, textPaint);
     }
 
     private static void loadCustomEmojiPacks() {
