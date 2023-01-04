@@ -397,6 +397,7 @@ public class CustomEmojiHelper {
 
     public static void checkEmojiPacks() {
         loadEmojisInfo(() -> {
+            if (getSelectedEmojiPackId().equals("default")) return;
             if (emojiPacksInfo.isEmpty()) {
                 if (!isInstalledOffline(OwlConfig.emojiPackSelected)) {
                     OwlConfig.emojiPackSelected = "default";
