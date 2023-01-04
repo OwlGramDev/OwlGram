@@ -114,10 +114,31 @@ public class CustomEmojiHelper {
         if (OwlConfig.useSystemEmoji) return LocaleController.getString("CameraTypeSystem", R.string.CameraTypeSystem);
         return emojiPacksInfo
                 .stream()
+                .filter(e -> {
+                    if (e instanceof EmojiPackInfo) {
+                        return emojiDir(e.packId, ((EmojiPackInfo) e).versionWithMd5).exists();
+                    }
+                    return true;
+                })
                 .filter(emojiPackInfo -> Objects.equals(emojiPackInfo.packId, OwlConfig.emojiPackSelected))
                 .findFirst()
                 .map(e -> e.packName)
                 .orElse("Apple");
+    }
+
+    public static String getSelectedEmojiPackId() {
+        return emojiPacksInfo
+                .stream()
+                .filter(e -> {
+                    if (e instanceof EmojiPackInfo) {
+                        return emojiDir(e.packId, ((EmojiPackInfo) e).versionWithMd5).exists();
+                    }
+                    return true;
+                })
+                .map(e -> e.packId)
+                .filter(packId -> Objects.equals(packId, OwlConfig.emojiPackSelected))
+                .findFirst()
+                .orElse("default");
     }
 
     public static boolean loadedPackInfo() {

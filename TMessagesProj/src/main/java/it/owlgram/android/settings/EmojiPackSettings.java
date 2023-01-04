@@ -156,7 +156,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
     private int getSelectedOld(ArrayList<CustomEmojiHelper.EmojiPackBase> packBases, boolean isCustom) {
         int position = packBases
                 .stream()
-                .filter(emojiPackInfo -> emojiPackInfo.getPackId().equals(OwlConfig.emojiPackSelected))
+                .filter(emojiPackInfo -> emojiPackInfo.getPackId().equals(CustomEmojiHelper.getSelectedEmojiPackId()))
                 .findFirst()
                 .map(packBases::indexOf)
                 .orElse(-1);
@@ -343,7 +343,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                         emojiPackInfo = CustomEmojiHelper.getEmojiCustomPacksInfo().get(position - customEmojiStartRow);
                     }
                     if (emojiPackInfo != null) {
-                        emojiPackSetCell.setChecked(emojiPackInfo.getPackId().equals(OwlConfig.emojiPackSelected) && getCurrentDownloading() == null && !OwlConfig.useSystemEmoji, partial);
+                        emojiPackSetCell.setChecked(emojiPackInfo.getPackId().equals(CustomEmojiHelper.getSelectedEmojiPackId()) && getCurrentDownloading() == null && !OwlConfig.useSystemEmoji, partial);
                         emojiPackSetCell.setData(
                                 emojiPackInfo,
                                 partial,
