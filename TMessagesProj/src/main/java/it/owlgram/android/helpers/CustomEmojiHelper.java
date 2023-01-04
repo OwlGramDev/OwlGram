@@ -479,7 +479,7 @@ public class CustomEmojiHelper {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static boolean installEmoji(File emojiFile) {
+    public static void installEmoji(File emojiFile) {
         try {
             String fontName = emojiFile.getName();
             fontName = fontName.substring(0, fontName.lastIndexOf("."));
@@ -509,7 +509,7 @@ public class CustomEmojiHelper {
                     .filter(file -> new File(file, "preview.png").exists())
                     .anyMatch(file -> file.getName().endsWith(sb.toString()));
             if (isAlreadyInstalled) {
-                return false;
+                return;
             }
             emojiDir.mkdirs();
             File emojiFont = new File(emojiDir, "font.ttf");
@@ -548,10 +548,8 @@ public class CustomEmojiHelper {
             EmojiPackBase emojiPackBase = new EmojiPackBase();
             emojiPackBase.loadFromFile(emojiDir);
             emojiPacksInfo.add(emojiPackBase);
-            return true;
         } catch (Exception e) {
             FileLog.e(e);
-            return false;
         }
     }
 

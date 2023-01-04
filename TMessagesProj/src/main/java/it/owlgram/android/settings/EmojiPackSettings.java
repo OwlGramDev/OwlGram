@@ -464,17 +464,13 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         }
         AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
         new Thread(() -> {
-            int added = 0;
             for (File file : files) {
-                if (CustomEmojiHelper.installEmoji(file)) {
-                    added++;
-                }
+                CustomEmojiHelper.installEmoji(file);
             }
-            int finalAdded = added;
             AndroidUtilities.runOnUIThread(() -> {
                 progressDialog.dismiss();
                 updateRowsId();
-                listAdapter.notifyItemRangeInserted(customEmojiEndRow, finalAdded);
+                listAdapter.notifyItemRangeInserted(customEmojiStartRow, customEmojiEndRow - customEmojiStartRow);
             });
         }).start();
         progressDialog.setCanCancel(false);
