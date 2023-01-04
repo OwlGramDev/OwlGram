@@ -304,6 +304,7 @@ public class CustomEmojiHelper {
     public static Long getEmojiSize() {
         return getAllEmojis().stream()
                 .filter(file -> !file.getName().startsWith(OwlConfig.emojiPackSelected))
+                .filter(file -> !new File(file, "font.ttf").exists())
                 .map(CustomEmojiHelper::calculateFolderSize)
                 .reduce(0L, Long::sum);
     }
@@ -326,6 +327,7 @@ public class CustomEmojiHelper {
     public static void deleteAll() {
         getAllEmojis().stream()
                 .filter(file -> !file.getName().startsWith(OwlConfig.emojiPackSelected))
+                .filter(file -> !new File(file, "font.ttf").exists())
                 .forEach(FileUnzipHelper::deleteFolder);
     }
 
