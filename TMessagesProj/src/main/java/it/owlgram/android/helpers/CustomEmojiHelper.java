@@ -526,8 +526,9 @@ public class CustomEmojiHelper {
     }
 
     public static boolean isSelectedCustomEmojiPack() {
-        return getEmojiCustomPacksInfo()
-                .stream()
-                .anyMatch(emojiPackInfo -> emojiPackInfo.packId.equals(OwlConfig.emojiPackSelected));
+        return  getAllEmojis().stream()
+                .filter(file -> new File(file, "font.ttf").exists())
+                .filter(file -> new File(file, "preview.png").exists())
+                .anyMatch(file -> file.getName().endsWith(OwlConfig.emojiPackSelected));
     }
 }

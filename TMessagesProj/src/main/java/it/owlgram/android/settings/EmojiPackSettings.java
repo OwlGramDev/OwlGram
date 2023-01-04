@@ -119,8 +119,10 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
             }
             Emoji.reloadEmoji();
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
-            FileDownloadHelper.cancel(getCurrentDownloading());
-            FileUnzipHelper.cancel(getCurrentUnzipping());
+            if (OwlConfig.useSystemEmoji) {
+                FileDownloadHelper.cancel(getCurrentDownloading());
+                FileUnzipHelper.cancel(getCurrentUnzipping());
+            }
             listAdapter.notifyItemChanged(getSelectedOld(), PARTIAL);
         } else if (position == customEmojiAddRow) {
             chatAttachAlert = new ChatAttachAlert(context, EmojiPackSettings.this, false, false);
@@ -135,6 +137,14 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                 listAdapter.notifyItemChanged(selectedOld, PARTIAL);
             }
             OwlConfig.setEmojiPackSelected(cell.packId);
+            FileDownloadHelper.cancel(getCurrentDownloading());
+            FileUnzipHelper.cancel(getCurrentUnzipping());
+            Emoji.reloadEmoji();
+            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
+            if (OwlConfig.useSystemEmoji) {
+                OwlConfig.toggleUseSystemEmoji();
+                listAdapter.notifyItemChanged(useSystemEmojiRow, PARTIAL);
+            }
         }
     }
 
