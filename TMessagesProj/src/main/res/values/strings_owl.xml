@@ -318,4 +318,8 @@
     <string name="AddEmojiSet">Add Emoji Set</string>
     <string name="AddEmojiSetHint">You can add a custom emoji set by tapping the button above.</string>
     <string name="ErrorEmojiFontInvalidFormat">File must be and emoji font file.</string>
+    <string name="EmojiSetRemoved">Emoji set removed.</string>
+    <string name="EmojiSetRemovedInfo">%1$s is no longer in your emoji sets.</string>
+    <string name="DeleteEmojiSets">%1$s emoji sets</string>
+    <string name="DeleteEmojiSetsMessage">Are you sure you want to delete the selected emoji sets?</string>
 </resources>
