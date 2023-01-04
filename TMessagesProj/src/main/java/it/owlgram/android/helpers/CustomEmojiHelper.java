@@ -630,8 +630,8 @@ public class CustomEmojiHelper {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void deleteEmojiPack(EmojiPackBase emojiPackBase) {
-        File emojiDir = new File(emojiPackBase.getFileLocation());
-        if (emojiDir.exists()) {
+        File emojiDir = new File(emojiPackBase.getFileLocation()).getParentFile();
+        if (emojiDir != null && emojiDir.exists()) {
             File[] files = emojiDir.listFiles();
             if (files != null) {
                 for (File file : files) {
