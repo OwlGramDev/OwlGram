@@ -334,7 +334,7 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         listView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
     }
 
-    protected void showItemsAnimated() {
+    protected void showItemsAnimated(int from) {
         if (isPaused) {
             return;
         }
@@ -348,7 +348,9 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         final View finalProgressView = progressView;
         if (progressView != null) {
             listView.removeView(progressView);
+            from--;
         }
+        int finalFrom = from;
         listView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
             public boolean onPreDraw() {
@@ -357,7 +359,7 @@ public abstract class BaseSettingsActivity extends BaseFragment {
                 AnimatorSet animatorSet = new AnimatorSet();
                 for (int i = 0; i < n; i++) {
                     View child = listView.getChildAt(i);
-                    if (child == finalProgressView) {
+                    if (child == finalProgressView || listView.getChildAdapterPosition(child) < finalFrom) {
                         continue;
                     }
                     child.setAlpha(0);
