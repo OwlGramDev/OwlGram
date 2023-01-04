@@ -148,6 +148,10 @@ public class EmojiSetCell extends FrameLayout {
         }
     }
 
+    public boolean isSelected() {
+        return optionsButton.getVisibility() == VISIBLE;
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         if (needDivider) {

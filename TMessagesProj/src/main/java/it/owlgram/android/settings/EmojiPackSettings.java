@@ -80,6 +80,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         super.onItemClick(view, position, x, y);
         if (position >= emojiPacksStartRow && position < emojiPacksEndRow) {
             EmojiSetCell cell = (EmojiSetCell) view;
+            if (cell.isSelected()) return;
             int selectedOld = getSelectedOld();
             if (selectedOld != -1) {
                 String currentDownloading = getCurrentDownloading();
@@ -131,6 +132,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
             chatAttachAlert.show();
         } else if (position >= customEmojiStartRow && position < customEmojiEndRow) {
             EmojiSetCell cell = (EmojiSetCell) view;
+            if (cell.isSelected()) return;
             cell.setChecked(true, true);
             int selectedOld = getSelectedOld();
             if (selectedOld != position) {
