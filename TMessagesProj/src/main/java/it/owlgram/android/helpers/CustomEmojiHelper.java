@@ -455,7 +455,11 @@ public class CustomEmojiHelper {
                 sb.append(Integer.toString((mdByte & 0xff) + 0x100, 16).substring(1));
             }
             File emojiDir = new File(EMOJI_PACKS_CACHE_DIR + fontName + "_v" + sb);
-            if (emojiDir.exists()) {
+            boolean isAlreadyInstalled = getAllEmojis().stream()
+                    .filter(file -> new File(file, "font.ttf").exists())
+                    .filter(file -> new File(file, "preview.png").exists())
+                    .anyMatch(file -> file.getName().endsWith(sb.toString()));
+            if (isAlreadyInstalled) {
                 return false;
             }
             emojiDir.mkdirs();
@@ -526,7 +530,7 @@ public class CustomEmojiHelper {
     }
 
     public static boolean isSelectedCustomEmojiPack() {
-        return  getAllEmojis().stream()
+        return getAllEmojis().stream()
                 .filter(file -> new File(file, "font.ttf").exists())
                 .filter(file -> new File(file, "preview.png").exists())
                 .anyMatch(file -> file.getName().endsWith(OwlConfig.emojiPackSelected));
