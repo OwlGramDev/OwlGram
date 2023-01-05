@@ -254,7 +254,7 @@ public class UpdateManager {
             }
         } catch (Exception ignored) {
         }
-        boolean isAvailableFile = apkFile().exists() && FileDownloadHelper.isRunningDownload("appUpdate") && !isCorrupted;
+        boolean isAvailableFile = apkFile().exists() && !FileDownloadHelper.isRunningDownload("appUpdate") && !isCorrupted;
         if ((BuildVars.BUILD_VERSION >= OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
             OwlConfig.setUpdateData("");
             return false;
