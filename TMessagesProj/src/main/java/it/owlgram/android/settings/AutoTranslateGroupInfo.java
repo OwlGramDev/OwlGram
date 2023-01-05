@@ -95,8 +95,8 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
         } else if (position == removeGroupExceptionRow) {
             if (isDefault) return;
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-            builder.setTitle(LocaleController.getString("EditDeleteException", R.string.EditDeleteException));
-            builder.setMessage(LocaleController.formatString("EditRemoveExceptionText", R.string.EditRemoveExceptionText, chat.title));
+            builder.setTitle(LocaleController.getString("NotificationsDeleteAllExceptionTitle", R.string.NotificationsDeleteAllExceptionTitle));
+            builder.setMessage(LocaleController.formatString("NotificationsDeleteAllExceptionAlert", R.string.NotificationsDeleteAllExceptionAlert, chat.title));
             builder.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialogInterface, i) -> {
                 AutoTranslateConfig.removeGroupException(-chat.id);
                 if (editExceptionDelegate == null) {
@@ -210,7 +210,7 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
                         settingsCell.setTag(Theme.key_dialogTextRed);
                         settingsCell.setTextColor(Theme.getColor(Theme.key_dialogTextRed));
                         settingsCell.setCanDisable(true);
-                        settingsCell.setText(LocaleController.getString("EditDeleteException", R.string.EditDeleteException), false);
+                        settingsCell.setText(LocaleController.getString("NotificationsDeleteAllException", R.string.NotificationsDeleteAllException), false);
                     }
                     break;
                 case PLACEHOLDER:
