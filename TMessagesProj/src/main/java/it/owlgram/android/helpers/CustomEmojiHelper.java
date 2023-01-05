@@ -585,7 +585,7 @@ public class CustomEmojiHelper {
         int fontSize = (int)(emojiSize * 0.85f);
         Rect areaRect = new Rect(0, 0, emojiSize, emojiSize);
         TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setTypeface(typeface);
+        textPaint.setTypeface(Typeface.create(typeface, Typeface.NORMAL));
         textPaint.setTextSize(fontSize);
         textPaint.setTextAlign(Paint.Align.CENTER);
         Rect textRect = new Rect();
