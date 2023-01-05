@@ -77,6 +77,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "iconStyleSelected":
             case "useMonetIcon":
             case "DB_VERSION":
+            case "emojiPackSelected":
             case "NEED_RECREATE_FORMATTERS":
             case "NEED_RECREATE_SHADOW":
             case "NEED_FRAGMENT_REBASE_WITH_LAST":
@@ -90,6 +91,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "DOWNLOAD_BOOST_DEFAULT":
             case "DOWNLOAD_BOOST_FAST":
             case "DOWNLOAD_BOOST_EXTREME":
+            case "NEED_UPDATE_CAMERAX":
                 return false;
             default:
                 return true;
@@ -115,6 +117,8 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "cameraXFps":
             case "stickersAutoReorder":
             case "disableStickersAutoReorder":
+            case "NEED_UPDATE_CAMERAX":
+            case "emojiPackSelected":
                 return false;
             default:
                 return true;

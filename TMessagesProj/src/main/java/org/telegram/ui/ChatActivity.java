@@ -316,7 +316,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.components.EmojiSetBulletinLayout;
 import it.owlgram.android.components.ImportSettingsDialog;
+import it.owlgram.android.helpers.CustomEmojiHelper;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.PermissionHelper;
 import it.owlgram.android.settings.DoNotTranslateSettings;
@@ -14129,6 +14131,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                         return 207;
                                     } else if (!messageObject.isNewGif() && mime.endsWith("/mp4") || mime.endsWith("/png") || mime.endsWith("/jpg") || mime.endsWith("/jpeg")) {
                                         return 6;
+                                    } else if (mime.startsWith("font/")) {
+                                        return 208;
                                     }
                                 }
                             }
@@ -23229,10 +23233,16 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 options.add(OPTION_SHARE);
                                 icons.add(R.drawable.msg_shareout);
                             }
-                        } else if (type == 207) {
-                            items.add(LocaleController.getString("ImportSettings", R.string.ImportSettings));
-                            options.add(207);
-                            icons.add(R.drawable.round_settings_backup_restore);
+                        } else if (type == 207 || type == 208) {
+                            if (type == 207) {
+                                items.add(LocaleController.getString("ImportSettings", R.string.ImportSettings));
+                                options.add(type);
+                                icons.add(R.drawable.round_settings_backup_restore);
+                            } else {
+                                items.add(LocaleController.getString("ApplyEmojiSet", R.string.ApplyEmojiSet));
+                                options.add(OPTION_APPLY_LOCALIZATION_OR_THEME);
+                                icons.add(R.drawable.smiles_tab_smiles);
+                            }
                             if (!noforwards) {
                                 items.add(LocaleController.getString("SaveToDownloads", R.string.SaveToDownloads));
                                 options.add(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC);
@@ -25135,6 +25145,49 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             builder.setOnPreDismissListener(di -> dimBehindView(false));
                             showDialog(builder.create());
                         }
+                    } else if (getMessageType(selectedObject) == 208) {
+                        AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
+                        File finalLocFile = locFile;
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                boolean success = true;
+                                CustomEmojiHelper.EmojiPackBase emojiPackBase = null;
+                                try {
+                                    emojiPackBase = CustomEmojiHelper.installEmoji(finalLocFile, false);
+                                } catch (Exception e) {
+                                    FileLog.e("Emoji Font install failed", e);
+                                    success = false;
+                                }
+                                boolean finalSuccess = success;
+                                CustomEmojiHelper.EmojiPackBase finalEmojiPackBase = emojiPackBase;
+                                AndroidUtilities.runOnUIThread(() -> {
+                                    progressDialog.dismiss();
+                                    if (finalSuccess && finalEmojiPackBase != null) {
+                                        if (finalEmojiPackBase.getPackId().equals(OwlConfig.emojiPackSelected)) {
+                                            BulletinFactory.of(ChatActivity.this).createErrorBulletin(LocaleController.getString("EmojiSetAlreadyApplied", R.string.EmojiSetAlreadyApplied), themeDelegate).show();
+                                        } else {
+                                            EmojiSetBulletinLayout bulletinLayout = new EmojiSetBulletinLayout(
+                                                    getParentActivity(),
+                                                    LocaleController.getString("EmojiSetApplied", R.string.EmojiSetApplied),
+                                                    LocaleController.formatString("EmojiSetAppliedInfo", R.string.EmojiSetAppliedInfo, finalEmojiPackBase.getPackName()),
+                                                    finalEmojiPackBase,
+                                                    themeDelegate
+                                            );
+                                            Bulletin.make(ChatActivity.this, bulletinLayout, Bulletin.DURATION_LONG).show();
+                                            OwlConfig.setEmojiPackSelected(finalEmojiPackBase.getPackId());
+                                            Emoji.reloadEmoji();
+                                            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
+                                        }
+                                    } else {
+                                        BulletinFactory.of(ChatActivity.this).createErrorBulletin(LocaleController.getString("InvalidCustomEmojiSet", R.string.InvalidCustomEmojiSet), themeDelegate).show();
+                                    }
+                                });
+                            }
+                        }.start();
+                        progressDialog.setCanCancel(false);
+                        progressDialog.showDelayed(300);
+
                     } else {
                         if (LocaleController.getInstance().applyLanguageFile(locFile, currentAccount)) {
                             presentFragment(new LanguageSelectActivity());

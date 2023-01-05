@@ -97,6 +97,7 @@ public class OwlConfig extends SettingsManager {
     public static String oldBuildVersion = null;
     public static String languagePackVersioning;
     public static String doNotTranslateLanguages;
+    public static String emojiPackSelected;
     public static int deepLFormality;
     public static int translationProvider;
     public static int lastUpdateStatus = 0;
@@ -221,6 +222,7 @@ public class OwlConfig extends SettingsManager {
             hideSendAsChannel = getBoolean("hideSendAsChannel", false);
             showNameInActionBar = getBoolean("showNameInActionBar", false);
             stickersSorting = getBoolean("stickersSorting", true);
+            emojiPackSelected = getString("emojiPackSelected", "default");
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -597,6 +599,10 @@ public class OwlConfig extends SettingsManager {
 
     public static void setDownloadSpeedBoost(int boost) {
         putValue("downloadSpeedBoost", downloadSpeedBoost = boost);
+    }
+
+    public static void setEmojiPackSelected(String emojiPack) {
+        putValue("emojiPackSelected", emojiPackSelected = emojiPack);
     }
 
     public static int getNotificationColor() {

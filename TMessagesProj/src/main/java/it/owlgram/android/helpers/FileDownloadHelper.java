@@ -1,13 +1,10 @@
-package it.owlgram.android.updates;
+package it.owlgram.android.helpers;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.os.PowerManager;
 
-import org.json.JSONObject;
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.NotificationCenter;
 
 import java.io.File;
@@ -17,94 +14,55 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-import it.owlgram.android.OwlConfig;
-
-public class ApkDownloader {
+public class FileDownloadHelper {
     @SuppressLint("StaticFieldLeak")
-    private static DownloadThread downloadThread;
-    private final static AppDownloader.UpdateListener []listeners;
-
-    static {
-        listeners = new AppDownloader.UpdateListener[3];
-    }
-
-    public static boolean updateDownloaded() {
-        boolean isCorrupted = true;
-        try {
-            String data = OwlConfig.updateData;
-            if (data.length() > 0) {
-                UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(new JSONObject(data));
-                if (update.file_size == apkFile().length()) {
-                    isCorrupted = false;
-                }
-            }
-        } catch (Exception ignored) {
-        }
-        boolean isAvailableFile = apkFile().exists() && downloadThread == null && !isCorrupted;
-        if ((BuildVars.BUILD_VERSION >= OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
-            OwlConfig.setUpdateData("");
-            return false;
-        }
-        return isAvailableFile;
-    }
-
-    public static File apkFile() {
-        return new File(AndroidUtilities.getCacheDir().getAbsolutePath() + "/update.apk");
-    }
-
-    public static void installUpdate(Activity activity) {
-        ApkInstaller.installApk(activity);
-    }
+    private static final HashMap<String, DownloadThread> downloadThreads = new HashMap<>();
+    private final static HashMap<String, FileDownloadListener> listeners = new HashMap<>();
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void downloadAPK(Context context, String link, int version) {
-        if (downloadThread != null) return;
-        File output = apkFile();
+    public static boolean downloadFile(Context context, String id, File output, String link) {
+        if (downloadThreads.get(id) != null) return false;
         if (output.exists())
             output.delete();
-        OwlConfig.saveOldVersion(version);
-        downloadThread = new DownloadThread(context, output);
+        DownloadThread downloadThread = new DownloadThread(context, output, id);
         downloadThread.downloadFile(link);
+        downloadThreads.put(id, downloadThread);
+        return true;
     }
 
-    public static void cancel() {
+    public static void cancel(String id) {
+        DownloadThread downloadThread = downloadThreads.get(id);
         if (downloadThread != null) {
             downloadThread.cancel();
         }
     }
 
-    public static void setDownloadListener(AppDownloader.UpdateListener listener) {
-        listeners[0] = listener;
+    public static boolean isRunningDownload(String id) {
+        return downloadThreads.get(id) != null;
     }
 
-    public static void setDownloadMainListener(AppDownloader.UpdateListener listener) {
-        listeners[1] = listener;
-    }
-
-    public static void setDownloadDialogsListener(AppDownloader.UpdateListener listener) {
-        listeners[2] = listener;
-    }
-
-    public static boolean isRunningDownload() {
-        return downloadThread != null;
-    }
-
-    public static long downloadedBytes() {
+    public static long downloadedBytes(String id) {
+        DownloadThread downloadThread = downloadThreads.get(id);
         if (downloadThread != null) {
             return downloadThread.total;
         }
         return 0;
     }
 
-    public static long totalBytes() {
+    public static long totalBytes(String id) {
+        DownloadThread downloadThread = downloadThreads.get(id);
         if (downloadThread != null) {
             return downloadThread.fileLength;
         }
         return 0;
     }
 
-    public static int getDownloadProgress() {
+    public static int getDownloadProgress(String id) {
+        DownloadThread downloadThread = downloadThreads.get(id);
         if (downloadThread != null) {
             return downloadThread.percentage;
         }
@@ -119,10 +77,12 @@ public class ApkDownloader {
         public long fileLength = 0;
         public int percentage = 0;
         private boolean isDownloadCanceled = false;
+        private final String id;
 
-        public DownloadThread(Context context, File targetFile) {
+        public DownloadThread(Context context, File targetFile, String id) {
             this.mContext = context;
             this.mTargetFile = targetFile;
+            this.id = id;
         }
 
         public void cancel() {
@@ -192,7 +152,7 @@ public class ApkDownloader {
 
         private void onProgressUpdate(int percentage, long downBytes, long totBytes) {
             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoadProgressChanged);
-            onProgressChange(percentage, downBytes, totBytes);
+            onProgressChange(id, percentage, downBytes, totBytes);
         }
 
         private void onPreExecute() {
@@ -200,42 +160,70 @@ public class ApkDownloader {
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     getClass().getName());
             mWakeLock.acquire(10 * 60 * 1000L);
-            onPreStart();
+            onPreStart(id);
         }
 
+        @SuppressWarnings("ResultOfMethodCallIgnored")
         private void onPostExecute(boolean isCanceled) {
             mWakeLock.release();
             if (isCanceled) {
-                deleteUpdate();
+               mTargetFile.delete();
             }
-            downloadThread = null;
-            onFinished();
+            downloadThreads.remove(id);
+            onFinished(id);
         }
     }
 
-    private static void onPreStart() {
-        for (AppDownloader.UpdateListener value : listeners) {
-            if (value != null) value.onPreStart();
+    public static void addListener(String downloadID, String key, FileDownloadListener listener) {
+        listeners.put(downloadID + "_" + key, listener);
+    }
+
+    private static void onPreStart(String id) {
+        for (Map.Entry<String, FileDownloadListener> value : listeners.entrySet()) {
+            if (value != null) {
+                String lId = value.getKey().split("_")[0];
+                if (lId.equals(id)) value.getValue().onPreStart(id);
+            }
         }
     }
 
-    private static void onProgressChange(int percentage, long downBytes, long totBytes) {
-        for (AppDownloader.UpdateListener value : listeners) {
-            if (value != null) value.onProgressChange(percentage, downBytes, totBytes);
+    private static void onProgressChange(String id, int percentage, long downBytes, long totBytes) {
+        for (Map.Entry<String, FileDownloadListener> value : listeners.entrySet()) {
+            if (value != null) {
+                String lId = value.getKey().split("_")[0];
+                if (lId.equals(id)) {
+                    value.getValue().onProgressChange(id, percentage, downBytes, totBytes);
+                }
+            }
         }
     }
 
-    private static void onFinished() {
-        for (AppDownloader.UpdateListener value : listeners) {
-            if (value != null) value.onFinished();
+    private static void onFinished(String id) {
+        for (Map.Entry<String, FileDownloadListener> value : listeners.entrySet()) {
+            if (value != null) {
+                String lId = value.getKey().split("_")[0];
+                if (lId.equals(id)) {
+                    value.getValue().onFinished(id);
+                }
+            }
         }
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void deleteUpdate() {
-        File file = apkFile();
-        if (file.exists())
-            file.delete();
-        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoadFailed);
+    public ArrayList<String> getActiveDownloads() {
+        ArrayList<String> activeDownloads = new ArrayList<>();
+        for (Map.Entry<String, DownloadThread> value : downloadThreads.entrySet()) {
+            if (value != null) {
+                activeDownloads.add(value.getKey());
+            }
+        }
+        return activeDownloads;
+    }
+
+    public interface FileDownloadListener {
+        void onPreStart(String id);
+
+        void onProgressChange(String id, int percentage, long downBytes, long totBytes);
+
+        void onFinished(String id);
     }
 }

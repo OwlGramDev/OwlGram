@@ -177,7 +177,6 @@ import org.telegram.ui.Components.StickersAlert;
 import org.telegram.ui.Components.TermsOfServiceView;
 import org.telegram.ui.Components.ThemeEditorView;
 import org.telegram.ui.Components.UndoView;
-import org.telegram.ui.Components.UpdateAppAlertDialog;
 import org.telegram.ui.Components.voip.VoIPHelper;
 import org.webrtc.voiceengine.WebRtcAudioTrack;
 
@@ -203,6 +202,7 @@ import it.owlgram.android.StoreUtils;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateAlertDialog;
 import it.owlgram.android.Crashlytics;
+import it.owlgram.android.helpers.CustomEmojiHelper;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.LanguageHelper;
 import it.owlgram.android.helpers.MonetHelper;
@@ -214,7 +214,7 @@ import it.owlgram.android.settings.OwlgramExperimentalSettings;
 import it.owlgram.android.settings.OwlgramGeneralSettings;
 import it.owlgram.android.settings.OwlgramSettings;
 import it.owlgram.android.ui.DatacenterActivity;
-import it.owlgram.android.updates.ApkDownloader;
+import it.owlgram.android.helpers.FileDownloadHelper;
 import it.owlgram.android.updates.ApkInstaller;
 import it.owlgram.android.updates.AppDownloader;
 import it.owlgram.android.updates.PlayStoreAPI;
@@ -950,6 +950,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             MonetHelper.registerReceiver(this);
         }
+        CustomEmojiHelper.checkEmojiPacks();
     }
 
     @Override
@@ -4833,17 +4834,18 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         updateLayout.setOnClickListener(v -> {
             if (!UpdateManager.isAvailableUpdate()) return;
             if (!StoreUtils.isDownloadedFromAnyStore()) {
-                if(ApkDownloader.isRunningDownload()) {
-                    ApkDownloader.cancel();
-                } else if(ApkDownloader.updateDownloaded()) {
-                    ApkDownloader.installUpdate(LaunchActivity.this);
+                if(FileDownloadHelper.isRunningDownload("appUpdate")) {
+                    FileDownloadHelper.cancel("appUpdate");
+                } else if(UpdateManager.updateDownloaded()) {
+                    UpdateManager.installUpdate(LaunchActivity.this);
                 } else {
                     try {
                         String data = OwlConfig.updateData;
                         if(data.length() > 0) {
                             JSONObject jsonObject = new JSONObject(data);
                             UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(jsonObject);
-                            ApkDownloader.downloadAPK(LaunchActivity.this, update.link_file, update.version);
+                            if (FileDownloadHelper.downloadFile(LaunchActivity.this, "appUpdate", UpdateManager.apkFile(), update.link_file))
+                                OwlConfig.saveOldVersion(update.version);
                         }
                     } catch (Exception ignored){}
                 }
@@ -5029,7 +5031,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         UpdateManager.isDownloadedUpdate(result -> {
             updateAppUpdateViews();
-            AppDownloader.setDownloadMainListener(new AppDownloader.UpdateListener() {
+            AppDownloader.setListener("main_page", new AppDownloader.UpdateListener() {
                 @Override
                 public void onPreStart() {
                     updateAppUpdateViews();

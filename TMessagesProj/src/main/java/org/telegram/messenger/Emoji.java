@@ -33,6 +33,8 @@ import it.owlgram.android.helpers.CustomEmojiHelper;
 
 import org.telegram.ui.Components.AnimatedEmojiSpan;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,11 +65,38 @@ public class Emoji {
     public static ArrayList<String> recentEmoji = new ArrayList<>();
     public static HashMap<String, String> emojiColor = new HashMap<>();
     private static boolean recentEmojiLoaded;
-    private static Runnable invalidateUiRunnable = () -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
+    private static final Runnable invalidateUiRunnable = () -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
     public static float emojiDrawingYOffset;
     public static boolean emojiDrawingUseAlpha = true;
 
     private final static int MAX_RECENT_EMOJI_COUNT = 48;
+
+    private static boolean isSelectedCustomEmojiPack;
+    private static File emojiFile;
+    private static boolean isSelectedEmojiPack;
+
+    private static void reloadCache() {
+        isSelectedCustomEmojiPack = CustomEmojiHelper.isSelectedCustomEmojiPack();
+        emojiFile = CustomEmojiHelper.getCurrentEmojiPackOffline();
+        isSelectedEmojiPack = !OwlConfig.emojiPackSelected.equals("default") && emojiFile != null && emojiFile.exists();
+    }
+
+    public static boolean isSelectedCustomPack() {
+        return isSelectedCustomEmojiPack || isSelectedEmojiPack || OwlConfig.useSystemEmoji;
+    }
+
+    public static void reloadEmoji() {
+        reloadCache();
+        for (int a = 0; a < emojiBmp.length; a++) {
+            emojiBmp[a] = new Bitmap[emojiCounts[a]];
+            loadingEmoji[a] = new boolean[emojiCounts[a]];
+        }
+        for (int j = 0; j < EmojiData.data.length; j++) {
+            for (int i = 0; i < EmojiData.data[j].length; i++) {
+                rects.put(EmojiData.data[j][i], new DrawableInfo((byte) j, (short) i, i));
+            }
+        }
+    }
 
     static {
         drawImgSize = AndroidUtilities.dp(20);
@@ -85,6 +114,7 @@ public class Emoji {
         }
         placeholderPaint = new Paint();
         placeholderPaint.setColor(0x00000000);
+        reloadCache();
     }
 
     public static void preloadEmoji(CharSequence code) {
@@ -118,12 +148,31 @@ public class Emoji {
 
             Bitmap bitmap = null;
             try {
-                InputStream is = ApplicationLoader.applicationContext.getAssets().open("emoji/" + String.format(Locale.US, "%d_%d.png", page, page2));
-                BitmapFactory.Options opts = new BitmapFactory.Options();
-                opts.inJustDecodeBounds = false;
-                opts.inSampleSize = imageResize;
-                bitmap = BitmapFactory.decodeStream(is, null, opts);
-                is.close();
+                if (OwlConfig.useSystemEmoji || isSelectedCustomEmojiPack) {
+                    int emojiSize = 66;
+                    bitmap = Bitmap.createBitmap(emojiSize, emojiSize, Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(bitmap);
+                    CustomEmojiHelper.drawEmojiFont(
+                            canvas,
+                            0,
+                            0,
+                            CustomEmojiHelper.getCurrentTypeface(),
+                            fixEmoji(EmojiData.data[page][page2]),
+                            emojiSize
+                    );
+                } else {
+                    InputStream is;
+                    if (isSelectedEmojiPack) {
+                        is = new FileInputStream(new File(emojiFile, String.format(Locale.US, "%d_%d.png", page, page2)));
+                    } else {
+                        is = ApplicationLoader.applicationContext.getAssets().open("emoji/" + String.format(Locale.US, "%d_%d.png", page, page2));
+                    }
+                    BitmapFactory.Options opts = new BitmapFactory.Options();
+                    opts.inJustDecodeBounds = false;
+                    opts.inSampleSize = imageResize;
+                    bitmap = BitmapFactory.decodeStream(is, null, opts);
+                    is.close();
+                }
             } catch (Throwable e) {
                 FileLog.e(e);
             }
@@ -273,14 +322,6 @@ public class Emoji {
                 b = getDrawRect();
             } else {
                 b = getBounds();
-            }
-
-            if (OwlConfig.useSystemEmoji) {
-                String emoji = fixEmoji(EmojiData.data[info.page][info.emojiIndex]);
-                textPaint.setTextSize(b.height() * 0.8f);
-                textPaint.setTypeface(CustomEmojiHelper.getSystemEmojiTypeface());
-                canvas.drawText(emoji,  0, emoji.length(), b.left, b.bottom - b.height() * 0.225f, textPaint);
-                return;
             }
 
             if (!isLoaded()) {
@@ -516,7 +557,7 @@ public class Emoji {
     }
 
     public static CharSequence replaceEmoji(CharSequence cs, Paint.FontMetricsInt fontMetrics, boolean createNew, int[] emojiOnly, int alignment) {
-        if (SharedConfig.useSystemEmoji || cs == null || cs.length() == 0) {
+        if (cs == null || cs.length() == 0) {
             return cs;
         }
         Spannable s;

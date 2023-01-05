@@ -270,6 +270,8 @@ public class NotificationCenter {
     public static int chatSwithcedToForum = totalEvents++;
     public static int didUpdateGlobalAutoDeleteTimer = totalEvents++;
 
+    public static final int emojiPacksLoaded = totalEvents++;
+
     private SparseArray<ArrayList<NotificationCenterDelegate>> observers = new SparseArray<>();
     private SparseArray<ArrayList<NotificationCenterDelegate>> removeAfterBroadcast = new SparseArray<>();
     private SparseArray<ArrayList<NotificationCenterDelegate>> addAfterBroadcast = new SparseArray<>();
