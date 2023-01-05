@@ -8,13 +8,18 @@ import android.widget.TextView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
+import org.telegram.messenger.UserConfig;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.ActionBarMenuSubItem;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
+import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.PopupSwipeBackLayout;
+
+import it.owlgram.android.settings.AutoTranslateGroupInfo;
 
 public class AutoTranslatePopupWrapper {
     public ActionBarPopupWindow.ActionBarPopupWindowLayout windowLayout;
@@ -26,17 +31,14 @@ public class AutoTranslatePopupWrapper {
     private FragmentDelegate delegate;
     private final boolean isAlwaysShare;
 
-    public AutoTranslatePopupWrapper(Context context, PopupSwipeBackLayout swipeBackLayout, long dialogId, int topicId, Theme.ResourcesProvider resourcesProvider) {
-        this(context, swipeBackLayout, dialogId, topicId, false, resourcesProvider);
-    }
-
-    public AutoTranslatePopupWrapper(Context context, PopupSwipeBackLayout swipeBackLayout, long dialogId, int topicId, boolean isAlwaysShare, Theme.ResourcesProvider resourcesProvider) {
+    public AutoTranslatePopupWrapper(BaseFragment fragment, boolean isForum, ActionBarMenuItem otherItem, long dialogId, int topicId, boolean isAlwaysShare, Theme.ResourcesProvider resourcesProvider) {
         this.isAlwaysShare = isAlwaysShare;
+        Context context = fragment.getParentActivity();
         windowLayout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(context, 0, resourcesProvider);
         windowLayout.setFitItems(true);
         this.dialogId = dialogId;
         this.topicId = topicId;
-
+        PopupSwipeBackLayout swipeBackLayout = otherItem.getPopupLayout().getSwipeBack();
         if (swipeBackLayout != null) {
             var backItem = ActionBarMenuItem.addItem(windowLayout, R.drawable.msg_arrow_back, LocaleController.getString("Back", R.string.Back), false, resourcesProvider);
             backItem.setOnClickListener(view -> swipeBackLayout.closeForeground());
@@ -72,6 +74,15 @@ public class AutoTranslatePopupWrapper {
             });
         }
         updateItems();
+
+        if (isForum) {
+            ActionBarMenuSubItem customItem = ActionBarMenuItem.addItem(windowLayout, R.drawable.msg_customize, LocaleController.getString("AutoDeleteCustom", R.string.AutoDeleteCustom), false, resourcesProvider);
+            customItem.setOnClickListener(view -> {
+                otherItem.toggleSubMenu();
+                AutoTranslateGroupInfo groupInfo = new AutoTranslateGroupInfo(MessagesController.getInstance(UserConfig.selectedAccount).getChat(-dialogId), this::updateItems);
+                fragment.presentFragment(groupInfo);
+            });
+        }
 
         FrameLayout gap = new FrameLayout(context);
         gap.setBackgroundColor(Theme.getColor(Theme.key_actionBarDefaultSubmenuSeparator, resourcesProvider));

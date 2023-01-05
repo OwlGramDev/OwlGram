@@ -247,7 +247,8 @@ import it.owlgram.android.translator.AutoTranslatePopupWrapper;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
 import it.owlgram.android.translator.TranslatorHelper;
-import it.owlgram.android.updates.ApkDownloader;
+import it.owlgram.android.helpers.FileDownloadHelper;
+import it.owlgram.android.updates.UpdateManager;
 
 public class ProfileActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, SharedMediaLayout.SharedMediaPreloaderDelegate, ImageUpdater.ImageUpdaterDelegate, SharedMediaLayout.Delegate {
     private final static int PHONE_OPTION_CALL = 0,
@@ -656,6 +657,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private float customAvatarProgress;
     private float customPhotoOffset;
     private boolean hasFallbackPhoto;
+    private boolean hasCustomPhoto;
     private ImageReceiver fallbackImage;
 
     public int getTopicId() {
@@ -3523,7 +3525,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                 OwlConfig.saveUpdateStatus(0);
                                 OwlConfig.remindUpdate(-1);
                                 OwlConfig.saveLastUpdateCheck(true);
-                                if (!StoreUtils.isDownloadedFromAnyStore()) ApkDownloader.deleteUpdate();
+                                if (!StoreUtils.isDownloadedFromAnyStore()) UpdateManager.deleteUpdate();
                                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                             } else if (which == 17) {
                                 Set<String> suggestions = getMessagesController().pendingSuggestions;
@@ -6932,14 +6934,16 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
                 boolean onlineTextCrosafade = false;
 
-                ChatAvatarContainer avatarContainer = ((ChatActivityInterface) previousTransitionFragment).getAvatarContainer();
-                if (avatarContainer.getSubtitleTextView().getLeftDrawable() != null || avatarContainer.statusMadeShorter[0]) {
-                    transitionOnlineText = avatarContainer.getSubtitleTextView();
-                    avatarContainer2.invalidate();
-                    onlineTextCrosafade = true;
-                    onlineTextView[0].setAlpha(0f);
-                    onlineTextView[1].setAlpha(0f);
-                    animators.add(ObjectAnimator.ofFloat(onlineTextView[1], View.ALPHA, 1.0f));
+                if (previousTransitionFragment != null) {
+                    ChatAvatarContainer avatarContainer = previousTransitionFragment.getAvatarContainer();
+                    if (avatarContainer != null && avatarContainer.getSubtitleTextView().getLeftDrawable() != null || avatarContainer.statusMadeShorter[0]) {
+                        transitionOnlineText = avatarContainer.getSubtitleTextView();
+                        avatarContainer2.invalidate();
+                        onlineTextCrosafade = true;
+                        onlineTextView[0].setAlpha(0f);
+                        onlineTextView[1].setAlpha(0f);
+                        animators.add(ObjectAnimator.ofFloat(onlineTextView[1], View.ALPHA, 1.0f));
+                    }
                 }
 
                 if (!onlineTextCrosafade) {
@@ -7722,6 +7726,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         boolean shortStatus;
 
         hasFallbackPhoto = false;
+        hasCustomPhoto = false;
         if (userId != 0) {
             TLRPC.User user = getMessagesController().getUser(userId);
             if (user == null) {
@@ -7787,6 +7792,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                 }
             }
+            hasCustomPhoto = user.photo != null && user.photo.personal;
             try {
                 newString = Emoji.replaceEmoji(newString, nameTextView[1].getPaint().getFontMetricsInt(), AndroidUtilities.dp(24), false);
             } catch (Exception ignore) {
@@ -8206,7 +8212,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 }
                 if (isBot || getContactsController().contactsDict.get(userId) == null) {
                     if (MessagesController.isSupportUser(user)) {
-                        createAutoTranslateItem(context, userId);
+                        createAutoTranslateItem(ProfileActivity.this, userId);
                         if (userBlocked && ActionButtonManager.canShowButtons(isTopic)) {
                             otherItem.addSubItem(block_contact, R.drawable.msg_block, LocaleController.getString("Unblock", R.string.Unblock));
                         }
@@ -8214,7 +8220,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         if (currentEncryptedChat == null) {
                             createAutoDeleteItem(context);
                         }
-                        createAutoTranslateItem(context, userId);
+                        createAutoTranslateItem(ProfileActivity.this, userId);
                         if (isBot) {
                             if (!user.bot_nochats) {
                                 if (!actionButtonManager.hasItem("add_bot")) {
@@ -8244,7 +8250,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     if (currentEncryptedChat == null) {
                         createAutoDeleteItem(context);
                     }
-                    createAutoTranslateItem(context, userId);
+                    createAutoTranslateItem(ProfileActivity.this, userId);
 
                     if (!TextUtils.isEmpty(user.phone)) {
                         if (!actionButtonManager.hasItem("share_contact")) {
@@ -8271,7 +8277,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (topicId == 0 && ChatObject.canUserDoAdminAction(chat, ChatObject.ACTION_DELETE_MESSAGES)) {
                 createAutoDeleteItem(context);
             }
-            createAutoTranslateItem(context, -chatId, topicId, chat);
+            createAutoTranslateItem(ProfileActivity.this, -chatId, topicId, chat);
             if (ChatObject.isChannel(chat)) {
                 /*if (isTopic) {
                     if (ChatObject.canManageTopic(currentAccount, chat, topicId)) {
@@ -8573,12 +8579,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         updateAutoDeleteItem();
     }
 
-    private void createAutoTranslateItem(Context context, long dialogId) {
+    private void createAutoTranslateItem(BaseFragment context, long dialogId) {
         createAutoTranslateItem(context, dialogId, 0, null);
     }
-    private void createAutoTranslateItem(Context context, long dialogId, int topicId, TLRPC.Chat chat) {
+    private void createAutoTranslateItem(BaseFragment context, long dialogId, int topicId, TLRPC.Chat chat) {
         if (LanguageDetector.hasSupport() && TranslatorHelper.isSupportAutoTranslate()) {
-            AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, otherItem.getPopupLayout().getSwipeBack(), dialogId, topicId, arguments.getBoolean("isAlwaysShare", false), getResourceProvider());
+            AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, ChatObject.isForum(currentChat), otherItem, dialogId, topicId, arguments.getBoolean("isAlwaysShare", false), getResourceProvider());
             if (arguments.getBoolean("isSettings")) {
                 BaseFragment parentFragment = parentLayout.getFragmentStack().get(parentLayout.getFragmentStack().size() - 2);
                 autoTranslatePopupWrapper.setDelegate(new AutoTranslatePopupWrapper.FragmentDelegate() {
@@ -11401,9 +11407,16 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             }
 
         } else {
-            if (onlineTextView[2] != null) {
-                onlineTextView[2].setAlpha(photoDescriptionProgress);
+            if (hasCustomPhoto) {
+                if (onlineTextView[2] != null) {
+                    onlineTextView[2].setAlpha(photoDescriptionProgress);
+                }
+            } else {
+                if (onlineTextView[2] != null) {
+                    onlineTextView[2].setAlpha(0);
+                }
             }
+
         }
 
     }

@@ -32,6 +32,8 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
     private final TLRPC.Chat chat;
     private final ArrayList<TLRPC.TL_forumTopic> topics = new ArrayList<>();
     private final boolean isAllow;
+    private boolean isDefault;
+    private final EditExceptionDelegate editExceptionDelegate;
 
     private int avatarRow;
     private int dividerRow;
@@ -48,13 +50,25 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
         return LocaleController.getString("ChannelEdit", R.string.ChannelEdit);
     }
 
+    public AutoTranslateGroupInfo(TLRPC.Chat chat, EditExceptionDelegate delegate) {
+        this(chat, false, delegate);
+    }
+
     public AutoTranslateGroupInfo(TLRPC.Chat chat, boolean isAllow) {
+        this(chat, isAllow, null);
+    }
+
+    public AutoTranslateGroupInfo(TLRPC.Chat chat, boolean isAllow, EditExceptionDelegate delegate) {
         this.chat = chat;
         ArrayList<TLRPC.TL_forumTopic> tmp = getMessagesController().getTopicsController().getTopics(chat.id);
         if (tmp != null) {
             tmp.stream().sorted(Comparator.comparing(o -> o.title)).forEach(topics::add);
         }
         this.isAllow = isAllow;
+        this.editExceptionDelegate = delegate;
+        boolean allowed = AutoTranslateConfig.getExceptionsById(true, -chat.id);
+        boolean disabled = AutoTranslateConfig.getExceptionsById(false, -chat.id);
+        this.isDefault = !allowed && !disabled;
     }
 
     @Override
@@ -65,19 +79,32 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
             TLRPC.TL_forumTopic topic = topics.get(position - startTopicsRow);
             AutoTranslateConfig.setEnabled(-chat.id, topic.id, !AutoTranslateConfig.isAutoTranslateEnabled(-chat.id, topic.id));
             listAdapter.notifyItemChanged(position, PARTIAL);
-            if (AutoTranslateConfig.getExceptions(isAllow).isEmpty()) {
-                hideLastFragment();
-            } else {
-                showLastFragment();
-            }
-        } else if (position == removeGroupExceptionRow) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-            builder.setTitle(LocaleController.getString("EditDeleteException", R.string.EditDeleteException));
-            builder.setMessage(LocaleController.formatString("EditRemoveExceptionText", R.string.EditRemoveExceptionText, chat.title));
-            builder.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialogInterface, i) -> {
-                AutoTranslateConfig.removeGroupException(-chat.id);
+            if (editExceptionDelegate == null) {
                 if (AutoTranslateConfig.getExceptions(isAllow).isEmpty()) {
                     hideLastFragment();
+                } else {
+                    showLastFragment();
+                }
+            } else {
+                editExceptionDelegate.onExceptionChanged();
+                if (isDefault) {
+                    isDefault = false;
+                    listAdapter.notifyItemChanged(removeGroupExceptionRow);
+                }
+            }
+        } else if (position == removeGroupExceptionRow) {
+            if (isDefault) return;
+            AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+            builder.setTitle(LocaleController.getString("NotificationsDeleteAllExceptionTitle", R.string.NotificationsDeleteAllExceptionTitle));
+            builder.setMessage(LocaleController.formatString("NotificationsDeleteAllExceptionAlert", R.string.NotificationsDeleteAllExceptionAlert, chat.title));
+            builder.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialogInterface, i) -> {
+                AutoTranslateConfig.removeGroupException(-chat.id);
+                if (editExceptionDelegate == null) {
+                    if (AutoTranslateConfig.getExceptions(isAllow).isEmpty()) {
+                        hideLastFragment();
+                    }
+                } else {
+                    editExceptionDelegate.onExceptionChanged();
                 }
                 finishFragment();
             });
@@ -183,7 +210,7 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
                         settingsCell.setTag(Theme.key_dialogTextRed);
                         settingsCell.setTextColor(Theme.getColor(Theme.key_dialogTextRed));
                         settingsCell.setCanDisable(true);
-                        settingsCell.setText(LocaleController.getString("EditDeleteException", R.string.EditDeleteException), false);
+                        settingsCell.setText(LocaleController.getString("NotificationsDeleteAllException", R.string.NotificationsDeleteAllException), false);
                     }
                     break;
                 case PLACEHOLDER:
@@ -216,7 +243,11 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
 
         @Override
         protected boolean isEnabled(ViewType viewType, int position) {
-            return viewType == ViewType.CHAT || viewType == ViewType.SETTINGS;
+            return viewType == ViewType.CHAT || viewType == ViewType.SETTINGS && !isDefault;
         }
+    }
+
+    public interface EditExceptionDelegate {
+        void onExceptionChanged();
     }
 }

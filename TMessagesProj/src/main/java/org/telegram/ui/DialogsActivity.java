@@ -84,7 +84,6 @@ import androidx.recyclerview.widget.LinearSmoothScrollerCustom;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
-import org.json.JSONObject;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -200,8 +199,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.AppLinkVerifyBottomSheet;
@@ -212,7 +209,6 @@ import it.owlgram.android.Crashlytics;
 import it.owlgram.android.helpers.ForwardContext;
 import it.owlgram.android.helpers.MonetIconsHelper;
 import it.owlgram.android.helpers.PasscodeHelper;
-import it.owlgram.android.updates.ApkDownloader;
 import it.owlgram.android.updates.AppDownloader;
 import it.owlgram.android.updates.UpdateManager;
 
@@ -2219,7 +2215,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     public DialogsActivity(Bundle args) {
         super(args);
-        AppDownloader.setDownloadDialogsListener(new AppDownloader.UpdateListener() {
+        AppDownloader.setListener("dialogs", new AppDownloader.UpdateListener() {
             @Override
             public void onPreStart() {
                 updateMenuButton(false);

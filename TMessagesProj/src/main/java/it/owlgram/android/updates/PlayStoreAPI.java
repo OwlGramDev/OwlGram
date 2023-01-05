@@ -19,13 +19,15 @@ import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.NotificationCenter;
 
+import java.util.HashMap;
+
 import it.owlgram.android.OwlConfig;
 
 public class PlayStoreAPI {
     private static final AppUpdateManager appUpdateManager;
     private final static int UPDATE_REQUEST_CODE = 290;
     private static InstallStateUpdatedListener listener;
-    private static final AppDownloader.UpdateListener []listeners;
+    private final static HashMap<String, AppDownloader.UpdateListener> listeners = new HashMap<>();
     private static int percentage = 0;
     private static long bytesDownloaded = 0, totalBytesToDownload = 0;
     private static boolean openingAppUpdate = false;
@@ -35,7 +37,6 @@ public class PlayStoreAPI {
 
     static {
         appUpdateManager = AppUpdateManagerFactory.create(ApplicationLoader.applicationContext);
-        listeners = new AppDownloader.UpdateListener[3];
         loadUpdateInfo(new UpdateCheckCallback() {
             @SuppressLint("SwitchIntDef")
             @Override
@@ -192,33 +193,25 @@ public class PlayStoreAPI {
     }
 
     private static void onPreStart() {
-        for (AppDownloader.UpdateListener value : listeners) {
+        for (AppDownloader.UpdateListener value : listeners.values()) {
             if (value != null) value.onPreStart();
         }
     }
 
     private static void onProgressChange(int percentage, long downBytes, long totBytes) {
-        for (AppDownloader.UpdateListener value : listeners) {
+        for (AppDownloader.UpdateListener value : listeners.values()) {
             if (value != null) value.onProgressChange(percentage, downBytes, totBytes);
         }
     }
 
     private static void onFinished() {
-        for (AppDownloader.UpdateListener value : listeners) {
+        for (AppDownloader.UpdateListener value : listeners.values()) {
             if (value != null) value.onFinished();
         }
     }
 
-    public static void setDownloadMainListener(AppDownloader.UpdateListener listener) {
-        listeners[0] = listener;
-    }
-
-    public static void setDownloadListener(AppDownloader.UpdateListener listener) {
-        listeners[1] = listener;
-    }
-
-    public static void setDownloadDialogsListener(AppDownloader.UpdateListener listener) {
-        listeners[2] = listener;
+    public static void addListener(String key, AppDownloader.UpdateListener listener) {
+        listeners.put(key, listener);
     }
 
     public static void installUpdate() {
