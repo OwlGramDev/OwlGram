@@ -108,6 +108,8 @@ public class EmojiSetCell extends FrameLayout {
         packId = emojiPackInfo.getPackId();
         if (emojiPackInfo instanceof CustomEmojiHelper.EmojiPackInfo) {
             versionWithMD5 = ((CustomEmojiHelper.EmojiPackInfo) emojiPackInfo).getVersionWithMd5();
+        } else {
+            versionWithMD5 = null;
         }
         packFileLink = emojiPackInfo.getFileLocation();
         if (Objects.equals(packId, "default")) {
