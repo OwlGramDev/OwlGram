@@ -500,80 +500,85 @@ public class CustomEmojiHelper {
         return typeface != null && !typeface.equals(Typeface.DEFAULT);
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static boolean installEmoji(File emojiFile) {
-        try {
-            String fontName = emojiFile.getName();
-            fontName = fontName.substring(0, fontName.lastIndexOf("."));
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            try (FileInputStream fis = new FileInputStream(emojiFile)) {
-                byte[] dataBytes = new byte[1024];
-                int nread;
-                while ((nread = fis.read(dataBytes)) != -1) {
-                    md.update(dataBytes, 0, nread);
-                }
-            }
+    public static EmojiPackBase installEmoji(File emojiFile) throws Exception {
+        return installEmoji(emojiFile, true);
+    }
 
-            byte[] mdBytes = md.digest();
-            StringBuilder sb = new StringBuilder();
-            for (byte mdByte : mdBytes) {
-                sb.append(Integer.toString((mdByte & 0xff) + 0x100, 16).substring(1));
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static EmojiPackBase installEmoji(File emojiFile, boolean checkInstallation) throws Exception {
+        String fontName = emojiFile.getName();
+        fontName = fontName.substring(0, fontName.lastIndexOf("."));
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        try (FileInputStream fis = new FileInputStream(emojiFile)) {
+            byte[] dataBytes = new byte[1024];
+            int nread;
+            while ((nread = fis.read(dataBytes)) != -1) {
+                md.update(dataBytes, 0, nread);
             }
-            try {
-                String tmpFontName = FontFileReader.readTTF(emojiFile.getAbsolutePath()).getFullName();
-                if (tmpFontName != null) {
-                    fontName = tmpFontName;
-                }
-            } catch (IOException ignored) {}
-            File emojiDir = new File(EMOJI_PACKS_FILE_DIR + fontName + "_v" + sb);
-            boolean isAlreadyInstalled = getAllEmojis().stream()
-                    .filter(CustomEmojiHelper::isValidCustomPack)
-                    .anyMatch(file -> file.getName().endsWith(sb.toString()));
-            if (isAlreadyInstalled) {
-                return false;
-            }
-            emojiDir.mkdirs();
-            File emojiFont = new File(emojiDir, fontName + ".ttf");
-            FileInputStream inputStream = new FileInputStream(emojiFile);
-            FileOutputStream outputStream = new FileOutputStream(emojiFont);
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, length);
-            }
-            int emojiSize = 73;
-            Bitmap bitmap = Bitmap.createBitmap(emojiSize * 2, emojiSize * 2, Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-            Typeface typeface = Typeface.createFromFile(emojiFont);
-            for (int x = 0; x < 2; x++) {
-                for (int y = 0; y < 2; y++) {
-                    int xPos = x * emojiSize;
-                    int yPos = y * emojiSize;
-                    String emoji = previewEmojis[x + y * 2];
-                    CustomEmojiHelper.drawEmojiFont(
-                            canvas,
-                            xPos,
-                            yPos,
-                            typeface,
-                            emoji,
-                            emojiSize
-                    );
-                }
-            }
-            File emojiPreview = new File(emojiDir, "preview.png");
-            FileOutputStream out = new FileOutputStream(emojiPreview);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-            out.close();
-            inputStream.close();
-            outputStream.close();
-            EmojiPackBase emojiPackBase = new EmojiPackBase();
-            emojiPackBase.loadFromFile(emojiDir);
-            emojiPacksInfo.add(emojiPackBase);
-            return true;
-        } catch (Exception e) {
-            FileLog.e(e);
-            return false;
         }
+
+        byte[] mdBytes = md.digest();
+        StringBuilder sb = new StringBuilder();
+        for (byte mdByte : mdBytes) {
+            sb.append(Integer.toString((mdByte & 0xff) + 0x100, 16).substring(1));
+        }
+        try {
+            String tmpFontName = FontFileReader.readTTF(emojiFile.getAbsolutePath()).getFullName();
+            if (tmpFontName != null) {
+                fontName = tmpFontName;
+            }
+        } catch (IOException ignored) {}
+        File emojiDir = new File(EMOJI_PACKS_FILE_DIR + fontName + "_v" + sb);
+        boolean isAlreadyInstalled = getAllEmojis().stream()
+                .filter(CustomEmojiHelper::isValidCustomPack)
+                .anyMatch(file -> file.getName().endsWith(sb.toString()));
+        if (isAlreadyInstalled) {
+            if (checkInstallation) {
+                return null;
+            } else {
+                EmojiPackBase emojiPackBase = new EmojiPackBase();
+                emojiPackBase.loadFromFile(emojiDir);
+                return emojiPackBase;
+            }
+        }
+        emojiDir.mkdirs();
+        File emojiFont = new File(emojiDir, fontName + ".ttf");
+        FileInputStream inputStream = new FileInputStream(emojiFile);
+        FileOutputStream outputStream = new FileOutputStream(emojiFont);
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inputStream.read(buffer)) > 0) {
+            outputStream.write(buffer, 0, length);
+        }
+        int emojiSize = 73;
+        Bitmap bitmap = Bitmap.createBitmap(emojiSize * 2, emojiSize * 2, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Typeface typeface = Typeface.createFromFile(emojiFont);
+        for (int x = 0; x < 2; x++) {
+            for (int y = 0; y < 2; y++) {
+                int xPos = x * emojiSize;
+                int yPos = y * emojiSize;
+                String emoji = previewEmojis[x + y * 2];
+                CustomEmojiHelper.drawEmojiFont(
+                        canvas,
+                        xPos,
+                        yPos,
+                        typeface,
+                        emoji,
+                        emojiSize
+                );
+            }
+        }
+        File emojiPreview = new File(emojiDir, "preview.png");
+        FileOutputStream out = new FileOutputStream(emojiPreview);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+        out.close();
+        inputStream.close();
+        outputStream.close();
+        EmojiPackBase emojiPackBase = new EmojiPackBase();
+        emojiPackBase.loadFromFile(emojiDir);
+        emojiPacksInfo.add(emojiPackBase);
+        return emojiPackBase;
     }
 
     public static void drawEmojiFont(Canvas canvas, int x, int y, Typeface typeface, String emoji, int emojiSize) {
@@ -632,7 +637,13 @@ public class CustomEmojiHelper {
         if (wasSelected) {
             OwlConfig.setEmojiPackSelected("default");
         }
-        EmojiSetBulletinLayout bulletinLayout = new EmojiSetBulletinLayout(fragment.getParentActivity(), emojiPackBase);
+        EmojiSetBulletinLayout bulletinLayout = new EmojiSetBulletinLayout(
+                fragment.getParentActivity(),
+                LocaleController.getString("EmojiSetRemoved", R.string.EmojiSetRemoved),
+                LocaleController.formatString("EmojiSetRemovedInfo", R.string.EmojiSetRemovedInfo, emojiPackBase.getPackName()),
+                emojiPackBase,
+                null
+                );
         Bulletin.UndoButton undoButton = new Bulletin.UndoButton(fragment.getParentActivity(), false).setUndoAction(() -> {
             if (wasSelected) {
                 OwlConfig.setEmojiPackSelected(pendingDeleteEmojiPackId);

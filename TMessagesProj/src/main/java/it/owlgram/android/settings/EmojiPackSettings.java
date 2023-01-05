@@ -649,8 +649,12 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         new Thread(() -> {
             int count = 0;
             for (File file : files) {
-                if (CustomEmojiHelper.installEmoji(file)) {
-                    count++;
+                try {
+                    if (CustomEmojiHelper.installEmoji(file) != null) {
+                        count++;
+                    }
+                } catch (Exception e) {
+                    FileLog.e("Emoji Font install failed", e);
                 }
             }
             int finalCount = count;
