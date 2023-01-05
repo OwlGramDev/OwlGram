@@ -40,6 +40,7 @@ import org.telegram.ui.Components.NumberTextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.EmojiSetCell;
@@ -525,7 +526,25 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                                     AndroidUtilities.runOnUIThread(() -> {
                                         progressDialog.dismiss();
                                         clearSelected();
-                                        notifyItemRangeRemoved(customEmojiStartRow, count);
+                                        List<int[]> consecutiveItems = stickerSetList.stream()
+                                                .map(packs::indexOf)
+                                                .reduce(new ArrayList<>(), (acc, ordinalPos) -> {
+                                                    boolean isConsecutive = acc.size() > 0 && ordinalPos == acc.get(acc.size() - 1)[1] + 1;
+                                                    if (isConsecutive) {
+                                                        int[] lastInterval = acc.get(acc.size() - 1);
+                                                        lastInterval[1] = ordinalPos;
+                                                    } else {
+                                                        acc.add(new int[]{ordinalPos, ordinalPos});
+                                                    }
+                                                    return acc;
+                                                }, (acc1, acc2) -> acc1);
+                                        for (int[] interval : consecutiveItems) {
+                                            if (interval[0] == interval[1]) {
+                                                notifyItemRemoved(customEmojiStartRow + interval[0]);
+                                            } else {
+                                                notifyItemRangeRemoved(customEmojiStartRow + interval[0], interval[1] - interval[0] + 1);
+                                            }
+                                        }
                                         updateRowsId();
                                         Emoji.reloadEmoji();
                                         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
