@@ -493,16 +493,22 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                         break;
                     case 1:
                         CustomEmojiHelper.EmojiPackBase pack = stickerSetList.get(0);
-                        int position = customEmojiStartRow + packs.indexOf(pack);
-                        CustomEmojiHelper.cancelableDelete(EmojiPackSettings.this, pack, () -> {
-                            notifyItemInserted(position);
-                            updateRowsId();
-                            notifyEmojiSetsChanged();
+                        CustomEmojiHelper.cancelableDelete(EmojiPackSettings.this, pack, new CustomEmojiHelper.OnBulletinAction() {
+                            @Override
+                            public void onPreStart() {
+                                notifyItemRemoved(customEmojiStartRow + packs.indexOf(pack));
+                                notifyEmojiSetsChanged();
+                                updateRowsId();
+                                clearSelected();
+                            }
+
+                            @Override
+                            public void onUndo() {
+                                notifyItemInserted(customEmojiStartRow + CustomEmojiHelper.getEmojiCustomPacksInfo().indexOf(pack));
+                                updateRowsId();
+                                notifyEmojiSetsChanged();
+                            }
                         });
-                        notifyItemRemoved(customEmojiStartRow + packs.indexOf(pack));
-                        notifyEmojiSetsChanged();
-                        updateRowsId();
-                        clearSelected();
                         break;
                     default:
                         AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());

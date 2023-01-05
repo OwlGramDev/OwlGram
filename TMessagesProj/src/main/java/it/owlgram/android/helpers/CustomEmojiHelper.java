@@ -8,6 +8,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.os.SystemClock;
 import android.text.TextPaint;
 import android.text.TextUtils;
 
@@ -22,6 +23,7 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.Components.Bulletin;
 
@@ -51,6 +53,7 @@ public class CustomEmojiHelper {
     private static String pendingDeleteEmojiPackId;
     private static final ArrayList<EmojiPackBase> emojiPacksInfo = new ArrayList<>();
     private static final SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("customEmojiCache", Activity.MODE_PRIVATE);
+    private static Bulletin emojiPackBulletin;
 
     private final static String EMOJI_PACKS_CACHE_DIR = AndroidUtilities.getCacheDir().getAbsolutePath() + "/emojis/";
     private final static String EMOJI_PACKS_FILE_DIR = ApplicationLoader.applicationContext.getExternalFilesDir(null).getAbsolutePath() + "/emojis/";
@@ -601,7 +604,27 @@ public class CustomEmojiHelper {
     }
 
     public static void cancelableDelete(BaseFragment fragment, EmojiPackBase emojiPackBase, OnBulletinAction onUndoBulletinAction) {
+        if (emojiPackBulletin != null && pendingDeleteEmojiPackId != null) {
+            AlertDialog progressDialog = new AlertDialog(fragment.getParentActivity(), 3);
+            emojiPackBulletin.hide(false, 0);
+            new Thread(){
+                @Override
+                public void run() {
+                    do {
+                        SystemClock.sleep(50);
+                    } while (pendingDeleteEmojiPackId != null);
+                    AndroidUtilities.runOnUIThread(() -> {
+                        progressDialog.dismiss();
+                        cancelableDelete(fragment, emojiPackBase, onUndoBulletinAction);
+                    });
+                }
+            }.start();
+            progressDialog.setCanCancel(false);
+            progressDialog.showDelayed(150);
+            return;
+        }
         pendingDeleteEmojiPackId = emojiPackBase.getPackId();
+        onUndoBulletinAction.onPreStart();
         boolean wasSelected = emojiPackBase.getPackId().equals(OwlConfig.emojiPackSelected);
         if (wasSelected) {
             OwlConfig.setEmojiPackSelected("default");
@@ -613,19 +636,17 @@ public class CustomEmojiHelper {
             }
             pendingDeleteEmojiPackId = null;
             onUndoBulletinAction.onUndo();
-        }).setDelayedAction(() -> {
-            pendingDeleteEmojiPackId = null;
-            new Thread() {
-                @Override
-                public void run() {
-                    deleteEmojiPack(emojiPackBase);
-                    Emoji.reloadEmoji();
-                    AndroidUtilities.runOnUIThread(() -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded));
-                }
-            }.start();
-        });
+        }).setDelayedAction(() -> new Thread() {
+            @Override
+            public void run() {
+                deleteEmojiPack(emojiPackBase);
+                Emoji.reloadEmoji();
+                AndroidUtilities.runOnUIThread(() -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded));
+                pendingDeleteEmojiPackId = null;
+            }
+        }.start());
         bulletinLayout.setButton(undoButton);
-        Bulletin.make(fragment, bulletinLayout, Bulletin.DURATION_LONG).show();
+        emojiPackBulletin = Bulletin.make(fragment, bulletinLayout, Bulletin.DURATION_LONG).show();
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -647,6 +668,7 @@ public class CustomEmojiHelper {
     }
 
     public interface OnBulletinAction {
+        void onPreStart();
         void onUndo();
     }
 }
