@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildConfig;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
@@ -71,12 +72,17 @@ public class OwlgramSettings extends BaseSettingsActivity {
             builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
             builder.setPositiveButton(LocaleController.getString("Reset", R.string.Reset), (dialogInterface, i) -> {
                 int differenceUI = OwlConfig.getDifferenceUI();
+                boolean isDefault = OwlConfig.emojiPackSelected.equals("default");
                 OwlConfig.resetSettings();
                 Theme.lastHolidayCheckTime = 0;
                 Theme.dialogs_holidayDrawable = null;
-                getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
-                getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                reloadDialogs();
+                reloadMainInfo();
                 OwlConfig.doRebuildUIWithDiff(differenceUI, parentLayout);
+                if (!isDefault) {
+                    Emoji.reloadEmoji();
+                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
+                }
                 BulletinFactory.of(OwlgramSettings.this).createSimpleBulletin(R.raw.forward, LocaleController.getString("ResetSettingsHint", R.string.ResetSettingsHint)).show();
             });
             AlertDialog alertDialog = builder.create();

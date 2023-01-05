@@ -20,11 +20,7 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.NumberPicker;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.components.dynamic.IceledButtonCell;
-import it.owlgram.android.components.dynamic.LinearButtonCell;
-import it.owlgram.android.components.dynamic.PillsButtonCell;
-import it.owlgram.android.components.dynamic.RoundedButtonCell;
-import it.owlgram.android.components.dynamic.SquaredButtonCell;
+import it.owlgram.android.components.dynamic.ButtonCell;
 
 public class DynamicButtonSelector extends LinearLayout {
     Paint pickerDividersPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -80,7 +76,7 @@ public class DynamicButtonSelector extends LinearLayout {
                         int wSubItem = hItem - padding;
                         int xMiddle = x + (hItem >> 1) - (wSubItem >> 1);
                         int yMiddle = yContainer + (hItem >> 1) - (wSubItem >> 1);
-                        drawButtonPreview(canvas, xMiddle, yMiddle, wSubItem, selectedStyle, i);
+                        ButtonCell.drawButtonPreview(canvas, xMiddle, yMiddle, wSubItem, i, selectedStyle, context);
                     }
                 } else {
                     int hSubItem = hItem - padding;
@@ -147,26 +143,6 @@ public class DynamicButtonSelector extends LinearLayout {
         int textY = (y + h) - textH;
         RectF rectF3 = new RectF(x, textY, x + Math.round((w * 60f) / 100f), textY + textH);
         canvas.drawRoundRect(rectF3, rad1, rad1, p);
-    }
-
-    private void drawButtonPreview(Canvas canvas, int x, int y, int w, int index, int pos) {
-        switch (index) {
-            case 1:
-                RoundedButtonCell.drawButtonPreview(canvas, x, y, w);
-                break;
-            case 2:
-                IceledButtonCell.drawButtonPreview(canvas, x, y, w);
-                break;
-            case 3:
-                PillsButtonCell.drawButtonPreview(canvas, x, y, w);
-                break;
-            case 4:
-                LinearButtonCell.drawButtonPreview(canvas, x, y, w, pos, getContext());
-                break;
-            default:
-                SquaredButtonCell.drawButtonPreview(canvas, x, y, w);
-                break;
-        }
     }
 
     protected void onSelectionChange() {

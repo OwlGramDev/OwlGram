@@ -16,7 +16,7 @@
     <string name="OfficialChannel">Official Channel</string>
     <string name="ChannelUsername">OwlGram</string>
     <string name="OfficialGroup">Official Group</string>
-    <string name="GroupUsername">OwlGramChat</string>
+    <string name="GroupUsername">OwlGramForum</string>
     <string name="SourceCode">View Source Code</string>
     <string name="TranslateOwl">Translate OwlGram</string>
     <string name="TranslateOwlDesc">Help us translate OwlGram into your language</string>
@@ -47,6 +47,8 @@
     <string name="MenuItemsOrderDesc">Customize side menu items to better meet your needs.</string>
     <string name="RecommendedItems">Recommended Menu Items</string>
     <string name="ResetItemsOrder">Reset Items Order</string>
+    <string name="AddDivider">Add Divider</string>
+    <string name="Divider">Divider</string>
     <string name="DatacenterStatus">Datacenter Status</string>
     <string name="DatacenterStatusDesc">Check the Telegram\'s <![CDATA[<a href="https://core.telegram.org/api/datacenter">Datacenter</a>]]> Status in realtime.</string>
     <string name="WebVersion">Open Web Version</string>
@@ -56,23 +58,24 @@
     <string name="ShapePills">Pills</string>
     <string name="ShapeLinear">Linear</string>
     <string name="ShapeStock">Default</string>
-    <string name="DefaultIcon">Default</string>
-    <string name="AquaIcon">Aqua</string>
     <string name="SunsetIcon">Sunset</string>
     <string name="AppIconMonoBlack" comment="AppIconMonoBlack">Mono Black</string>
     <string name="AppIconDeveloper" comment="AppIconDeveloper">Developer</string>
     <string name="AppIconArctic" comment="AppIconArctic">Arctic</string>
     <string name="AppIconFoxgram" comment="AppIconFoxgram">Shy Fox</string>
+    <string name="UnlockedHiddenFoxIcon">Oh… Congratulations! You unlocked the little shy fox icon.</string>
     <string name="AppIconRainbow" comment="AppIconRainbow">Rainbow</string>
     <string name="AppIconChupa" comment="AppIconChupa">Chupa</string>
+    <string name="UnlockedHiddenChupaIcon">You were chuped! Chupa\'s icon is now available in settings.</string>
     <string name="ClassicIcon">Classic</string>
     <string name="HidePhone">Hide Your Phone Number</string>
     <string name="HidePhoneDesc">It will be hidden from settings and side menu</string>
     <string name="HidePhoneOthers">Hide other people\'s Phone Number</string>
     <string name="HidePhoneOthersDesc">It will be hidden just for you from their profile</string>
-    <string name="FontsAndEmojis">Fonts and Emojis</string>
+    <string name="FontsAndEmojis">Fonts and Emoji</string>
     <string name="UseSystemFonts">Use System Fonts</string>
-    <string name="UseSystemEmojis">Use System Emojis</string>
+    <string name="UseSystemEmojis">Use System Emoji</string>
+    <string name="UseSystemEmojisDesc">Use the system\'s emoji instead of the chosen one.</string>
     <string name="PacManAnimation">Pac-Man Animation when Archive</string>
     <string name="ChristmasHat">Christmas Hat</string>
     <string name="FallingSnow">Falling Snow</string>
@@ -103,6 +106,7 @@
     <string name="HideChatKeyboard">Hide Keyboard on Chat Scroll</string>
     <string name="ScrollableChatPreview">Scrollable Chat Preview</string>
     <string name="OpenArchiveOnPull">Pull down to Open the Archive</string>
+    <string name="OnlineStatusDesc">Show the online status of other people next to their profile photo in groups</string>
     <string name="HideAllChatsFolder">Hide "All Chats" Folder</string>
     <string name="FoldersWhenForwarding">Show Folders when Forwarding</string>
     <string name="ContextMenu">Context Menu</string>
@@ -124,6 +128,7 @@
     <string name="ProviderDeepLTranslate">DeepL Translate</string>
     <string name="ProviderNiuTrans">Niu Trans</string>
     <string name="ProviderDuckDuckGo">DuckDuckGo Translate</string>
+    <string name="ProviderTelegram">Telegram Translate</string>
     <string name="TranslationProviderInfo">%s may have access to the messages you translate.</string>
     <string name="TranslationLanguage">Translation Language</string>
     <string name="UseGoogleTranslate">Use Google</string>
@@ -134,6 +139,15 @@
     <string name="DeepLFormalityLess">Less</string>
     <string name="AutoTranslate">Auto-Translate</string>
     <string name="AutoTranslateDesc">Automatically translate messages that are in another language.</string>
+    <string name="AutoTranslateTitle">Do you want auto-translation of messages?</string>
+    <string name="AutoTranslateDesc2">These chats will or will not be translated regardless of the settings above.</string>
+    <string name="AlwaysTranslate">Always translate</string>
+    <string name="NeverTranslate">Never translate</string>
+    <string name="EditExceptionTitle">Do you want to edit topics exceptions?</string>
+    <string name="EditExceptionHint">You can disable auto-translate for specific topics in this group.</string>
+    <string name="EditRemoveExceptionText">Are you sure you want to delete \"%1$s\" from auto-translate exceptions?</string>
+    <string name="EditDeleteException">Delete exception</string>
+    <string name="EditTopicsException">Edit topics exceptions</string>
     <string name="MessageAlreadyInX">You cannot translate 1 message since it is already in %1$s.</string>
     <string name="MessagesAlreadyInX">You cannot translate %1$d messages since they are already in %2$s.</string>
     <string name="TranslationFailed">Translate Server Error</string>
@@ -150,6 +164,7 @@
     <string name="BotInfo">Bot</string>
     <string name="FullName">Full Name</string>
     <string name="MessageText">Text</string>
+    <string name="MessageTextLength">Text Length</string>
     <string name="EditedDate">Edited Date</string>
     <string name="MessageDate">Date</string>
     <string name="ForwardsNumber">Forwards</string>
@@ -170,7 +185,7 @@
     <string name="CameraXDesc">CameraX is only supported on <![CDATA[<a href="https://developer.android.com/training/camerax/devices">selected devices</a>]]>, effects and lenses support depends on your manufacturer.</string>
     <string name="PerformanceMode">Performance Mode</string>
     <string name="PerformanceModeDesc">CameraX\'s quality will be reduced in favor of performance</string>
-    <string name="MotionSmoothness">Motion Smoothness</string>
+    <string name="CameraQuality">Camera Quality</string>
     <string name="CameraTypeSystem">System</string>
     <string name="SystemCameraDesc">Access directly the system camera (not applicable for video messages).</string>
     <string name="MediaSettings">Media</string>
@@ -187,6 +202,8 @@
     <string name="UseRearRoundVideosDesc">Record video messages with the rear camera instead of the front camera</string>
     <string name="ConfirmAVMessages">Confirm Sending Audio/Video Messages</string>
     <string name="ConfirmStickersGIFs">Confirm Sending Stickers and GIFs</string>
+    <string name="HideTimeOnSticker">Hide Time on Stickers</string>
+    <string name="OnlineStatus">Show Online Status</string>
     <string name="InAppUpdates">In-App Updates</string>
     <string name="CheckUpdates">Check</string>
     <string name="UpdateAvailable">Update Available</string>
@@ -198,7 +215,7 @@
     <string name="RemindUpdate">Remind me later</string>
     <string name="InstallingUpdate">Installing Update</string>
     <string name="InstallationInProgress">Installation in progress…</string>
-    <string name="InstallationWarning">Please keep the app open until the installation in complete.</string>
+    <string name="InstallationWarning">Please keep the app open until the installation is complete.</string>
     <string name="ErrorDuringInstallation">Error during installation!</string>
     <string name="InstallationBlocked">The installation was blocked by your device. Please report this issue to OwlGram support.</string>
     <string name="InstallationFailure">The APK file is corrupted. Please report this issue to OwlGram support.</string>
@@ -222,6 +239,11 @@
     <string name="MonetIcon">Force Monet Icon</string>
     <string name="MonetIconDesc">Use Material You\'s dynamic icon on Android 12</string>
     <string name="MaxRecentStickers">Max Recent Stickers</string>
+    <string name="DownloadSpeed">Download Speed</string>
+    <string name="DownloadSpeedDefault">Default</string>
+    <string name="DownloadSpeedFast">Fast</string>
+    <string name="DownloadSpeedExtreme">Extreme</string>
+    <string name="FasterUploadSpeed">Increase Upload Speed</string>
     <string name="AutoLockInstant">Instant</string>
     <string name="MKVAsVideo">Show MKV as Video</string>
     <string name="StreamAllVideos">Stream All Videos</string>
@@ -255,7 +277,6 @@
     <string name="SendWithoutMarkdown">Send without markdown</string>
     <string name="SaveWithoutMarkdown">Save without markdown</string>
     <string name="SendAsEmoji">Send as emoji</string>
-    <string name="ClearRecentStickers">Clear recent stickers?</string>
     <string name="ChangeIcon">Change App Icon</string>
     <string name="ChangeIconDesc">Since on Android 12 the monet icon was forced and you upgraded to Android 13, you need to change the app icon to the default one for a better support.</string>
     <string name="CopyPhoto">Copy Photo</string>
@@ -279,35 +300,31 @@
     <string name="KeepMarkdownDesc" comment="KeepMarkdownDesc">When translating a message, keep the markdown formatting.</string>
     <string name="ThemeMonetLight">Monet Light</string>
     <string name="ThemeMonetDark">Monet Dark</string>
-    <string name="DownloadSpeed">Download Speed</string>
-    <string name="DownloadSpeedDefault">Default</string>
-    <string name="DownloadSpeedFast">Fast</string>
-    <string name="DownloadSpeedExtreme">Extreme</string>
-    <string name="FasterUploadSpeed">Faster Upload Speed</string>
-    <string name="HideTimeOnSticker">Hide time on stickers</string>
-    <string name="MessageTextLength">Text Length</string>
-    <string name="Divider">Divider</string>
-    <string name="AddDivider">Add Divider</string>
-    <string name="OnlineStatus">Show Online Status</string>
-    <string name="OnlineStatusDesc">Show the online status of other people next to their profile photo in groups</string>
     <string name="Patpat">Patpat</string>
-    <string name="UnlockedHiddenFoxIcon">Oh… Congratulations! You unlocked the little shy fox icon!</string>
-    <string name="UnlockedHiddenChupaIcon">You were chuped! Chupa\'s icon is now available in settings.</string>
-    <string name="PrivacyPolicyLogin">By logging in,\nyou agree to the *Privacy Policy*.</string>
+    <string name="PrivacyPolicyLogin">By continuing,\nyou agree to the *Privacy Policy*.</string>
     <string name="OwlPrivacyPolicy">OwlGram Privacy Policy</string>
-    <string name="HideSendAsChannel">Hide Send as Channel</string>
-    <string name="ProviderTelegram">Telegram Translate</string>
-    <string name="AutoTranslateTitle">Do you want auto-translation of messages?</string>
-    <string name="AutoTranslateDesc2">These chats will or will not be translated regardless of the settings above.</string>
-    <string name="AlwaysTranslate">Always translate</string>
-    <string name="NeverTranslate">Never translate</string>
-    <string name="ResetAutoTranslationPreferences">Reset Auto-Translation Preferences</string>
-    <string name="EditExceptionTitle">Do you want to edit topics?</string>
-    <string name="EditExceptionHint">You can disable auto-translate for specific topics in this group.</string>
-    <string name="EditRemoveAlwaysText">Are you sure you want to delete \"%1$s\" from always auto-translate exceptions?</string>
-    <string name="EditRemoveNeverText">Are you sure you want to delete \"%1$s\" from never auto-translate exceptions?</string>
-    <string name="EditDeleteException">Delete exception</string>
-    <string name="DeleteAllAllowExceptions">Are you sure you want to delete all always allowed exceptions?</string>
-    <string name="DeleteAllNeverExceptions">Are you sure you want to delete all never allowed exceptions?</string>
-    <string name="EditTopicsException">Edit topics exception</string>
+    <string name="HideSendAsChannel">Hide "Send as Channel"</string>
+    <string name="AutomaticSorting">Automatic Sorting</string>
+    <string name="AutomaticSortingDesc">Move recently used custom emoji and sticker sets to the first position</string>
+    <string name="EmojiSets">Emoji Sets</string>
+    <string name="MyEmojiSets">My Emoji Sets</string>
+    <string name="InstalledEmojiSet">Installed</string>
+    <string name="InstallingEmojiSet">Installing…</string>
+    <string name="UpdateEmojiSet">Update</string>
+    <string name="ChooseEmojiSetHeader">Choose emoji set</string>
+    <string name="EmojiSetHint">This affects emoji appearance only for you. Others see them based on their preferences.</string>
+    <string name="CustomEmojiSet">Custom Emoji Set</string>
+    <string name="CustomEmojiSetHint">Import and choose emoji sets from your internal storage.</string>
+    <string name="AddEmojiSet">Add Emoji Set</string>
+    <string name="AddEmojiSetHint">You can add a custom emoji set by tapping the button above.</string>
+    <string name="ErrorEmojiFontInvalidFormat">File must be an emoji font file.</string>
+    <string name="EmojiSetRemoved">Emoji set removed.</string>
+    <string name="EmojiSetRemovedInfo">%1$s is no longer in your emoji sets.</string>
+    <string name="DeleteEmojiSets">%1$s emoji sets</string>
+    <string name="DeleteEmojiSetsMessage">Are you sure you want to delete the selected emoji sets?</string>
+    <string name="ApplyEmojiSet">Apply emoji set</string>
+    <string name="InvalidCustomEmojiSet">Invalid font file.</string>
+    <string name="EmojiSetApplied">Emoji set applied.</string>
+    <string name="EmojiSetAppliedInfo">%1$s is now your emoji set.</string>
+    <string name="EmojiSetAlreadyApplied">Emoji set already applied.</string>
 </resources>

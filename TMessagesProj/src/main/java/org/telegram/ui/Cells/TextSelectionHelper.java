@@ -63,7 +63,6 @@ import org.telegram.ui.Components.RecyclerListView;
 import java.util.ArrayList;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.entities.EntitiesHelper;
 import it.owlgram.android.settings.DoNotTranslateSettings;
 
 public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.SelectableView> {
@@ -1816,6 +1815,10 @@ public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.Selec
                 MessageObject.TextLayoutBlock lastBlock = cell.getMessageObject().textLayoutBlocks.get(cell.getMessageObject().textLayoutBlocks.size() - 1);
                 lastLayout = lastBlock.textLayout;
                 yOffset = lastBlock.textYOffset;
+            }
+
+            if (lastLayout == null) {
+                return -1;
             }
 
             if (y < 0) {

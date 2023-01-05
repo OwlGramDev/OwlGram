@@ -2,6 +2,7 @@ package it.owlgram.android.translator;
 
 import android.text.TextUtils;
 
+import androidx.core.text.HtmlCompat;
 import androidx.core.util.Pair;
 
 import org.telegram.messenger.AndroidUtilities;
@@ -10,6 +11,7 @@ import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.BaseFragment;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.entities.HTMLKeeper;
@@ -167,6 +169,12 @@ public class TranslatorHelper {
             }
             translateObject = additionalObjectTranslation;
         }
+    }
+
+    public static String languageName(String code) {
+        Locale language = Locale.forLanguageTag(code);
+        String fromString = !TextUtils.isEmpty(language.getScript()) ? String.valueOf(HtmlCompat.fromHtml(language.getDisplayScript(), HtmlCompat.FROM_HTML_MODE_LEGACY)) : language.getDisplayName();
+        return AndroidUtilities.capitalize(fromString);
     }
 
     public interface TranslateCallback {

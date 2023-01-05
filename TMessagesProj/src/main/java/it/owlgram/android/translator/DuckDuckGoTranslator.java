@@ -58,7 +58,7 @@ public class DuckDuckGoTranslator extends BaseTranslator {
         if (m.find()) {
             String uid = m.group(0);
             String url = "https://duckduckgo.com/translation.js?" +
-                    "vqd=" + URLEncoder.encode(uid, StandardCharsets.UTF_8.toString()) +
+                    "vqd=" + URLEncoder.encode(uid, StandardCharsets.UTF_8.name()) +
                     "&query=translate" +
                     "&to=" + tl;
             for (String block : blocks) {

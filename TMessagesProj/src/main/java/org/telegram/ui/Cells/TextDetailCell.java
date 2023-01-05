@@ -13,7 +13,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.HapticFeedbackConstants;
@@ -27,7 +26,6 @@ import android.widget.TextView;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.LocaleController;
-import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.LinkSpanDrawable;
@@ -146,6 +144,9 @@ public class TextDetailCell extends FrameLayout {
 
     public void setImageClickListener(View.OnClickListener clickListener) {
         imageView.setOnClickListener(clickListener);
+        if (clickListener == null) {
+            imageView.setClickable(false);
+        }
     }
 
     public void setTextWithEmojiAndValue(CharSequence text, CharSequence value, boolean divider) {
@@ -169,11 +170,11 @@ public class TextDetailCell extends FrameLayout {
     protected void onDraw(Canvas canvas) {
         if (needDivider) {
             canvas.drawLine(
-                    LocaleController.isRTL ? 0 : AndroidUtilities.dp(20),
-                    getMeasuredHeight() - 1,
-                    getMeasuredWidth() - (LocaleController.isRTL ? AndroidUtilities.dp(20) : 0),
-                    getMeasuredHeight() - 1,
-                    Theme.dividerPaint
+                LocaleController.isRTL ? 0 : AndroidUtilities.dp(20),
+                getMeasuredHeight() - 1,
+                getMeasuredWidth() - (LocaleController.isRTL ? AndroidUtilities.dp(20) : 0),
+                getMeasuredHeight() - 1,
+                Theme.dividerPaint
             );
         }
     }

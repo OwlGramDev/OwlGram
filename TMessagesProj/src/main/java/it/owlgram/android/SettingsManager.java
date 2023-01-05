@@ -11,14 +11,16 @@ import androidx.core.content.FileProvider;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
-import org.telegram.ui.ActionBar.ActionBarLayout;
 import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.LaunchActivity;
 
@@ -34,6 +36,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
 
+import it.owlgram.android.camera.CameraXUtils;
 import it.owlgram.android.components.FileSettingsNameDialog;
 import it.owlgram.android.helpers.MenuOrderManager;
 import it.owlgram.android.helpers.SharedPreferencesHelper;
@@ -52,6 +55,7 @@ public class SettingsManager extends SharedPreferencesHelper {
     public static final int NEED_RECREATE_SHADOW = 2;
     public static final int NEED_FRAGMENT_REBASE_WITH_LAST = 4;
     public static final int NEED_FRAGMENT_REBASE = 8;
+    public static final int NEED_UPDATE_CAMERAX = 16;
 
     private static boolean isBackupAvailable(String key) {
         switch (key) {
@@ -73,6 +77,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "iconStyleSelected":
             case "useMonetIcon":
             case "DB_VERSION":
+            case "emojiPackSelected":
             case "NEED_RECREATE_FORMATTERS":
             case "NEED_RECREATE_SHADOW":
             case "NEED_FRAGMENT_REBASE_WITH_LAST":
@@ -86,6 +91,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "DOWNLOAD_BOOST_DEFAULT":
             case "DOWNLOAD_BOOST_FAST":
             case "DOWNLOAD_BOOST_EXTREME":
+            case "NEED_UPDATE_CAMERAX":
                 return false;
             default:
                 return true;
@@ -107,8 +113,12 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "increaseAudioMessages":
             case "useMonetIcon":
             case "scrollableChatPreview":
-            case "showNameInActionBar":
             case "showInActionBar":
+            case "cameraXFps":
+            case "stickersAutoReorder":
+            case "disableStickersAutoReorder":
+            case "NEED_UPDATE_CAMERAX":
+            case "emojiPackSelected":
                 return false;
             default:
                 return true;
@@ -211,7 +221,8 @@ public class SettingsManager extends SharedPreferencesHelper {
                             integerValue == Translator.PROVIDER_YANDEX ||
                             integerValue == Translator.PROVIDER_DEEPL ||
                             integerValue == Translator.PROVIDER_NIU ||
-                            integerValue == Translator.PROVIDER_DUCKDUCKGO;
+                            integerValue == Translator.PROVIDER_DUCKDUCKGO ||
+                            integerValue == Translator.PROVIDER_TELEGRAM;
                 case "blurIntensity":
                     return integerValue >= 0 && integerValue <= 100;
                 case "eventType":
@@ -220,8 +231,8 @@ public class SettingsManager extends SharedPreferencesHelper {
                 case "idType":
                 case "translatorStyle":
                     return integerValue >= 0 && integerValue <= 1;
-                case "cameraXFps":
-                    return integerValue == 30 || integerValue == 60;
+                case "cameraResolution":
+                    return true;
                 case "maxRecentStickers":
                     return integerValue >= 20 && integerValue <= 200;
                 case "stickerSizeStack":
@@ -367,13 +378,6 @@ public class SettingsManager extends SharedPreferencesHelper {
         int returnStatus = 0;
         for (int i = 0; i < differences.size(); i++) {
             switch (differences.get(i)) {
-                case "showIDAndDC":
-                case "buttonStyleType":
-                case "hidePhoneNumber":
-                case "showNameInActionBar":
-                case "useSystemFont":
-                    returnStatus = addWithCheck(returnStatus, NEED_FRAGMENT_REBASE);
-                    break;
                 case "fullTime":
                     returnStatus = addWithCheck(returnStatus, NEED_RECREATE_FORMATTERS);
                     returnStatus = addWithCheck(returnStatus, NEED_FRAGMENT_REBASE_WITH_LAST);
@@ -381,9 +385,14 @@ public class SettingsManager extends SharedPreferencesHelper {
                 case "disableAppBarShadow":
                     returnStatus = addWithCheck(returnStatus, NEED_RECREATE_SHADOW);
                 case "roundedNumbers":
-                case "showPencilIcon":
-                case "hideSendAsChannel":
+                case "useSystemFont":
                     returnStatus = addWithCheck(returnStatus, NEED_FRAGMENT_REBASE_WITH_LAST);
+                    break;
+                case "showPencilIcon":
+                    returnStatus = addWithCheck(returnStatus, NEED_FRAGMENT_REBASE);
+                    break;
+                case "cameraResolution":
+                    returnStatus = addWithCheck(returnStatus, NEED_UPDATE_CAMERAX);
                     break;
             }
         }
@@ -398,17 +407,25 @@ public class SettingsManager extends SharedPreferencesHelper {
     }
 
     public static void doRebuildUIWithDiff(int difference, INavigationLayout parentLayout) {
-        if ((difference & OwlConfig.NEED_RECREATE_FORMATTERS) > 0) {
+        if ((difference & NEED_RECREATE_FORMATTERS) > 0) {
             LocaleController.getInstance().recreateFormatters();
         }
-        if ((difference & OwlConfig.NEED_RECREATE_SHADOW) > 0) {
-            ActionBarLayout.headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : parentLayout.getView().getResources().getDrawable(R.drawable.header_shadow).mutate();
+        if ((difference & NEED_RECREATE_SHADOW) > 0) {
+            parentLayout.setHeaderShadow(OwlConfig.disableAppBarShadow ? null : parentLayout.getView().getResources().getDrawable(R.drawable.header_shadow).mutate());
         }
-        if ((difference & OwlConfig.NEED_FRAGMENT_REBASE) > 0) {
+        if ((difference & NEED_FRAGMENT_REBASE) > 0) {
             parentLayout.rebuildAllFragmentViews(false, false);
-        } else if ((difference & OwlConfig.NEED_FRAGMENT_REBASE_WITH_LAST) > 0) {
-            parentLayout.rebuildAllFragmentViews(true, true);
+        } else if ((difference & NEED_FRAGMENT_REBASE_WITH_LAST) > 0) {
+            parentLayout.rebuildFragments(INavigationLayout.REBUILD_FLAG_REBUILD_LAST);
         }
+        if ((difference & NEED_UPDATE_CAMERAX) > 0) {
+            CameraXUtils.loadSuggestedResolution();
+        }
+        NotificationCenter currentAccount = AccountInstance.getInstance(UserConfig.selectedAccount).getNotificationCenter();
+        currentAccount.postNotificationName(NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_CHAT);
+        currentAccount.postNotificationName(NotificationCenter.mainUserInfoChanged);
+        currentAccount.postNotificationName(NotificationCenter.dialogFiltersUpdated);
+        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
     }
 
     public static void restoreBackup(File inputFile, boolean isRestore) {

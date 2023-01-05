@@ -26,6 +26,7 @@ import java.util.List;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.UpdateInstallingDialog;
+import it.owlgram.android.helpers.FileDownloadHelper;
 
 public class ApkInstaller {
     @SuppressLint("StaticFieldLeak")
@@ -57,7 +58,7 @@ public class ApkInstaller {
     }
 
     public static void installApk(Activity context) {
-        File apk = ApkDownloader.apkFile();
+        File apk = UpdateManager.apkFile();
         if (OwlConfig.xiaomiBlockedInstaller && XiaomiUtilities.isMIUI()) {
             AndroidUtilities.openForView(apk, "update.apk", "application/vnd.android.package-archive", context, null);
             return;

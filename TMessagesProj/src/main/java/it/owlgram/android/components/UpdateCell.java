@@ -28,7 +28,8 @@ import org.telegram.ui.Components.RadialProgressView;
 
 import java.util.Objects;
 
-import it.owlgram.android.updates.ApkDownloader;
+import it.owlgram.android.helpers.FileDownloadHelper;
+import it.owlgram.android.updates.UpdateManager;
 
 public class UpdateCell extends FrameLayout {
     private final BackupImageView backupImageView;
@@ -194,7 +195,7 @@ public class UpdateCell extends FrameLayout {
         Drawable d = ContextCompat.getDrawable(context, R.drawable.round_close_white_36);
         Objects.requireNonNull(d).setColorFilter(colorText, PorterDuff.Mode.SRC_ATOP);
         imageView.setBackground(d);
-        imageView.setOnClickListener(view -> ApkDownloader.cancel());
+        imageView.setOnClickListener(view -> FileDownloadHelper.cancel("appUpdate"));
 
         LinearLayout linearLayout4 = new LinearLayout(context);
         linearLayout4.setLayoutParams(new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));

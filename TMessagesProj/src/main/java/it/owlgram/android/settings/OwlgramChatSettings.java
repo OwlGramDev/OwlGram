@@ -2,13 +2,16 @@ package it.owlgram.android.settings;
 
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.util.Size;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.camera.video.Quality;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBarMenu;
@@ -22,9 +25,13 @@ import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.UndoView;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.camera.CameraXUtilities;
+import it.owlgram.android.camera.CameraXUtils;
 import it.owlgram.android.components.CameraTypeSelector;
 import it.owlgram.android.components.StickerSizeCell;
 import it.owlgram.android.entities.EntitiesHelper;
@@ -63,7 +70,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
     private int cameraTypeHeaderRow;
     private int cameraTypeSelectorRow;
     private int cameraXOptimizeRow;
-    private int cameraXFpsRow;
+    private int cameraXQualityRow;
     private int cameraAdviseRow;
     private int proximitySensorRow;
     private int suppressionRow;
@@ -73,6 +80,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
     private int hideTimeOnStickerRow;
     private int onlineStatusRow;
     private int hideSendAsChannelRow;
+    private int stickersSortingRow;
 
     @Override
     public boolean onFragmentCreate() {
@@ -168,7 +176,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.hideAllTab);
             }
-            getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
+            reloadDialogs();
         } else if (position == showPatpatRow) {
             OwlConfig.toggleShowPatpat();
             if (view instanceof TextCheckbox2Cell) {
@@ -179,23 +187,21 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.useCameraXOptimizedMode);
             }
-        } else if (position == cameraXFpsRow) {
-            ArrayList<String> arrayList = new ArrayList<>();
-            ArrayList<Integer> types = new ArrayList<>();
-            arrayList.add("60 Fps");
-            types.add(60);
-            arrayList.add("30 Fps");
-            types.add(30);
-            PopupHelper.show(arrayList, LocaleController.getString("MotionSmoothness", R.string.MotionSmoothness), types.indexOf(OwlConfig.cameraXFps), context, i -> {
-                OwlConfig.saveCameraXFps(types.get(i));
-                listAdapter.notifyItemChanged(cameraXFpsRow, PARTIAL);
+        } else if (position == cameraXQualityRow) {
+            Map<Quality, Size> availableSizes = CameraXUtils.getAvailableVideoSizes();
+            Stream<Integer> tmp = availableSizes.values().stream().sorted(Comparator.comparingInt(Size::getWidth).reversed()).map(Size::getHeight);
+            ArrayList<Integer> types = tmp.collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<String> arrayList = types.stream().map(p -> p + "p").collect(Collectors.toCollection(ArrayList::new));
+            PopupHelper.show(arrayList, LocaleController.getString("CameraQuality", R.string.CameraQuality), types.indexOf(OwlConfig.cameraResolution), context, i -> {
+                OwlConfig.saveCameraResolution(types.get(i));
+                listAdapter.notifyItemChanged(cameraXQualityRow, PARTIAL);
             });
         } else if (position == proximitySensorRow) {
             OwlConfig.toggleDisableProximityEvents();
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.disableProximityEvents);
             }
-            restartTooltip.showWithAction(0, UndoView.ACTION_CACHE_WAS_CLEARED, null, null);
+            restartTooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
         } else if (position == suppressionRow) {
             OwlConfig.toggleVoicesAgc();
             if (view instanceof TextCheckCell) {
@@ -231,7 +237,12 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.hideSendAsChannel);
             }
-            parentLayout.rebuildAllFragmentViews(true, true);
+            getNotificationCenter().postNotificationName(NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_CHAT);
+        } else if (position == stickersSortingRow) {
+            OwlConfig.toggleStickersSorting();
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(OwlConfig.stickersSorting);
+            }
         }
     }
 
@@ -266,7 +277,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
         cameraTypeHeaderRow = -1;
         cameraTypeSelectorRow = -1;
         cameraXOptimizeRow = -1;
-        cameraXFpsRow = -1;
+        cameraXQualityRow = -1;
         cameraAdviseRow = -1;
         suppressionRow = -1;
 
@@ -274,12 +285,12 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
         stickerSizeRow = rowCount++;
         stickerSizeDividerRow = rowCount++;
 
-        if (CameraXUtilities.isCameraXSupported()) {
+        if (CameraXUtils.isCameraXSupported()) {
             cameraTypeHeaderRow = rowCount++;
             cameraTypeSelectorRow = rowCount++;
             if (OwlConfig.cameraType == 1) {
                 cameraXOptimizeRow = rowCount++;
-                cameraXFpsRow = rowCount++;
+                cameraXQualityRow = rowCount++;
             }
             cameraAdviseRow = rowCount++;
         }
@@ -288,6 +299,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
         mediaSwipeByTapRow = rowCount++;
         jumpChannelRow = rowCount++;
         showGreetings = rowCount++;
+        stickersSortingRow = rowCount++;
         playGifAsVideoRow = rowCount++;
         hideKeyboardRow = rowCount++;
         hideSendAsChannelRow = rowCount++;
@@ -330,7 +342,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
 
     private class ListAdapter extends BaseListAdapter {
         @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
+        protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
             switch (ViewType.fromInt(holder.getItemViewType())) {
                 case SHADOW:
                     holder.itemView.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
@@ -390,6 +402,8 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("OnlineStatus", R.string.OnlineStatus), LocaleController.getString("OnlineStatusDesc", R.string.OnlineStatusDesc), OwlConfig.showStatusInChat, true, false);
                     } else if (position == hideSendAsChannelRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("HideSendAsChannel", R.string.HideSendAsChannel), OwlConfig.hideSendAsChannel, true);
+                    } else if (position == stickersSortingRow) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("AutomaticSorting", R.string.AutomaticSorting), LocaleController.getString("AutomaticSortingDesc", R.string.AutomaticSortingDesc), OwlConfig.stickersSorting, true, true);
                     }
                     break;
                 case TEXT_HINT_WITH_PADDING:
@@ -415,8 +429,8 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                 case SETTINGS:
                     TextSettingsCell textSettingsCell = (TextSettingsCell) holder.itemView;
                     textSettingsCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-                    if (position == cameraXFpsRow) {
-                        textSettingsCell.setTextAndValue(LocaleController.getString("MotionSmoothness", R.string.MotionSmoothness), OwlConfig.cameraXFps + " Fps", partial,false);
+                    if (position == cameraXQualityRow) {
+                        textSettingsCell.setTextAndValue(LocaleController.getString("CameraQuality", R.string.CameraQuality), OwlConfig.cameraResolution + "p", partial,false);
                     }
                     break;
                 case CHECKBOX:
@@ -469,16 +483,20 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                         @Override
                         protected void onSelectedCamera(int cameraSelected) {
                             super.onSelectedCamera(cameraSelected);
+                            int oldValue = OwlConfig.cameraType;
+                            OwlConfig.saveCameraType(cameraSelected);
                             if (cameraSelected == 1) {
                                 updateRowsId();
                                 listAdapter.notifyItemInserted(cameraXOptimizeRow);
-                                listAdapter.notifyItemInserted(cameraXFpsRow);
+                                listAdapter.notifyItemInserted(cameraXQualityRow);
                                 listAdapter.notifyItemChanged(cameraAdviseRow);
-                            } else {
+                            } else if (oldValue == 1){
                                 listAdapter.notifyItemRemoved(cameraXOptimizeRow);
-                                listAdapter.notifyItemRemoved(cameraXFpsRow);
+                                listAdapter.notifyItemRemoved(cameraXQualityRow);
                                 listAdapter.notifyItemChanged(cameraAdviseRow - 1);
                                 updateRowsId();
+                            } else {
+                                listAdapter.notifyItemChanged(cameraAdviseRow);
                             }
                         }
                     };
@@ -502,7 +520,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                     position == cameraXOptimizeRow || position == proximitySensorRow || position == suppressionRow ||
                     position == turnSoundOnVDKeyRow || position == openArchiveOnPullRow || position == confirmStickersGIFsRow ||
                     position == hideTimeOnStickerRow || position == onlineStatusRow || position == hideAllTabRow ||
-                    position == hideSendAsChannelRow) {
+                    position == hideSendAsChannelRow || position == stickersSortingRow) {
                 return ViewType.SWITCH;
             } else if (position == stickerSizeRow) {
                 return ViewType.STICKER_SIZE;
@@ -510,7 +528,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                 return ViewType.CAMERA_SELECTOR;
             } else if (position == cameraAdviseRow) {
                 return ViewType.TEXT_HINT_WITH_PADDING;
-            } else if (position == cameraXFpsRow) {
+            } else if (position == cameraXQualityRow) {
                 return ViewType.SETTINGS;
             } else if (position == showDeleteRow || position == showNoQuoteForwardRow || position == showAddToSMRow ||
                     position == showRepeatRow || position == showReportRow ||

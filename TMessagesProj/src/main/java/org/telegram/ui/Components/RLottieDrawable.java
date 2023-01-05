@@ -253,7 +253,9 @@ public class RLottieDrawable extends BitmapDrawable implements Animatable, Bitma
     protected void recycleResources() {
         ArrayList<Bitmap> bitmapToRecycle = new ArrayList<>();
         bitmapToRecycle.add(renderingBitmap);
+        bitmapToRecycle.add(backgroundBitmap);
         bitmapToRecycle.add(nextRenderingBitmap);
+        nextRenderingBitmap = null;
         renderingBitmap = null;
         backgroundBitmap = null;
         AndroidUtilities.recycleBitmaps(bitmapToRecycle);
@@ -933,7 +935,7 @@ public class RLottieDrawable extends BitmapDrawable implements Animatable, Bitma
             newReplaceColors = null;
         }
         loadFrameTask = loadFrameRunnable;
-        if (shouldLimitFps) {
+        if (shouldLimitFps && Thread.currentThread() == ApplicationLoader.applicationHandler.getLooper().getThread()) {
             DispatchQueuePoolBackground.execute(loadFrameTask, frameWaitSync != null);
         } else {
             loadFrameRunnableQueue.execute(loadFrameTask);
@@ -1094,7 +1096,7 @@ public class RLottieDrawable extends BitmapDrawable implements Animatable, Bitma
 
     @Override
     public void draw(Canvas canvas) {
-        drawInternal(canvas, false, 0, 0);
+        drawInternal(canvas, null, false, 0, 0);
     }
 
     public void drawInBackground(Canvas canvas, float x, float y, float w, float h, int alpha, ColorFilter colorFilter, int threadIndex) {
@@ -1106,10 +1108,14 @@ public class RLottieDrawable extends BitmapDrawable implements Animatable, Bitma
         backgroundPaint[threadIndex].setAlpha(alpha);
         backgroundPaint[threadIndex].setColorFilter(colorFilter);
         dstRectBackground[threadIndex].set(x, y, x + w, y + h);
-        drawInternal(canvas, true, 0, threadIndex);
+        drawInternal(canvas, null,true, 0, threadIndex);
     }
 
-    public void drawInternal(Canvas canvas, boolean drawInBackground, long time, int threadIndex) {
+    public void draw(Canvas canvas, Paint paint) {
+        drawInternal(canvas, paint, false, 0, 0);
+    }
+
+    public void drawInternal(Canvas canvas, Paint overridePaint, boolean drawInBackground, long time, int threadIndex) {
         if (!canLoadFrames() || destroyWhenDone) {
             return;
         }
@@ -1118,7 +1124,7 @@ public class RLottieDrawable extends BitmapDrawable implements Animatable, Bitma
         }
 
         RectF rect = drawInBackground ? dstRectBackground[threadIndex] : dstRect;
-        Paint paint = drawInBackground ? backgroundPaint[threadIndex] : getPaint();
+        Paint paint = overridePaint != null ? overridePaint : (drawInBackground ? backgroundPaint[threadIndex] : getPaint());
 
         if (paint.getAlpha() == 0) {
             return;
@@ -1279,6 +1285,18 @@ public class RLottieDrawable extends BitmapDrawable implements Animatable, Bitma
         return 1;
     }
 
+    private int rawBackgroundBitmapFrame = -1;
+    public void drawFrame(Canvas canvas, int frame) {
+        if (rawBackgroundBitmapFrame != frame || backgroundBitmap == null) {
+            if (backgroundBitmap == null) {
+                backgroundBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            }
+            int result = getFrame(nativePtr, rawBackgroundBitmapFrame = frame, backgroundBitmap, width, height, backgroundBitmap.getRowBytes(), true);
+        }
+        AndroidUtilities.rectTmp2.set(0, 0, width, height);
+        canvas.drawBitmap(backgroundBitmap, AndroidUtilities.rectTmp2, getBounds(), getPaint());
+    }
+
     @Override
     public void releaseForGenerateCache() {
         if (generateCacheNativePtr != 0) {
@@ -1298,7 +1316,7 @@ public class RLottieDrawable extends BitmapDrawable implements Animatable, Bitma
         return bitmap;
     }
 
-    void setMasterParent(View parent) {
+    public void setMasterParent(View parent) {
         masterParent = parent;
     }
 

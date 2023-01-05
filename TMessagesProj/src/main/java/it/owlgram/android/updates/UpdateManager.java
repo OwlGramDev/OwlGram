@@ -1,5 +1,6 @@
 package it.owlgram.android.updates;
 
+import android.app.Activity;
 import android.content.pm.PackageInfo;
 
 import androidx.annotation.NonNull;
@@ -14,8 +15,10 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.tgnet.TLRPC;
 
+import java.io.File;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -24,6 +27,7 @@ import java.util.Locale;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.StoreUtils;
 import it.owlgram.android.entities.HTMLKeeper;
+import it.owlgram.android.helpers.FileDownloadHelper;
 import it.owlgram.android.helpers.StandardHTTPRequest;
 
 public class UpdateManager {
@@ -42,6 +46,10 @@ public class UpdateManager {
 
     public interface UpdateUICallback {
         void onResult(boolean result);
+    }
+
+    public static String getApkChannel() {
+        return OwlConfig.betaUpdates ? "OwlGramBeta" : "OwlGramAPKs";
     }
 
     public static void getChangelogs(ChangelogCallback changelogCallback) {
@@ -120,7 +128,7 @@ public class UpdateManager {
                             abi = "universal";
                             break;
                     }
-                    String url = String.format(locale, "https://app.owlgram.org/version?lang=%s&beta=%s&abi=%s", locale.getLanguage(), betaMode, URLEncoder.encode(abi, StandardCharsets.UTF_8.toString()));
+                    String url = String.format(locale, "https://app.owlgram.org/version?lang=%s&beta=%s&abi=%s", locale.getLanguage(), betaMode, URLEncoder.encode(abi, StandardCharsets.UTF_8.name()));
                     JSONObject obj = new JSONObject(new StandardHTTPRequest(url).request());
                     String update_status = obj.getString("status");
                     if (update_status.equals("no_updates")) {
@@ -220,5 +228,41 @@ public class UpdateManager {
 
     public interface ChangelogCallback {
         void onSuccess(Pair<String, ArrayList<TLRPC.MessageEntity>> updateResult);
+    }
+
+    public static File apkFile() {
+        return new File(AndroidUtilities.getCacheDir().getAbsolutePath() + "/update.apk");
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static void deleteUpdate() {
+        File file = apkFile();
+        if (file.exists())
+            file.delete();
+        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.fileLoadFailed);
+    }
+
+    public static boolean updateDownloaded() {
+        boolean isCorrupted = true;
+        try {
+            String data = OwlConfig.updateData;
+            if (data.length() > 0) {
+                UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(new JSONObject(data));
+                if (update.file_size == apkFile().length()) {
+                    isCorrupted = false;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        boolean isAvailableFile = apkFile().exists() && FileDownloadHelper.isRunningDownload("appUpdate") && !isCorrupted;
+        if ((BuildVars.BUILD_VERSION >= OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
+            OwlConfig.setUpdateData("");
+            return false;
+        }
+        return isAvailableFile;
+    }
+
+    public static void installUpdate(Activity activity) {
+        ApkInstaller.installApk(activity);
     }
 }

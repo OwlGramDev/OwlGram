@@ -10,7 +10,7 @@ import org.telegram.ui.ActionBar.Theme;
 import java.util.Calendar;
 import java.util.Date;
 
-import it.owlgram.android.camera.CameraXUtilities;
+import it.owlgram.android.camera.CameraXUtils;
 import it.owlgram.android.helpers.MonetIconsHelper;
 import it.owlgram.android.translator.AutoTranslateConfig;
 import it.owlgram.android.translator.BaseTranslator;
@@ -89,6 +89,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean hideAllTab;
     public static boolean hideSendAsChannel;
     public static boolean showNameInActionBar;
+    public static boolean stickersSorting;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -96,6 +97,7 @@ public class OwlConfig extends SettingsManager {
     public static String oldBuildVersion = null;
     public static String languagePackVersioning;
     public static String doNotTranslateLanguages;
+    public static String emojiPackSelected;
     public static int deepLFormality;
     public static int translationProvider;
     public static int lastUpdateStatus = 0;
@@ -107,7 +109,7 @@ public class OwlConfig extends SettingsManager {
     public static int buttonStyleType = 0;
     public static int translatorStyle = 0;
     public static int cameraType;
-    public static int cameraXFps;
+    public static int cameraResolution;
     public static int maxRecentStickers;
     public static int stickerSizeStack = 0;
     public static int dcStyleType;
@@ -190,8 +192,8 @@ public class OwlConfig extends SettingsManager {
             translationProvider = getInt("translationProvider", Translator.PROVIDER_GOOGLE);
             showSantaHat = getBoolean("showSantaHat", true);
             showSnowFalling = getBoolean("showSnowFalling", true);
-            cameraType = getInt("cameraType", CameraXUtilities.getDefault());
-            cameraXFps = getInt("cameraXFps", SharedConfig.getDevicePerformanceClass() == SharedConfig.PERFORMANCE_CLASS_HIGH ? 60 : 30);
+            cameraType = getInt("cameraType", CameraXUtils.getDefault());
+            cameraResolution = getInt("cameraResolution", CameraXUtils.getCameraResolution());
             useCameraXOptimizedMode = getBoolean("useCameraXOptimizedMode", SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_HIGH);
             disableProximityEvents = getBoolean("disableProximityEvents", false);
             verifyLinkTip = getBoolean("verifyLinkTip", false);
@@ -219,6 +221,8 @@ public class OwlConfig extends SettingsManager {
             hideAllTab = getBoolean("hideAllTab", false);
             hideSendAsChannel = getBoolean("hideSendAsChannel", false);
             showNameInActionBar = getBoolean("showNameInActionBar", false);
+            stickersSorting = getBoolean("stickersSorting", true);
+            emojiPackSelected = getString("emojiPackSelected", "default");
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -464,6 +468,10 @@ public class OwlConfig extends SettingsManager {
         putValue("showNameInActionBar", showNameInActionBar ^= true);
     }
 
+    public static void toggleStickersSorting() {
+        putValue("stickersSorting", stickersSorting ^= true);
+    }
+
     public static void unlockChupa() {
         putValue("unlockedChupa", unlockedChupa = true);
     }
@@ -565,8 +573,8 @@ public class OwlConfig extends SettingsManager {
         putValue("cameraType", cameraType = type);
     }
 
-    public static void saveCameraXFps(int fps) {
-        putValue("cameraXFps", cameraXFps = fps);
+    public static void saveCameraResolution(int resolution) {
+        putValue("cameraResolution", cameraResolution = resolution);
     }
 
     public static void setMaxRecentStickers(int size) {
@@ -591,6 +599,10 @@ public class OwlConfig extends SettingsManager {
 
     public static void setDownloadSpeedBoost(int boost) {
         putValue("downloadSpeedBoost", downloadSpeedBoost = boost);
+    }
+
+    public static void setEmojiPackSelected(String emojiPack) {
+        putValue("emojiPackSelected", emojiPackSelected = emojiPack);
     }
 
     public static int getNotificationColor() {

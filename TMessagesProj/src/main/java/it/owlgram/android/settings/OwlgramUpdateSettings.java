@@ -21,7 +21,7 @@ import it.owlgram.android.OwlConfig;
 import it.owlgram.android.StoreUtils;
 import it.owlgram.android.components.UpdateCell;
 import it.owlgram.android.components.UpdateCheckCell;
-import it.owlgram.android.updates.ApkDownloader;
+import it.owlgram.android.helpers.FileDownloadHelper;
 import it.owlgram.android.updates.AppDownloader;
 import it.owlgram.android.updates.PlayStoreAPI;
 import it.owlgram.android.updates.UpdateManager;
@@ -58,7 +58,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
             }
         } catch (Exception ignored) {
         }
-        AppDownloader.setDownloadListener(new AppDownloader.UpdateListener() {
+        AppDownloader.setListener("settings", new AppDownloader.UpdateListener() {
             @Override
             public void onPreStart() {
             }
@@ -97,10 +97,11 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
     @Override
     protected void onItemClick(View view, int position, float x, float y) {
         if (position == betaUpdatesRow) {
-            if (!ApkDownloader.updateDownloaded() && !checkingUpdates) {
+            if (!UpdateManager.updateDownloaded() && !checkingUpdates) {
                 OwlConfig.toggleBetaUpdates();
-                ApkDownloader.cancel();
-                ApkDownloader.deleteUpdate();
+                FileDownloadHelper.cancel("appUpdate");
+                UpdateManager.deleteUpdate();
+                listAdapter.notifyItemChanged(apkChannelRow, PARTIAL);
                 if (updateAvailable != null) {
                     OwlConfig.remindUpdate(updateAvailable.version);
                     NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
@@ -120,7 +121,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                 ((TextCheckCell) view).setChecked(OwlConfig.notifyUpdates);
             }
         } else if (position == apkChannelRow) {
-            MessagesController.getInstance(currentAccount).openByUserName("OwlGramAPKs", this, 1);
+            MessagesController.getInstance(currentAccount).openByUserName(UpdateManager.getApkChannel(), this, 1);
         }
     }
 
@@ -205,7 +206,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                 case TEXT_CELL:
                     TextCell textCell = (TextCell) holder.itemView;
                     if (position == apkChannelRow) {
-                        textCell.setTextAndValue(LocaleController.getString("APKsChannel", R.string.APKsChannel), "@OwlGramAPKs", false);
+                        textCell.setTextAndValue(LocaleController.getString("APKsChannel", R.string.APKsChannel), "@" + UpdateManager.getApkChannel(), partial, false);
                     }
                     break;
             }
@@ -225,14 +226,15 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                         @Override
                         protected void onInstallUpdate() {
                             super.onInstallUpdate();
-                            ApkDownloader.installUpdate(getParentActivity());
+                            UpdateManager.installUpdate(getParentActivity());
                         }
 
                         @Override
                         protected void onConfirmUpdate() {
                             super.onConfirmUpdate();
-                            if (!ApkDownloader.isRunningDownload()) {
-                                ApkDownloader.downloadAPK(context, updateAvailable.link_file, updateAvailable.version);
+                            if (!FileDownloadHelper.isRunningDownload("appUpdate")) {
+                                if (FileDownloadHelper.downloadFile(context, "appUpdate", UpdateManager.apkFile(), updateAvailable.link_file))
+                                    OwlConfig.saveOldVersion(updateAvailable.version);
                                 updateCell.setDownloadMode();
                             }
                         }
@@ -242,7 +244,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                             super.onRemindUpdate();
                             updateCheckCell.setCheckTime();
                             if (updateAvailable != null) {
-                                ApkDownloader.deleteUpdate();
+                                UpdateManager.deleteUpdate();
                                 OwlConfig.remindUpdate(updateAvailable.version);
                                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                                 updateCheckCell.setCheckTime();

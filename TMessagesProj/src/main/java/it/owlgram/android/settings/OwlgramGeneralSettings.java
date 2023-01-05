@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
-import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
@@ -80,8 +79,8 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.hidePhoneNumber);
             }
-            parentLayout.rebuildAllFragmentViews(false, false);
-            getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+            reloadInterface();
+            reloadMainInfo();
         } else if (position == phoneContactsSwitchRow) {
             OwlConfig.toggleHideContactNumber();
             if (view instanceof TextCheckCell) {
@@ -92,7 +91,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.showIDAndDC);
             }
-            parentLayout.rebuildAllFragmentViews(false, false);
+            reloadInterface();
         } else if (position == translationStyle) {
             ArrayList<String> arrayList = new ArrayList<>();
             ArrayList<Integer> types = new ArrayList<>();
@@ -197,7 +196,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
             PopupHelper.show(arrayList, LocaleController.getString("IDType", R.string.IDType), types.indexOf(OwlConfig.idType), context, i -> {
                 OwlConfig.setIdType(types.get(i));
                 listAdapter.notifyItemChanged(idTypeRow, PARTIAL);
-                parentLayout.rebuildAllFragmentViews(false, false);
+                reloadInterface();
             });
         } else if (position == autoTranslateRow) {
             if (!supportLanguageDetector) {
@@ -258,7 +257,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
     private class ListAdapter extends BaseListAdapter {
 
         @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
+        protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
             switch (ViewType.fromInt(holder.getItemViewType())) {
                 case SHADOW:
                     holder.itemView.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));
@@ -455,8 +454,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                     @Override
                     protected void onSelectedStyle() {
                         super.onSelectedStyle();
-                        parentLayout.rebuildAllFragmentViews(false, false);
-                        getNotificationCenter().postNotificationName(NotificationCenter.mainUserInfoChanged);
+                        reloadInterface();
                     }
                 };
                 view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));

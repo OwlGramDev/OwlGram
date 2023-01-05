@@ -329,7 +329,7 @@ public class FilterCreateActivity extends BaseFragment {
                 updateRows();
             } else if (position == includeAddRow || position == excludeAddRow) {
                 ArrayList<Long> arrayList = position == excludeAddRow ? newNeverShow : newAlwaysShow;
-                FilterUsersActivity fragment = new FilterUsersActivity(position == includeAddRow, arrayList, newFilterFlags);
+                UsersSelectActivity fragment = new UsersSelectActivity(position == includeAddRow, arrayList, newFilterFlags);
                 fragment.setDelegate((ids, flags) -> {
                     newFilterFlags = flags;
                     if (position == excludeAddRow) {
@@ -372,7 +372,7 @@ public class FilterCreateActivity extends BaseFragment {
                 builder.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialog, which) -> {
                     AlertDialog progressDialog = null;
                     if (getParentActivity() != null) {
-                        progressDialog = new AlertDialog(getParentActivity(), 3);
+                        progressDialog = new AlertDialog(getParentActivity(), AlertDialog.ALERT_TYPE_SPINNER);
                         progressDialog.setCanCancel(false);
                         progressDialog.show();
                     }
@@ -573,7 +573,7 @@ public class FilterCreateActivity extends BaseFragment {
         }
         AlertDialog progressDialog;
         if (progress) {
-            progressDialog = new AlertDialog(fragment.getParentActivity(), 3);
+            progressDialog = new AlertDialog(fragment.getParentActivity(), AlertDialog.ALERT_TYPE_SPINNER);
             progressDialog.setCanCancel(false);
             progressDialog.show();
         } else {

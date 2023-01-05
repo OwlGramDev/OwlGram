@@ -64,7 +64,7 @@ public class AutoTranslationException extends BaseSettingsActivity {
             presentFragment(fragment);
         } else if (position >= exceptionsStartRow && position < exceptionsEndRow) {
             Bundle args = new Bundle();
-            long uid = AutoTranslateConfig.getExceptions(isAllow).get(position - exceptionsStartRow).dialog_id;
+            long uid = AutoTranslateConfig.getExceptions(isAllow).get(position - exceptionsStartRow).dialogId;
             if (DialogObject.isUserDialog(uid)) {
                 args.putLong("user_id", uid);
             } else {
@@ -75,14 +75,8 @@ public class AutoTranslationException extends BaseSettingsActivity {
             presentFragment(new ProfileActivity(args));
         } else if (position == deleteAllExceptionsRow) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-            builder.setTitle(LocaleController.getString("NotificationsDeleteAllException", R.string.NotificationsDeleteAllException));
-            String message;
-            if (isAllow) {
-                message = LocaleController.getString("DeleteAllAllowExceptions", R.string.DeleteAllAllowExceptions);
-            } else {
-                message = LocaleController.formatString("DeleteAllNeverExceptions", R.string.DeleteAllNeverExceptions);
-            }
-            builder.setMessage(message);
+            builder.setTitle(LocaleController.getString("NotificationsDeleteAllExceptionTitle", R.string.NotificationsDeleteAllExceptionTitle));
+            builder.setMessage(LocaleController.getString("NotificationsDeleteAllExceptionAlert", R.string.NotificationsDeleteAllExceptionAlert));
             builder.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialogInterface, i) -> {
                 AutoTranslateConfig.removeAllTypeExceptions(isAllow);
                 finishFragment();
@@ -192,18 +186,12 @@ public class AutoTranslationException extends BaseSettingsActivity {
             } else {
                 chatTitle = ContactsController.formatName(((TLRPC.User) info.chat).first_name, ((TLRPC.User) info.chat).last_name);
             }
-            String message;
-            if (isAllow) {
-                message = LocaleController.formatString("EditRemoveAlwaysText", R.string.EditRemoveAlwaysText, chatTitle);
-            } else {
-                message = LocaleController.formatString("EditRemoveNeverText", R.string.EditRemoveNeverText, chatTitle);
-            }
-            builder2.setMessage(message);
+            builder2.setMessage(LocaleController.formatString("EditRemoveExceptionText", R.string.EditRemoveExceptionText, chatTitle));
             builder2.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialogInterface2, i2) -> {
                 if (info.chat instanceof TLRPC.Chat) {
-                    AutoTranslateConfig.removeGroupException(info.dialog_id);
+                    AutoTranslateConfig.removeGroupException(info.dialogId);
                 } else {
-                    AutoTranslateConfig.setDefault(info.dialog_id, 0);
+                    AutoTranslateConfig.setDefault(info.dialogId, 0);
                 }
                 if (AutoTranslateConfig.getExceptions(isAllow).isEmpty()) {
                     finishFragment();

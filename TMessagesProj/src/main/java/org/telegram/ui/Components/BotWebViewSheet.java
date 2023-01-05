@@ -623,10 +623,10 @@ public class BotWebViewSheet extends Dialog implements NotificationCenter.Notifi
 
         if (springAnimation == null) {
             springAnimation = new SpringAnimation(this, ACTION_BAR_TRANSITION_PROGRESS_VALUE)
-                    .setSpring(new SpringForce()
-                            .setStiffness(1200f)
-                            .setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY)
-                    );
+                .setSpring(new SpringForce()
+                    .setStiffness(1200f)
+                    .setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY)
+                );
         }
     }
 

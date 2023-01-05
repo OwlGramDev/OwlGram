@@ -458,7 +458,7 @@ public class FileRefController extends BaseController {
                 }
             } else if (string.startsWith("sent_")) {
                 String[] params = string.split("_");
-                if (params.length == 3) {
+                if (params.length >= 3) {
                     long channelId = Utilities.parseLong(params[1]);
                     if (channelId != 0) {
                         TLRPC.TL_channels_getMessages req = new TLRPC.TL_channels_getMessages();
@@ -752,7 +752,7 @@ public class FileRefController extends BaseController {
                             } else if (message.media.webpage != null) {
                                 result = getFileReference(message.media.webpage, requester.location, needReplacement, locationReplacement);
                             }
-                        } else if (message.action instanceof TLRPC.TL_messageActionChatEditPhoto) {
+                        } else if (message.action instanceof TLRPC.TL_messageActionChatEditPhoto || message.action instanceof TLRPC.TL_messageActionSuggestProfilePhoto) {
                             result = getFileReference(message.action.photo, requester.location, needReplacement, locationReplacement);
                         }
                         if (result != null) {
