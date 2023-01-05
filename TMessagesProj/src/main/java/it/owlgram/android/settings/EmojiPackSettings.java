@@ -103,38 +103,32 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         if (position >= emojiPacksStartRow && position < emojiPacksEndRow) {
             EmojiSetCell cell = (EmojiSetCell) view;
             if (cell.isChecked() || adapter.hasSelected()) return;
-            int selectedOld = getSelectedOld();
-            if (selectedOld != -1) {
-                String currentDownloading = getCurrentDownloading();
-                String currentUnzipping = getCurrentUnzipping();
-                boolean isDownloading = FileDownloadHelper.isRunningDownload(cell.packId);
-                boolean isUnzipping = FileUnzipHelper.isRunningUnzip(cell.packId);
-                if (!isDownloading && currentDownloading != null) {
-                    FileDownloadHelper.cancel(currentDownloading);
-                }
-                if (!isUnzipping && currentUnzipping != null) {
-                    FileUnzipHelper.cancel(currentUnzipping);
-                }
-                if (isDownloading || isUnzipping) return;
-                if (CustomEmojiHelper.emojiDir(cell.packId, cell.versionWithMD5).exists() || cell.packId.equals("default")) {
-                    OwlConfig.setEmojiPackSelected(cell.packId);
-                    cell.setChecked(true, true);
-                    if (selectedOld != position) {
-                        listAdapter.notifyItemChanged(selectedOld, PARTIAL);
-                    }
-                    Emoji.reloadEmoji();
-                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
-                    if (OwlConfig.useSystemEmoji) {
-                        OwlConfig.toggleUseSystemEmoji();
-                        listAdapter.notifyItemChanged(useSystemEmojiRow, PARTIAL);
-                    }
-                } else {
-                    cell.setProgress(true, true);
-                    CustomEmojiHelper.mkDirs();
-                    FileDownloadHelper.downloadFile(ApplicationLoader.applicationContext, cell.packId, CustomEmojiHelper.emojiTmp(cell.packId), cell.packFileLink);
-                    listAdapter.notifyItemChanged(selectedOld, PARTIAL);
-                }
+            String currentDownloading = getCurrentDownloading();
+            String currentUnzipping = getCurrentUnzipping();
+            boolean isDownloading = FileDownloadHelper.isRunningDownload(cell.packId);
+            boolean isUnzipping = FileUnzipHelper.isRunningUnzip(cell.packId);
+            if (!isDownloading && currentDownloading != null) {
+                FileDownloadHelper.cancel(currentDownloading);
             }
+            if (!isUnzipping && currentUnzipping != null) {
+                FileUnzipHelper.cancel(currentUnzipping);
+            }
+            if (isDownloading || isUnzipping) return;
+            if (CustomEmojiHelper.emojiDir(cell.packId, cell.versionWithMD5).exists() || cell.packId.equals("default")) {
+                OwlConfig.setEmojiPackSelected(cell.packId);
+                cell.setChecked(true, true);
+                Emoji.reloadEmoji();
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
+                if (OwlConfig.useSystemEmoji) {
+                    OwlConfig.toggleUseSystemEmoji();
+                    listAdapter.notifyItemChanged(useSystemEmojiRow, PARTIAL);
+                }
+            } else {
+                cell.setProgress(true, true);
+                CustomEmojiHelper.mkDirs();
+                FileDownloadHelper.downloadFile(ApplicationLoader.applicationContext, cell.packId, CustomEmojiHelper.emojiTmp(cell.packId), cell.packFileLink);
+            }
+            adapter.notifyEmojiSetsChanged();
         } else if (position == useSystemEmojiRow) {
             OwlConfig.toggleUseSystemEmoji();
             if (view instanceof TextCheckCell) {
@@ -146,7 +140,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                 FileDownloadHelper.cancel(getCurrentDownloading());
                 FileUnzipHelper.cancel(getCurrentUnzipping());
             }
-            listAdapter.notifyItemChanged(getSelectedOld(), PARTIAL);
+            adapter.notifyEmojiSetsChanged();
         } else if (position == customEmojiAddRow) {
             chatAttachAlert = new ChatAttachAlert(context, EmojiPackSettings.this, false, false);
             chatAttachAlert.setEmojiPicker();
@@ -159,10 +153,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
             } else {
                 if (cell.isChecked()) return;
                 cell.setChecked(true, true);
-                int selectedOld = getSelectedOld();
-                if (selectedOld != position) {
-                    listAdapter.notifyItemChanged(selectedOld, PARTIAL);
-                }
+                adapter.notifyEmojiSetsChanged();
                 OwlConfig.setEmojiPackSelected(cell.packId);
                 FileDownloadHelper.cancel(getCurrentDownloading());
                 FileUnzipHelper.cancel(getCurrentUnzipping());
@@ -174,24 +165,6 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                 }
             }
         }
-    }
-
-    private int getSelectedOld() {
-        return getSelectedOld(CustomEmojiHelper.getEmojiPacksInfo(), false);
-    }
-    private int getSelectedOld(ArrayList<CustomEmojiHelper.EmojiPackBase> packBases, boolean isCustom) {
-        int position = packBases
-                .stream()
-                .filter(emojiPackInfo -> emojiPackInfo.getPackId().equals(CustomEmojiHelper.getSelectedEmojiPackId()))
-                .findFirst()
-                .map(packBases::indexOf)
-                .orElse(-1);
-        if (position != -1) {
-            return position + (isCustom ? customEmojiStartRow:emojiPacksStartRow);
-        } else if (isCustom) {
-            return -1;
-        }
-        return getSelectedOld(CustomEmojiHelper.getEmojiCustomPacksInfo(), true);
     }
 
     private String getCurrentUnzipping() {
@@ -237,7 +210,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                         FileUnzipHelper.unzipFile(ApplicationLoader.applicationContext, cell.packId, CustomEmojiHelper.emojiTmp(cell.packId), CustomEmojiHelper.emojiDir(cell.packId, cell.versionWithMD5));
                     } else {
                         CustomEmojiHelper.emojiTmp(cell.packId).delete();
-                        listAdapter.notifyItemChanged(getSelectedOld(), PARTIAL);
+                        ((ListAdapter) listAdapter).notifyEmojiSetsChanged();
                     }
                 }
             }
@@ -256,7 +229,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                     }
                 }
             }
-            listAdapter.notifyItemChanged(getSelectedOld(), PARTIAL);
+            ((ListAdapter) listAdapter).notifyEmojiSetsChanged();
             cell.checkDownloaded();
         });
     }
