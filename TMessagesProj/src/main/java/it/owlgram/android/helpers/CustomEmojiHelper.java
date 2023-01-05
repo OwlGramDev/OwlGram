@@ -234,7 +234,7 @@ public class CustomEmojiHelper {
             int versionSep = packName.lastIndexOf("_v");
             packName = packName.substring(0, versionSep);
             packId = fileName.substring(versionSep);
-            File fileFont = new File(file,"/font.ttf");
+            File fileFont = new File(file, packName + ".ttf");
             fileLocation = fileFont.getAbsolutePath();
             preview = file.getAbsolutePath() + "/preview.png";
             fileSize = fileFont.length();
@@ -340,7 +340,7 @@ public class CustomEmojiHelper {
     public static Long getEmojiSize() {
         return getAllEmojis().stream()
                 .filter(file -> !file.getName().startsWith(OwlConfig.emojiPackSelected))
-                .filter(file -> !new File(file, "font.ttf").exists())
+                .filter(file -> !isValidCustomPack(file))
                 .map(CustomEmojiHelper::calculateFolderSize)
                 .reduce(0L, Long::sum);
     }
@@ -363,8 +363,14 @@ public class CustomEmojiHelper {
     public static void deleteAll() {
         getAllEmojis().stream()
                 .filter(file -> !file.getName().startsWith(OwlConfig.emojiPackSelected))
-                .filter(file -> !new File(file, "font.ttf").exists())
+                .filter(file -> !isValidCustomPack(file))
                 .forEach(FileUnzipHelper::deleteFolder);
+    }
+
+    public static boolean isValidCustomPack(File file) {
+        String packName = file.getName();
+        packName = packName.substring(0, packName.lastIndexOf("_v"));
+        return new File(file, packName + ".ttf").exists() && new File(file, "preview.png").exists();
     }
 
     public static void deleteOldVersions(String emojiID, String versionWithMd5) {
@@ -521,14 +527,13 @@ public class CustomEmojiHelper {
             } catch (IOException ignored) {}
             File emojiDir = new File(EMOJI_PACKS_FILE_DIR + fontName + "_v" + sb);
             boolean isAlreadyInstalled = getAllEmojis().stream()
-                    .filter(file -> new File(file, "font.ttf").exists())
-                    .filter(file -> new File(file, "preview.png").exists())
+                    .filter(CustomEmojiHelper::isValidCustomPack)
                     .anyMatch(file -> file.getName().endsWith(sb.toString()));
             if (isAlreadyInstalled) {
                 return false;
             }
             emojiDir.mkdirs();
-            File emojiFont = new File(emojiDir, "font.ttf");
+            File emojiFont = new File(emojiDir, fontName + ".ttf");
             FileInputStream inputStream = new FileInputStream(emojiFile);
             FileOutputStream outputStream = new FileOutputStream(emojiFont);
             byte[] buffer = new byte[1024];
@@ -585,8 +590,7 @@ public class CustomEmojiHelper {
 
     private static void loadCustomEmojiPacks() {
         getAllEmojis().stream()
-                .filter(file -> new File(file, "font.ttf").exists())
-                .filter(file -> new File(file, "preview.png").exists())
+                .filter(CustomEmojiHelper::isValidCustomPack)
                 .sorted(Comparator.comparingLong(File::lastModified))
                 .map(file -> {
                     EmojiPackBase emojiPackBase = new EmojiPackBase();
@@ -598,8 +602,7 @@ public class CustomEmojiHelper {
 
     public static boolean isSelectedCustomEmojiPack() {
         return getAllEmojis().stream()
-                .filter(file -> new File(file, "font.ttf").exists())
-                .filter(file -> new File(file, "preview.png").exists())
+                .filter(CustomEmojiHelper::isValidCustomPack)
                 .anyMatch(file -> file.getName().endsWith(OwlConfig.emojiPackSelected));
     }
 

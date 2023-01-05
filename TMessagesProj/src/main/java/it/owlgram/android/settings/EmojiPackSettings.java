@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.TextView;
@@ -37,6 +38,7 @@ import org.telegram.ui.Components.CombinedDrawable;
 import org.telegram.ui.Components.FlickerLoadingView;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.NumberTextView;
+import org.telegram.ui.LaunchActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -477,9 +479,8 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         }
 
         private void processSelectionMenu(int which) {
-            if (which == MENU_SHARE) {
 
-            } else if (which == MENU_DELETE) {
+            if (which == MENU_DELETE || which == MENU_SHARE) {
                 ArrayList<CustomEmojiHelper.EmojiPackBase> stickerSetList = new ArrayList<>(selectedItems.size());
                 ArrayList<CustomEmojiHelper.EmojiPackBase> packs = CustomEmojiHelper.getEmojiCustomPacksInfo();
                 for (int i = 0, size = packs.size(); i < size; i++) {
@@ -494,72 +495,94 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                         break;
                     case 1:
                         CustomEmojiHelper.EmojiPackBase pack = stickerSetList.get(0);
-                        CustomEmojiHelper.cancelableDelete(EmojiPackSettings.this, pack, new CustomEmojiHelper.OnBulletinAction() {
-                            @Override
-                            public void onPreStart() {
-                                notifyItemRemoved(customEmojiStartRow + packs.indexOf(pack));
-                                notifyEmojiSetsChanged();
-                                updateRowsId();
-                                clearSelected();
-                            }
+                        if (which == MENU_SHARE) {
+                            Intent intent = new Intent(context, LaunchActivity.class);
+                            intent.setAction(Intent.ACTION_SEND);
+                            Uri uri = Uri.fromFile(new File(pack.getFileLocation()));
+                            intent.putExtra(Intent.EXTRA_STREAM, uri);
+                            context.startActivity(intent);
+                            clearSelected();
+                        } else {
+                            CustomEmojiHelper.cancelableDelete(EmojiPackSettings.this, pack, new CustomEmojiHelper.OnBulletinAction() {
+                                @Override
+                                public void onPreStart() {
+                                    notifyItemRemoved(customEmojiStartRow + packs.indexOf(pack));
+                                    notifyEmojiSetsChanged();
+                                    updateRowsId();
+                                    clearSelected();
+                                }
 
-                            @Override
-                            public void onUndo() {
-                                notifyItemInserted(customEmojiStartRow + CustomEmojiHelper.getEmojiCustomPacksInfo().indexOf(pack));
-                                updateRowsId();
-                                notifyEmojiSetsChanged();
-                            }
-                        });
+                                @Override
+                                public void onUndo() {
+                                    notifyItemInserted(customEmojiStartRow + CustomEmojiHelper.getEmojiCustomPacksInfo().indexOf(pack));
+                                    updateRowsId();
+                                    notifyEmojiSetsChanged();
+                                }
+                            });
+                        }
                         break;
                     default:
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-                        builder.setTitle(LocaleController.formatString("DeleteStickerSetsAlertTitle", R.string.DeleteStickerSetsAlertTitle, LocaleController.formatString("DeleteEmojiSets", R.string.DeleteEmojiSets, count)));
-                        builder.setMessage(LocaleController.getString("DeleteEmojiSetsMessage", R.string.DeleteEmojiSetsMessage));
-                        builder.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialog, which1) -> {
-                            AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
-                            new Thread() {
-                                @Override
-                                public void run() {
-                                    for (int i = 0, size = stickerSetList.size(); i < size; i++) {
-                                        CustomEmojiHelper.deleteEmojiPack(stickerSetList.get(i));
-                                    }
-                                    AndroidUtilities.runOnUIThread(() -> {
-                                        progressDialog.dismiss();
-                                        clearSelected();
-                                        List<int[]> consecutiveItems = stickerSetList.stream()
-                                                .map(packs::indexOf)
-                                                .reduce(new ArrayList<>(), (acc, ordinalPos) -> {
-                                                    boolean isConsecutive = acc.size() > 0 && ordinalPos == acc.get(acc.size() - 1)[1] + 1;
-                                                    if (isConsecutive) {
-                                                        int[] lastInterval = acc.get(acc.size() - 1);
-                                                        lastInterval[1] = ordinalPos;
-                                                    } else {
-                                                        acc.add(new int[]{ordinalPos, ordinalPos});
-                                                    }
-                                                    return acc;
-                                                }, (acc1, acc2) -> acc1);
-                                        for (int[] interval : consecutiveItems) {
-                                            if (interval[0] == interval[1]) {
-                                                notifyItemRemoved(customEmojiStartRow + interval[0]);
-                                            } else {
-                                                notifyItemRangeRemoved(customEmojiStartRow + interval[0], interval[1] - interval[0] + 1);
-                                            }
+                        if (which == MENU_SHARE) {
+                            Intent intent = new Intent(context, LaunchActivity.class);
+                            intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+                            ArrayList<Uri> uriList = new ArrayList<>();
+                            for (CustomEmojiHelper.EmojiPackBase packTmp : stickerSetList) {
+                                uriList.add(Uri.fromFile(new File(packTmp.getFileLocation())));
+                            }
+                            if (!uriList.isEmpty()) {
+                                intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uriList);
+                                context.startActivity(intent);
+                            }
+                        } else {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+                            builder.setTitle(LocaleController.formatString("DeleteStickerSetsAlertTitle", R.string.DeleteStickerSetsAlertTitle, LocaleController.formatString("DeleteEmojiSets", R.string.DeleteEmojiSets, count)));
+                            builder.setMessage(LocaleController.getString("DeleteEmojiSetsMessage", R.string.DeleteEmojiSetsMessage));
+                            builder.setPositiveButton(LocaleController.getString("Delete", R.string.Delete), (dialog, which1) -> {
+                                AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
+                                new Thread() {
+                                    @Override
+                                    public void run() {
+                                        for (int i = 0, size = stickerSetList.size(); i < size; i++) {
+                                            CustomEmojiHelper.deleteEmojiPack(stickerSetList.get(i));
                                         }
-                                        updateRowsId();
-                                        Emoji.reloadEmoji();
-                                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
-                                    });
-                                }
-                            }.start();
-                            progressDialog.setCanCancel(false);
-                            progressDialog.showDelayed(300);
-                        });
-                        builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
-                        AlertDialog dialog = builder.create();
-                        showDialog(dialog);
-                        TextView button = (TextView) dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-                        if (button != null) {
-                            button.setTextColor(Theme.getColor(Theme.key_dialogTextRed2));
+                                        AndroidUtilities.runOnUIThread(() -> {
+                                            progressDialog.dismiss();
+                                            clearSelected();
+                                            List<int[]> consecutiveItems = stickerSetList.stream()
+                                                    .map(packs::indexOf)
+                                                    .reduce(new ArrayList<>(), (acc, ordinalPos) -> {
+                                                        boolean isConsecutive = acc.size() > 0 && ordinalPos == acc.get(acc.size() - 1)[1] + 1;
+                                                        if (isConsecutive) {
+                                                            int[] lastInterval = acc.get(acc.size() - 1);
+                                                            lastInterval[1] = ordinalPos;
+                                                        } else {
+                                                            acc.add(new int[]{ordinalPos, ordinalPos});
+                                                        }
+                                                        return acc;
+                                                    }, (acc1, acc2) -> acc1);
+                                            for (int[] interval : consecutiveItems) {
+                                                if (interval[0] == interval[1]) {
+                                                    notifyItemRemoved(customEmojiStartRow + interval[0]);
+                                                } else {
+                                                    notifyItemRangeRemoved(customEmojiStartRow + interval[0], interval[1] - interval[0] + 1);
+                                                }
+                                            }
+                                            updateRowsId();
+                                            Emoji.reloadEmoji();
+                                            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
+                                        });
+                                    }
+                                }.start();
+                                progressDialog.setCanCancel(false);
+                                progressDialog.showDelayed(300);
+                            });
+                            builder.setNegativeButton(LocaleController.getString("Cancel", R.string.Cancel), null);
+                            AlertDialog dialog = builder.create();
+                            showDialog(dialog);
+                            TextView button = (TextView) dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                            if (button != null) {
+                                button.setTextColor(Theme.getColor(Theme.key_dialogTextRed2));
+                            }
                         }
                         break;
                 }
