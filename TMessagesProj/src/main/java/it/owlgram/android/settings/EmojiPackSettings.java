@@ -1,7 +1,6 @@
 package it.owlgram.android.settings;
 
 import android.annotation.SuppressLint;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -68,6 +67,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
 
     private ChatAttachAlert chatAttachAlert;
     private NumberTextView selectedCountTextView;
+    private AlertDialog progressDialog;
 
     private static final int MENU_DELETE = 0;
     private static final int MENU_SHARE = 1;
@@ -567,7 +567,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         try {
             Intent photoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
             photoPickerIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            photoPickerIntent.setType("application/*");
+            photoPickerIntent.setType("font/*");
             startActivityForResult(photoPickerIntent, 21);
         } catch (Exception e) {
             FileLog.e(e);
@@ -576,49 +576,41 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
 
     @Override
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 21) {
-            if (data == null) {
-                return;
-            }
+        progressDialog = new AlertDialog(getParentActivity(), 3);
+        new Thread(() -> {
+            if (requestCode == 21) {
+                if (data == null) {
+                    return;
+                }
 
-            if (chatAttachAlert != null) {
-                boolean apply = false;
-                ArrayList<File> files = new ArrayList<>();
-                if (data.getData() != null) {
-                    String path = AndroidUtilities.getPath(data.getData());
-                    if (path != null) {
-                        File file = new File(path);
-                        if (chatAttachAlert.getDocumentLayout().isEmojiFont(file)) {
-                            apply = true;
-                            files.add(file);
-                        }
-                    }
-                } else if (data.getClipData() != null) {
-                    ClipData clipData = data.getClipData();
-                    for (int i = 0; i < clipData.getItemCount(); i++) {
-                        String path = clipData.getItemAt(i).getUri().toString();
-                        if (chatAttachAlert.getDocumentLayout().isEmojiFont(new File(path))) {
-                            apply = true;
-                            files.add(new File(path));
+                if (chatAttachAlert != null) {
+                    ArrayList<File> files = CustomEmojiHelper.getFilesFromActivityResult(data);
+                    AndroidUtilities.runOnUIThread(() -> {
+                        boolean apply = files.stream().allMatch(file -> chatAttachAlert.getDocumentLayout().isEmojiFont(file));
+                        if (apply) {
+                            chatAttachAlert.dismiss();
+                            processFiles(files);
                         } else {
-                            apply = false;
-                            break;
+                            progressDialog.dismiss();
+                            progressDialog = null;
                         }
-                    }
-                }
-                if (apply) {
-                    chatAttachAlert.dismiss();
-                    processFiles(files);
+                    });
                 }
             }
-        }
+        }).start();
+        progressDialog.setCanCancel(false);
+        progressDialog.showDelayed(300);
     }
 
     public void processFiles(ArrayList<File> files) {
         if (files == null || files.isEmpty()) {
             return;
         }
-        AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
+        if (progressDialog == null) {
+            progressDialog = new AlertDialog(getParentActivity(), 3);
+            progressDialog.setCanCancel(false);
+            progressDialog.showDelayed(300);
+        }
         new Thread(() -> {
             int count = 0;
             for (File file : files) {
@@ -628,17 +620,18 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                     }
                 } catch (Exception e) {
                     FileLog.e("Emoji Font install failed", e);
+                } finally {
+                    CustomEmojiHelper.deleteTempFile(file);
                 }
             }
             int finalCount = count;
             AndroidUtilities.runOnUIThread(() -> {
                 progressDialog.dismiss();
+                progressDialog = null;
                 listAdapter.notifyItemRangeInserted(customEmojiEndRow, finalCount);
                 updateRowsId();
             });
         }).start();
-        progressDialog.setCanCancel(false);
-        progressDialog.showDelayed(300);
     }
 
     @Override
