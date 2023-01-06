@@ -580,6 +580,12 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         new Thread(() -> {
             if (requestCode == 21) {
                 if (data == null) {
+                    AndroidUtilities.runOnUIThread(() -> {
+                        if (progressDialog != null) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                    });
                     return;
                 }
 
@@ -587,7 +593,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                     ArrayList<File> files = CustomEmojiHelper.getFilesFromActivityResult(data);
                     AndroidUtilities.runOnUIThread(() -> {
                         boolean apply = files.stream().allMatch(file -> chatAttachAlert.getDocumentLayout().isEmojiFont(file));
-                        if (apply) {
+                        if (apply && !files.isEmpty()) {
                             chatAttachAlert.dismiss();
                             processFiles(files);
                         } else {
