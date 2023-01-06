@@ -204,7 +204,6 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
 
             @Override
             public void onFinished(String id) {
-                cell.checkDownloaded();
                 if (cell.packId.equals(id)) {
                     if (CustomEmojiHelper.emojiTmpDownloaded(cell.packId)) {
                         FileUnzipHelper.unzipFile(ApplicationLoader.applicationContext, cell.packId, CustomEmojiHelper.emojiTmp(cell.packId), CustomEmojiHelper.emojiDir(cell.packId, cell.versionWithMD5));
@@ -213,6 +212,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                         ((ListAdapter) listAdapter).notifyEmojiSetsChanged();
                     }
                 }
+                cell.checkDownloaded(true);
             }
         });
         FileUnzipHelper.addListener(cell.packId, "emojiCellSettings", (id) -> {
@@ -230,7 +230,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                 }
             }
             ((ListAdapter) listAdapter).notifyEmojiSetsChanged();
-            cell.checkDownloaded();
+            cell.checkDownloaded(true);
         });
     }
 
@@ -337,7 +337,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                         emojiPackSetCell.setSelected(selectedItems.get(position, false), partial);
                     }
                     if (emojiPackInfo != null) {
-                        emojiPackSetCell.setChecked(!hasSelected() && emojiPackInfo.getPackId().equals(CustomEmojiHelper.getSelectedEmojiPackId()) && getCurrentDownloading() == null && !OwlConfig.useSystemEmoji, partial);
+                        emojiPackSetCell.setChecked(!hasSelected() && emojiPackInfo.getPackId().equals(CustomEmojiHelper.getSelectedEmojiPackId()) && getCurrentDownloading() == null && getCurrentUnzipping() == null && !OwlConfig.useSystemEmoji, partial);
                         emojiPackSetCell.setData(
                                 emojiPackInfo,
                                 partial,
