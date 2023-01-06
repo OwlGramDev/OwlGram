@@ -510,7 +510,7 @@ public class CustomEmojiHelper {
         fontName = fontName.substring(0, fontName.lastIndexOf("."));
         MessageDigest md = MessageDigest.getInstance("MD5");
         try (FileInputStream fis = new FileInputStream(emojiFile)) {
-            byte[] dataBytes = new byte[1024];
+            byte[] dataBytes = new byte[4 * 1024];
             int nread;
             while ((nread = fis.read(dataBytes)) != -1) {
                 md.update(dataBytes, 0, nread);
@@ -545,7 +545,7 @@ public class CustomEmojiHelper {
         File emojiFont = new File(emojiDir, fontName + ".ttf");
         FileInputStream inputStream = new FileInputStream(emojiFile);
         FileOutputStream outputStream = new FileOutputStream(emojiFont);
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[4 * 1024];
         int length;
         while ((length = inputStream.read(buffer)) > 0) {
             outputStream.write(buffer, 0, length);
