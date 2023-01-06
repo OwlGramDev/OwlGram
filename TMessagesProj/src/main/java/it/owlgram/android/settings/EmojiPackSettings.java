@@ -1,7 +1,6 @@
 package it.owlgram.android.settings;
 
 import android.annotation.SuppressLint;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -68,6 +67,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
 
     private ChatAttachAlert chatAttachAlert;
     private NumberTextView selectedCountTextView;
+    private AlertDialog progressDialog;
 
     private static final int MENU_DELETE = 0;
     private static final int MENU_SHARE = 1;
@@ -103,38 +103,32 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         if (position >= emojiPacksStartRow && position < emojiPacksEndRow) {
             EmojiSetCell cell = (EmojiSetCell) view;
             if (cell.isChecked() || adapter.hasSelected()) return;
-            int selectedOld = getSelectedOld();
-            if (selectedOld != -1) {
-                String currentDownloading = getCurrentDownloading();
-                String currentUnzipping = getCurrentUnzipping();
-                boolean isDownloading = FileDownloadHelper.isRunningDownload(cell.packId);
-                boolean isUnzipping = FileUnzipHelper.isRunningUnzip(cell.packId);
-                if (!isDownloading && currentDownloading != null) {
-                    FileDownloadHelper.cancel(currentDownloading);
-                }
-                if (!isUnzipping && currentUnzipping != null) {
-                    FileUnzipHelper.cancel(currentUnzipping);
-                }
-                if (isDownloading || isUnzipping) return;
-                if (CustomEmojiHelper.emojiDir(cell.packId, cell.versionWithMD5).exists() || cell.packId.equals("default")) {
-                    OwlConfig.setEmojiPackSelected(cell.packId);
-                    cell.setChecked(true, true);
-                    if (selectedOld != position) {
-                        listAdapter.notifyItemChanged(selectedOld, PARTIAL);
-                    }
-                    Emoji.reloadEmoji();
-                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
-                    if (OwlConfig.useSystemEmoji) {
-                        OwlConfig.toggleUseSystemEmoji();
-                        listAdapter.notifyItemChanged(useSystemEmojiRow, PARTIAL);
-                    }
-                } else {
-                    cell.setProgress(true, true);
-                    CustomEmojiHelper.mkDirs();
-                    FileDownloadHelper.downloadFile(ApplicationLoader.applicationContext, cell.packId, CustomEmojiHelper.emojiTmp(cell.packId), cell.packFileLink);
-                    listAdapter.notifyItemChanged(selectedOld, PARTIAL);
-                }
+            String currentDownloading = getCurrentDownloading();
+            String currentUnzipping = getCurrentUnzipping();
+            boolean isDownloading = FileDownloadHelper.isRunningDownload(cell.packId);
+            boolean isUnzipping = FileUnzipHelper.isRunningUnzip(cell.packId);
+            if (!isDownloading && currentDownloading != null) {
+                FileDownloadHelper.cancel(currentDownloading);
             }
+            if (!isUnzipping && currentUnzipping != null) {
+                FileUnzipHelper.cancel(currentUnzipping);
+            }
+            if (isDownloading || isUnzipping) return;
+            if (CustomEmojiHelper.emojiDir(cell.packId, cell.versionWithMD5).exists() || cell.packId.equals("default")) {
+                OwlConfig.setEmojiPackSelected(cell.packId);
+                cell.setChecked(true, true);
+                Emoji.reloadEmoji();
+                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
+                if (OwlConfig.useSystemEmoji) {
+                    OwlConfig.toggleUseSystemEmoji();
+                    listAdapter.notifyItemChanged(useSystemEmojiRow, PARTIAL);
+                }
+            } else {
+                cell.setProgress(true, true);
+                CustomEmojiHelper.mkDirs();
+                FileDownloadHelper.downloadFile(ApplicationLoader.applicationContext, cell.packId, CustomEmojiHelper.emojiTmp(cell.packId), cell.packFileLink);
+            }
+            adapter.notifyEmojiSetsChanged();
         } else if (position == useSystemEmojiRow) {
             OwlConfig.toggleUseSystemEmoji();
             if (view instanceof TextCheckCell) {
@@ -146,7 +140,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                 FileDownloadHelper.cancel(getCurrentDownloading());
                 FileUnzipHelper.cancel(getCurrentUnzipping());
             }
-            listAdapter.notifyItemChanged(getSelectedOld(), PARTIAL);
+            adapter.notifyEmojiSetsChanged();
         } else if (position == customEmojiAddRow) {
             chatAttachAlert = new ChatAttachAlert(context, EmojiPackSettings.this, false, false);
             chatAttachAlert.setEmojiPicker();
@@ -159,10 +153,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
             } else {
                 if (cell.isChecked()) return;
                 cell.setChecked(true, true);
-                int selectedOld = getSelectedOld();
-                if (selectedOld != position) {
-                    listAdapter.notifyItemChanged(selectedOld, PARTIAL);
-                }
+                adapter.notifyEmojiSetsChanged();
                 OwlConfig.setEmojiPackSelected(cell.packId);
                 FileDownloadHelper.cancel(getCurrentDownloading());
                 FileUnzipHelper.cancel(getCurrentUnzipping());
@@ -174,24 +165,6 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                 }
             }
         }
-    }
-
-    private int getSelectedOld() {
-        return getSelectedOld(CustomEmojiHelper.getEmojiPacksInfo(), false);
-    }
-    private int getSelectedOld(ArrayList<CustomEmojiHelper.EmojiPackBase> packBases, boolean isCustom) {
-        int position = packBases
-                .stream()
-                .filter(emojiPackInfo -> emojiPackInfo.getPackId().equals(CustomEmojiHelper.getSelectedEmojiPackId()))
-                .findFirst()
-                .map(packBases::indexOf)
-                .orElse(-1);
-        if (position != -1) {
-            return position + (isCustom ? customEmojiStartRow:emojiPacksStartRow);
-        } else if (isCustom) {
-            return -1;
-        }
-        return getSelectedOld(CustomEmojiHelper.getEmojiCustomPacksInfo(), true);
     }
 
     private String getCurrentUnzipping() {
@@ -231,15 +204,15 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
 
             @Override
             public void onFinished(String id) {
-                cell.checkDownloaded();
                 if (cell.packId.equals(id)) {
                     if (CustomEmojiHelper.emojiTmpDownloaded(cell.packId)) {
                         FileUnzipHelper.unzipFile(ApplicationLoader.applicationContext, cell.packId, CustomEmojiHelper.emojiTmp(cell.packId), CustomEmojiHelper.emojiDir(cell.packId, cell.versionWithMD5));
                     } else {
                         CustomEmojiHelper.emojiTmp(cell.packId).delete();
-                        listAdapter.notifyItemChanged(getSelectedOld(), PARTIAL);
+                        ((ListAdapter) listAdapter).notifyEmojiSetsChanged();
                     }
                 }
+                cell.checkDownloaded(true);
             }
         });
         FileUnzipHelper.addListener(cell.packId, "emojiCellSettings", (id) -> {
@@ -256,8 +229,8 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                     }
                 }
             }
-            listAdapter.notifyItemChanged(getSelectedOld(), PARTIAL);
-            cell.checkDownloaded();
+            ((ListAdapter) listAdapter).notifyEmojiSetsChanged();
+            cell.checkDownloaded(true);
         });
     }
 
@@ -364,7 +337,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                         emojiPackSetCell.setSelected(selectedItems.get(position, false), partial);
                     }
                     if (emojiPackInfo != null) {
-                        emojiPackSetCell.setChecked(!hasSelected() && emojiPackInfo.getPackId().equals(CustomEmojiHelper.getSelectedEmojiPackId()) && getCurrentDownloading() == null && !OwlConfig.useSystemEmoji, partial);
+                        emojiPackSetCell.setChecked(!hasSelected() && emojiPackInfo.getPackId().equals(CustomEmojiHelper.getSelectedEmojiPackId()) && getCurrentDownloading() == null && getCurrentUnzipping() == null && !OwlConfig.useSystemEmoji, partial);
                         emojiPackSetCell.setData(
                                 emojiPackInfo,
                                 partial,
@@ -594,7 +567,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         try {
             Intent photoPickerIntent = new Intent(Intent.ACTION_GET_CONTENT);
             photoPickerIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-            photoPickerIntent.setType("application/*");
+            photoPickerIntent.setType("font/*");
             startActivityForResult(photoPickerIntent, 21);
         } catch (Exception e) {
             FileLog.e(e);
@@ -603,49 +576,47 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
 
     @Override
     public void onActivityResultFragment(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 21) {
-            if (data == null) {
-                return;
-            }
+        progressDialog = new AlertDialog(getParentActivity(), 3);
+        new Thread(() -> {
+            if (requestCode == 21) {
+                if (data == null) {
+                    AndroidUtilities.runOnUIThread(() -> {
+                        if (progressDialog != null) {
+                            progressDialog.dismiss();
+                            progressDialog = null;
+                        }
+                    });
+                    return;
+                }
 
-            if (chatAttachAlert != null) {
-                boolean apply = false;
-                ArrayList<File> files = new ArrayList<>();
-                if (data.getData() != null) {
-                    String path = AndroidUtilities.getPath(data.getData());
-                    if (path != null) {
-                        File file = new File(path);
-                        if (chatAttachAlert.getDocumentLayout().isEmojiFont(file)) {
-                            apply = true;
-                            files.add(file);
-                        }
-                    }
-                } else if (data.getClipData() != null) {
-                    ClipData clipData = data.getClipData();
-                    for (int i = 0; i < clipData.getItemCount(); i++) {
-                        String path = clipData.getItemAt(i).getUri().toString();
-                        if (chatAttachAlert.getDocumentLayout().isEmojiFont(new File(path))) {
-                            apply = true;
-                            files.add(new File(path));
+                if (chatAttachAlert != null) {
+                    ArrayList<File> files = CustomEmojiHelper.getFilesFromActivityResult(data);
+                    AndroidUtilities.runOnUIThread(() -> {
+                        boolean apply = files.stream().allMatch(file -> chatAttachAlert.getDocumentLayout().isEmojiFont(file));
+                        if (apply && !files.isEmpty()) {
+                            chatAttachAlert.dismiss();
+                            processFiles(files);
                         } else {
-                            apply = false;
-                            break;
+                            progressDialog.dismiss();
+                            progressDialog = null;
                         }
-                    }
-                }
-                if (apply) {
-                    chatAttachAlert.dismiss();
-                    processFiles(files);
+                    });
                 }
             }
-        }
+        }).start();
+        progressDialog.setCanCancel(false);
+        progressDialog.showDelayed(300);
     }
 
     public void processFiles(ArrayList<File> files) {
         if (files == null || files.isEmpty()) {
             return;
         }
-        AlertDialog progressDialog = new AlertDialog(getParentActivity(), 3);
+        if (progressDialog == null) {
+            progressDialog = new AlertDialog(getParentActivity(), 3);
+            progressDialog.setCanCancel(false);
+            progressDialog.showDelayed(300);
+        }
         new Thread(() -> {
             int count = 0;
             for (File file : files) {
@@ -655,17 +626,18 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                     }
                 } catch (Exception e) {
                     FileLog.e("Emoji Font install failed", e);
+                } finally {
+                    CustomEmojiHelper.deleteTempFile(file);
                 }
             }
             int finalCount = count;
             AndroidUtilities.runOnUIThread(() -> {
                 progressDialog.dismiss();
+                progressDialog = null;
                 listAdapter.notifyItemRangeInserted(customEmojiEndRow, finalCount);
                 updateRowsId();
             });
         }).start();
-        progressDialog.setCanCancel(false);
-        progressDialog.showDelayed(300);
     }
 
     @Override

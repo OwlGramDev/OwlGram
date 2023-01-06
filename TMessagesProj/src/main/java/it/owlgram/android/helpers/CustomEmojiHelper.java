@@ -1,14 +1,18 @@
 package it.owlgram.android.helpers;
 
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
 import android.os.SystemClock;
+import android.provider.DocumentsContract;
 import android.text.TextPaint;
 import android.text.TextUtils;
 
@@ -33,6 +37,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -57,6 +63,7 @@ public class CustomEmojiHelper {
 
     private final static String EMOJI_PACKS_CACHE_DIR = AndroidUtilities.getCacheDir().getAbsolutePath() + "/emojis/";
     private final static String EMOJI_PACKS_FILE_DIR = ApplicationLoader.applicationContext.getExternalFilesDir(null).getAbsolutePath() + "/emojis/";
+    private final static String EMOJI_PACKS_TMP_DIR = AndroidUtilities.getCacheDir().getAbsolutePath() + "/emojis/tmp/";
     private static final Runnable invalidateUiRunnable = () -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
     private static final String[] previewEmojis = {
             "\uD83D\uDE00",
@@ -369,7 +376,11 @@ public class CustomEmojiHelper {
 
     public static boolean isValidCustomPack(File file) {
         String packName = file.getName();
-        packName = packName.substring(0, packName.lastIndexOf("_v"));
+        int lastIndexOf = packName.lastIndexOf("_v");
+        if (lastIndexOf == -1) {
+            return false;
+        }
+        packName = packName.substring(0, lastIndexOf);
         return new File(file, packName + ".ttf").exists() && new File(file, "preview.png").exists();
     }
 
@@ -507,10 +518,13 @@ public class CustomEmojiHelper {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static EmojiPackBase installEmoji(File emojiFile, boolean checkInstallation) throws Exception {
         String fontName = emojiFile.getName();
-        fontName = fontName.substring(0, fontName.lastIndexOf("."));
+        int dotIndex = fontName.lastIndexOf('.');
+        if (dotIndex != -1) {
+            fontName = fontName.substring(0, dotIndex);
+        }
         MessageDigest md = MessageDigest.getInstance("MD5");
         try (FileInputStream fis = new FileInputStream(emojiFile)) {
-            byte[] dataBytes = new byte[1024];
+            byte[] dataBytes = new byte[4 * 1024];
             int nread;
             while ((nread = fis.read(dataBytes)) != -1) {
                 md.update(dataBytes, 0, nread);
@@ -545,7 +559,7 @@ public class CustomEmojiHelper {
         File emojiFont = new File(emojiDir, fontName + ".ttf");
         FileInputStream inputStream = new FileInputStream(emojiFile);
         FileOutputStream outputStream = new FileOutputStream(emojiFont);
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[4 * 1024];
         int length;
         while ((length = inputStream.read(buffer)) > 0) {
             outputStream.write(buffer, 0, length);
@@ -585,7 +599,7 @@ public class CustomEmojiHelper {
         int fontSize = (int)(emojiSize * 0.85f);
         Rect areaRect = new Rect(0, 0, emojiSize, emojiSize);
         TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        textPaint.setTypeface(typeface);
+        textPaint.setTypeface(Typeface.create(typeface, Typeface.NORMAL));
         textPaint.setTextSize(fontSize);
         textPaint.setTextAlign(Paint.Align.CENTER);
         Rect textRect = new Rect();
@@ -679,6 +693,63 @@ public class CustomEmojiHelper {
         if (emojiPackBase.getPackId().equals(OwlConfig.emojiPackSelected)) {
             OwlConfig.setEmojiPackSelected("default");
         }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static ArrayList<File> getFilesFromActivityResult(Intent intentResult) {
+        File dir = new File(EMOJI_PACKS_TMP_DIR);
+        if (dir.exists()) {
+            FileUnzipHelper.deleteFolder(dir);
+        }
+        dir.mkdirs();
+        ArrayList<File> files = new ArrayList<>();
+        Uri data = intentResult.getData();
+        ClipData clipData = intentResult.getClipData();
+        if (data != null) {
+            File file = getFileFromUri(data);
+            if (file != null) {
+                files.add(file);
+            }
+        } else if (clipData != null) {
+            for (int i = 0; i < clipData.getItemCount(); i++) {
+                File file = getFileFromUri(clipData.getItemAt(i).getUri());
+                if (file != null) {
+                    files.add(file);
+                }
+            }
+        }
+        return files;
+    }
+
+    private static File getFileFromUri(Uri uri) {
+        String docId = DocumentsContract.getDocumentId(uri);
+        String path = AndroidUtilities.getPath(uri);
+        if (docId.startsWith("msf:") && path == null) {
+            File file = new File(EMOJI_PACKS_TMP_DIR, docId.substring(4));
+            try {
+                final InputStream inputStream = ApplicationLoader.applicationContext.getContentResolver().openInputStream(uri);
+                OutputStream outputStream = new FileOutputStream(file);
+                final byte[] buffer = new byte[4 * 1024];
+                int read;
+                while ((read = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, read);
+                }
+                inputStream.close();
+                outputStream.flush();
+                outputStream.close();
+                return file;
+            } catch (IOException e) {
+                FileLog.e(e);
+            }
+        } else if (path != null) {
+            return new File(path);
+        }
+        return null;
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static void deleteTempFile(File file) {
+        if (file.getAbsolutePath().startsWith(EMOJI_PACKS_TMP_DIR)) file.delete();
     }
 
     public interface OnBulletinAction {
