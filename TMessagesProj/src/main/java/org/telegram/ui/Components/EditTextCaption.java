@@ -18,6 +18,7 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -413,6 +414,7 @@ public class EditTextCaption extends EditTextBoldCursor {
         editText.setHeaderHintColor(getThemedColor(Theme.key_windowBackgroundWhiteBlueHeader));
         editText.setSingleLine(true);
         editText.setFocusable(true);
+        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         editText.setTransformHintToHeader(true);
         editText.setLineColors(getThemedColor(Theme.key_windowBackgroundWhiteInputField), getThemedColor(Theme.key_windowBackgroundWhiteInputFieldActivated), getThemedColor(Theme.key_windowBackgroundWhiteRedText3));
         editText.setImeOptions(EditorInfo.IME_ACTION_DONE);

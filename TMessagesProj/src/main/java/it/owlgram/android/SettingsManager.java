@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
@@ -56,6 +57,7 @@ public class SettingsManager extends SharedPreferencesHelper {
     public static final int NEED_FRAGMENT_REBASE_WITH_LAST = 4;
     public static final int NEED_FRAGMENT_REBASE = 8;
     public static final int NEED_UPDATE_CAMERAX = 16;
+    public static final int NEED_UPDATE_EMOJI = 32;
 
     private static boolean isBackupAvailable(String key) {
         switch (key) {
@@ -92,6 +94,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "DOWNLOAD_BOOST_FAST":
             case "DOWNLOAD_BOOST_EXTREME":
             case "NEED_UPDATE_CAMERAX":
+            case "NEED_UPDATE_EMOJI":
                 return false;
             default:
                 return true;
@@ -394,6 +397,9 @@ public class SettingsManager extends SharedPreferencesHelper {
                 case "cameraResolution":
                     returnStatus = addWithCheck(returnStatus, NEED_UPDATE_CAMERAX);
                     break;
+                case "useSystemEmoji":
+                    returnStatus = addWithCheck(returnStatus, NEED_UPDATE_EMOJI);
+                    break;
             }
         }
         return returnStatus;
@@ -407,6 +413,7 @@ public class SettingsManager extends SharedPreferencesHelper {
     }
 
     public static void doRebuildUIWithDiff(int difference, INavigationLayout parentLayout) {
+        NotificationCenter currentAccount = AccountInstance.getInstance(UserConfig.selectedAccount).getNotificationCenter();
         if ((difference & NEED_RECREATE_FORMATTERS) > 0) {
             LocaleController.getInstance().recreateFormatters();
         }
@@ -421,7 +428,10 @@ public class SettingsManager extends SharedPreferencesHelper {
         if ((difference & NEED_UPDATE_CAMERAX) > 0) {
             CameraXUtils.loadSuggestedResolution();
         }
-        NotificationCenter currentAccount = AccountInstance.getInstance(UserConfig.selectedAccount).getNotificationCenter();
+        if ((difference & NEED_UPDATE_EMOJI) > 0) {
+            Emoji.reloadEmoji();
+            currentAccount.postNotificationName(NotificationCenter.emojiLoaded);
+        }
         currentAccount.postNotificationName(NotificationCenter.updateInterfaces, MessagesController.UPDATE_MASK_CHAT);
         currentAccount.postNotificationName(NotificationCenter.mainUserInfoChanged);
         currentAccount.postNotificationName(NotificationCenter.dialogFiltersUpdated);

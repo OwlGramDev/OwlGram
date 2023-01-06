@@ -949,6 +949,26 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
                 } catch (Exception e) {
                     FileLog.e(e);
                 }
+            } else if (isEmojiPicker) {
+                String[] projection = {
+                        MediaStore.Files.FileColumns._ID,
+                        MediaStore.Files.FileColumns.DATA,
+                };
+                try (Cursor cursor = ApplicationLoader.applicationContext.getContentResolver().query(MediaStore.Files.getContentUri("external"), projection, MediaStore.Files.FileColumns.MIME_TYPE + " LIKE 'font/%'", null, MediaStore.Files.FileColumns.DATE_ADDED + " DESC")) {
+                    while (cursor.moveToNext()) {
+                        File file = new File(cursor.getString(1));
+                        if (!CustomEmojiHelper.isValidEmojiPack(file)) continue;
+                        ListItem item = new ListItem();
+                        item.title = file.getName();
+                        item.file = file;
+                        String[] sp = file.getName().split("\\.");
+                        item.ext = sp.length > 1 ? sp[sp.length - 1] : "?";
+                        item.subtitle = AndroidUtilities.formatFileSize(file.length());
+                        listAdapter.recentItems.add(item);
+                    }
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
             } else {
                 checkDirectory(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
                 sortRecentItems();

@@ -30,6 +30,8 @@ import org.telegram.ui.Components.RadialProgressView;
 import java.util.Objects;
 
 import it.owlgram.android.helpers.CustomEmojiHelper;
+import it.owlgram.android.helpers.FileDownloadHelper;
+import it.owlgram.android.helpers.FileUnzipHelper;
 
 public class EmojiSetCell extends FrameLayout {
     private final TextView textView;
@@ -127,6 +129,7 @@ public class EmojiSetCell extends FrameLayout {
                     AndroidUtilities.formatFileSize(packFileSize)
             ), animated);
         }
+        if (!animated) checkDownloaded(false);
         textView.setTranslationY(0);
         imageView.setImage(emojiPackInfo.getPreview(), null, null);
     }
@@ -210,18 +213,22 @@ public class EmojiSetCell extends FrameLayout {
         ), animated);
     }
 
-    public void checkDownloaded() {
-        if (CustomEmojiHelper.emojiTmpDownloaded(packId) || CustomEmojiHelper.emojiDir(packId, versionWithMD5).exists()) {
-            setProgress(false, true);
-            if (CustomEmojiHelper.emojiDir(packId, versionWithMD5).exists()) {
-                valueTextView.setText(LocaleController.getString("InstalledEmojiSet", R.string.InstalledEmojiSet));
-                setChecked(true, true);
+    public void checkDownloaded(boolean animated) {
+        if (Objects.equals(packId, "default")) return;
+        if (CustomEmojiHelper.emojiTmpDownloaded(packId) || CustomEmojiHelper.emojiDir(packId, versionWithMD5).exists() || TextUtils.isEmpty(versionWithMD5)) {
+            setProgress(false, animated);
+            if (FileUnzipHelper.isRunningUnzip(packId)) {
+                valueTextView.setText(LocaleController.getString("InstallingEmojiSet", R.string.InstallingEmojiSet), animated);
             } else {
-                valueTextView.setText(LocaleController.getString("InstallingEmojiSet", R.string.InstallingEmojiSet));
+                valueTextView.setText(LocaleController.getString("InstalledEmojiSet", R.string.InstalledEmojiSet), animated);
             }
+        } else if (FileDownloadHelper.isRunningDownload(packId)) {
+            setProgress(true, animated);
+            setChecked(false, animated);
+            setProgress(FileDownloadHelper.getDownloadProgress(packId), FileDownloadHelper.downloadedBytes(packId), animated);
         } else {
-            setProgress(false, true);
-            setChecked(false, false);
+            setProgress(false, animated);
+            setChecked(false, animated);
             String status = LocaleController.getString("DownloadUpdate", R.string.DownloadUpdate);
             if (CustomEmojiHelper.isInstalledOldVersion(packId, versionWithMD5)) {
                 status = LocaleController.getString("UpdateEmojiSet", R.string.UpdateEmojiSet);
@@ -230,7 +237,7 @@ public class EmojiSetCell extends FrameLayout {
                     "%s %s",
                     status,
                     AndroidUtilities.formatFileSize(packFileSize)
-            ));
+            ), animated);
         }
     }
 }
