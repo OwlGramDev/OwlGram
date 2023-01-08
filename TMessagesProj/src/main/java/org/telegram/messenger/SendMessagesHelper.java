@@ -93,6 +93,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.camera.VideoUtils;
 import it.owlgram.android.entities.EntitiesHelper;
 
 public class SendMessagesHelper extends BaseController implements NotificationCenter.NotificationCenterDelegate {
@@ -8181,29 +8182,19 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
         videoEditedInfo.rotationValue = params[AnimatedFileDrawable.PARAM_NUM_ROTATION];
         videoEditedInfo.originalDuration = (long) (videoDuration * 1000);
 
-        int compressionsCount;
+        int compressionsCount = VideoUtils.getCompressionsCount(videoEditedInfo.originalWidth, videoEditedInfo.originalHeight);
+        float maxSize = VideoUtils.getMaxSize(videoEditedInfo.originalWidth, videoEditedInfo.originalHeight, compressionsCount -1);
 
-        float maxSize = Math.max(videoEditedInfo.originalWidth, videoEditedInfo.originalHeight);
-        if (maxSize > 1280) {
-            compressionsCount = 4;
-        } else if (maxSize > 854) {
-            compressionsCount = 3;
-        } else if (maxSize > 640) {
-            compressionsCount = 2;
-        } else {
-            compressionsCount = 1;
-        }
-
-        int selectedCompression = Math.round(DownloadController.getInstance(UserConfig.selectedAccount).getMaxVideoBitrate() / (100f / compressionsCount));
+        int selectedCompression = OwlConfig.lastSelectedCompression;
 
         if (selectedCompression > compressionsCount) {
             selectedCompression = compressionsCount;
         }
         boolean needCompress = false;
         if (new File(videoPath).length() < 1024L * 1024L * 1000L) {
-            if (selectedCompression != compressionsCount || Math.max(videoEditedInfo.originalWidth, videoEditedInfo.originalHeight) > 1280) {
+            if (selectedCompression != compressionsCount/* || Math.max(videoEditedInfo.originalWidth, videoEditedInfo.originalHeight) > 1280*/) {
                 needCompress = true;
-                switch (selectedCompression) {
+                /*switch (selectedCompression) {
                     case 1:
                         maxSize = 432.0f;
                         break;
@@ -8216,16 +8207,18 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                     default:
                         maxSize = 1280.0f;
                         break;
-                }
+                }*/
                 float scale = videoEditedInfo.originalWidth > videoEditedInfo.originalHeight ? maxSize / videoEditedInfo.originalWidth : maxSize / videoEditedInfo.originalHeight;
                 videoEditedInfo.resultWidth = Math.round(videoEditedInfo.originalWidth * scale / 2) * 2;
                 videoEditedInfo.resultHeight = Math.round(videoEditedInfo.originalHeight * scale / 2) * 2;
             }
-            bitrate = MediaController.makeVideoBitrate(
-                    videoEditedInfo.originalHeight, videoEditedInfo.originalWidth,
-                    originalBitrate,
-                    videoEditedInfo.resultHeight, videoEditedInfo.resultWidth
-            );
+            if (videoEditedInfo.resultWidth != videoEditedInfo.originalWidth || videoEditedInfo.resultHeight != videoEditedInfo.originalHeight) {
+                bitrate = MediaController.makeVideoBitrate(
+                        videoEditedInfo.originalHeight, videoEditedInfo.originalWidth,
+                        originalBitrate,
+                        videoEditedInfo.resultHeight, videoEditedInfo.resultWidth
+                );
+            }
         }
 
         if (!needCompress) {

@@ -464,6 +464,8 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
         private TextSettingsCell doNotTranslateCell;
         private TextInfoPrivacyCell info;
         private TextInfoPrivacyCell info2;
+        private TextSettingsCell translateShortcut;
+        private ShadowSectionCell sectionCell;
         private ValueAnimator doNotTranslateCellAnimation = null;
 //        private HeaderCell header2;
 
@@ -487,15 +489,14 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             header.setContentDescription(LocaleController.getString("TranslateMessages", R.string.TranslateMessages));
             addView(header, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
-            TextSettingsCell cell = new TextSettingsCell(context);
-            cell.setText(LocaleController.getString("OwlSetting", R.string.OwlSetting), false);
-            cell.setBackground(Theme.createSelectorWithBackgroundDrawable(Theme.getColor(Theme.key_windowBackgroundWhite), Theme.getColor(Theme.key_listSelector)));
-            cell.setOnClickListener(e -> {
+            translateShortcut = new TextSettingsCell(context);
+            translateShortcut.setText(LocaleController.getString("OwlSetting", R.string.OwlSetting), false);
+            translateShortcut.setBackground(Theme.createSelectorWithBackgroundDrawable(Theme.getColor(Theme.key_windowBackgroundWhite), Theme.getColor(Theme.key_listSelector)));
+            translateShortcut.setOnClickListener(e -> {
                 presentFragment(new OwlgramGeneralSettings());
             });
-            addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-
-            addView(new ShadowSectionCell(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+            addView(translateShortcut, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+            addView(sectionCell = new ShadowSectionCell(context), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
             /*boolean value = getValue();
             showButtonCheck = new TextCheckCell(context);
@@ -646,8 +647,12 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             doNotTranslateCell.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
             info.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
             info2.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);*/
+            header.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
+            translateShortcut.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
+            sectionCell.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
 
             int newHeight = searching ? 0 : height();
+            translateSettingsBackgroundHeight = newHeight - shadowHeight();
             if (getLayoutParams() == null) {
                 setLayoutParams(new RecyclerView.LayoutParams(LayoutHelper.MATCH_PARENT, newHeight));
             } else if (getLayoutParams().height != newHeight) {
@@ -658,12 +663,24 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
         }
 
         int height() {
-            return LayoutHelper.WRAP_CONTENT;
+            return Math.max(AndroidUtilities.dp(40), header.getMeasuredHeight()) +
+                    Math.max(AndroidUtilities.dp(50), translateShortcut.getMeasuredHeight()) +
+                    shadowHeight();
+        }
+
+        int shadowHeight() {
+            return Math.max(AndroidUtilities.dp(12), sectionCell.getMeasuredHeight());
         }
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            updateHeight();
+        }
+
+        @Override
+        protected void onAttachedToWindow() {
+            super.onAttachedToWindow();
             updateHeight();
         }
 /*

@@ -75,7 +75,7 @@
     <string name="FontsAndEmojis">Fonts and Emoji</string>
     <string name="UseSystemFonts">Use System Fonts</string>
     <string name="UseSystemEmojis">Use System Emoji</string>
-    <string name="UseSystemEmojisDesc">Use the system\'s emoji instead of the chosen one.</string>
+    <string name="UseSystemEmojisDesc">Use system\'s emoji instead of the chosen ones</string>
     <string name="PacManAnimation">Pac-Man Animation when Archive</string>
     <string name="ChristmasHat">Christmas Hat</string>
     <string name="FallingSnow">Falling Snow</string>
@@ -87,9 +87,9 @@
     <string name="NumberRounding">Number Rounding</string>
     <string name="NumberRoundingDesc">35.702 &gt; 35.7k</string>
     <string name="ShortcutsForAdmins">Shortcuts for Admins</string>
-    <string name="AppBarShadow">Disable Title Bar Shadow</string>
+    <string name="AppBarShadow">Disable Shadow</string>
     <string name="SlidingTitle">Sliding Title</string>
-    <string name="SearchIconTitleBar">Search Icon on the Title Bar</string>
+    <string name="SearchIconTitleBar">Show Search Icon</string>
     <string name="SlidingTitleDesc">If the chat title is long, it will scroll on the screen</string>
     <string name="AccentAsNotificationColor">Accent Color as Notification Color</string>
     <string name="ConfirmCalls">Prompt Before Calling</string>
@@ -281,7 +281,7 @@
     <string name="ChangeIconDesc">Since on Android 12 the monet icon was forced and you upgraded to Android 13, you need to change the app icon to the default one for a better support.</string>
     <string name="CopyPhoto">Copy Photo</string>
     <string name="PhotoCopied">Photo copied to clipboard.</string>
-    <string name="AccountNameTitleBar">Account Name on the Title Bar</string>
+    <string name="AccountNameTitleBar">Show Account Name</string>
     <string name="ShowPencilIcon">Pencil Icon for Edited Messages</string>
     <string name="AccountProtection">Account Protection</string>
     <string name="AccountProtectionDesc">Protect your accounts with a unique passcode. Tap the lock icon above your chat list to access them.</string>
@@ -311,20 +311,20 @@
     <string name="InstalledEmojiSet">Installed</string>
     <string name="InstallingEmojiSet">Installing…</string>
     <string name="UpdateEmojiSet">Update</string>
-    <string name="ChooseEmojiSetHeader">Choose emoji set</string>
     <string name="EmojiSetHint">This affects emoji appearance only for you. Others see them based on their preferences.</string>
     <string name="CustomEmojiSet">Custom Emoji Set</string>
     <string name="CustomEmojiSetHint">Import and choose emoji sets from your internal storage.</string>
     <string name="AddEmojiSet">Add Emoji Set</string>
-    <string name="AddEmojiSetHint">You can add a custom emoji set by tapping the button above.</string>
     <string name="ErrorEmojiFontInvalidFormat">File must be an emoji font file.</string>
-    <string name="EmojiSetRemoved">Emoji set removed.</string>
+    <string name="EmojiSetRemoved">Emoji set removed</string>
     <string name="EmojiSetRemovedInfo">%1$s is no longer in your emoji sets.</string>
     <string name="DeleteEmojiSets">%1$s emoji sets</string>
     <string name="DeleteEmojiSetsMessage">Are you sure you want to delete the selected emoji sets?</string>
     <string name="ApplyEmojiSet">Apply emoji set</string>
     <string name="InvalidCustomEmojiSet">Invalid font file.</string>
-    <string name="EmojiSetApplied">Emoji set applied.</string>
+    <string name="EmojiSetApplied">Emoji set applied</string>
     <string name="EmojiSetAppliedInfo">%1$s is now your emoji set.</string>
     <string name="EmojiSetAlreadyApplied">Emoji set already applied.</string>
+    <string name="EmojiSetErrorDownloading">Error downloading emoji set.</string>
+    <string name="ChatHeader">Chat Header</string>
 </resources>

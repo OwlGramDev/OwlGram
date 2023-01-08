@@ -5207,6 +5207,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         containerView.addView(qualityPicker, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 48, Gravity.BOTTOM | Gravity.LEFT));
         qualityPicker.cancelButton.setOnClickListener(view -> {
             selectedCompression = previousCompression;
+            OwlConfig.setCompression(selectedCompression);
             didChangedCompressionLevel(false);
             showQualityView(false);
             requestVideoPreview(2);
@@ -5216,6 +5217,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             if (object instanceof MediaController.MediaEditState) {
                 ((MediaController.MediaEditState) object).editedInfo = getCurrentVideoEditedInfo();
             }
+            OwlConfig.setCompression(selectedCompression);
             showQualityView(false);
             requestVideoPreview(2);
         });
@@ -17358,7 +17360,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     }
 
     private int selectCompression() {
-        //1GB
+        // FORCE TO HIGHEST QUALITY
+        return Math.min(OwlConfig.lastSelectedCompression, compressionsCount - 1);
+        /*//1GB
         if (originalSize > 1024L * 1024L * 1000L) {
             return compressionsCount - 1;
         }
@@ -17372,7 +17376,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
             compressionsCount++;
         }
-        return Math.min(maxCompression, Math.round(DownloadController.getInstance(currentAccount).getMaxVideoBitrate() / (100f / compressionsCount)) - 1);
+        return Math.min(maxCompression, Math.round(DownloadController.getInstance(currentAccount).getMaxVideoBitrate() / (100f / compressionsCount)) - 1);*/
     }
 
     private void updateCompressionsCount(int h, int w) {
