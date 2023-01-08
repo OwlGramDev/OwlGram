@@ -41,7 +41,11 @@ public class SharedPreferencesHelper {
     }
 
     protected static long getLong(String key, long defaultValue) {
-        return preferences.getLong(key, defaultValue);
+        try {
+            return preferences.getLong(key, defaultValue);
+        } catch (ClassCastException e) {
+            return getInt(key, (int) defaultValue);
+        }
     }
 
     protected static Map<String, ?> getAll() {
