@@ -46,6 +46,8 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
     private int fontsAndEmojiHeaderRow;
     private int useSystemFontRow;
     private int fontsAndEmojiDividerRow;
+    private int chatHeaderRow;
+    private int chatHeaderDividerRow;
     private int appearanceHeaderRow;
     private int forcePacmanRow;
     private int showSantaHatRow;
@@ -252,6 +254,13 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
         useSystemFontRow = rowCount++;
         fontsAndEmojiDividerRow = rowCount++;
 
+        chatHeaderRow = rowCount++;
+        appBarShadowRow = rowCount++;
+        showInActionBarRow = rowCount++;
+        slidingTitleRow = rowCount++;
+        searchIconInActionBarRow = rowCount++;
+        chatHeaderDividerRow = rowCount++;
+
         appearanceHeaderRow = rowCount++;
         forcePacmanRow = rowCount++;
         if (((Theme.getEventType() == 0 && OwlConfig.eventType == 0) || OwlConfig.eventType == 1)) {
@@ -262,10 +271,6 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
         roundedNumberSwitchRow = rowCount++;
         showPencilIconRow = rowCount++;
         smartButtonsRow = rowCount++;
-        appBarShadowRow = rowCount++;
-        slidingTitleRow = rowCount++;
-        showInActionBarRow = rowCount++;
-        searchIconInActionBarRow = rowCount++;
         appearanceDividerRow = rowCount++;
     }
 
@@ -305,6 +310,8 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
                         headerCell.setText(LocaleController.getString("FontsAndEmojis", R.string.FontsAndEmojis));
                     } else if (position == appearanceHeaderRow) {
                         headerCell.setText(LocaleController.getString("Appearance", R.string.Appearance));
+                    } else if (position == chatHeaderRow) {
+                        headerCell.setText(LocaleController.getString("ChatHeader", R.string.ChatHeader));
                     }
                     break;
                 case SWITCH:
@@ -328,7 +335,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
                     } else if (position == forcePacmanRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("PacManAnimation", R.string.PacManAnimation), OwlConfig.pacmanForced, true);
                     } else if (position == smartButtonsRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("ShortcutsForAdmins", R.string.ShortcutsForAdmins), OwlConfig.smartButtons, true);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("ShortcutsForAdmins", R.string.ShortcutsForAdmins), OwlConfig.smartButtons, false);
                     } else if (position == appBarShadowRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("AppBarShadow", R.string.AppBarShadow), OwlConfig.disableAppBarShadow, true);
                     } else if (position == showSantaHatRow) {
@@ -338,7 +345,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
                     } else if (position == slidingTitleRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("SlidingTitle", R.string.SlidingTitle), LocaleController.getString("SlidingTitleDesc", R.string.SlidingTitleDesc), OwlConfig.slidingChatTitle, true, true);
                     } else if (position == searchIconInActionBarRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("SearchIconTitleBar", R.string.SearchIconTitleBar), OwlConfig.searchIconInActionBar, true);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("SearchIconTitleBar", R.string.SearchIconTitleBar), OwlConfig.searchIconInActionBar, false);
                     } else if (position == showPencilIconRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ShowPencilIcon", R.string.ShowPencilIcon), OwlConfig.showPencilIcon, true);
                     } else if (position == showInActionBarRow) {
@@ -447,10 +454,11 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
         @Override
         public ViewType getViewType(int position) {
             if (position == drawerDividerRow || position == editBlurDividerRow || position == themeDrawerDividerRow ||
-                    position == dynamicDividerRow || position == fontsAndEmojiDividerRow || position == appearanceDividerRow) {
+                    position == dynamicDividerRow || position == fontsAndEmojiDividerRow || position == appearanceDividerRow ||
+                    position == chatHeaderDividerRow) {
                 return ViewType.SHADOW;
             } else if (position == editBlurHeaderRow || position == themeDrawerHeader || position == dynamicButtonHeaderRow ||
-                    position == fontsAndEmojiHeaderRow || position == appearanceHeaderRow) {
+                    position == fontsAndEmojiHeaderRow || position == appearanceHeaderRow || position == chatHeaderRow) {
                 return ViewType.HEADER;
             } else if (position == roundedNumberSwitchRow || position == messageTimeSwitchRow ||
                     position == useSystemFontRow || position == drawerAvatarAsBackgroundRow ||
