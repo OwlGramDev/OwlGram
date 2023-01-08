@@ -117,6 +117,7 @@ public class OwlConfig extends SettingsManager {
     public static long lastUpdateCheck = 0;
     public static int downloadSpeedBoost;
     public static int unlockedSecretIcon;
+    public static int lastSelectedCompression;
 
     static {
         loadConfig(true);
@@ -223,6 +224,7 @@ public class OwlConfig extends SettingsManager {
             showNameInActionBar = getBoolean("showNameInActionBar", false);
             stickersSorting = getBoolean("stickersSorting", true);
             emojiPackSelected = getString("emojiPackSelected", "default");
+            lastSelectedCompression = getInt("lastSelectedCompression", 3);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -579,6 +581,10 @@ public class OwlConfig extends SettingsManager {
 
     public static void setMaxRecentStickers(int size) {
         putValue("maxRecentStickers", maxRecentStickers = size);
+    }
+
+    public static void setCompression(int compression) {
+        putValue("lastSelectedCompression", lastSelectedCompression = compression);
     }
 
     public static void setUpdateData(String data) {

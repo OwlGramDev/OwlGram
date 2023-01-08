@@ -95,6 +95,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "DOWNLOAD_BOOST_EXTREME":
             case "NEED_UPDATE_CAMERAX":
             case "NEED_UPDATE_EMOJI":
+            case "lastSelectedCompression":
                 return false;
             default:
                 return true;
