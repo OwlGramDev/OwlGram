@@ -5,7 +5,6 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
@@ -20,6 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 public class RawDeepLTranslator {
     private final AtomicLong id = new AtomicLong(ThreadLocalRandom.current().nextLong(Long.parseLong("10000000000")));
@@ -156,12 +156,12 @@ public class RawDeepLTranslator {
         httpConnection.getOutputStream().flush();
         httpConnection.getOutputStream().close();
 
-        InputStream httpConnectionStream;
+        GZIPInputStream httpConnectionStream;
         try {
-            httpConnectionStream = httpConnection.getInputStream();
+            httpConnectionStream = new GZIPInputStream(httpConnection.getInputStream());
         } catch (IOException var12) {
             errorOccurred = true;
-            httpConnectionStream = httpConnection.getErrorStream();
+            httpConnectionStream = new GZIPInputStream(httpConnection.getErrorStream());
         }
 
         if (!errorOccurred) {
@@ -175,9 +175,8 @@ public class RawDeepLTranslator {
                 }
             }
         }
-
         ByteArrayOutputStream outBuf = new ByteArrayOutputStream();
-        byte[] data = new byte['耀'];
+        byte[] data = new byte[32768];
         while (true) {
             int read = httpConnectionStream.read(data);
             if (read <= 0) {
