@@ -134,7 +134,7 @@ public class FileDownloadHelper {
                         AndroidUtilities.runOnUIThread(() -> onProgressUpdate((int) (total * 100 / fileLength), total, fileLength));
                         AndroidUtilities.runOnUIThread(() -> onPostExecute(false));
                     } catch (Exception e) {
-                        AndroidUtilities.runOnUIThread(() -> onPostExecute(true));
+                        AndroidUtilities.runOnUIThread(() -> onPostExecute(false));
                     } finally {
                         try {
                             if (output != null)
@@ -166,11 +166,9 @@ public class FileDownloadHelper {
         @SuppressWarnings("ResultOfMethodCallIgnored")
         private void onPostExecute(boolean isCanceled) {
             mWakeLock.release();
-            if (isCanceled) {
-               mTargetFile.delete();
-            }
+            mTargetFile.delete();
             downloadThreads.remove(id);
-            onFinished(id);
+            onFinished(id, isCanceled);
         }
     }
 
@@ -198,12 +196,12 @@ public class FileDownloadHelper {
         }
     }
 
-    private static void onFinished(String id) {
+    private static void onFinished(String id, boolean isCanceled) {
         for (Map.Entry<String, FileDownloadListener> value : listeners.entrySet()) {
             if (value != null) {
                 String lId = value.getKey().split("_")[0];
                 if (lId.equals(id)) {
-                    value.getValue().onFinished(id);
+                    value.getValue().onFinished(id, isCanceled);
                 }
             }
         }
@@ -224,6 +222,6 @@ public class FileDownloadHelper {
 
         void onProgressChange(String id, int percentage, long downBytes, long totBytes);
 
-        void onFinished(String id);
+        void onFinished(String id, boolean isCanceled);
     }
 }

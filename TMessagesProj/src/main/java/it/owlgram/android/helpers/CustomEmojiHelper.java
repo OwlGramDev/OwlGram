@@ -458,7 +458,7 @@ public class CustomEmojiHelper {
 
                                 @SuppressWarnings("ResultOfMethodCallIgnored")
                                 @Override
-                                public void onFinished(String id) {
+                                public void onFinished(String id, boolean isCanceled) {
                                     if (CustomEmojiHelper.emojiTmpDownloaded(id)) {
                                         FileUnzipHelper.unzipFile(ApplicationLoader.applicationContext, id, CustomEmojiHelper.emojiTmp(id), CustomEmojiHelper.emojiDir(id, emojiPackInfo.versionWithMd5));
                                         FileUnzipHelper.addListener(id, "checkListener", id1 -> {
@@ -470,7 +470,7 @@ public class CustomEmojiHelper {
                                             AndroidUtilities.cancelRunOnUIThread(invalidateUiRunnable);
                                             AndroidUtilities.runOnUIThread(invalidateUiRunnable);
                                         });
-                                    } else {
+                                    } else if (!isCanceled) {
                                         CustomEmojiHelper.emojiTmp(id).delete();
                                         if (!isUpdate) OwlConfig.setEmojiPackSelected("default");
                                         Emoji.reloadEmoji();

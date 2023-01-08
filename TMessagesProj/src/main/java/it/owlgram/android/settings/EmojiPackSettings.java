@@ -31,6 +31,7 @@ import org.telegram.ui.Cells.CreationTextCell;
 import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
+import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.Components.ChatAttachAlert;
 import org.telegram.ui.Components.ChatAttachAlertDocumentLayout;
 import org.telegram.ui.Components.CombinedDrawable;
@@ -203,13 +204,14 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
             }
 
             @Override
-            public void onFinished(String id) {
+            public void onFinished(String id, boolean isCanceled) {
                 if (cell.packId.equals(id)) {
                     if (CustomEmojiHelper.emojiTmpDownloaded(cell.packId)) {
                         FileUnzipHelper.unzipFile(ApplicationLoader.applicationContext, cell.packId, CustomEmojiHelper.emojiTmp(cell.packId), CustomEmojiHelper.emojiDir(cell.packId, cell.versionWithMD5));
                     } else {
                         CustomEmojiHelper.emojiTmp(cell.packId).delete();
                         ((ListAdapter) listAdapter).notifyEmojiSetsChanged();
+                        if (!isCanceled) BulletinFactory.of(EmojiPackSettings.this).createErrorBulletin(LocaleController.getString("EmojiSetErrorDownloading", R.string.EmojiSetErrorDownloading)).show();
                     }
                 }
                 cell.checkDownloaded(true);
