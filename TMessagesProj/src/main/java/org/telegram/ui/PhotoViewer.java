@@ -17358,7 +17358,9 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
     }
 
     private int selectCompression() {
-        //1GB
+        // FORCE TO HIGHEST QUALITY
+        return compressionsCount - 1;
+        /*//1GB
         if (originalSize > 1024L * 1024L * 1000L) {
             return compressionsCount - 1;
         }
@@ -17372,7 +17374,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             }
             compressionsCount++;
         }
-        return Math.min(maxCompression, Math.round(DownloadController.getInstance(currentAccount).getMaxVideoBitrate() / (100f / compressionsCount)) - 1);
+        return Math.min(maxCompression, Math.round(DownloadController.getInstance(currentAccount).getMaxVideoBitrate() / (100f / compressionsCount)) - 1);*/
     }
 
     private void updateCompressionsCount(int h, int w) {
