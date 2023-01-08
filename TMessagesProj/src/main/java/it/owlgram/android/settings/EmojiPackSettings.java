@@ -334,8 +334,8 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                         emojiPackInfo = CustomEmojiHelper.getEmojiPacksInfo().get(position - emojiPacksStartRow);
                     } else if (position >= customEmojiStartRow && position < customEmojiEndRow) {
                         emojiPackInfo = CustomEmojiHelper.getEmojiCustomPacksInfo().get(position - customEmojiStartRow);
-                        emojiPackSetCell.setSelected(selectedItems.get(position, false), partial);
                     }
+                    emojiPackSetCell.setSelected(selectedItems.get(position, false), partial);
                     if (emojiPackInfo != null) {
                         emojiPackSetCell.setChecked(!hasSelected() && emojiPackInfo.getPackId().equals(CustomEmojiHelper.getSelectedEmojiPackId()) && getCurrentDownloading() == null && getCurrentUnzipping() == null && !OwlConfig.useSystemEmoji, partial);
                         emojiPackSetCell.setData(
