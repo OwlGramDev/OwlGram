@@ -171,9 +171,9 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             protected void dispatchDraw(Canvas canvas) {
                 if (getAdapter() == listAdapter && getItemAnimator() != null && getItemAnimator().isRunning()) {
                     int backgroundColor = Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider);
-                    //drawItemBackground(canvas, 0, translateSettingsBackgroundHeight, backgroundColor);
+                    drawItemBackground(canvas, 0, translateSettingsBackgroundHeight, backgroundColor);
 //                    drawItemBackground(canvas, 1, Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider));
-                    //drawSectionBackground(canvas, 1, 2, backgroundColor);
+                    drawSectionBackground(canvas, 1, 2, backgroundColor);
                 }
                 super.dispatchDraw(canvas);
             }
@@ -652,6 +652,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             sectionCell.measure(MeasureSpec.makeMeasureSpec(AndroidUtilities.displaySize.x, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
 
             int newHeight = searching ? 0 : height();
+            translateSettingsBackgroundHeight = newHeight - shadowHeight();
             if (getLayoutParams() == null) {
                 setLayoutParams(new RecyclerView.LayoutParams(LayoutHelper.MATCH_PARENT, newHeight));
             } else if (getLayoutParams().height != newHeight) {
@@ -664,7 +665,11 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
         int height() {
             return Math.max(AndroidUtilities.dp(40), header.getMeasuredHeight()) +
                     Math.max(AndroidUtilities.dp(50), translateShortcut.getMeasuredHeight()) +
-                    Math.max(AndroidUtilities.dp(12), sectionCell.getMeasuredHeight());
+                    shadowHeight();
+        }
+
+        int shadowHeight() {
+            return Math.max(AndroidUtilities.dp(12), sectionCell.getMeasuredHeight());
         }
 
         @Override
