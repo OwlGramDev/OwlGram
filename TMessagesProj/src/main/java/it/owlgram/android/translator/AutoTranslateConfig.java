@@ -129,11 +129,10 @@ public class AutoTranslateConfig {
                         entry.getKey().split("_").length > 3 ? Integer.parseInt(entry.getKey().split("_")[3]) : 0,
                         (boolean) entry.getValue()))
                 .filter(exception -> exception.chat != null)
-                .sorted((o1, o2) -> {
-                    String n1 = o1.chat instanceof TLRPC.User ? ((TLRPC.User) o1.chat).first_name : ((TLRPC.Chat) o1.chat).title;
-                    String n2 = o2.chat instanceof TLRPC.User ? ((TLRPC.User) o2.chat).first_name : ((TLRPC.Chat) o2.chat).title;
-                    return n1.compareTo(n2);
-                })
+                .filter(o1 -> !TextUtils.isEmpty(o1.chat instanceof TLRPC.User ? ((TLRPC.User) o1.chat).first_name : ((TLRPC.Chat) o1.chat).title))
+                .sorted((Comparator.comparing(o1 -> o1.chat instanceof TLRPC.User ?
+                        ((TLRPC.User) o1.chat).first_name :
+                        ((TLRPC.Chat) o1.chat).title)))
                 .collect(Collectors.toList());
     }
 
