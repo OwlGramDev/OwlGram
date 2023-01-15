@@ -170,7 +170,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
 
     private String getCurrentUnzipping() {
         return CustomEmojiHelper.getEmojiPacksInfo()
-                .stream()
+                .parallelStream()
                 .map(CustomEmojiHelper.EmojiPackBase::getPackId)
                 .filter(FileUnzipHelper::isRunningUnzip)
                 .findFirst()
@@ -179,7 +179,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
 
     private String getCurrentDownloading() {
         return CustomEmojiHelper.getEmojiPacksInfo()
-                .stream()
+                .parallelStream()
                 .map(CustomEmojiHelper.EmojiPackBase::getPackId)
                 .filter(FileDownloadHelper::isRunningDownload)
                 .findFirst()
@@ -523,7 +523,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                                         AndroidUtilities.runOnUIThread(() -> {
                                             progressDialog.dismiss();
                                             clearSelected();
-                                            List<int[]> consecutiveItems = stickerSetList.stream()
+                                            List<int[]> consecutiveItems = stickerSetList.parallelStream()
                                                     .map(packs::indexOf)
                                                     .reduce(new ArrayList<>(), (acc, ordinalPos) -> {
                                                         boolean isConsecutive = acc.size() > 0 && ordinalPos == acc.get(acc.size() - 1)[1] + 1;
@@ -594,7 +594,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                 if (chatAttachAlert != null) {
                     ArrayList<File> files = CustomEmojiHelper.getFilesFromActivityResult(data);
                     AndroidUtilities.runOnUIThread(() -> {
-                        boolean apply = files.stream().allMatch(file -> chatAttachAlert.getDocumentLayout().isEmojiFont(file));
+                        boolean apply = files.parallelStream().allMatch(file -> chatAttachAlert.getDocumentLayout().isEmojiFont(file));
                         if (apply && !files.isEmpty()) {
                             chatAttachAlert.dismiss();
                             processFiles(files);

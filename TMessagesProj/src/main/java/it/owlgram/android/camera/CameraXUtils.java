@@ -111,10 +111,10 @@ public class CameraXUtils {
     }
 
     private static Map<Quality, Size> getAvailableVideoSizes(CameraSelector cameraSelector, ProcessCameraProvider provider) {
-        return cameraSelector.filter(provider.getAvailableCameraInfos()).stream()
+        return cameraSelector.filter(provider.getAvailableCameraInfos()).parallelStream()
                 .findFirst()
                 .map(camInfo ->
-                        QualitySelector.getSupportedQualities(camInfo).stream().collect(
+                        QualitySelector.getSupportedQualities(camInfo).parallelStream().collect(
                                 Collectors.toMap(
                                         Function.identity(),
                                         quality -> Optional.ofNullable(QualitySelector.getResolution(camInfo, quality))
@@ -128,15 +128,15 @@ public class CameraXUtils {
         int suggestedRes = getSuggestedResolution(false);
         Map<Quality, Size> sizes = getAvailableVideoSizes();
 
-        int min = sizes.values().stream()
+        int min = sizes.values().parallelStream()
                 .mapToInt(Size::getHeight)
                 .min().orElse(0);
 
-        int max = sizes.values().stream()
+        int max = sizes.values().parallelStream()
                 .mapToInt(Size::getHeight)
                 .max().orElse(0);
 
-        getAvailableVideoSizes().values().stream()
+        getAvailableVideoSizes().values().parallelStream()
                 .sorted(Comparator.comparingInt(Size::getHeight).reversed())
                 .mapToInt(Size::getHeight)
                 .filter(height -> height <= suggestedRes)
@@ -155,14 +155,14 @@ public class CameraXUtils {
 
     public static Size getPreviewBestSize() {
         int suggestedRes = getSuggestedResolution(true);
-        return getAvailableVideoSizes().values().stream()
+        return getAvailableVideoSizes().values().parallelStream()
                 .filter(size -> size.getHeight() <= OwlConfig.cameraResolution && size.getHeight() < suggestedRes)
                 .findFirst()
                 .orElse(new Size(0, 0));
     }
 
     public static Quality getVideoQuality() {
-        return getAvailableVideoSizes().entrySet().stream()
+        return getAvailableVideoSizes().entrySet().parallelStream()
                 .filter(entry -> entry.getValue().getHeight() == OwlConfig.cameraResolution)
                 .map(Map.Entry::getKey)
                 .findFirst()
@@ -184,14 +184,6 @@ public class CameraXUtils {
                 break;
         }
         return suggestedRes;
-    }
-
-    public int getCurrentResolution() {
-        return getAvailableVideoSizes().values().stream()
-                .mapToInt(Size::getHeight)
-                .filter(size -> size == OwlConfig.cameraResolution)
-                .findFirst()
-                .orElse(-1);
     }
 
     @SuppressLint({"RestrictedApi", "UnsafeOptInUsageError"})

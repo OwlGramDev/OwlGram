@@ -114,7 +114,7 @@ public class CustomEmojiHelper {
 
     private static Typeface getSelectedTypeface() {
         return getEmojiCustomPacksInfo()
-                .stream()
+                .parallelStream()
                 .filter(emojiPackInfo -> emojiPackInfo.packId.equals(OwlConfig.emojiPackSelected))
                 .map(emojiPackInfo -> {
                     File emojiFile = new File(emojiPackInfo.fileLocation);
@@ -123,6 +123,7 @@ public class CustomEmojiHelper {
                     }
                     return null;
                 })
+                .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
     }
@@ -130,7 +131,7 @@ public class CustomEmojiHelper {
     public static String getSelectedPackName() {
         if (OwlConfig.useSystemEmoji) return LocaleController.getString("CameraTypeSystem", R.string.CameraTypeSystem);
         return emojiPacksInfo
-                .stream()
+                .parallelStream()
                 .filter(e -> {
                     if (e instanceof EmojiPackInfo) {
                         return emojiDir(e.packId, ((EmojiPackInfo) e).versionWithMd5).exists();
@@ -145,14 +146,14 @@ public class CustomEmojiHelper {
 
     public static String getSelectedEmojiPackId() {
         return getAllEmojis()
-                .stream()
+                .parallelStream()
                 .map(File::getName)
                 .anyMatch(name -> name.startsWith(OwlConfig.emojiPackSelected) || name.endsWith(OwlConfig.emojiPackSelected))
                 ? OwlConfig.emojiPackSelected : "default";
     }
 
     public static boolean loadedPackInfo() {
-        return emojiPacksInfo.stream().anyMatch(e -> e instanceof EmojiPackInfo);
+        return emojiPacksInfo.parallelStream().anyMatch(e -> e instanceof EmojiPackInfo);
     }
 
     public static void loadEmojisInfo() {
@@ -202,7 +203,7 @@ public class CustomEmojiHelper {
                     obj.getString("md5")
             ));
         }
-        return packs.stream()
+        return packs.parallelStream()
                 .sorted(Comparator.comparing(e -> e.packName))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -212,13 +213,13 @@ public class CustomEmojiHelper {
     }
 
     public static ArrayList<EmojiPackBase> getEmojiPacksInfo() {
-        return emojiPacksInfo.stream()
+        return emojiPacksInfo.parallelStream()
                 .filter(e -> e instanceof EmojiPackInfo)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static ArrayList<EmojiPackBase> getEmojiCustomPacksInfo() {
-        return emojiPacksInfo.stream()
+        return emojiPacksInfo.parallelStream()
                 .filter(e -> !(e instanceof EmojiPackInfo))
                 .filter(e -> !e.getPackId().equals(pendingDeleteEmojiPackId))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -277,17 +278,11 @@ public class CustomEmojiHelper {
     }
 
     public static class EmojiPackInfo extends EmojiPackBase {
-        private final Integer packVersion;
         private final String versionWithMd5;
 
         public EmojiPackInfo(String packName, String fileLink, String previewLink, String packId, Long packSize, Integer packVersion, String md5) {
             super(packName, Objects.equals(packId, "apple") ? "default" : packId, fileLink, previewLink, packSize);
-            this.packVersion = packVersion;
             this.versionWithMd5 = String.format("%s_%s", packVersion, md5);
-        }
-
-        public Integer getPackVersion() {
-            return packVersion;
         }
 
         public String getVersionWithMd5() {
@@ -309,7 +304,7 @@ public class CustomEmojiHelper {
 
     public static File getCurrentEmojiPackOffline() {
         return getAllVersions(OwlConfig.emojiPackSelected)
-                .stream()
+                .parallelStream()
                 .findFirst()
                 .orElse(null);
     }
@@ -338,14 +333,14 @@ public class CustomEmojiHelper {
     }
 
     public static ArrayList<File> getAllVersions(String emojiID, String versionWithMd5) {
-        return getAllEmojis().stream()
+        return getAllEmojis().parallelStream()
                 .filter(file -> file.getName().startsWith(emojiID))
                 .filter(file -> TextUtils.isEmpty(versionWithMd5) || !file.getName().endsWith("_v" + versionWithMd5))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static Long getEmojiSize() {
-        return getAllEmojis().stream()
+        return getAllEmojis().parallelStream()
                 .filter(file -> !file.getName().startsWith(OwlConfig.emojiPackSelected))
                 .filter(file -> !isValidCustomPack(file))
                 .map(CustomEmojiHelper::calculateFolderSize)
@@ -368,7 +363,7 @@ public class CustomEmojiHelper {
     }
 
     public static void deleteAll() {
-        getAllEmojis().stream()
+        getAllEmojis().parallelStream()
                 .filter(file -> !file.getName().startsWith(OwlConfig.emojiPackSelected))
                 .filter(file -> !isValidCustomPack(file))
                 .forEach(FileUnzipHelper::deleteFolder);
@@ -402,7 +397,7 @@ public class CustomEmojiHelper {
         boolean isCorrupted = true;
         try {
             long neededLength = getEmojiPacksInfo()
-                    .stream()
+                    .parallelStream()
                     .filter(emojiPackInfo -> Objects.equals(emojiPackInfo.packId, id))
                     .findFirst()
                     .map(e -> e.fileSize)
@@ -491,15 +486,6 @@ public class CustomEmojiHelper {
         });
     }
 
-    public static EmojiPackInfo getEmojiPackInfo(String emojiPackId) {
-        return emojiPacksInfo.stream()
-                .filter(emojiPackInfo -> emojiPackInfo instanceof EmojiPackInfo)
-                .filter(emojiPackInfo -> emojiPackInfo.packId.equals(emojiPackId))
-                .map(emojiPackInfo -> (EmojiPackInfo) emojiPackInfo)
-                .findFirst()
-                .orElse(null);
-    }
-
     public static boolean isValidEmojiPack(File path) {
         Typeface typeface;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -543,7 +529,7 @@ public class CustomEmojiHelper {
             }
         } catch (IOException ignored) {}
         File emojiDir = new File(EMOJI_PACKS_FILE_DIR + fontName + "_v" + sb);
-        boolean isAlreadyInstalled = getAllEmojis().stream()
+        boolean isAlreadyInstalled = getAllEmojis().parallelStream()
                 .filter(CustomEmojiHelper::isValidCustomPack)
                 .anyMatch(file -> file.getName().endsWith(sb.toString()));
         if (isAlreadyInstalled) {
@@ -608,7 +594,7 @@ public class CustomEmojiHelper {
     }
 
     private static void loadCustomEmojiPacks() {
-        getAllEmojis().stream()
+        getAllEmojis().parallelStream()
                 .filter(CustomEmojiHelper::isValidCustomPack)
                 .sorted(Comparator.comparingLong(File::lastModified))
                 .map(file -> {
@@ -620,7 +606,7 @@ public class CustomEmojiHelper {
     }
 
     public static boolean isSelectedCustomEmojiPack() {
-        return getAllEmojis().stream()
+        return getAllEmojis().parallelStream()
                 .filter(CustomEmojiHelper::isValidCustomPack)
                 .anyMatch(file -> file.getName().endsWith(OwlConfig.emojiPackSelected));
     }
