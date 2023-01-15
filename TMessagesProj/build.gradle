@@ -58,7 +58,7 @@ dependencies {
     compileOnly 'org.checkerframework:checker-compat-qual:2.5.5'
 
     // Firebase dependencies
-    implementation 'com.google.firebase:firebase-messaging:23.1.0'
+    implementation 'com.google.firebase:firebase-messaging:23.1.1'
     implementation 'com.google.firebase:firebase-config:21.2.0'
     implementation 'com.google.firebase:firebase-datatransport:18.1.7'
     implementation 'com.google.firebase:firebase-appindexing:20.0.0'
