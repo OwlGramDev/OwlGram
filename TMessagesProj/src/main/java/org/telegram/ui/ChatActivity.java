@@ -25176,6 +25176,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                             );
                                             Bulletin.make(ChatActivity.this, bulletinLayout, Bulletin.DURATION_LONG).show();
                                             OwlConfig.setEmojiPackSelected(finalEmojiPackBase.getPackId());
+                                            if (OwlConfig.useSystemEmoji) OwlConfig.toggleUseSystemEmoji();
                                             Emoji.reloadEmoji();
                                             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
                                         }
