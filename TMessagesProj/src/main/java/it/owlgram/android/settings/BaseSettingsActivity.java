@@ -1,9 +1,5 @@
 package it.owlgram.android.settings;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Parcelable;
@@ -11,11 +7,9 @@ import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
-import androidx.collection.LongSparseArray;
 import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -45,6 +39,7 @@ import org.telegram.ui.Cells.TextRadioCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Cells.UserCell;
 import org.telegram.ui.Cells.UserCell2;
+import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.EmptyTextProgressView;
 import org.telegram.ui.Components.FlickerLoadingView;
 import org.telegram.ui.Components.LayoutHelper;
@@ -107,6 +102,10 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         listView = new RecyclerListView(context);
         listView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         listView.setVerticalScrollBarEnabled(false);
+        DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
+        itemAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
+        itemAnimator.setDelayAnimations(false);
+        listView.setItemAnimator(itemAnimator);
         listView.setAdapter(listAdapter = createAdapter());
         if (listView.getItemAnimator() != null) {
             ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
@@ -340,66 +339,5 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         }
         parentLayout.rebuildFragments(INavigationLayout.REBUILD_FLAG_REBUILD_LAST);
         listView.getLayoutManager().onRestoreInstanceState(recyclerViewState);
-    }
-
-    protected void showItemsAnimated(int from) {
-        if (isPaused) {
-            return;
-        }
-        View progressView = null;
-        for (int i = 0; i < listView.getChildCount(); i++) {
-            View child = listView.getChildAt(i);
-            if (child instanceof FlickerLoadingView) {
-                progressView = child;
-            }
-        }
-        final View finalProgressView = progressView;
-        if (progressView != null) {
-            listView.removeView(progressView);
-            from--;
-        }
-        int finalFrom = from;
-        listView.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
-            @Override
-            public boolean onPreDraw() {
-                listView.getViewTreeObserver().removeOnPreDrawListener(this);
-                int n = listView.getChildCount();
-                AnimatorSet animatorSet = new AnimatorSet();
-                for (int i = 0; i < n; i++) {
-                    View child = listView.getChildAt(i);
-                    if (child == finalProgressView || listView.getChildAdapterPosition(child) < finalFrom) {
-                        continue;
-                    }
-                    child.setAlpha(0);
-                    int s = Math.min(listView.getMeasuredHeight(), Math.max(0, child.getTop()));
-                    int delay = (int) ((s / (float) listView.getMeasuredHeight()) * 100);
-                    ObjectAnimator a = ObjectAnimator.ofFloat(child, View.ALPHA, 0, 1f);
-                    a.setStartDelay(delay);
-                    a.setDuration(200);
-                    animatorSet.playTogether(a);
-                }
-
-                if (finalProgressView != null && finalProgressView.getParent() == null) {
-                    listView.addView(finalProgressView);
-                    RecyclerView.LayoutManager layoutManager = listView.getLayoutManager();
-                    if (layoutManager != null) {
-                        layoutManager.ignoreView(finalProgressView);
-                        Animator animator = ObjectAnimator.ofFloat(finalProgressView, View.ALPHA, finalProgressView.getAlpha(), 0);
-                        animator.addListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                finalProgressView.setAlpha(1f);
-                                layoutManager.stopIgnoringView(finalProgressView);
-                                listView.removeView(finalProgressView);
-                            }
-                        });
-                        animator.start();
-                    }
-                }
-
-                animatorSet.start();
-                return true;
-            }
-        });
     }
 }
