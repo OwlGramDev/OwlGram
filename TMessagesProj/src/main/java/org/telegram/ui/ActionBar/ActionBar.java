@@ -319,7 +319,7 @@ public class ActionBar extends FrameLayout {
                     }
                 }
             }
-            if (Theme.canStartHolidayAnimation() && (OwlConfig.eventType == 0 || (OwlConfig.eventType == 1 && OwlConfig.showSnowFalling))) {
+            if (Theme.canStartHolidayAnimation() && (OwlConfig.eventType == 0 || OwlConfig.eventType == 1)) {
                 if (snowflakesEffect == null) {
                     fireworksEffect = null;
                     snowflakesEffect = new SnowflakesEffect(0);
@@ -1721,6 +1721,7 @@ public class ActionBar extends FrameLayout {
         titleTextView[0].animate().alpha(1f).translationX(0).setDuration(duration).start();
 
         titleAnimationRunning = true;
+        overlayTitleAnimationInProgress = true;
         ViewPropertyAnimator a = titleTextView[1].animate().alpha(0);
         a.translationX(forward ? -AndroidUtilities.dp(20) : AndroidUtilities.dp(20));
         a.setDuration(duration).setListener(new AnimatorListenerAdapter() {
@@ -1732,7 +1733,7 @@ public class ActionBar extends FrameLayout {
                 }
                 titleTextView[1] = null;
                 titleAnimationRunning = false;
-
+                overlayTitleAnimationInProgress = false;
                 requestLayout();
             }
         }).start();

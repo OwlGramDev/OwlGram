@@ -50,6 +50,7 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.DynamicDrawableSpan;
 import android.text.style.MetricAffectingSpan;
 import android.text.style.URLSpan;
 import android.util.Property;
@@ -106,6 +107,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.DownloadController;
+import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLoader;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageLoader;
@@ -2503,6 +2505,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         } else {
             paint = getTextPaint(richText, richText, parentBlock);
         }
+        text = Emoji.replaceEmoji(text, paint.getFontMetricsInt(), false, null, DynamicDrawableSpan.ALIGN_BASELINE);
         StaticLayout result;
         if (maxLines != 0) {
             if (parentBlock instanceof TLRPC.TL_pageBlockPullquote) {
@@ -3689,7 +3692,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
         textSelectionHelper.setParentView(listView[0]);
         if (MessagesController.getGlobalMainSettings().getBoolean("translate_button2", false)) {
             textSelectionHelper.setOnTranslate((text, fromLang, toLang, onAlertDismiss) -> {
-                TranslateAlert.showAlert(parentActivity, parentFragment, fromLang, toLang, text, false, null, onAlertDismiss);
+                TranslateAlert.showAlert(parentActivity, parentFragment, currentAccount, fromLang, toLang, text, false, null, onAlertDismiss);
             });
         }
         textSelectionHelper.layoutManager = layoutManager[0];
@@ -3711,7 +3714,7 @@ public class ArticleViewer implements NotificationCenter.NotificationCenterDeleg
             @Override
             public void startTranslate(CharSequence text, Runnable onAlertDismiss) {
                 super.startTranslate(text, onAlertDismiss);
-                TranslateAlert alert = TranslateAlert.showAlert(activity, parentFragment, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], text, false, null, onAlertDismiss);
+                TranslateAlert alert = TranslateAlert.showAlert(activity, parentFragment, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], text, false, null, onAlertDismiss);
                 alert.showDim(false);
             }
         });

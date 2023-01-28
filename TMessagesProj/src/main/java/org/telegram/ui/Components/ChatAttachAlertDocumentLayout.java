@@ -89,6 +89,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import it.owlgram.android.helpers.CustomEmojiHelper;
+
 public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLayout {
 
     public interface DocumentSelectActivityDelegate {
@@ -108,6 +110,7 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
     public final static int TYPE_DEFAULT = 0;
     public final static int TYPE_MUSIC = 1;
     public final static int TYPE_RINGTONE = 2;
+    public final static int TYPE_EMOJI = 200;
 
     private int type;
 
@@ -157,6 +160,7 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
     private final static int search_button = 0;
     private final static int sort_button = 6;
     public boolean isSoundPicker;
+    public boolean isEmojiPicker;
 
     private static class ListItem {
         public int icon;
@@ -201,6 +205,7 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
         listAdapter = new ListAdapter(context);
         allowMusic = type == TYPE_MUSIC;
         isSoundPicker = type == TYPE_RINGTONE;
+        isEmojiPicker = type == TYPE_EMOJI;
         sortByName = SharedConfig.sortFilesByName;
         loadRecentFiles();
 
@@ -797,6 +802,9 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
                 if (isSoundPicker && !isRingtone(item.file)) {
                     return false;
                 }
+                if (isEmojiPicker && !isEmojiFont(item.file)) {
+                    return false;
+                }
                 if (item.file.length() == 0) {
                     return false;
                 }
@@ -826,6 +834,12 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
         }
         parentAlert.updateCountButton(add ? 1 : 2);
         return true;
+    }
+
+    public boolean isEmojiFont(File file) {
+        boolean isValidEmojiFont = CustomEmojiHelper.isValidEmojiPack(file);
+        if (!isValidEmojiFont) BulletinFactory.of(parentAlert.getContainer(), null).createErrorBulletinSubtitle(LocaleController.formatString("InvalidFormatError", R.string.InvalidFormatError), LocaleController.formatString("ErrorEmojiFontInvalidFormat", R.string.ErrorEmojiFontInvalidFormat), null).show();
+        return isValidEmojiFont;
     }
 
     public boolean isRingtone(File file) {
@@ -930,6 +944,26 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
                         if (fname.endsWith(".jpg") || fname.endsWith(".png") || fname.endsWith(".gif") || fname.endsWith(".jpeg")) {
                             item.thumb = file.getAbsolutePath();
                         }
+                        listAdapter.recentItems.add(item);
+                    }
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
+            } else if (isEmojiPicker) {
+                String[] projection = {
+                        MediaStore.Files.FileColumns._ID,
+                        MediaStore.Files.FileColumns.DATA,
+                };
+                try (Cursor cursor = ApplicationLoader.applicationContext.getContentResolver().query(MediaStore.Files.getContentUri("external"), projection, MediaStore.Files.FileColumns.MIME_TYPE + " LIKE 'font/%'", null, MediaStore.Files.FileColumns.DATE_ADDED + " DESC")) {
+                    while (cursor.moveToNext()) {
+                        File file = new File(cursor.getString(1));
+                        if (!CustomEmojiHelper.isValidEmojiPack(file)) continue;
+                        ListItem item = new ListItem();
+                        item.title = file.getName();
+                        item.file = file;
+                        String[] sp = file.getName().split("\\.");
+                        item.ext = sp.length > 1 ? sp[sp.length - 1] : "?";
+                        item.subtitle = AndroidUtilities.formatFileSize(file.length());
                         listAdapter.recentItems.add(item);
                     }
                 } catch (Exception e) {
@@ -1327,7 +1361,7 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
             FileLog.e(e);
         }
 
-        if (!isSoundPicker) {
+        if (!isSoundPicker && !isEmojiPicker) {
             fs = new ListItem();
             fs.title = LocaleController.getString("Gallery", R.string.Gallery);
             fs.subtitle = LocaleController.getString("GalleryInfo", R.string.GalleryInfo);

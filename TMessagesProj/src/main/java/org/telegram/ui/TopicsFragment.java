@@ -498,10 +498,16 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
                         switchToChat(false);
                         break;
                     case add_member_id:
-                        if (chatFull != null && chatFull.participants != null) {
+                        TLRPC.ChatFull chatFull = getMessagesController().getChatFull(chatId);
+                        if (TopicsFragment.this.chatFull != null && TopicsFragment.this.chatFull.participants != null) {
+                            chatFull.participants = TopicsFragment.this.chatFull.participants;
+                        }
+                        if (chatFull != null) {
                             LongSparseArray<TLObject> users = new LongSparseArray<>();
-                            for (int a = 0; a < chatFull.participants.participants.size(); a++) {
-                                users.put(chatFull.participants.participants.get(a).user_id, null);
+                            if (chatFull.participants != null) {
+                                for (int a = 0; a < chatFull.participants.participants.size(); a++) {
+                                    users.put(chatFull.participants.participants.get(a).user_id, null);
+                                }
                             }
                             long chatId = chatFull.id;
                             InviteMembersBottomSheet bottomSheet = new InviteMembersBottomSheet(context, currentAccount, users, chatFull.id, TopicsFragment.this, themeDelegate) {
@@ -1883,7 +1889,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
 
     private void checkLoading() {
         loadingTopics = topicsController.isLoading(chatId);
-        if (topicsEmptyView != null/* && forumTopics.size() == 0*/) {
+        if (topicsEmptyView != null && (forumTopics.size() == 0 || (forumTopics.size() == 1 && forumTopics.get(0).topic.id == 1))) {
             topicsEmptyView.showProgress(loadingTopics, fragmentBeginToShow);
         }
         if (recyclerListView != null) {
@@ -1904,7 +1910,7 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
             searchAnimator.cancel();
         }
         if (searchTabsView == null) {
-            searchTabsView = searchContainer.createTabsView();
+            searchTabsView = searchContainer.createTabsView(false, 8);
             if (parentDialogsActivity != null) {
                 searchTabsView.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
             }
@@ -2541,8 +2547,8 @@ public class TopicsFragment extends BaseFragment implements NotificationCenter.N
                 adapter.setItems(oldItems, forumTopics);
             }
 
-            if (scrollToTop && layoutManager != null) {
-                layoutManager.scrollToPosition(0);
+            if ((scrollToTop || oldCount == 0) && layoutManager != null) {
+                layoutManager.scrollToPositionWithOffset(0, 0);
                 scrollToTop = false;
             }
         }

@@ -24,6 +24,7 @@ import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.INavigationLayout;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Cells.CreationTextCell;
 import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.ManageChatTextCell;
 import org.telegram.ui.Cells.ManageChatUserCell;
@@ -38,6 +39,7 @@ import org.telegram.ui.Cells.TextRadioCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Cells.UserCell;
 import org.telegram.ui.Cells.UserCell2;
+import org.telegram.ui.Components.CubicBezierInterpolator;
 import org.telegram.ui.Components.EmptyTextProgressView;
 import org.telegram.ui.Components.FlickerLoadingView;
 import org.telegram.ui.Components.LayoutHelper;
@@ -48,6 +50,7 @@ import java.util.List;
 import java.util.Locale;
 
 import it.owlgram.android.components.EditTopicCell;
+import it.owlgram.android.components.EmojiSetCell;
 
 public abstract class BaseSettingsActivity extends BaseFragment {
     protected static final Object PARTIAL = new Object();
@@ -84,7 +87,9 @@ public abstract class BaseSettingsActivity extends BaseFragment {
             @Override
             public void onItemClick(int id) {
                 if (id == -1) {
-                    finishFragment();
+                    if (onBackPressed()) {
+                        finishFragment();
+                    }
                 } else {
                     onMenuItemClick(id);
                 }
@@ -97,12 +102,17 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         listView = new RecyclerListView(context);
         listView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         listView.setVerticalScrollBarEnabled(false);
+        DefaultItemAnimator itemAnimator = new DefaultItemAnimator();
+        itemAnimator.setInterpolator(CubicBezierInterpolator.EASE_OUT_QUINT);
+        itemAnimator.setDelayAnimations(false);
+        listView.setItemAnimator(itemAnimator);
         listView.setAdapter(listAdapter = createAdapter());
         if (listView.getItemAnimator() != null) {
             ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
         }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         listView.setOnItemClickListener(this::onItemClick);
+        listView.setOnItemLongClickListener(this::onItemLongClick);
 
         if (haveEmptyView()) {
             emptyView = new EmptyTextProgressView(context);
@@ -122,7 +132,6 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         }
 
         restartTooltip = new UndoView(context);
-        restartTooltip.setInfoText(LocaleController.formatString("RestartAppToApplyChanges", R.string.RestartAppToApplyChanges));
         frameLayout.addView(restartTooltip, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM | Gravity.LEFT, 8, 0, 8, 8));
         parentFragment = parentLayout.getLastFragment();
         return fragmentView;
@@ -152,6 +161,10 @@ public abstract class BaseSettingsActivity extends BaseFragment {
 
     protected void onItemClick(View view, int position, float x, float y) {
 
+    }
+
+    protected boolean onItemLongClick(View view, int position, float x, float y) {
+        return false;
     }
 
     protected void onMenuItemClick(int id) {
@@ -255,6 +268,15 @@ public abstract class BaseSettingsActivity extends BaseFragment {
                     break;
                 case PLACEHOLDER:
                     view = new FlickerLoadingView(parent.getContext());
+                    break;
+                case EMOJI_PACK_SET_CELL:
+                    view = new EmojiSetCell(parent.getContext());
+                    view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
+                    break;
+                case CREATION_TEXT_CELL:
+                    CreationTextCell creationTextCell = new CreationTextCell(context);
+                    creationTextCell.startPadding = 61;
+                    view = creationTextCell;
                     break;
                 default:
                     view = onCreateViewHolder(type);

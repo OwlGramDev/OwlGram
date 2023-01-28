@@ -189,9 +189,9 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
             }
         } else if (position == cameraXQualityRow) {
             Map<Quality, Size> availableSizes = CameraXUtils.getAvailableVideoSizes();
-            Stream<Integer> tmp = availableSizes.values().stream().sorted(Comparator.comparingInt(Size::getWidth).reversed()).map(Size::getHeight);
+            Stream<Integer> tmp = availableSizes.values().parallelStream().sorted(Comparator.comparingInt(Size::getWidth).reversed()).map(Size::getHeight);
             ArrayList<Integer> types = tmp.collect(Collectors.toCollection(ArrayList::new));
-            ArrayList<String> arrayList = types.stream().map(p -> p + "p").collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<String> arrayList = types.parallelStream().map(p -> p + "p").collect(Collectors.toCollection(ArrayList::new));
             PopupHelper.show(arrayList, LocaleController.getString("CameraQuality", R.string.CameraQuality), types.indexOf(OwlConfig.cameraResolution), context, i -> {
                 OwlConfig.saveCameraResolution(types.get(i));
                 listAdapter.notifyItemChanged(cameraXQualityRow, PARTIAL);
@@ -201,7 +201,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.disableProximityEvents);
             }
-            restartTooltip.showWithAction(0, UndoView.ACTION_CACHE_WAS_CLEARED, null, null);
+            restartTooltip.showWithAction(0, UndoView.ACTION_NEED_RESTART, null, null);
         } else if (position == suppressionRow) {
             OwlConfig.toggleVoicesAgc();
             if (view instanceof TextCheckCell) {
@@ -342,7 +342,7 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
 
     private class ListAdapter extends BaseListAdapter {
         @Override
-        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
+        protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, boolean partial) {
             switch (ViewType.fromInt(holder.getItemViewType())) {
                 case SHADOW:
                     holder.itemView.setBackground(Theme.getThemedDrawable(context, R.drawable.greydivider, Theme.key_windowBackgroundGrayShadow));

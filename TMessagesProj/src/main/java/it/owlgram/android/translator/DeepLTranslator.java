@@ -15,8 +15,10 @@ public class DeepLTranslator extends BaseTranslator {
     public static final int FORMALITY_LESS = 2;
 
     private final List<String> targetLanguages = Arrays.asList(
-            "bg", "pl", "da", "de", "ru", "fr", "fi", "nl", "cs", "lv", "lt", "ro",
-            "pt", "pt-PT", "pt-BR", "ja", "sv", "sk", "sl", "es", "el", "hu", "it", "en", "en-GB", "en-US", "zh");
+            "bg", "cs", "da", "de", "el", "en", "en-GB", "en-US", "es", "fi", "fr", "hu", "id",
+            "it", "ja", "lt", "lv", "nl", "pl", "pt", "pt-BR", "pt-PT", "ro", "ru", "sk", "sl",
+            "sv", "tr", "uk", "zh");
+
     private final RawDeepLTranslator deeplTranslator = new RawDeepLTranslator();
 
     private static final class InstanceHolder {

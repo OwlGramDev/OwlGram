@@ -97,6 +97,7 @@ public class OwlConfig extends SettingsManager {
     public static String oldBuildVersion = null;
     public static String languagePackVersioning;
     public static String doNotTranslateLanguages;
+    public static String emojiPackSelected;
     public static int deepLFormality;
     public static int translationProvider;
     public static int lastUpdateStatus = 0;
@@ -116,6 +117,7 @@ public class OwlConfig extends SettingsManager {
     public static long lastUpdateCheck = 0;
     public static int downloadSpeedBoost;
     public static int unlockedSecretIcon;
+    public static int lastSelectedCompression;
 
     static {
         loadConfig(true);
@@ -221,6 +223,8 @@ public class OwlConfig extends SettingsManager {
             hideSendAsChannel = getBoolean("hideSendAsChannel", false);
             showNameInActionBar = getBoolean("showNameInActionBar", false);
             stickersSorting = getBoolean("stickersSorting", true);
+            emojiPackSelected = getString("emojiPackSelected", "default");
+            lastSelectedCompression = getInt("lastSelectedCompression", 3);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -579,6 +583,10 @@ public class OwlConfig extends SettingsManager {
         putValue("maxRecentStickers", maxRecentStickers = size);
     }
 
+    public static void setCompression(int compression) {
+        putValue("lastSelectedCompression", lastSelectedCompression = compression);
+    }
+
     public static void setUpdateData(String data) {
         putValue("updateData", updateData = data);
     }
@@ -597,6 +605,10 @@ public class OwlConfig extends SettingsManager {
 
     public static void setDownloadSpeedBoost(int boost) {
         putValue("downloadSpeedBoost", downloadSpeedBoost = boost);
+    }
+
+    public static void setEmojiPackSelected(String emojiPack) {
+        putValue("emojiPackSelected", emojiPackSelected = emojiPack);
     }
 
     public static int getNotificationColor() {
