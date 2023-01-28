@@ -56,6 +56,7 @@ public class CustomEmojiHelper {
     private static boolean loadSystemEmojiFailed = false;
     private static final String EMOJI_FONT_AOSP = "NotoColorEmoji.ttf";
     private static boolean loadingPack = false;
+    private static boolean loadingPackFailed = false;
     private static String pendingDeleteEmojiPackId;
     private static final ArrayList<EmojiPackBase> emojiPacksInfo = new ArrayList<>();
     private static final SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("customEmojiCache", Activity.MODE_PRIVATE);
@@ -114,7 +115,7 @@ public class CustomEmojiHelper {
 
     private static Typeface getSelectedTypeface() {
         return getEmojiCustomPacksInfo()
-                .parallelStream()
+                .stream()
                 .filter(emojiPackInfo -> emojiPackInfo.packId.equals(OwlConfig.emojiPackSelected))
                 .map(emojiPackInfo -> {
                     File emojiFile = new File(emojiPackInfo.fileLocation);
@@ -131,7 +132,7 @@ public class CustomEmojiHelper {
     public static String getSelectedPackName() {
         if (OwlConfig.useSystemEmoji) return LocaleController.getString("CameraTypeSystem", R.string.CameraTypeSystem);
         return emojiPacksInfo
-                .parallelStream()
+                .stream()
                 .filter(e -> {
                     if (e instanceof EmojiPackInfo) {
                         return emojiDir(e.packId, ((EmojiPackInfo) e).versionWithMd5).exists();
@@ -146,18 +147,28 @@ public class CustomEmojiHelper {
 
     public static String getSelectedEmojiPackId() {
         return getAllEmojis()
-                .parallelStream()
+                .stream()
                 .map(File::getName)
                 .anyMatch(name -> name.startsWith(OwlConfig.emojiPackSelected) || name.endsWith(OwlConfig.emojiPackSelected))
                 ? OwlConfig.emojiPackSelected : "default";
     }
 
-    public static boolean loadedPackInfo() {
-        return emojiPacksInfo.parallelStream().anyMatch(e -> e instanceof EmojiPackInfo);
+    public static boolean isFailedLoading() {
+        return loadingPackFailed;
+    }
+
+    public static boolean isLoading() {
+        return loadingPack;
     }
 
     public static void loadEmojisInfo() {
         loadEmojisInfo(() -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiPacksLoaded));
+    }
+
+    private static void invalidateCache(boolean isRemotePack) {
+        new ArrayList<>(emojiPacksInfo).stream()
+                .filter(emojiPackInfo -> (emojiPackInfo instanceof EmojiPackInfo) == isRemotePack)
+                .forEach(emojiPacksInfo::remove);
     }
 
     public static void loadEmojisInfo(EmojiPackListener listener) {
@@ -165,19 +176,25 @@ public class CustomEmojiHelper {
             return;
         }
         loadingPack = true;
-        emojiPacksInfo.clear();
-        loadCustomEmojiPacks();
+        loadingPackFailed = false;
         new Thread() {
             @Override
             public void run() {
+                ArrayList<EmojiPackBase> tmp = loadCustomEmojiPacks();
+                invalidateCache(false);
+                emojiPacksInfo.addAll(tmp);
+                AndroidUtilities.runOnUIThread(listener::onLoaded);
                 try {
                     String json = new StandardHTTPRequest(String.format("https://app.owlgram.org/emoji_packs?noCache=%s",  Math.random() * 10000)).request();
                     preferences.edit().putString("emoji_packs", json).apply();
+                    invalidateCache(true);
                     emojiPacksInfo.addAll(loadFromJson(json));
                 } catch (Exception e) {
                     try {
+                        invalidateCache(true);
                         emojiPacksInfo.addAll(loadFromJson(preferences.getString("emoji_packs", "[]")));
                     } catch (JSONException ignored) {
+                        loadingPackFailed = true;
                     }
                     FileLog.e("Error loading emoji packs", e);
                 } finally {
@@ -203,7 +220,7 @@ public class CustomEmojiHelper {
                     obj.getString("md5")
             ));
         }
-        return packs.parallelStream()
+        return packs.stream()
                 .sorted(Comparator.comparing(e -> e.packName))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
@@ -213,13 +230,13 @@ public class CustomEmojiHelper {
     }
 
     public static ArrayList<EmojiPackBase> getEmojiPacksInfo() {
-        return emojiPacksInfo.parallelStream()
+        return emojiPacksInfo.stream()
                 .filter(e -> e instanceof EmojiPackInfo)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static ArrayList<EmojiPackBase> getEmojiCustomPacksInfo() {
-        return emojiPacksInfo.parallelStream()
+        return emojiPacksInfo.stream()
                 .filter(e -> !(e instanceof EmojiPackInfo))
                 .filter(e -> !e.getPackId().equals(pendingDeleteEmojiPackId))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -304,7 +321,7 @@ public class CustomEmojiHelper {
 
     public static File getCurrentEmojiPackOffline() {
         return getAllVersions(OwlConfig.emojiPackSelected)
-                .parallelStream()
+                .stream()
                 .findFirst()
                 .orElse(null);
     }
@@ -333,14 +350,14 @@ public class CustomEmojiHelper {
     }
 
     public static ArrayList<File> getAllVersions(String emojiID, String versionWithMd5) {
-        return getAllEmojis().parallelStream()
+        return getAllEmojis().stream()
                 .filter(file -> file.getName().startsWith(emojiID))
                 .filter(file -> TextUtils.isEmpty(versionWithMd5) || !file.getName().endsWith("_v" + versionWithMd5))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static Long getEmojiSize() {
-        return getAllEmojis().parallelStream()
+        return getAllEmojis().stream()
                 .filter(file -> !file.getName().startsWith(OwlConfig.emojiPackSelected))
                 .filter(file -> !isValidCustomPack(file))
                 .map(CustomEmojiHelper::calculateFolderSize)
@@ -363,7 +380,7 @@ public class CustomEmojiHelper {
     }
 
     public static void deleteAll() {
-        getAllEmojis().parallelStream()
+        getAllEmojis().stream()
                 .filter(file -> !file.getName().startsWith(OwlConfig.emojiPackSelected))
                 .filter(file -> !isValidCustomPack(file))
                 .forEach(FileUnzipHelper::deleteFolder);
@@ -397,7 +414,7 @@ public class CustomEmojiHelper {
         boolean isCorrupted = true;
         try {
             long neededLength = getEmojiPacksInfo()
-                    .parallelStream()
+                    .stream()
                     .filter(emojiPackInfo -> Objects.equals(emojiPackInfo.packId, id))
                     .findFirst()
                     .map(e -> e.fileSize)
@@ -529,7 +546,7 @@ public class CustomEmojiHelper {
             }
         } catch (IOException ignored) {}
         File emojiDir = new File(EMOJI_PACKS_FILE_DIR + fontName + "_v" + sb);
-        boolean isAlreadyInstalled = getAllEmojis().parallelStream()
+        boolean isAlreadyInstalled = getAllEmojis().stream()
                 .filter(CustomEmojiHelper::isValidCustomPack)
                 .anyMatch(file -> file.getName().endsWith(sb.toString()));
         if (isAlreadyInstalled) {
@@ -593,8 +610,8 @@ public class CustomEmojiHelper {
         canvas.drawText(emoji, areaRect.centerX() + x,-textRect.top + y, textPaint);
     }
 
-    private static void loadCustomEmojiPacks() {
-        getAllEmojis().parallelStream()
+    private static ArrayList<EmojiPackBase> loadCustomEmojiPacks() {
+        return getAllEmojis().stream()
                 .filter(CustomEmojiHelper::isValidCustomPack)
                 .sorted(Comparator.comparingLong(File::lastModified))
                 .map(file -> {
@@ -602,11 +619,11 @@ public class CustomEmojiHelper {
                     emojiPackBase.loadFromFile(file);
                     return emojiPackBase;
                 })
-                .forEach(emojiPacksInfo::add);
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public static boolean isSelectedCustomEmojiPack() {
-        return getAllEmojis().parallelStream()
+        return getAllEmojis().stream()
                 .filter(CustomEmojiHelper::isValidCustomPack)
                 .anyMatch(file -> file.getName().endsWith(OwlConfig.emojiPackSelected));
     }
