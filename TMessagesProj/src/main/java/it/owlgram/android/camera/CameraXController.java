@@ -327,7 +327,7 @@ public class CameraXController {
         vCapture = VideoCapture.withOutput(recorder);
 
         ImageCapture.Builder iCaptureBuilder = new ImageCapture.Builder()
-                .setCaptureMode(OwlConfig.useCameraXOptimizedMode ? ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY : ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+                .setCaptureMode(OwlConfig.useCameraXOptimizedMode ? ImageCapture.CAPTURE_MODE_ZERO_SHUTTER_LAG : ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                 .setTargetAspectRatio(AspectRatio.RATIO_16_9);
 
         provider.unbindAll();
