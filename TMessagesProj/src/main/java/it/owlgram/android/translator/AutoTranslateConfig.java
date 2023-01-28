@@ -2,6 +2,7 @@ package it.owlgram.android.translator;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.MessagesController;
@@ -9,6 +10,7 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,14 +53,14 @@ public class AutoTranslateConfig {
     }
 
     private static void deleteAllTopicExceptions(long dialogId) {
-        getAllExceptions().stream()
+        getAllExceptions().parallelStream()
                 .filter(e -> e.dialogId == dialogId)
                 .filter(e -> e.topicId != 0)
                 .forEach(e -> preferences.edit().remove(getExceptionsKey(e.dialogId, e.topicId)).apply());
     }
 
     public static void removeAllTypeExceptions(boolean isAllowed) {
-        getAllExceptions().stream()
+        getAllExceptions().parallelStream()
                 .filter(e -> e.isAllow == isAllowed)
                 .forEach(e -> preferences.edit().remove(getExceptionsKey(e.dialogId, e.topicId)).apply());
     }
@@ -66,7 +68,7 @@ public class AutoTranslateConfig {
     private static boolean isAllTopicEnabledOrDisabled(long dialogId, boolean enabled) {
         List<TLRPC.TL_forumTopic> topics = MessagesController.getInstance(UserConfig.selectedAccount).getTopicsController().getTopics(-dialogId);
         if (topics != null) {
-            return topics.stream().allMatch(t -> isAutoTranslateEnabled(dialogId, t.id) == enabled);
+            return topics.parallelStream().allMatch(t -> isAutoTranslateEnabled(dialogId, t.id) == enabled);
         } else {
             return true;
         }
@@ -75,7 +77,7 @@ public class AutoTranslateConfig {
     public static boolean isLastTopicAvailable(long dialogId, int topicId, boolean enabled) {
         List<TLRPC.TL_forumTopic> topics = MessagesController.getInstance(UserConfig.selectedAccount).getTopicsController().getTopics(-dialogId);
         if (topics != null) {
-            return topics.stream().filter(t -> t.id != topicId).anyMatch(t -> isAutoTranslateEnabled(dialogId, t.id) == enabled);
+            return topics.parallelStream().filter(t -> t.id != topicId).anyMatch(t -> isAutoTranslateEnabled(dialogId, t.id) == enabled);
         } else {
             return false;
         }
@@ -90,7 +92,7 @@ public class AutoTranslateConfig {
     }
 
     public static void migrate() {
-        preferences.getAll().entrySet().stream()
+        preferences.getAll().entrySet().parallelStream()
                 .filter(entry -> entry.getKey().startsWith("autoTranslate_"))
                 .forEach(entry -> {
                     String key = entry.getKey();
@@ -122,23 +124,22 @@ public class AutoTranslateConfig {
     }
 
     public static List<AutoTranslateException> getAllExceptions() {
-        return preferences.getAll().entrySet().stream()
+        return preferences.getAll().entrySet().parallelStream()
                 .filter(entry -> entry.getKey().startsWith("exceptions_" + UserConfig.selectedAccount))
                 .map(entry -> new AutoTranslateException(
                         Long.parseLong(entry.getKey().split("_")[2]),
                         entry.getKey().split("_").length > 3 ? Integer.parseInt(entry.getKey().split("_")[3]) : 0,
                         (boolean) entry.getValue()))
                 .filter(exception -> exception.chat != null)
-                .sorted((o1, o2) -> {
-                    String n1 = o1.chat instanceof TLRPC.User ? ((TLRPC.User) o1.chat).first_name : ((TLRPC.Chat) o1.chat).title;
-                    String n2 = o2.chat instanceof TLRPC.User ? ((TLRPC.User) o2.chat).first_name : ((TLRPC.Chat) o2.chat).title;
-                    return n1.compareTo(n2);
-                })
+                .filter(o1 -> !TextUtils.isEmpty(o1.chat instanceof TLRPC.User ? ((TLRPC.User) o1.chat).first_name : ((TLRPC.Chat) o1.chat).title))
+                .sorted((Comparator.comparing(o1 -> o1.chat instanceof TLRPC.User ?
+                        ((TLRPC.User) o1.chat).first_name :
+                        ((TLRPC.Chat) o1.chat).title)))
                 .collect(Collectors.toList());
     }
 
     public static List<AutoTranslateException> getExceptions(boolean isAllow) {
-        return getAllExceptions().stream()
+        return getAllExceptions().parallelStream()
                 .filter(exception -> exception.isAllow == isAllow)
                 .filter(distinctByKey(exception -> exception.dialogId))
                 .filter(exception -> isAllTopicEnabledOrDisabled(exception.dialogId, isAllow) || isAllow)
@@ -146,7 +147,7 @@ public class AutoTranslateConfig {
     }
 
     public static boolean getExceptionsById(boolean allow, long dialogId) {
-        return getExceptions(allow).stream().anyMatch(e -> e.dialogId == dialogId);
+        return getExceptions(allow).parallelStream().anyMatch(e -> e.dialogId == dialogId);
     }
 
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
@@ -154,7 +155,7 @@ public class AutoTranslateConfig {
         return t -> seen.add(keyExtractor.apply(t));
     }
 
-    public static boolean resetExceptions() {
-        return preferences.edit().clear().commit();
+    public static void resetExceptions() {
+        preferences.edit().clear().apply();
     }
 }

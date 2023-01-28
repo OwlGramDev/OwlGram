@@ -62,7 +62,7 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
         this.chat = chat;
         ArrayList<TLRPC.TL_forumTopic> tmp = getMessagesController().getTopicsController().getTopics(chat.id);
         if (tmp != null) {
-            tmp.stream().sorted(Comparator.comparing(o -> o.title)).forEach(topics::add);
+            tmp.parallelStream().sorted(Comparator.comparing(o -> o.title)).forEach(topics::add);
         }
         this.isAllow = isAllow;
         this.editExceptionDelegate = delegate;
@@ -154,7 +154,7 @@ public class AutoTranslateGroupInfo extends BaseSettingsActivity implements Noti
             if (this.chat.id == chatId) {
                 topics.clear();
                 ArrayList<TLRPC.TL_forumTopic> tmp = getMessagesController().getTopicsController().getTopics(chat.id);
-                tmp.stream().sorted(Comparator.comparing(o -> o.title)).forEach(topics::add);
+                tmp.parallelStream().sorted(Comparator.comparing(o -> o.title)).forEach(topics::add);
                 updateRowsId();
                 listAdapter.notifyDataSetChanged();
                 if (!getMessagesController().getTopicsController().endIsReached(chat.id)) {

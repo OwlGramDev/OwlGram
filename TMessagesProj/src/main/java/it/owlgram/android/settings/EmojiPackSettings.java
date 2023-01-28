@@ -9,10 +9,12 @@ import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.SparseBooleanArray;
+import android.util.SparseIntArray;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
@@ -42,7 +44,7 @@ import org.telegram.ui.LaunchActivity;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.EmojiSetCell;
@@ -51,6 +53,9 @@ import it.owlgram.android.helpers.FileDownloadHelper;
 import it.owlgram.android.helpers.FileUnzipHelper;
 
 public class EmojiPackSettings extends BaseSettingsActivity implements NotificationCenter.NotificationCenterDelegate, ChatAttachAlertDocumentLayout.DocumentSelectActivityDelegate {
+
+    private final ArrayList<CustomEmojiHelper.EmojiPackBase> emojiPacks = new ArrayList<>();
+    private final ArrayList<CustomEmojiHelper.EmojiPackBase> customEmojiPacks = new ArrayList<>();
 
     private int generalHeaderRow;
     private int emojiDividerRow;
@@ -62,6 +67,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
     private int customEmojiAddRow;
     private int emojiPackHeaderRow;
     private int placeHolderRow;
+    private int customEmojiPlaceHolderRow;
     private int emojiPacksStartRow;
     private int emojiPacksEndRow;
     private int emojiHintRow;
@@ -169,8 +175,8 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
     }
 
     private String getCurrentUnzipping() {
-        return CustomEmojiHelper.getEmojiPacksInfo()
-                .stream()
+        return emojiPacks
+                .parallelStream()
                 .map(CustomEmojiHelper.EmojiPackBase::getPackId)
                 .filter(FileUnzipHelper::isRunningUnzip)
                 .findFirst()
@@ -178,8 +184,8 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
     }
 
     private String getCurrentDownloading() {
-        return CustomEmojiHelper.getEmojiPacksInfo()
-                .stream()
+        return emojiPacks
+                .parallelStream()
                 .map(CustomEmojiHelper.EmojiPackBase::getPackId)
                 .filter(FileDownloadHelper::isRunningDownload)
                 .findFirst()
@@ -204,14 +210,14 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
             }
 
             @Override
-            public void onFinished(String id, boolean isCanceled) {
+            public void onFinished(String id, boolean isFailed) {
                 if (cell.packId.equals(id)) {
                     if (CustomEmojiHelper.emojiTmpDownloaded(cell.packId)) {
                         FileUnzipHelper.unzipFile(ApplicationLoader.applicationContext, cell.packId, CustomEmojiHelper.emojiTmp(cell.packId), CustomEmojiHelper.emojiDir(cell.packId, cell.versionWithMD5));
                     } else {
                         CustomEmojiHelper.emojiTmp(cell.packId).delete();
                         ((ListAdapter) listAdapter).notifyEmojiSetsChanged();
-                        if (!isCanceled) BulletinFactory.of(EmojiPackSettings.this).createErrorBulletin(LocaleController.getString("EmojiSetErrorDownloading", R.string.EmojiSetErrorDownloading)).show();
+                        if (isFailed) BulletinFactory.of(EmojiPackSettings.this).createErrorBulletin(LocaleController.getString("EmojiSetErrorDownloading", R.string.EmojiSetErrorDownloading)).show();
                     }
                 }
                 cell.checkDownloaded(true);
@@ -257,21 +263,31 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
     @Override
     protected void updateRowsId() {
         super.updateRowsId();
+        updatePacks();
+
         generalHeaderRow =  rowCount++;
         useSystemEmojiRow = rowCount++;
         emojiDividerRow = rowCount++;
         useCustomEmojiHeaderRow = rowCount++;
-        customEmojiStartRow = rowCount;
-        rowCount += CustomEmojiHelper.getEmojiCustomPacksInfo().size();
-        customEmojiEndRow = rowCount;
+        if (customEmojiPacks.size() > 0) {
+            customEmojiStartRow = rowCount;
+            rowCount += customEmojiPacks.size();
+            customEmojiEndRow = rowCount;
+            customEmojiPlaceHolderRow = -1;
+        } else {
+            customEmojiStartRow = -1;
+            customEmojiEndRow = -1;
+            customEmojiPlaceHolderRow = rowCount++;
+        }
         customEmojiAddRow = rowCount++;
         customEmojiHintRow = rowCount++;
 
         emojiPackHeaderRow = rowCount++;
-        if (CustomEmojiHelper.loadedPackInfo()) {
+        if (emojiPacks.size() > 0) {
             emojiPacksStartRow = rowCount;
-            rowCount += CustomEmojiHelper.getEmojiPacksInfo().size();
+            rowCount += emojiPacks.size();
             emojiPacksEndRow = rowCount;
+            placeHolderRow = -1;
         } else {
             emojiPacksStartRow = -1;
             emojiPacksEndRow = -1;
@@ -280,23 +296,25 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         emojiHintRow = rowCount++;
     }
 
+    public void updatePacks() {
+        emojiPacks.clear();
+        customEmojiPacks.clear();
+        emojiPacks.addAll(CustomEmojiHelper.getEmojiPacksInfo());
+        customEmojiPacks.addAll(CustomEmojiHelper.getEmojiCustomPacksInfo());
+    }
+
     @Override
     protected BaseListAdapter createAdapter() {
         return new ListAdapter();
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.emojiPacksLoaded) {
-            if (!CustomEmojiHelper.loadedPackInfo()) {
+            if (CustomEmojiHelper.isFailedLoading()) {
                 AndroidUtilities.runOnUIThread(CustomEmojiHelper::loadEmojisInfo, 1000);
             } else {
-                if (listAdapter != null) {
-                    updateRowsId();
-                    showItemsAnimated(emojiPacksStartRow + 1);
-                    listAdapter.notifyDataSetChanged();
-                }
+                updateListAnimated();
             }
         }
     }
@@ -333,9 +351,9 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                     EmojiSetCell emojiPackSetCell = (EmojiSetCell) holder.itemView;
                     CustomEmojiHelper.EmojiPackBase emojiPackInfo = null;
                     if (position >= emojiPacksStartRow && position < emojiPacksEndRow) {
-                        emojiPackInfo = CustomEmojiHelper.getEmojiPacksInfo().get(position - emojiPacksStartRow);
+                        emojiPackInfo = emojiPacks.get(position - emojiPacksStartRow);
                     } else if (position >= customEmojiStartRow && position < customEmojiEndRow) {
-                        emojiPackInfo = CustomEmojiHelper.getEmojiCustomPacksInfo().get(position - customEmojiStartRow);
+                        emojiPackInfo = customEmojiPacks.get(position - customEmojiStartRow);
                     }
                     emojiPackSetCell.setSelected(selectedItems.get(position, false), partial);
                     if (emojiPackInfo != null) {
@@ -398,7 +416,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                 return ViewType.SHADOW;
             } else if (position == customEmojiAddRow) {
                 return ViewType.CREATION_TEXT_CELL;
-            } else if (position == placeHolderRow) {
+            } else if (position == placeHolderRow || position == customEmojiPlaceHolderRow) {
                 return ViewType.PLACEHOLDER;
             }
             throw new IllegalArgumentException("Invalid position");
@@ -457,7 +475,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
 
             if (which == MENU_DELETE || which == MENU_SHARE) {
                 ArrayList<CustomEmojiHelper.EmojiPackBase> stickerSetList = new ArrayList<>(selectedItems.size());
-                ArrayList<CustomEmojiHelper.EmojiPackBase> packs = CustomEmojiHelper.getEmojiCustomPacksInfo();
+                ArrayList<CustomEmojiHelper.EmojiPackBase> packs = customEmojiPacks;
                 for (int i = 0, size = packs.size(); i < size; i++) {
                     CustomEmojiHelper.EmojiPackBase pack = packs.get(i);
                     if (selectedItems.get(customEmojiStartRow + i, false)) {
@@ -489,8 +507,8 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
 
                                 @Override
                                 public void onUndo() {
-                                    notifyItemInserted(customEmojiStartRow + CustomEmojiHelper.getEmojiCustomPacksInfo().indexOf(pack));
                                     updateRowsId();
+                                    notifyItemInserted(customEmojiStartRow + customEmojiPacks.indexOf(pack));
                                     notifyEmojiSetsChanged();
                                 }
                             });
@@ -523,26 +541,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                                         AndroidUtilities.runOnUIThread(() -> {
                                             progressDialog.dismiss();
                                             clearSelected();
-                                            List<int[]> consecutiveItems = stickerSetList.stream()
-                                                    .map(packs::indexOf)
-                                                    .reduce(new ArrayList<>(), (acc, ordinalPos) -> {
-                                                        boolean isConsecutive = acc.size() > 0 && ordinalPos == acc.get(acc.size() - 1)[1] + 1;
-                                                        if (isConsecutive) {
-                                                            int[] lastInterval = acc.get(acc.size() - 1);
-                                                            lastInterval[1] = ordinalPos;
-                                                        } else {
-                                                            acc.add(new int[]{ordinalPos, ordinalPos});
-                                                        }
-                                                        return acc;
-                                                    }, (acc1, acc2) -> acc1);
-                                            for (int[] interval : consecutiveItems) {
-                                                if (interval[0] == interval[1]) {
-                                                    notifyItemRemoved(customEmojiStartRow + interval[0]);
-                                                } else {
-                                                    notifyItemRangeRemoved(customEmojiStartRow + interval[0], interval[1] - interval[0] + 1);
-                                                }
-                                            }
-                                            updateRowsId();
+                                            updateListAnimated();
                                             Emoji.reloadEmoji();
                                             NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
                                         });
@@ -594,7 +593,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                 if (chatAttachAlert != null) {
                     ArrayList<File> files = CustomEmojiHelper.getFilesFromActivityResult(data);
                     AndroidUtilities.runOnUIThread(() -> {
-                        boolean apply = files.stream().allMatch(file -> chatAttachAlert.getDocumentLayout().isEmojiFont(file));
+                        boolean apply = files.parallelStream().allMatch(file -> chatAttachAlert.getDocumentLayout().isEmojiFont(file));
                         if (apply && !files.isEmpty()) {
                             chatAttachAlert.dismiss();
                             processFiles(files);
@@ -658,6 +657,106 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         if (id == MENU_DELETE || id == MENU_SHARE) {
             ListAdapter adapter = (ListAdapter) listAdapter;
             adapter.processSelectionMenu(id);
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateListAnimated() {
+        if (listAdapter == null) {
+            updateRowsId();
+            return;
+        }
+        DiffCallback diffCallback = new DiffCallback();
+        diffCallback.oldRowCount = rowCount;
+        diffCallback.fillPositions(diffCallback.oldPositionToItem);
+        diffCallback.oldEmojiPacks.clear();
+        diffCallback.oldCustomPacks.clear();
+        diffCallback.oldEmojiPacks.addAll(emojiPacks);
+        diffCallback.oldCustomPacks.addAll(customEmojiPacks);
+        diffCallback.oldEmojiPacksStartRow = emojiPacksStartRow;
+        diffCallback.oldEmojiPacksEndRow = emojiPacksEndRow;
+        diffCallback.oldCustomEmojiStartRow = customEmojiStartRow;
+        diffCallback.oldCustomEmojiEndRow = customEmojiEndRow;
+        updateRowsId();
+        diffCallback.fillPositions(diffCallback.newPositionToItem);
+        try {
+            DiffUtil.calculateDiff(diffCallback).dispatchUpdatesTo(listAdapter);
+        } catch (Exception e) {
+            FileLog.e(e);
+            listAdapter.notifyDataSetChanged();
+        }
+        AndroidUtilities.updateVisibleRows(listView);
+    }
+
+    private class DiffCallback extends DiffUtil.Callback {
+
+        int oldRowCount;
+
+        SparseIntArray oldPositionToItem = new SparseIntArray();
+        SparseIntArray newPositionToItem = new SparseIntArray();
+        ArrayList<CustomEmojiHelper.EmojiPackBase> oldEmojiPacks = new ArrayList<>();
+        ArrayList<CustomEmojiHelper.EmojiPackBase> oldCustomPacks = new ArrayList<>();
+        int oldEmojiPacksStartRow;
+        int oldEmojiPacksEndRow;
+        int oldCustomEmojiStartRow;
+        int oldCustomEmojiEndRow;
+
+        @Override
+        public int getOldListSize() {
+            return oldRowCount;
+        }
+
+        @Override
+        public int getNewListSize() {
+            return rowCount;
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            if (newItemPosition >= emojiPacksStartRow && newItemPosition < emojiPacksEndRow) {
+                if (oldItemPosition >= oldEmojiPacksStartRow && oldItemPosition < oldEmojiPacksEndRow) {
+                    CustomEmojiHelper.EmojiPackBase oldItem = oldEmojiPacks.get(oldItemPosition - oldEmojiPacksStartRow);
+                    CustomEmojiHelper.EmojiPackBase newItem = emojiPacks.get(newItemPosition - emojiPacksStartRow);
+                    return Objects.equals(oldItem.getPackId(), newItem.getPackId());
+                }
+            }
+            if (newItemPosition >= customEmojiStartRow && newItemPosition < customEmojiEndRow) {
+                if (oldItemPosition >= oldCustomEmojiStartRow && oldItemPosition < oldCustomEmojiEndRow) {
+                    CustomEmojiHelper.EmojiPackBase oldItem = oldCustomPacks.get(oldItemPosition - oldCustomEmojiStartRow);
+                    CustomEmojiHelper.EmojiPackBase newItem = customEmojiPacks.get(newItemPosition - customEmojiStartRow);
+                    return Objects.equals(oldItem.getPackId(), newItem.getPackId());
+                }
+            }
+            int oldIndex = oldPositionToItem.get(oldItemPosition, -1);
+            int newIndex = newPositionToItem.get(newItemPosition, -1);
+            return oldIndex == newIndex && oldIndex >= 0;
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return areItemsTheSame(oldItemPosition, newItemPosition);
+        }
+
+        public void fillPositions(SparseIntArray sparseIntArray) {
+            sparseIntArray.clear();
+            int pointer = 0;
+
+            put(++pointer, generalHeaderRow, sparseIntArray);
+            put(++pointer, useSystemEmojiRow, sparseIntArray);
+            put(++pointer, emojiDividerRow, sparseIntArray);
+            put(++pointer, useCustomEmojiHeaderRow, sparseIntArray);
+            put(++pointer, customEmojiPlaceHolderRow, sparseIntArray);
+            put(++pointer, customEmojiAddRow, sparseIntArray);
+            put(++pointer, customEmojiHintRow, sparseIntArray);
+            put(++pointer, emojiPackHeaderRow, sparseIntArray);
+            put(++pointer, placeHolderRow, sparseIntArray);
+            put(++pointer, emojiHintRow, sparseIntArray);
+        }
+
+        private void put(int id, int position, SparseIntArray sparseIntArray) {
+            if (position >= 0) {
+                sparseIntArray.put(position, id);
+            }
         }
     }
 }

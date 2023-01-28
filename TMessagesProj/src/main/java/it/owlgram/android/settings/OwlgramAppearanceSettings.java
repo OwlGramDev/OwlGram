@@ -282,9 +282,9 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.emojiPacksLoaded) {
-            if (!CustomEmojiHelper.loadedPackInfo()) {
+            if (CustomEmojiHelper.isFailedLoading()) {
                 AndroidUtilities.runOnUIThread(CustomEmojiHelper::loadEmojisInfo, 1000);
-            } else if (listAdapter != null) {
+            } else {
                 listAdapter.notifyItemChanged(chooseEmojiPackRow, PARTIAL);
             }
         }
@@ -367,7 +367,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
                     TextSettingsCell textSettingsCell = (TextSettingsCell) holder.itemView;
                     textSettingsCell.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                     if (position == chooseEmojiPackRow) {
-                        textSettingsCell.setDrawLoading(!CustomEmojiHelper.loadedPackInfo(), 30, partial);
+                        textSettingsCell.setDrawLoading(CustomEmojiHelper.isLoading(), 30, partial);
                         String emojiPack = CustomEmojiHelper.getSelectedPackName();
                         textSettingsCell.setTextAndValue(LocaleController.getString("EmojiSets", R.string.EmojiSets), emojiPack, true);
                     }

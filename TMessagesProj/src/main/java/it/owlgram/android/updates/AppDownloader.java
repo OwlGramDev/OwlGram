@@ -63,7 +63,7 @@ public class AppDownloader {
                 }
 
                 @Override
-                public void onFinished(String id, boolean isCanceled) {
+                public void onFinished(String id, boolean isFailed) {
                     listener.onFinished();
                 }
             });
