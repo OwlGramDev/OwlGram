@@ -344,8 +344,8 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                 sendMediaEmbededLinksRow = rowCount++;
                 sendPollsRow = rowCount++;
                 sendGamesRow = rowCount++;
+                useInlineBotRow = rowCount++;
             }
-            useInlineBotRow = rowCount++;
             addUsersRow = rowCount++;
             pinMessagesRow = rowCount++;
             changeInfoRow = rowCount++;
@@ -753,6 +753,8 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                         defaultBannedRights.send_gifs = !defaultBannedRights.send_gifs;
                     } else if (position == sendGamesRow) {
                         defaultBannedRights.send_games = !defaultBannedRights.send_games;
+                    } else if (position == useInlineBotRow) {
+                        defaultBannedRights.send_inline = !defaultBannedRights.send_inline;
                     }
 
                     checkBoxCell.setChecked(!checkBoxCell.isChecked(), true);
@@ -1220,6 +1222,9 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                             bannedRights = new TLRPC.TL_chatBannedRights();
                             bannedRights.view_messages = true;
                             bannedRights.send_stickers = true;
+                            bannedRights.send_gifs = true;
+                            bannedRights.send_games = true;
+                            bannedRights.send_inline = true;
                             bannedRights.send_media = true;
                             bannedRights.send_photos = true;
                             bannedRights.send_videos = true;
@@ -2109,6 +2114,24 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                 builder.append(", ");
             }
             builder.append(LocaleController.getString("UserRestrictionsNoSendStickers", R.string.UserRestrictionsNoSendStickers));
+        }
+        if (rights.send_gifs && defaultBannedRights.send_gifs != rights.send_gifs) {
+            if (builder.length() != 0) {
+                builder.append(", ");
+            }
+            builder.append(LocaleController.getString("UserRestrictionsNoSendGifs", R.string.UserRestrictionsNoSendGifs));
+        }
+        if (rights.send_games && defaultBannedRights.send_games != rights.send_games) {
+            if (builder.length() != 0) {
+                builder.append(", ");
+            }
+            builder.append(LocaleController.getString("UserRestrictionsNoSendGames", R.string.UserRestrictionsNoSendGames));
+        }
+        if (rights.send_inline && defaultBannedRights.send_inline != rights.send_inline) {
+            if (builder.length() != 0) {
+                builder.append(", ");
+            }
+            builder.append(LocaleController.getString("UserRestrictionsNoSendInlineBots", R.string.UserRestrictionsNoSendInlineBots));
         }
         if (rights.send_polls && defaultBannedRights.send_polls != rights.send_polls) {
             if (builder.length() != 0) {
@@ -3410,7 +3433,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                     } else if (position == sendMediaRow) {
                         int sentMediaCount = getSendMediaSelectedCount();
                         checkCell.setTextAndCheck(LocaleController.getString("UserRestrictionsSendMedia", R.string.UserRestrictionsSendMedia), sentMediaCount > 0, true, animated);
-                        checkCell.setCollapseArrow(String.format(Locale.US, "%d/9", sentMediaCount), !sendMediaExpanded, new Runnable() {
+                        checkCell.setCollapseArrow(String.format(Locale.US, "%d/12", sentMediaCount), !sendMediaExpanded, new Runnable() {
                             @Override
                             public void run() {
                                 boolean checked = !checkCell.isChecked();
@@ -3499,14 +3522,16 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                     } else if (position == sendMediaVideoMessagesRow) {
                         checkBoxCell.setText(LocaleController.getString("SendMediaPermissionRound", R.string.SendMediaPermissionRound), "", !defaultBannedRights.send_roundvideos, true, animated);
                     } else if (position == sendMediaEmbededLinksRow) {
-                        checkBoxCell.setText(LocaleController.getString("SendMediaEmbededLinks", R.string.SendMediaEmbededLinks), "", !defaultBannedRights.embed_links && !defaultBannedRights.send_plain, false, animated);
+                        checkBoxCell.setText(LocaleController.getString("SendMediaEmbededLinks", R.string.SendMediaEmbededLinks), "", !defaultBannedRights.embed_links && !defaultBannedRights.send_plain, true, animated);
                     }else if (position == sendPollsRow) {
-                        checkBoxCell.setText(LocaleController.getString("SendMediaPolls", R.string.SendMediaPolls), "", !defaultBannedRights.send_polls, false, animated);
+                        checkBoxCell.setText(LocaleController.getString("SendMediaPolls", R.string.SendMediaPolls), "", !defaultBannedRights.send_polls, true, animated);
                     } else if (position == sendGifsRow) {
-                        checkBoxCell.setText(LocaleController.getString("SendMediaPermissionGifs", R.string.SendMediaPermissionGifs), "", !defaultBannedRights.send_gifs, true);
+                        checkBoxCell.setText(LocaleController.getString("SendMediaPermissionGifs", R.string.SendMediaPermissionGifs), "", !defaultBannedRights.send_gifs, true, animated);
                     } else if (position == sendGamesRow) {
-                        checkBoxCell.setText(LocaleController.getString("UserRestrictionsSendGames", R.string.UserRestrictionsSendGames), "", !defaultBannedRights.send_games, true);
-                    } 
+                        checkBoxCell.setText(LocaleController.getString("SendMediaPermissionGames", R.string.SendMediaPermissionGames), "", !defaultBannedRights.send_games, true, animated);
+                    } else if (position == useInlineBotRow) {
+                        checkBoxCell.setText(LocaleController.getString("SendMediaPermissionInline", R.string.SendMediaPermissionInline), "", !defaultBannedRights.send_inline, false, animated);
+                    }
                     //  checkBoxCell.setText(getCheckBoxTitle(item.headerName, percents[item.index < 0 ? 8 : item.index], item.index < 0), AndroidUtilities.formatFileSize(item.size), selected, item.index < 0 ? !collapsed : !item.last);
                     checkBoxCell.setPad(1);
                     break;
@@ -3539,7 +3564,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
             } else if (position == removedUsersRow) {
                 return 6;
             } else if (position == changeInfoRow || position == addUsersRow || position == pinMessagesRow || position == sendMessagesRow ||
-                    position == sendStickersRow || position == embedLinksRow || position == manageTopicsRow || position == useInlineBotRow) {
+                    position == embedLinksRow || position == manageTopicsRow) {
                 return 7;
             } else if (position == membersHeaderRow || position == contactsHeaderRow || position == botHeaderRow || position == loadingHeaderRow) {
                 return 8;
@@ -3576,6 +3601,9 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
         defaultBannedRights.send_photos = !enabled;
         defaultBannedRights.send_videos = !enabled;
         defaultBannedRights.send_stickers = !enabled;
+        defaultBannedRights.send_gifs = !enabled;
+        defaultBannedRights.send_games = !enabled;
+        defaultBannedRights.send_inline = !enabled;
         defaultBannedRights.send_audios = !enabled;
         defaultBannedRights.send_docs = !enabled;
         defaultBannedRights.send_voices = !enabled;
@@ -3589,7 +3617,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
         return position == sendMediaPhotosRow || position == sendMediaVideosRow || position == sendStickersRow ||
                 position == sendMediaMusicRow || position == sendMediaFilesRow || position == sendMediaVoiceMessagesRow ||
                 position == sendMediaVideoMessagesRow || position == sendMediaEmbededLinksRow || position == sendPollsRow ||
-                position == sendGifsRow || position == sendGamesRow;
+                position == sendGifsRow || position == sendGamesRow || position == useInlineBotRow;
     }
 
     public DiffCallback saveState() {
@@ -3747,6 +3775,15 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
             i++;
         }
         if (!bannedRights.send_stickers) {
+            i++;
+        }
+        if (!bannedRights.send_gifs) {
+            i++;
+        }
+        if (!bannedRights.send_games) {
+            i++;
+        }
+        if (!bannedRights.send_inline) {
             i++;
         }
         if (!bannedRights.send_audios) {

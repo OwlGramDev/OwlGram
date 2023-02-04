@@ -1508,9 +1508,6 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
                                 count++;
                             }
                             count += ChatUsersActivity.getSendMediaSelectedCount(currentChat.default_banned_rights);
-                            if (!currentChat.default_banned_rights.send_inline) {
-                                count++;
-                            }
                             if (!currentChat.default_banned_rights.pin_messages) {
                                 count++;
                             }
@@ -1524,9 +1521,9 @@ public class ChatEditActivity extends BaseFragment implements ImageUpdater.Image
                                 count++;
                             }
                         } else {
-                            count = forum ? 16 : 15;
+                            count = forum ? 17 : 16;
                         }
-                        blockCell.setTextAndValueAndIcon(LocaleController.getString("ChannelPermissions", R.string.ChannelPermissions), String.format("%d/%d", count, forum ? 16 : 15), animated, R.drawable.msg_permissions, true);
+                        blockCell.setTextAndValueAndIcon(LocaleController.getString("ChannelPermissions", R.string.ChannelPermissions), String.format("%d/%d", count, forum ? 17 : 16), animated, R.drawable.msg_permissions, true);
                     }
                     if (memberRequestsCell != null) {
                         memberRequestsCell.setTextAndValueAndIcon(LocaleController.getString("MemberRequests", R.string.MemberRequests), String.format("%d", info.requests_pending), R.drawable.msg_requests, logCell != null && logCell.getVisibility() == View.VISIBLE);
