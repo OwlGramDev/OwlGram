@@ -55,7 +55,8 @@ public class TelegramTranslator extends BaseTranslator {
             TLRPC.TL_messages_translateText req = new TLRPC.TL_messages_translateText();
             req.flags |= 2;
             req.to_lang = tl;
-            req.text = block.replace("\n", "<br>");
+            // TODO: ADD KEEP_FORMATTING FLAG
+            /*req.text = block.replace("\n", "<br>");
             ConnectionsManager.getInstance(UserConfig.selectedAccount).sendRequest(req, (res, err) -> {
                 if (res instanceof TLRPC.TL_messages_translateResultText) {
                     TLRPC.TL_messages_translateResultText result = (TLRPC.TL_messages_translateResultText) res;
@@ -71,7 +72,7 @@ public class TelegramTranslator extends BaseTranslator {
             if (exception.get() != null) {
                 throw exception.get();
             }
-            resultString.append(buildTranslatedString(block, translated.get().replace("<br>", "\n")));
+            resultString.append(buildTranslatedString(block, translated.get().replace("<br>", "\n")));*/
         }
         return new Result(resultString.toString(), detectedLanguage.get());
     }

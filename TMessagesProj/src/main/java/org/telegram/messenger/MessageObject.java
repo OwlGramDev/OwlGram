@@ -2531,7 +2531,6 @@ public class MessageObject {
         return updateTranslation(true);
     }
 
-    public boolean translated = false;
     public boolean updateTranslation(boolean force) {
         boolean replyUpdated = replyMessageObject != null && replyMessageObject.updateTranslation(force);
         if (

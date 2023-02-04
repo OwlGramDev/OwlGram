@@ -5337,7 +5337,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 }
             });
         } else {
-            TranslateAlert.showAlert(getParentActivity(), this, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], bio, false, span -> {
+            TranslateAlert2.showAlert(getParentActivity(), this, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], bio, null, false, span -> {
                 if (span != null) {
                     openUrl(span.getURL(), null);
                     return true;

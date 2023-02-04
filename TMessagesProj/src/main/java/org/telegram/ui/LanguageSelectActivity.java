@@ -787,10 +787,9 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             super.onAttachedToWindow();
             update();
             updateHeight();
-        }
+        }*/
     }
 
-*/
     private boolean getContextValue() {
         return getMessagesController().getTranslateController().isContextTranslateEnabled();
     }

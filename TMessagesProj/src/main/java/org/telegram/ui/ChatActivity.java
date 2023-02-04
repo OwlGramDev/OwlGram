@@ -9182,8 +9182,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             @Override
             public void startTranslate(CharSequence text, Runnable onAlertDismiss) {
                 super.startTranslate(text, onAlertDismiss);
-                TranslateAlert alert = TranslateAlert.showAlert(getParentActivity(), ChatActivity.this, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], text, false, null, onAlertDismiss);
-                alert.showDim(false);
+                // ADD KEEP MARKDOWN
+                TranslateAlert2 alert = TranslateAlert2.showAlert(getParentActivity(), ChatActivity.this, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], text, null, false, null, onAlertDismiss);
+                alert.setDimBehind(false);
             }
         });
 
@@ -24524,7 +24525,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     });
                     if (option == 201) { // OwlGram Translate Button
                         MessageObject messageObject = getMessageHelper().getMessageForTranslate(selectedObject, selectedObjectGroup);
-                        TranslateAlert.OnLinkPress onLinkPress = (link) ->  {
+                        Utilities.CallbackReturn<URLSpan, Boolean> onLinkPress = (link) -> {
                             didPressMessageUrl(link, false, selectedObject, v instanceof ChatMessageCell ? (ChatMessageCell) v : null);
                             return true;
                         };
@@ -24570,8 +24571,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 TranslatorHelper.resetTranslatedMessage(dialog_id, ChatActivity.this, messageObject);
                             } else {
                                 if (OwlConfig.translatorStyle == BaseTranslator.DIALOG_STYLE) {
-                                    TranslateAlert alert = TranslateAlert.showAlert(getParentActivity(), this, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], getMessageHelper().getPlainText(messageObject), noforwards, onLinkPress, () -> dimBehindView(false));
-                                    alert.showDim(false);
+                                    // TODO: ADD KEEP_FORMATTING FLAG
+                                    TranslateAlert2 alert = TranslateAlert2.showAlert(getParentActivity(), this, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], getMessageHelper().getPlainText(messageObject), null, noforwards, onLinkPress, () -> dimBehindView(false));
+                                    alert.setDimBehind(false);
                                     return;
                                 }
                                 translateMessage(messageObject, false);

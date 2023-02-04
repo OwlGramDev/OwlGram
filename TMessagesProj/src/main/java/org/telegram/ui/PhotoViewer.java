@@ -232,7 +232,7 @@ import org.telegram.ui.Components.SizeNotifierFrameLayoutPhoto;
 import org.telegram.ui.Components.StickersAlert;
 import org.telegram.ui.Components.TextViewSwitcher;
 import org.telegram.ui.Components.Tooltip;
-import org.telegram.ui.Components.TranslateAlert;
+import org.telegram.ui.Components.TranslateAlert2;
 import org.telegram.ui.Components.URLSpanReplacement;
 import org.telegram.ui.Components.URLSpanUserMentionPhotoViewer;
 import org.telegram.ui.Components.UndoView;
@@ -17693,7 +17693,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             return;
         }
         if (OwlConfig.translatorStyle == BaseTranslator.DIALOG_STYLE) {
-            TranslateAlert.showAlert(parentActivity, null, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], currentMessageObject.messageOwner.message, false, urlSpan -> onLinkClick(urlSpan, captionTextViewSwitcher.getCurrentView()), null);
+            TranslateAlert2.showAlert(parentActivity, null, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], currentMessageObject.messageOwner.message, null, false, urlSpan -> onLinkClick(urlSpan, captionTextViewSwitcher.getCurrentView()), null);
             return;
         }
         try {
