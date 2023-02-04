@@ -70,6 +70,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-wearable:18.0.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
     implementation 'com.google.android.gms:play-services-wallet:19.1.0'
+    implementation 'com.google.android.gms:play-services-safetynet:18.0.1'
 
     //noinspection GradleDependency
     implementation 'com.googlecode.mp4parser:isoparser:1.0.6' // NOT YET SUPPORTED BY TELEGRAM

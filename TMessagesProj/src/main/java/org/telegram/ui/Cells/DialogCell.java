@@ -99,6 +99,7 @@ import org.telegram.ui.Components.TimerDrawable;
 import org.telegram.ui.Components.TypefaceSpan;
 import org.telegram.ui.Components.URLSpanNoUnderline;
 import org.telegram.ui.Components.URLSpanNoUnderlineBold;
+import org.telegram.ui.Components.VectorAvatarThumbDrawable;
 import org.telegram.ui.Components.spoilers.SpoilerEffect;
 import org.telegram.ui.DialogsActivity;
 import org.telegram.ui.RightSlidingDialogContainer;
@@ -939,6 +940,9 @@ public class DialogCell extends BaseCell {
             }
         }
 
+        if (message != null) {
+            message.updateTranslation();
+        }
         CharSequence msgText = message != null ? message.messageText : null;
         if (msgText instanceof Spannable) {
             Spannable sp = new SpannableStringBuilder(msgText);
@@ -1107,12 +1111,10 @@ public class DialogCell extends BaseCell {
                         }
                         drawPremium = MessagesController.getInstance(currentAccount).isPremiumUser(user) && UserConfig.getInstance(currentAccount).clientUserId != user.id && user.id != 0;
                         if (drawPremium) {
-                            if (user.emoji_status instanceof TLRPC.TL_emojiStatusUntil && ((TLRPC.TL_emojiStatusUntil) user.emoji_status).until > (int) (System.currentTimeMillis() / 1000)) {
+                            Long emojiStatusId = UserObject.getEmojiStatusDocumentId(user);
+                            if (emojiStatusId != null) {
                                 nameLayoutEllipsizeByGradient = true;
-                                emojiStatus.set(((TLRPC.TL_emojiStatusUntil) user.emoji_status).document_id, false);
-                            } else if (user.emoji_status instanceof TLRPC.TL_emojiStatus) {
-                                nameLayoutEllipsizeByGradient = true;
-                                emojiStatus.set(((TLRPC.TL_emojiStatus) user.emoji_status).document_id, false);
+                                emojiStatus.set(emojiStatusId, false);
                             } else {
                                 nameLayoutEllipsizeByGradient = true;
                                 emojiStatus.set(PremiumGradient.getInstance().premiumStarDrawableMini, false);
@@ -1234,7 +1236,7 @@ public class DialogCell extends BaseCell {
                                 }
                             }
                         } else {
-                            if (dialogsType == 3 && UserObject.isUserSelf(user)) {
+                            if (dialogsType == DialogsActivity.DIALOGS_TYPE_FORWARD && UserObject.isUserSelf(user)) {
                                 messageString = LocaleController.getString("SavedMessagesInfo", R.string.SavedMessagesInfo);
                                 showChecks = false;
                                 drawTime = false;
@@ -1276,7 +1278,7 @@ public class DialogCell extends BaseCell {
                         }
                         if (lastMessageIsReaction) {
 
-                        } else if (dialogsType == 2) {
+                        } else if (dialogsType == DialogsActivity.DIALOGS_TYPE_ADD_USERS_TO) {
                             if (chat != null) {
                                 if (ChatObject.isChannel(chat) && !chat.megagroup) {
                                     if (chat.participants_count != 0) {
@@ -1307,7 +1309,7 @@ public class DialogCell extends BaseCell {
                             drawCount2 = false;
                             showChecks = false;
                             drawTime = false;
-                        } else if (dialogsType == 3 && UserObject.isUserSelf(user)) {
+                        } else if (dialogsType == DialogsActivity.DIALOGS_TYPE_FORWARD && UserObject.isUserSelf(user)) {
                             messageString = LocaleController.getString("SavedMessagesInfo", R.string.SavedMessagesInfo);
                             showChecks = false;
                             drawTime = false;
@@ -1606,7 +1608,7 @@ public class DialogCell extends BaseCell {
 
             promoDialog = false;
             MessagesController messagesController = MessagesController.getInstance(currentAccount);
-            if (dialogsType == 0 && messagesController.isPromoDialog(currentDialogId, true)) {
+            if (dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT && messagesController.isPromoDialog(currentDialogId, true)) {
                 drawPinBackground = true;
                 promoDialog = true;
                 if (messagesController.promoDialogType == MessagesController.PROMO_TYPE_PROXY) {
@@ -1652,7 +1654,7 @@ public class DialogCell extends BaseCell {
                         if (useMeForMyMessages) {
                             nameString = LocaleController.getString("FromYou", R.string.FromYou);
                         } else {
-                            if (dialogsType == 3) {
+                            if (dialogsType == DialogsActivity.DIALOGS_TYPE_FORWARD) {
                                 drawPinBackground = true;
                             }
                             nameString = LocaleController.getString("SavedMessages", R.string.SavedMessages);
@@ -2594,7 +2596,7 @@ public class DialogCell extends BaseCell {
                 mentionCount = forumTopic.unread_mentions_count;
                 reactionMentionCount = forumTopic.unread_reactions_count;
             }
-            if (dialogsType == 2) {
+            if (dialogsType == DialogsActivity.DIALOGS_TYPE_ADD_USERS_TO) {
                 drawPin = false;
             }
 
@@ -2606,12 +2608,10 @@ public class DialogCell extends BaseCell {
                 }
                 if (user != null && (mask & MessagesController.UPDATE_MASK_EMOJI_STATUS) != 0) {
                     user = MessagesController.getInstance(currentAccount).getUser(user.id);
-                    if (user.emoji_status instanceof TLRPC.TL_emojiStatusUntil && ((TLRPC.TL_emojiStatusUntil) user.emoji_status).until > (int) (System.currentTimeMillis() / 1000)) {
+                    Long emojiStatusId = UserObject.getEmojiStatusDocumentId(user);
+                    if (emojiStatusId != null) {
                         nameLayoutEllipsizeByGradient = true;
-                        emojiStatus.set(((TLRPC.TL_emojiStatusUntil) user.emoji_status).document_id, animated);
-                    } else if (user.emoji_status instanceof TLRPC.TL_emojiStatus) {
-                        nameLayoutEllipsizeByGradient = true;
-                        emojiStatus.set(((TLRPC.TL_emojiStatus) user.emoji_status).document_id, animated);
+                        emojiStatus.set(emojiStatusId, animated);
                     } else {
                         nameLayoutEllipsizeByGradient = true;
                         emojiStatus.set(PremiumGradient.getInstance().premiumStarDrawableMini, animated);
@@ -2781,7 +2781,7 @@ public class DialogCell extends BaseCell {
                         avatarDrawable.setAvatarType(AvatarDrawable.AVATAR_TYPE_SAVED);
                         avatarImage.setImage(null, null, avatarDrawable, null, user, 0);
                     } else {
-                        avatarImage.setForUserOrChat(user, avatarDrawable, null, true);
+                        avatarImage.setForUserOrChat(user, avatarDrawable, null, true, VectorAvatarThumbDrawable.TYPE_SMALL);
                     }
                 } else if (chat != null) {
                     avatarDrawable.setInfo(chat);
@@ -3728,6 +3728,9 @@ public class DialogCell extends BaseCell {
                     timerPaint.setShader(null);
                     if (avatarImage.getBitmap() != null && !avatarImage.getBitmap().isRecycled()) {
                         timerPaint.setColor(PremiumLockIconView.getDominantColor(avatarImage.getBitmap()));
+                    } else if (avatarImage.getDrawable() instanceof VectorAvatarThumbDrawable){
+                        VectorAvatarThumbDrawable vectorAvatarThumbDrawable = (VectorAvatarThumbDrawable) avatarImage.getDrawable();
+                        timerPaint.setColor(vectorAvatarThumbDrawable.gradientTools.getAverageColor());
                     } else {
                         timerPaint.setColor(avatarDrawable.getColor2());
                     }
@@ -4579,6 +4582,9 @@ public class DialogCell extends BaseCell {
                 applyName = false;
                 stringBuilder = SpannableStringBuilder.valueOf(mess);
             }
+            if (applyThumbs) {
+                applyThumbs(stringBuilder);
+            }
         } else if (captionMessage != null && captionMessage.caption != null) {
             MessageObject message = captionMessage;
             CharSequence mess = message.caption.toString();
@@ -4791,6 +4797,10 @@ public class DialogCell extends BaseCell {
         public boolean update() {
             TLRPC.Dialog dialog = MessagesController.getInstance(currentAccount).dialogs_dict.get(currentDialogId);
             if (dialog == null) {
+                if (dialogsType == DialogsActivity.DIALOGS_TYPE_FORWARD && lastDrawnDialogId != currentDialogId) {
+                    lastDrawnDialogId = currentDialogId;
+                    return true;
+                }
                 return false;
             }
             int messageHash = message == null ? 0 : message.getId();

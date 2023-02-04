@@ -267,8 +267,8 @@
     <string name="IDCopied">ID copied to clipboard.</string>
     <string name="InlineQueryCopied">Inline Query copied to clipboard.</string>
     <string name="StickerSavedHint">Sticker saved to gallery.</string>
-    <string name="UserRestrictionsSendStickers2">Send Stickers</string>
-    <string name="UserRestrictionsSendGifs">Send GIFs</string>
+    <string name="SendMediaPermissionStickers">Stickers</string>
+    <string name="SendMediaPermissionGifs">GIFs</string>
     <string name="UserRestrictionsSendGames">Send Animated Games</string>
     <string name="UserRestrictionsUseInlineBot">Use Inline Bots</string>
     <string name="RestrictionReason">Restriction Reason</string>
