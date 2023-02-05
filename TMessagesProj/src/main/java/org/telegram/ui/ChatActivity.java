@@ -31984,7 +31984,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             final CharSequence text = cell.getText();
             LanguageDetector.detectLanguage(text == null ? "" : text.toString(), lang -> {
                 String toLang = LocaleController.getInstance().getCurrentLocale().getLanguage();
-                if (lang != null && (!lang.equals(toLang) || lang.equals("und")) && !RestrictedLanguagesSelectActivity.getRestrictedLanguages().contains(lang)) {
+                if (lang != null && !DoNotTranslateSettings.getRestrictedLanguages().contains(lang.split("-")[0])) {
                     cell.setOnClickListener(e -> {
 
                         ActionBarPopupWindow.ActionBarPopupWindowLayout layout = new ActionBarPopupWindow.ActionBarPopupWindowLayout(getContext());

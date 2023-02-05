@@ -28,13 +28,15 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
+import it.owlgram.android.settings.DoNotTranslateSettings;
+
 public class TranslateController extends BaseController {
 
     public static final String UNKNOWN_LANGUAGE = "und";
 
     private static final int REQUIRED_TOTAL_MESSAGES_CHECKED = 8;
-    private static final float REQUIRED_PERCENTAGE_MESSAGES_TRANSLATABLE = .60F;
-    private static final float REQUIRED_MIN_PERCENTAGE_MESSAGES_UNKNOWN = .65F;
+    private static final float REQUIRED_PERCENTAGE_MESSAGES_TRANSLATABLE = .10F;
+    private static final float REQUIRED_MIN_PERCENTAGE_MESSAGES_UNKNOWN = .85F;
 
     private static final int MAX_SYMBOLS_PER_REQUEST = 25000;
     private static final int MAX_MESSAGES_PER_REQUEST = 20;
@@ -84,21 +86,13 @@ public class TranslateController extends BaseController {
         return (
             messageObject != null && messageObject.messageOwner != null &&
             !messageObject.isOutOwner() &&
-            (
-                messageObject.type == MessageObject.TYPE_TEXT ||
-                messageObject.type == MessageObject.TYPE_VIDEO ||
-                messageObject.type == MessageObject.TYPE_PHOTO ||
-                messageObject.type == MessageObject.TYPE_VOICE ||
-                messageObject.type == MessageObject.TYPE_FILE ||
-                messageObject.type == MessageObject.TYPE_MUSIC
-            ) && !TextUtils.isEmpty(messageObject.messageOwner.message)
+            !TextUtils.isEmpty(messageObject.messageOwner.message)
         );
     }
 
     public boolean isDialogTranslatable(long dialogId) {
         return (
             isFeatureAvailable() &&
-            !DialogObject.isEncryptedDialog(dialogId) &&
             getUserConfig().getClientUserId() != dialogId &&
             /* DialogObject.isChatDialog(dialogId) &&*/
             translatableDialogs.contains(dialogId)
@@ -311,17 +305,7 @@ public class TranslateController extends BaseController {
     public static void analyzeSuggestedLanguageCodes() {
         LinkedHashSet<String> langs = new LinkedHashSet<>();
         try {
-            langs.add(LocaleController.getInstance().getCurrentLocaleInfo().pluralLangCode);
-        } catch (Exception e1) {
-            FileLog.e(e1);
-        }
-        try {
-            langs.add(Resources.getSystem().getConfiguration().locale.getLanguage());
-        } catch (Exception e2) {
-            FileLog.e(e2);
-        }
-        try {
-            langs.addAll(RestrictedLanguagesSelectActivity.getRestrictedLanguages());
+            langs.addAll(DoNotTranslateSettings.getRestrictedLanguages());
         } catch (Exception e3) {
             FileLog.e(e3);
         }
@@ -337,7 +321,7 @@ public class TranslateController extends BaseController {
                             currentLocale = currentLocale.split("_")[0];
                         }
                         if (TranslateAlert2.languageName(currentLocale) != null) {
-                            langs.add(currentLocale);
+                            langs.add(currentLocale.split("-")[0]);
                         }
                     }
                 }
@@ -420,10 +404,10 @@ public class TranslateController extends BaseController {
             translatableDialogMessages.clear();
 
             ArrayList<Long> toNotify = new ArrayList<>();
-            HashSet<String> languages = RestrictedLanguagesSelectActivity.getRestrictedLanguages();
+            HashSet<String> languages = DoNotTranslateSettings.getRestrictedLanguages();
             for (long dialogId : translatableDialogs) {
                 String language = detectedDialogLanguage.get(dialogId);
-                if (language != null && languages.contains(language)) {
+                if (language != null && languages.contains(language.split("-")[0])) {
                     cancelTranslations(dialogId);
                     translatingDialogs.remove(dialogId);
                     toNotify.add(dialogId);
@@ -641,9 +625,7 @@ public class TranslateController extends BaseController {
         final boolean translatable = (
             isTranslatable(messageObject) &&
             messageObject.messageOwner.originalLanguage != null &&
-            !UNKNOWN_LANGUAGE.equals(messageObject.messageOwner.originalLanguage) &&
-            !RestrictedLanguagesSelectActivity.getRestrictedLanguages().contains(messageObject.messageOwner.originalLanguage) &&
-            !TextUtils.equals(getDialogTranslateTo(dialogId), messageObject.messageOwner.originalLanguage)
+            !DoNotTranslateSettings.getRestrictedLanguages().contains(messageObject.messageOwner.originalLanguage.split("-")[0])
         );
 
         if (isUnknown) {
@@ -899,7 +881,7 @@ public class TranslateController extends BaseController {
         }
         String[] dialogs = translatingDialogsCache.split(";");
 
-        HashSet<String> restricted = RestrictedLanguagesSelectActivity.getRestrictedLanguages();
+        HashSet<String> restricted = DoNotTranslateSettings.getRestrictedLanguages();
         for (int i = 0; i < dialogs.length; ++i) {
             String[] keyval = dialogs[i].split("=");
             if (keyval.length < 2) {
@@ -915,7 +897,7 @@ public class TranslateController extends BaseController {
             if ("null".equals(to)) to = null;
             if (from != null) {
                 detectedDialogLanguage.put(did, from);
-                if (!restricted.contains(from)) {
+                if (!restricted.contains(from.split("-")[0])) {
                     translatingDialogs.add(did);
                     translatableDialogs.add(did);
                 }
