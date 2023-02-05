@@ -8,8 +8,6 @@
 
 package org.telegram.messenger;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -31,7 +29,6 @@ import android.text.util.Linkify;
 import android.util.Base64;
 
 import androidx.collection.LongSparseArray;
-import androidx.core.util.Pair;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.browser.Browser;
@@ -204,13 +201,7 @@ public class MessageObject {
     public boolean scheduled;
     public boolean preview;
 
-    public boolean translated;
-    public Pair<String, String> translatedLanguage;
-    public boolean translating;
-    public Object originalMessage;
-    public ArrayList<TLRPC.MessageEntity> originalEntities;
     public MessageHelper.ReplyMarkupButtonsTexts originalReplyMarkupRows;
-    public boolean canceledTranslation;
 
     public ArrayList<TLRPC.TL_pollAnswer> checkedVotes;
 
@@ -2531,6 +2522,7 @@ public class MessageObject {
         return updateTranslation(true);
     }
 
+    public boolean translated = false;
     public boolean updateTranslation(boolean force) {
         boolean replyUpdated = replyMessageObject != null && replyMessageObject.updateTranslation(force);
         if (
@@ -6069,7 +6061,7 @@ public class MessageObject {
             for (int a = 0; a < document.attributes.size(); a++) {
                 TLRPC.DocumentAttribute attribute = document.attributes.get(a);
                 if (attribute instanceof TLRPC.TL_documentAttributeSticker ||
-                        attribute instanceof TLRPC.TL_documentAttributeCustomEmoji) {
+                    attribute instanceof TLRPC.TL_documentAttributeCustomEmoji) {
                     return "video/webm".equals(document.mime_type);
                 }
             }
@@ -7498,7 +7490,6 @@ public class MessageObject {
     public boolean equals(MessageObject obj) {
         return getId() == obj.getId() && getDialogId() == obj.getDialogId();
     }
-
 
     public boolean isReactionsAvailable() {
         return !isEditing() && !isSponsored() && isSent() && messageOwner.action == null;

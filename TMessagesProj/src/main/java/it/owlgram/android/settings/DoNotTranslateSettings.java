@@ -13,6 +13,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBarMenu;
 import org.telegram.ui.ActionBar.ActionBarMenuItem;
@@ -52,6 +53,7 @@ public class DoNotTranslateSettings extends BaseSettingsActivity {
                 selectedLanguages.remove(targetLanguages.get(position - languagesStartRow));
             }
             saveRestrictedLanguages(selectedLanguages);
+            MessagesController.getInstance(currentAccount).getTranslateController().checkRestrictedLanguagesUpdate();
         }
     }
 

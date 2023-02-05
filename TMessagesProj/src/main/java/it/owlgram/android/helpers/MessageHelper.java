@@ -260,13 +260,16 @@ public class MessageHelper extends BaseController {
     }
 
     public static CharSequence createTranslateString(MessageObject messageObject) {
-        if (messageObject.translating) {
-            return LocaleController.getString("MessageTranslateProgress", R.string.MessageTranslateProgress) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
+        String time = LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
+        String fromLanguage = messageObject.messageOwner.originalLanguage;
+        String toLanguage = messageObject.messageOwner.translatedToLanguage;
+        if (messageObject.messageOwner.translatedText != null && TextUtils.equals(messageObject.messageOwner.message, messageObject.messageOwner.translatedText.text)) {
+            return time;
         }
-        Pair<String, String> translatedLanguage = messageObject.translatedLanguage;
-        if (translatedLanguage == null || TextUtils.isEmpty(translatedLanguage.first) || TextUtils.isEmpty(translatedLanguage.second)) {
-            return LocaleController.getString("MessageTranslated", R.string.MessageTranslated) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
+        if (TextUtils.isEmpty(fromLanguage) || TextUtils.isEmpty(toLanguage) || TextUtils.equals(fromLanguage, TranslateController.UNKNOWN_LANGUAGE)) {
+            return LocaleController.getString("MessageTranslated", R.string.MessageTranslated) + " " + time;
         }
+        fromLanguage = fromLanguage.split("-")[0];
         if (arrowDrawable == null) {
             arrowDrawable = Objects.requireNonNull(ContextCompat.getDrawable(ApplicationLoader.applicationContext, R.drawable.search_arrow)).mutate();
         }
@@ -276,13 +279,13 @@ public class MessageHelper extends BaseController {
         }
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
         spannableStringBuilder
-                .append(TranslatorHelper.languageName(translatedLanguage.first))
+                .append(TranslatorHelper.languageName(fromLanguage))
                 .append(' ')
                 .append(arrowSpan)
                 .append(' ')
-                .append(TranslatorHelper.languageName(translatedLanguage.second))
+                .append(TranslatorHelper.languageName(toLanguage))
                 .append(' ')
-                .append(LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000));
+                .append(time);
         return spannableStringBuilder;
     }
 

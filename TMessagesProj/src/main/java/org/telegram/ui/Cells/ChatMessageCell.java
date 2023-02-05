@@ -12173,7 +12173,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 }
             }
         }
-        if (currentMessageObject.translating || currentMessageObject.translated) {
+        if (currentMessageObject.translated) {
             timeString = MessageHelper.createTranslateString(currentMessageObject);;
         } else if (currentMessageObject.isSponsored()) {
             if (currentMessageObject.sponsoredRecommended) {
@@ -12198,7 +12198,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
         timeTextWidth = timeWidth = (int) Math.ceil(Theme.chat_timePaint.measureText(currentTimeString, 0, currentTimeString == null ? 0 : currentTimeString.length()));
         if (timeString instanceof SpannableStringBuilder) {
-            if (currentMessageObject.translating || currentMessageObject.translated) {
+            if (currentMessageObject.translated) {
                 timeTextWidth = timeWidth += MessageHelper.arrowDrawable.getIntrinsicWidth();
             } else if (edited && OwlConfig.showPencilIcon) {
                 timeTextWidth = timeWidth += MessageHelper.editedDrawable.getIntrinsicWidth();
