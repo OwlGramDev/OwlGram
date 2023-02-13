@@ -184,7 +184,7 @@ public class TelegramTranslator extends BaseTranslator {
             Object q = translations.get(i);
             String sourceLanguage = null;
             if (q instanceof TLRPC.TL_textWithEntities || q instanceof CharSequence) {
-                results.set(i, rawResults.get(i));
+                results.add(rawResults.get(i));
             } else if (q instanceof AdditionalObjectTranslation) {
                 AdditionalObjectTranslation res = (AdditionalObjectTranslation) q;
                 Object translationData = res.translation;
@@ -204,7 +204,7 @@ public class TelegramTranslator extends BaseTranslator {
                     ArrayList<Result> totalPollResults = new ArrayList<>();
                     for (int x = 0; x < pollTexts.getTexts().size(); x++) {
                         totalPollResults.add(Objects.requireNonNull(rawResults.get(i++)));
-                        pollTexts.getTexts().set(x, stringFromTranslation(totalPollResults.get(i-1).translation));
+                        pollTexts.getTexts().set(x, stringFromTranslation(totalPollResults.get(x).translation));
                     }
                     res.translation = pollTexts;
                     sourceLanguage = getTopLanguage(totalPollResults);
