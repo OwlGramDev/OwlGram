@@ -25,6 +25,8 @@ import org.telegram.messenger.Utilities;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import it.owlgram.android.helpers.MessageHelper;
+
 public class TLRPC {
 
     public static final int USER_FLAG_ACCESS_HASH           = 0x00000001;
@@ -59636,6 +59638,11 @@ public class TLRPC {
         public String originalLanguage; //custom
         public String translatedToLanguage; //custom
         public TL_textWithEntities translatedText; // custom
+
+        public MessageHelper.ReplyMarkupButtonsTexts originalReplyMarkupRows; // custom
+        public MessageHelper.ReplyMarkupButtonsTexts translatedReplyMarkupRows; // custom
+        public MessageHelper.PollTexts originalPoll; // custom
+        public MessageHelper.PollTexts translatedPoll; // custom
 
         public static Message TLdeserialize(AbstractSerializedData stream, int constructor, boolean exception) {
             Message result = null;

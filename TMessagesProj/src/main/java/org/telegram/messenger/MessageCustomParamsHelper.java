@@ -5,6 +5,8 @@ import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 
+import it.owlgram.android.helpers.MessageHelper;
+
 public class MessageCustomParamsHelper {
 
     public static boolean isEmpty(TLRPC.Message message) {
@@ -17,7 +19,11 @@ public class MessageCustomParamsHelper {
                 !message.premiumEffectWasPlayed &&
                 message.originalLanguage == null &&
                 message.translatedToLanguage == null &&
-                message.translatedText == null;
+                message.translatedText == null &&
+                message.translatedPoll == null &&
+                message.originalPoll == null &&
+                message.translatedReplyMarkupRows == null &&
+                message.originalReplyMarkupRows == null;
     }
 
     public static void copyParams(TLRPC.Message fromMessage, TLRPC.Message toMessage) {
@@ -31,6 +37,10 @@ public class MessageCustomParamsHelper {
         toMessage.originalLanguage = fromMessage.originalLanguage;
         toMessage.translatedToLanguage = fromMessage.translatedToLanguage;
         toMessage.translatedText = fromMessage.translatedText;
+        toMessage.translatedPoll = fromMessage.translatedPoll;
+        toMessage.originalPoll = fromMessage.originalPoll;
+        toMessage.translatedReplyMarkupRows = fromMessage.translatedReplyMarkupRows;
+        toMessage.originalReplyMarkupRows = fromMessage.originalReplyMarkupRows;
     }
 
 
@@ -79,6 +89,10 @@ public class MessageCustomParamsHelper {
             flags += message.originalLanguage != null ? 4 : 0;
             flags += message.translatedToLanguage != null ? 8 : 0;
             flags += message.translatedText != null ? 16 : 0;
+            flags += message.translatedPoll != null ? 32 : 0;
+            flags += message.originalPoll != null ? 64 : 0;
+            flags += message.translatedReplyMarkupRows != null ? 128 : 0;
+            flags += message.originalReplyMarkupRows != null ? 256 : 0;
         }
 
         @Override
@@ -105,6 +119,18 @@ public class MessageCustomParamsHelper {
             if ((flags & 16) != 0) {
                 message.translatedText.serializeToStream(stream);
             }
+            if ((flags & 32) != 0) {
+                message.translatedPoll.serializeToStream(stream);
+            }
+            if ((flags & 64) != 0) {
+                message.originalPoll.serializeToStream(stream);
+            }
+            if ((flags & 128) != 0) {
+                message.translatedReplyMarkupRows.serializeToStream(stream);
+            }
+            if ((flags & 256) != 0) {
+                message.originalReplyMarkupRows.serializeToStream(stream);
+            }
         }
 
         @Override
@@ -129,6 +155,18 @@ public class MessageCustomParamsHelper {
             }
             if ((flags & 16) != 0) {
                 message.translatedText = TLRPC.TL_textWithEntities.TLdeserialize(stream, stream.readInt32(exception), exception);
+            }
+            if ((flags & 32) != 0) {
+                message.translatedPoll = MessageHelper.PollTexts.TLdeserialize(stream, stream.readInt32(exception), exception);
+            }
+            if ((flags & 64) != 0) {
+                message.originalPoll = MessageHelper.PollTexts.TLdeserialize(stream, stream.readInt32(exception), exception);
+            }
+            if ((flags & 128) != 0) {
+                message.translatedReplyMarkupRows = MessageHelper.ReplyMarkupButtonsTexts.TLdeserialize(stream, stream.readInt32(exception), exception);
+            }
+            if ((flags & 256) != 0) {
+                message.originalReplyMarkupRows = MessageHelper.ReplyMarkupButtonsTexts.TLdeserialize(stream, stream.readInt32(exception), exception);
             }
         }
 

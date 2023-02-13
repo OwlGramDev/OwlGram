@@ -30,6 +30,7 @@ import org.telegram.messenger.R;
 import org.telegram.messenger.TranslateController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
+import org.telegram.tgnet.AbstractSerializedData;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
@@ -278,6 +279,7 @@ public class MessageHelper extends BaseController {
 
     public static class PollTexts {
         private final ArrayList<String> texts = new ArrayList<>();
+        public static int constructor = 0xca;
 
         public PollTexts(TLRPC.Poll source) {
             texts.add(source.question);
@@ -298,6 +300,42 @@ public class MessageHelper extends BaseController {
             return pollTexts;
         }
 
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt32(0x1cb5c415);
+            stream.writeInt32(texts.size());
+            for (int a = 0; a < texts.size(); a++) {
+                stream.writeString(texts.get(a));
+            }
+        }
+
+        public static PollTexts TLdeserialize(AbstractSerializedData stream, int constructor, boolean exception) {
+            if (constructor != PollTexts.constructor) {
+                if (exception) {
+                    throw new RuntimeException(String.format("can't parse magic %x in PollTexts", constructor));
+                } else {
+                    return null;
+                }
+            }
+            PollTexts result = new PollTexts();
+            result.readParams(stream, exception);
+            return result;
+        }
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            int magic = stream.readInt32(exception);
+            if (magic != 0x1cb5c415) {
+                if (exception) {
+                    throw new RuntimeException(String.format("wrong Vector magic, got %x", magic));
+                }
+                return;
+            }
+            int count = stream.readInt32(exception);
+            for (int a = 0; a < count; a++) {
+                texts.add(stream.readString(exception));
+            }
+        }
+
         public int size() {
             return texts.size();
         }
@@ -312,6 +350,7 @@ public class MessageHelper extends BaseController {
 
     public static class ReplyMarkupButtonsTexts {
         private final ArrayList<ArrayList<String>> texts = new ArrayList<>();
+        public static int constructor = 0xc9;
 
         public ReplyMarkupButtonsTexts(ArrayList<TLRPC.TL_keyboardButtonRow> source) {
             for (int a = 0; a < source.size(); a++) {
@@ -333,6 +372,58 @@ public class MessageHelper extends BaseController {
                 total += texts.get(a).size();
             }
             return total;
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt32(0x1cb5c415);
+            stream.writeInt32(texts.size());
+            for (int a = 0; a < texts.size(); a++) {
+                stream.writeInt32(0x1cb5c415);
+                stream.writeInt32(texts.get(a).size());
+                for (int b = 0; b < texts.get(a).size(); b++) {
+                    stream.writeString(texts.get(a).get(b));
+                }
+            }
+        }
+
+        public static ReplyMarkupButtonsTexts TLdeserialize(AbstractSerializedData stream, int constructor, boolean exception) {
+            if (constructor != ReplyMarkupButtonsTexts.constructor) {
+                if (exception) {
+                    throw new RuntimeException(String.format("can't parse magic %x in ReplyMarkupButtonsTexts", constructor));
+                } else {
+                    return null;
+                }
+            }
+            ReplyMarkupButtonsTexts result = new ReplyMarkupButtonsTexts();
+            result.readParams(stream, exception);
+            return result;
+        }
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            int magic = stream.readInt32(exception);
+            if (magic != 0x1cb5c415) {
+                if (exception) {
+                    throw new RuntimeException(String.format("wrong Vector magic, got %x", magic));
+                }
+                return;
+            }
+            int count = stream.readInt32(exception);
+            for (int a = 0; a < count; a++) {
+                int subMagic = stream.readInt32(exception);
+                if (subMagic != 0x1cb5c415) {
+                    if (exception) {
+                        throw new RuntimeException(String.format("wrong Vector magic, got %x", magic));
+                    }
+                    return;
+                }
+                int subCount = stream.readInt32(exception);
+                texts.add(new ArrayList<>());
+                for (int b = 0; b < subCount; b++) {
+                    String text = stream.readString(exception);
+                    texts.get(a).add(text);
+                }
+            }
         }
 
         public ArrayList<ArrayList<String>> getTexts() {

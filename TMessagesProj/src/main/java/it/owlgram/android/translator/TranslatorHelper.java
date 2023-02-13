@@ -26,7 +26,7 @@ public class TranslatorHelper {
     public static void resetTranslatedMessage(MessageObject messageObject, boolean noCache) {
         if (noCache) {
             messageObject.messageOwner.translatedText = null;
-            messageObject.translatedPoll = null;
+            messageObject.messageOwner.translatedPoll = null;
         } else {
             MessagesController.getInstance(UserConfig.selectedAccount).getTranslateController().hideTranslation(messageObject);
         }
@@ -61,21 +61,21 @@ public class TranslatorHelper {
         public TranslatorContext(MessageObject messageObject) {
             BaseTranslator.AdditionalObjectTranslation additionalObjectTranslation = new BaseTranslator.AdditionalObjectTranslation();
             if (messageObject.type == MessageObject.TYPE_POLL) {
-                if (messageObject.originalPoll == null) {
-                    messageObject.originalPoll = new MessageHelper.PollTexts(((TLRPC.TL_messageMediaPoll) messageObject.messageOwner.media).poll);
+                if (messageObject.messageOwner.originalPoll == null) {
+                    messageObject.messageOwner.originalPoll = new MessageHelper.PollTexts(((TLRPC.TL_messageMediaPoll) messageObject.messageOwner.media).poll);
                 }
-                additionalObjectTranslation.translation = messageObject.originalPoll.copy();
-                additionalObjectTranslation.messagesCount = messageObject.originalPoll.size();
+                additionalObjectTranslation.translation = messageObject.messageOwner.originalPoll.copy();
+                additionalObjectTranslation.messagesCount = messageObject.messageOwner.originalPoll.size();
             } else {
                 additionalObjectTranslation.translation = messageObject.messageOwner.message;
                 additionalObjectTranslation.messagesCount = 1;
             }
             if (messageObject.messageOwner.reply_markup != null && messageObject.messageOwner.reply_markup.rows.size() > 0) {
-                if (messageObject.originalReplyMarkupRows == null) {
-                    messageObject.originalReplyMarkupRows = new MessageHelper.ReplyMarkupButtonsTexts(messageObject.messageOwner.reply_markup.rows);
+                if (messageObject.messageOwner.originalReplyMarkupRows == null) {
+                    messageObject.messageOwner.originalReplyMarkupRows = new MessageHelper.ReplyMarkupButtonsTexts(messageObject.messageOwner.reply_markup.rows);
                 }
-                additionalObjectTranslation.additionalInfo = messageObject.originalReplyMarkupRows.copy();
-                additionalObjectTranslation.messagesCount += messageObject.originalReplyMarkupRows.size();
+                additionalObjectTranslation.additionalInfo = messageObject.messageOwner.originalReplyMarkupRows.copy();
+                additionalObjectTranslation.messagesCount += messageObject.messageOwner.originalReplyMarkupRows.size();
             }
             if (additionalObjectTranslation.translation instanceof String) {
                 symbolsCount = ((String) additionalObjectTranslation.translation).length();

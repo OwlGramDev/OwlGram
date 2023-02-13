@@ -56,6 +56,7 @@ import org.telegram.ui.Components.URLSpanNoUnderlineBold;
 import org.telegram.ui.Components.URLSpanReplacement;
 import org.telegram.ui.Components.URLSpanUserMention;
 import org.telegram.ui.Components.spoilers.SpoilerEffect;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -199,11 +200,6 @@ public class MessageObject {
 
     public boolean scheduled;
     public boolean preview;
-
-    public MessageHelper.ReplyMarkupButtonsTexts originalReplyMarkupRows;
-    public MessageHelper.ReplyMarkupButtonsTexts translatedReplyMarkupRows;
-    public MessageHelper.PollTexts originalPoll;
-    public MessageHelper.PollTexts translatedPoll;
 
     public ArrayList<TLRPC.TL_pollAnswer> checkedVotes;
 
@@ -2528,11 +2524,10 @@ public class MessageObject {
 
     private boolean updatePoll(boolean translated) {
         if (messageOwner.media instanceof TLRPC.TL_messageMediaPoll) {
-            MessageHelper.PollTexts poll = translated ? translatedPoll:originalPoll;
-            if (poll == null) {
-                return true;
+            MessageHelper.PollTexts poll = translated ? messageOwner.translatedPoll:messageOwner.originalPoll;
+            if (poll != null) {
+                poll.applyTextToPoll(((TLRPC.TL_messageMediaPoll) messageOwner.media).poll);
             }
-            poll.applyTextToPoll(((TLRPC.TL_messageMediaPoll) messageOwner.media).poll);
             return false;
         }
         return true;
@@ -2543,7 +2538,7 @@ public class MessageObject {
                 (MessagesController.getInstance(currentAccount).getTranslateController().isGeneralTranslating(this)) &&
                 !MessagesController.getInstance(currentAccount).getTranslateController().isHiddenTranslation(this) &&
                 messageOwner != null &&
-                (messageOwner.translatedText != null || translatedPoll != null) &&
+                (messageOwner.translatedText != null || messageOwner.translatedPoll != null) &&
                 TextUtils.equals(MessagesController.getInstance(currentAccount).getTranslateController().getDialogTranslateTo(getDialogId()), messageOwner.translatedToLanguage);
     }
 
@@ -2557,8 +2552,8 @@ public class MessageObject {
             if (updatePoll(true)) {
                 applyNewText(messageOwner.translatedText.text);
                 generateCaption();
-                if (translatedReplyMarkupRows != null) {
-                    translatedReplyMarkupRows.applyTextToKeyboard(messageOwner.reply_markup.rows);
+                if (messageOwner.translatedReplyMarkupRows != null) {
+                    messageOwner.translatedReplyMarkupRows.applyTextToKeyboard(messageOwner.reply_markup.rows);
                     measureInlineBotButtons();
                 }
             }
@@ -2568,8 +2563,8 @@ public class MessageObject {
             if (updatePoll(false)) {
                 applyNewText(messageOwner.message);
                 generateCaption();
-                if (originalReplyMarkupRows != null) {
-                    originalReplyMarkupRows.applyTextToKeyboard(messageOwner.reply_markup.rows);
+                if (messageOwner.originalReplyMarkupRows != null) {
+                    messageOwner.originalReplyMarkupRows.applyTextToKeyboard(messageOwner.reply_markup.rows);
                     measureInlineBotButtons();
                 }
             }
@@ -4654,6 +4649,14 @@ public class MessageObject {
 
     public void generateCaption() {
         if (caption != null && translated == captionTranslated || isRoundVideo()) {
+            return;
+        }
+        if (messageOwner.media instanceof TLRPC.TL_messageMediaPoll) {
+            if (translated == captionTranslated) {
+                return;
+            }
+            updatePoll(translated);
+            captionTranslated = translated;
             return;
         }
         String text = messageOwner.message;
