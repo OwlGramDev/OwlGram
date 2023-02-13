@@ -1,7 +1,8 @@
 package it.owlgram.android.translator;
 
+import android.util.LruCache;
+
 import androidx.annotation.Nullable;
-import androidx.collection.LruCache;
 import androidx.core.util.Pair;
 
 import org.telegram.messenger.AndroidUtilities;
@@ -11,8 +12,15 @@ import org.telegram.tgnet.TLRPC;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.helpers.MessageHelper;
@@ -20,12 +28,40 @@ import it.owlgram.android.helpers.MessageHelper;
 
 abstract public class BaseTranslator {
 
-    private final LruCache<Pair<Object, String>, Result> cache = new LruCache<>(200);
+    protected final LruCache<Pair<Object, String>, Result> cache = new LruCache<>(200);
 
     public static final int INLINE_STYLE = 0;
     public static final int DIALOG_STYLE = 1;
 
-    abstract protected Result translate(String query, String tl) throws Exception;
+    abstract protected Result singleTranslate(Object query, String tl) throws Exception;
+
+    protected ArrayList<Result> multiTranslate(ArrayList<Object> translations, String tl) throws Exception {
+        int count = translations.size();
+        final CountDownLatch semaphore = new CountDownLatch(count);
+        final ArrayList<Result> results = new ArrayList<>(Collections.nCopies(count, null));
+        AtomicReference<Exception> exception = new AtomicReference<>();
+        for (int i = 0; i < count; i++) {
+            final int j = i;
+            new Thread() {
+                @Override
+                public void run() {
+                    if (exception.get() == null) {
+                        try {
+                            results.set(j, preProcessTranslation(translations.get(j), tl));
+                        } catch (Exception e) {
+                            exception.set(e);
+                        }
+                    }
+                    semaphore.countDown();
+                }
+            }.start();
+        }
+        semaphore.await();
+        if (exception.get() != null) {
+            throw exception.get();
+        }
+        return results;
+    }
 
     abstract public List<String> getTargetLanguages();
 
@@ -67,73 +103,97 @@ abstract public class BaseTranslator {
         return translated;
     }
 
-    public void startTask(Object query, String toLang, Translator.TranslateCallBack translateCallBack) {
-        Result result = cache.get(Pair.create(query, toLang));
-        if (result != null) {
-            translateCallBack.onSuccess(result);
-            return;
+    protected String stringFromTranslation(Object translation) throws UnsupportedOperationException {
+        if (translation instanceof TLRPC.TL_textWithEntities) {
+            return ((TLRPC.TL_textWithEntities) translation).text;
+        } else if (translation instanceof CharSequence) {
+            return (String) translation;
         }
+        throw new UnsupportedOperationException("Unsupported translation result type");
+    }
+
+    protected String getTopLanguage(ArrayList<Result> results) {
+        Map<String, Long> topLanguages = results.stream()
+                .map(result -> result.sourceLanguage)
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+        Map.Entry<String, Long> mostUsedLanguage = topLanguages.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .orElse(null);
+        if (mostUsedLanguage != null) {
+            return mostUsedLanguage.getKey();
+        } else {
+            return null;
+        }
+    }
+
+    protected Result preProcessTranslation(Object query, String toLang) throws Exception {
+        Pair<Object, String> key = new Pair<>(query, toLang);
+        Result cacheRes = cache.get(key);
+        if (cacheRes != null) {
+            return cacheRes;
+        }
+        Result resTranslation = null;
+        if (query instanceof CharSequence || query instanceof TLRPC.TL_textWithEntities) {
+            resTranslation = singleTranslate(query, toLang);
+        } else if (query instanceof AdditionalObjectTranslation) {
+            Object translationData = ((AdditionalObjectTranslation) query).translation;
+            if (translationData instanceof MessageHelper.PollTexts) {
+                ArrayList<Object> translations = new ArrayList<>(((MessageHelper.PollTexts) translationData).getTexts());
+                ArrayList<Result> results = multiTranslate(translations, toLang);
+                MessageHelper.PollTexts poll = (MessageHelper.PollTexts) translationData;
+                for (int i = 0; i < translations.size(); i++) {
+                    poll.getTexts().set(i, stringFromTranslation(results.get(i).translation));
+                }
+                resTranslation = new Result(poll, getTopLanguage(results));
+            } else if (translationData instanceof String || translationData instanceof TLRPC.TL_textWithEntities) {
+                ArrayList<Object> translations = new ArrayList<>();
+                translations.add(translationData);
+                if (((AdditionalObjectTranslation) query).additionalInfo != null && ((AdditionalObjectTranslation) query).additionalInfo instanceof MessageHelper.ReplyMarkupButtonsTexts) {
+                    MessageHelper.ReplyMarkupButtonsTexts buttonRows = (MessageHelper.ReplyMarkupButtonsTexts) ((AdditionalObjectTranslation) query).additionalInfo;
+                    for (int i = 0; i < buttonRows.getTexts().size(); i++) {
+                        translations.addAll(buttonRows.getTexts().get(i));
+                    }
+                }
+
+                ArrayList<Result> results;
+                if (translations.size() == 1) {
+                    results = new ArrayList<>(Collections.singletonList(singleTranslate(translations.get(0), toLang)));
+                } else {
+                    results = multiTranslate(translations, toLang);
+                }
+                MessageHelper.ReplyMarkupButtonsTexts buttonRows = (MessageHelper.ReplyMarkupButtonsTexts) ((AdditionalObjectTranslation) query).additionalInfo;
+                if (buttonRows != null) {
+                    int currIndex = 1;
+                    for (int i = 0; i < buttonRows.getTexts().size(); i++) {
+                        ArrayList<String> buttonsRow = buttonRows.getTexts().get(i);
+                        for (int j = 0; j < buttonsRow.size(); j++) {
+                            buttonsRow.set(j, stringFromTranslation(results.get(currIndex).translation));
+                            currIndex++;
+                        }
+                    }
+                }
+                resTranslation = new Result(results.get(0).translation, buttonRows, results.get(0).sourceLanguage);
+            }
+        }
+        cache.put(key, resTranslation);
+        if (resTranslation != null) {
+            return resTranslation;
+        }
+        throw new UnsupportedOperationException("Unsupported translation query: " + query.getClass().getSimpleName());
+    }
+
+    public void startTask(ArrayList<Object> translations, String toLang, Translator.MultiTranslateCallBack translateCallBack) {
         new Thread() {
             @Override
             public void run() {
                 try {
-                    if (query instanceof CharSequence) {
-                        Result result = translate(query.toString(), toLang);
-                        if (result != null) {
-                            cache.put(Pair.create(query, result.sourceLanguage), result);
-                            AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(result));
-                        } else {
-                            AndroidUtilities.runOnUIThread(() -> translateCallBack.onError(null));
-                        }
-                    } else if (query instanceof AdditionalObjectTranslation) {
-                        if (((AdditionalObjectTranslation) query).translation instanceof TLRPC.Poll) {
-                            TLRPC.TL_poll poll = new TLRPC.TL_poll();
-                            TLRPC.TL_poll original = (TLRPC.TL_poll) ((AdditionalObjectTranslation) query).translation;
-                            Result questionResult = translate(original.question, toLang);
-                            poll.question = (String) questionResult.translation;
-                            for (int i = 0; i < original.answers.size(); i++) {
-                                TLRPC.TL_pollAnswer answer = new TLRPC.TL_pollAnswer();
-                                answer.text = (String) translate(original.answers.get(i).text, toLang).translation;
-                                answer.option = original.answers.get(i).option;
-                                poll.answers.add(answer);
-                            }
-                            poll.close_date = original.close_date;
-                            poll.close_period = original.close_period;
-                            poll.closed = original.closed;
-                            poll.flags = original.flags;
-                            poll.id = original.id;
-                            poll.multiple_choice = original.multiple_choice;
-                            poll.public_voters = original.public_voters;
-                            poll.quiz = original.quiz;
-                            AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(new Result(poll, questionResult.sourceLanguage)));
-                        } else if (((AdditionalObjectTranslation) query).translation instanceof String) {
-                            Result result = translate((String) ((AdditionalObjectTranslation) query).translation, toLang);
-                            if (result != null) {
-                                if (((AdditionalObjectTranslation) query).additionalInfo != null && ((AdditionalObjectTranslation) query).additionalInfo instanceof MessageHelper.ReplyMarkupButtonsTexts) {
-                                    MessageHelper.ReplyMarkupButtonsTexts buttonRows = (MessageHelper.ReplyMarkupButtonsTexts) ((AdditionalObjectTranslation) query).additionalInfo;
-                                    for (int i = 0; i < buttonRows.getTexts().size(); i++) {
-                                        ArrayList<String> buttonsRow = buttonRows.getTexts().get(i);
-                                        for (int j = 0; j < buttonsRow.size(); j++) {
-                                            buttonsRow.set(j, (String) translate(buttonsRow.get(j), toLang).translation);
-                                        }
-                                    }
-                                    result.additionalInfo = buttonRows;
-                                }
-                                cache.put(Pair.create(query, result.sourceLanguage), result);
-                                AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(result));
-                            } else {
-                                AndroidUtilities.runOnUIThread(() -> translateCallBack.onError(null));
-                            }
-                        } else {
-                            throw new UnsupportedOperationException("Unsupported translation query");
-                        }
-                    } else {
-                        throw new UnsupportedOperationException("Unsupported translation query");
-                    }
+                    ArrayList<Result> results = multiTranslate(translations, toLang);
+                    AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(null, results));
                 } catch (Exception e) {
                     e.printStackTrace();
                     FileLog.e(e, false);
-                    AndroidUtilities.runOnUIThread(() -> translateCallBack.onError(e));
+                    AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(e, null));
                 }
             }
         }.start();
@@ -185,7 +245,7 @@ abstract public class BaseTranslator {
             this(translation, null, sourceLanguage);
         }
 
-        public Result(Object translation, @Nullable TLRPC.ReplyMarkup additionalInfo, @Nullable String sourceLanguage) {
+        public Result(Object translation, @Nullable Object additionalInfo, @Nullable String sourceLanguage) {
             this.translation = translation;
             this.additionalInfo = additionalInfo;
             this.sourceLanguage = sourceLanguage;
@@ -195,5 +255,6 @@ abstract public class BaseTranslator {
     public static class AdditionalObjectTranslation {
         public Object translation;
         public Object additionalInfo;
+        public int messagesCount;
     }
 }

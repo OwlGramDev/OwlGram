@@ -12173,8 +12173,8 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 }
             }
         }
-        CharSequence translatedMessage = MessageHelper.createTranslateString(currentMessageObject);
-        if (currentMessageObject.translated && translatedMessage != null) {
+        CharSequence translatedMessage = MessageHelper.createTranslateString(messageObject);
+        if (currentMessageObject.isDoneTranslation() && translatedMessage != null) {
             timeString = translatedMessage;
         } else if (currentMessageObject.isSponsored()) {
             if (currentMessageObject.sponsoredRecommended) {
@@ -12199,7 +12199,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         }
         timeTextWidth = timeWidth = (int) Math.ceil(Theme.chat_timePaint.measureText(currentTimeString, 0, currentTimeString == null ? 0 : currentTimeString.length()));
         if (timeString instanceof SpannableStringBuilder) {
-            if (currentMessageObject.translated && MessageHelper.arrowDrawable != null) {
+            if (currentMessageObject.isDoneTranslation() && MessageHelper.arrowDrawable != null && translatedMessage != null) {
                 timeTextWidth = timeWidth += MessageHelper.arrowDrawable.getIntrinsicWidth();
             } else if (edited && OwlConfig.showPencilIcon) {
                 timeTextWidth = timeWidth += MessageHelper.editedDrawable.getIntrinsicWidth();

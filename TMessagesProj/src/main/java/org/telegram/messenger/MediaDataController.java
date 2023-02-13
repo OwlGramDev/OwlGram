@@ -3894,6 +3894,7 @@ public class MediaDataController extends BaseController {
                         for (int i = 0; i < objects.size(); ++i) {
                            MessageObject messageObject = objects.get(i);
                            TLRPC.Message message = getMessagesStorage().getMessageWithCustomParamsOnlyInternal(messageObject.getId(), messageObject.getDialogId());
+                           messageObject.messageOwner.originalLanguage = message.originalLanguage;
                            messageObject.messageOwner.translatedToLanguage = message.translatedToLanguage;
                            messageObject.messageOwner.translatedText = message.translatedText;
                            messageObject.updateTranslation();

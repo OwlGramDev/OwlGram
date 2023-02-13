@@ -5317,23 +5317,19 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         if (OwlConfig.translatorStyle == BaseTranslator.INLINE_STYLE) {
             if(translatingBio) return;
             translatingBio = true;
-            Translator.translate(bio, new Translator.TranslateCallBack() {
-                @Override
-                public void onSuccess(BaseTranslator.Result result) {
-                    translatingBio = false;
-                    currentBio = (String) result.translation;
-                    originalBio = bio;
-                    aboutLinkCell.setTextAndValue((String) currentBio, channelInfoRow != -1 ? null:LocaleController.getString("UserBio", R.string.UserBio), true);
-                    if (userInfoRow != -1) {
-                        listAdapter.notifyItemChanged(userInfoRow);
-                    } else if (channelInfoRow != -1) {
-                        listAdapter.notifyItemChanged(channelInfoRow);
-                    }
+            Translator.translate(bio, (error, result) -> {
+                if (error != null) {
+                    Translator.handleTranslationError(getParentActivity(), error, () -> translateBio(bio, aboutLinkCell), null);
+                    return;
                 }
-
-                @Override
-                public void onError(Exception e) {
-                    Translator.handleTranslationError(getParentActivity(), e, () -> translateBio(bio, aboutLinkCell), null);
+                translatingBio = false;
+                currentBio = (String) result.translation;
+                originalBio = bio;
+                aboutLinkCell.setTextAndValue((String) currentBio, channelInfoRow != -1 ? null:LocaleController.getString("UserBio", R.string.UserBio), true);
+                if (userInfoRow != -1) {
+                    listAdapter.notifyItemChanged(userInfoRow);
+                } else if (channelInfoRow != -1) {
+                    listAdapter.notifyItemChanged(channelInfoRow);
                 }
             });
         } else {

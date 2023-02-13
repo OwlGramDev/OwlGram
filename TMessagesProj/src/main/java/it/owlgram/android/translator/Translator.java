@@ -1,23 +1,21 @@
 package it.owlgram.android.translator;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.widget.TextView;
 
 import androidx.core.text.HtmlCompat;
 import androidx.core.util.Pair;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
@@ -32,70 +30,9 @@ public class Translator {
     public static final int PROVIDER_DUCKDUCKGO = 13;
     public static final int PROVIDER_TELEGRAM = 14;
 
-    @SuppressLint("StaticFieldLeak")
-    private static AlertDialog progressDialog;
-
-    public static void showTranslateDialog(Context context, String query, Runnable callback) {
-        showTranslateDialog(context, query, callback, null);
-    }
-
-    public static boolean isSupportedOutputLang(int provider) {
-        return provider == PROVIDER_GOOGLE ||
-                provider == PROVIDER_YANDEX ||
-                provider == PROVIDER_DEEPL ||
-                provider == PROVIDER_DUCKDUCKGO;
-    }
-
-    public static void showTranslateDialog(Context context, String query, Runnable callback, Theme.ResourcesProvider resourcesProvider) {
-        try {
-            progressDialog.dismiss();
-        } catch (Exception ignore) {
-
-        }
-        progressDialog = new AlertDialog(context, 3, resourcesProvider);
-        progressDialog.showDelayed(400);
-        translate(query, new TranslateCallBack() {
-            @Override
-            public void onSuccess(BaseTranslator.Result result) {
-                try {
-                    progressDialog.dismiss();
-                } catch (Exception ignore) {
-                }
-                TextView messageTextView = new TextView(context);
-                messageTextView.setTextColor(Theme.getColor(Theme.key_dialogTextBlack, resourcesProvider));
-                messageTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
-                messageTextView.setGravity((LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) | Gravity.TOP);
-                messageTextView.setTextIsSelectable(true);
-                messageTextView.setText((String) result.translation);
-                messageTextView.setPadding(AndroidUtilities.dp(24), AndroidUtilities.dp(4), AndroidUtilities.dp(24), AndroidUtilities.dp(4));
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(context, resourcesProvider);
-                builder.setView(messageTextView);
-                builder.setPositiveButton(LocaleController.getString("OK", R.string.OK), null);
-                builder.setNeutralButton(LocaleController.getString("Copy", R.string.Copy), (dialog, which) -> {
-                    AndroidUtilities.addToClipboard((String) result.translation);
-                    if (callback != null) {
-                        callback.run();
-                    }
-                });
-                builder.show();
-            }
-
-            @Override
-            public void onError(Exception e) {
-                handleTranslationError(context, e, () -> showTranslateDialog(context, query, callback, resourcesProvider), resourcesProvider);
-            }
-        });
-    }
-
     public static void handleTranslationError(Context context, final Exception e, final Runnable onRetry, Theme.ResourcesProvider resourcesProvider) {
         if (context == null) {
             return;
-        }
-        try {
-            progressDialog.dismiss();
-        } catch (Exception ignore) {
-
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(context, resourcesProvider);
         if (e instanceof UnsupportedTargetLanguageException) {
@@ -233,24 +170,48 @@ public class Translator {
         }
     }
 
-    public static void translate(Object query, TranslateCallBack translateCallBack) {
-        translate(query, false, translateCallBack);
+    public static void translate(MessageObject query, TranslateCallBack translateCallBack) {
+        translate(new ArrayList<>(Collections.singletonList((new TranslatorHelper.TranslatorContext(query)).getTranslateObject())), singleTranslateCallback(translateCallBack));
     }
 
-    public static void translate(Object query, boolean isKeyboard, TranslateCallBack translateCallBack) {
+    public static void translate(String query, TranslateCallBack translateCallBack) {
+        translate(new ArrayList<>(Collections.singletonList(query)), singleTranslateCallback(translateCallBack));
+    }
+
+    public static void translate(ArrayList<Object> translations, MultiTranslateCallBack translateCallBack) {
+        translate(translations, false, translateCallBack);
+    }
+
+    public static void translate(String query, boolean isKeyboard, TranslateCallBack translateCallBack) {
+        translate(new ArrayList<>(Collections.singletonList(query)), isKeyboard, singleTranslateCallback(translateCallBack));
+    }
+
+    private static MultiTranslateCallBack singleTranslateCallback(TranslateCallBack callBack) {
+        return (e, result) -> {
+            if (result != null && !result.isEmpty()) {
+                callBack.onSuccess(e, result.get(0));
+            } else {
+                callBack.onSuccess(e, null);
+            }
+        };
+    }
+
+    public static void translate(ArrayList<Object> translations, boolean isKeyboard, MultiTranslateCallBack translateCallBack) {
         BaseTranslator translator = getCurrentTranslator();
         String language = isKeyboard ? translator.getCurrentTargetKeyboardLanguage() : translator.getCurrentTargetLanguage();
         if (!translator.supportLanguage(language)) {
-            translateCallBack.onError(new UnsupportedTargetLanguageException());
+            translateCallBack.onSuccess(new UnsupportedTargetLanguageException(), null);
         } else {
-            translator.startTask(query, language, translateCallBack);
+            translator.startTask(translations, language, translateCallBack);
         }
     }
 
-    public interface TranslateCallBack {
-        void onSuccess(BaseTranslator.Result result);
+    public interface MultiTranslateCallBack {
+        void onSuccess(Exception e, ArrayList<BaseTranslator.Result> result);
+    }
 
-        void onError(Exception e);
+    public interface TranslateCallBack {
+        void onSuccess(Exception e, BaseTranslator.Result result);
     }
 
 

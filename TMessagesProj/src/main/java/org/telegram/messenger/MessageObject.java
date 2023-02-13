@@ -56,7 +56,6 @@ import org.telegram.ui.Components.URLSpanNoUnderlineBold;
 import org.telegram.ui.Components.URLSpanReplacement;
 import org.telegram.ui.Components.URLSpanUserMention;
 import org.telegram.ui.Components.spoilers.SpoilerEffect;
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -202,6 +201,9 @@ public class MessageObject {
     public boolean preview;
 
     public MessageHelper.ReplyMarkupButtonsTexts originalReplyMarkupRows;
+    public MessageHelper.ReplyMarkupButtonsTexts translatedReplyMarkupRows;
+    public MessageHelper.PollTexts originalPoll;
+    public MessageHelper.PollTexts translatedPoll;
 
     public ArrayList<TLRPC.TL_pollAnswer> checkedVotes;
 
@@ -2523,26 +2525,54 @@ public class MessageObject {
     }
 
     public boolean translated = false;
+
+    private boolean updatePoll(boolean translated) {
+        if (messageOwner.media instanceof TLRPC.TL_messageMediaPoll) {
+            MessageHelper.PollTexts poll = translated ? translatedPoll:originalPoll;
+            if (poll == null) {
+                return true;
+            }
+            poll.applyTextToPoll(((TLRPC.TL_messageMediaPoll) messageOwner.media).poll);
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isDoneTranslation() {
+        return TranslateController.isTranslatable(this, true) &&
+                (MessagesController.getInstance(currentAccount).getTranslateController().isGeneralTranslating(this)) &&
+                !MessagesController.getInstance(currentAccount).getTranslateController().isHiddenTranslation(this) &&
+                messageOwner != null &&
+                (messageOwner.translatedText != null || translatedPoll != null) &&
+                TextUtils.equals(MessagesController.getInstance(currentAccount).getTranslateController().getDialogTranslateTo(getDialogId()), messageOwner.translatedToLanguage);
+    }
+
     public boolean updateTranslation(boolean force) {
         boolean replyUpdated = replyMessageObject != null && replyMessageObject.updateTranslation(force);
-        if (
-            TranslateController.isTranslatable(this) &&
-            MessagesController.getInstance(currentAccount).getTranslateController().isTranslatingDialog(getDialogId()) &&
-            messageOwner != null &&
-            messageOwner.translatedText != null &&
-            TextUtils.equals(MessagesController.getInstance(currentAccount).getTranslateController().getDialogTranslateTo(getDialogId()), messageOwner.translatedToLanguage)
-        ) {
+        if (isDoneTranslation()) {
             if (translated) {
                 return replyUpdated || false;
             }
             translated = true;
-            applyNewText(messageOwner.translatedText.text);
-            generateCaption();
+            if (updatePoll(true)) {
+                applyNewText(messageOwner.translatedText.text);
+                generateCaption();
+                if (translatedReplyMarkupRows != null) {
+                    translatedReplyMarkupRows.applyTextToKeyboard(messageOwner.reply_markup.rows);
+                    measureInlineBotButtons();
+                }
+            }
             return replyUpdated || true;
         } else if (messageOwner != null && (force || translated)) {
             translated = false;
-            applyNewText(messageOwner.message);
-            generateCaption();
+            if (updatePoll(false)) {
+                applyNewText(messageOwner.message);
+                generateCaption();
+                if (originalReplyMarkupRows != null) {
+                    originalReplyMarkupRows.applyTextToKeyboard(messageOwner.reply_markup.rows);
+                    measureInlineBotButtons();
+                }
+            }
             return replyUpdated || true;
         }
         return replyUpdated || false;

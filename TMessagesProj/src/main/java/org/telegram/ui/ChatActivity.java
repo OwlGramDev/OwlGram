@@ -324,6 +324,7 @@ import it.owlgram.android.components.EmojiSetBulletinLayout;
 import it.owlgram.android.components.ImportSettingsDialog;
 import it.owlgram.android.helpers.CustomEmojiHelper;
 import it.owlgram.android.helpers.ForwardContext;
+import it.owlgram.android.helpers.MessageHelper;
 import it.owlgram.android.helpers.PermissionHelper;
 import it.owlgram.android.settings.DoNotTranslateSettings;
 import it.owlgram.android.translator.AutoTranslateConfig;
@@ -10532,8 +10533,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         for (int a = 0; a < 2; a++) {
             for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
                 MessageObject messageObject = selectedMessagesIds[a].valueAt(b);
-                if (messageObject.translated && messageObject.originalMessage != null) {
-                    messageObject = TranslatorHelper.resetTranslatedMessage(dialog_id, ChatActivity.this, messageObject);
+                if (messageObject.translated && messageObject.messageOwner.translatedText != null) {
+                    TranslatorHelper.resetTranslatedMessage(messageObject, true);
                 }
                 if (messageObject.isPoll()) {
                     hasPoll = messageObject.isPublicPoll() ? 2 : 1;
@@ -17567,8 +17568,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     boolean isVoted = object.isVoted();
                     TLRPC.TL_messageMediaPoll media = (TLRPC.TL_messageMediaPoll) object.messageOwner.media;
                     if (poll != null) {
+                        MessageHelper.PollTexts polls = new MessageHelper.PollTexts(media.poll);
                         media.poll = poll;
                         isQuiz = poll.quiz;
+                        polls.applyTextToPoll(media.poll);
                     } else if (media.poll != null) {
                         isQuiz = media.poll.quiz;
                     }
@@ -17768,9 +17771,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             doOnIdle(() -> {
                 ArrayList<MessageObject> messageObjects = (ArrayList<MessageObject>) args[1];
                 replaceMessageObjects(messageObjects, loadIndex, false);
-                for (int a = 0; a < messageObjects.size(); a++) {
-                    handleAutoTranslate(messageObjects.get(a));
-                }
             });
         } else if (id == NotificationCenter.notificationsSettingsUpdated) {
             updateTitleIcons();
@@ -18529,6 +18529,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             if (pinnedMessageObject != null) {
                                 pinnedMessageObject.messageOwner.translatedText = messageObject.messageOwner.translatedText;
                                 pinnedMessageObject.messageOwner.translatedToLanguage = messageObject.messageOwner.translatedToLanguage;
+                                pinnedMessageObject.messageOwner.originalLanguage = messageObject.messageOwner.originalLanguage;
+                                pinnedMessageObject.translatedReplyMarkupRows = messageObject.translatedReplyMarkupRows;
+                                pinnedMessageObject.originalReplyMarkupRows = messageObject.originalReplyMarkupRows;
+                                pinnedMessageObject.translatedPoll = messageObject.translatedPoll;
+                                pinnedMessageObject.originalPoll = messageObject.originalPoll;
                                 if (pinnedMessageObject.updateTranslation(currentPinnedMessageId == messageObject.getId())) {
                                     updatedPinned = true;
                                 }
@@ -18549,6 +18554,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             if (translatedReplyMessageObject != null) {
                                 messageObject.replyMessageObject.messageOwner.translatedText = translatedReplyMessageObject.messageOwner.translatedText;
                                 messageObject.replyMessageObject.messageOwner.translatedToLanguage = translatedReplyMessageObject.messageOwner.translatedToLanguage;
+                                messageObject.replyMessageObject.messageOwner.originalLanguage = translatedReplyMessageObject.messageOwner.originalLanguage;
+                                messageObject.translatedReplyMarkupRows = translatedReplyMessageObject.translatedReplyMarkupRows;
+                                messageObject.originalReplyMarkupRows = translatedReplyMessageObject.originalReplyMarkupRows;
+                                messageObject.translatedPoll = translatedReplyMessageObject.translatedPoll;
+                                messageObject.originalPoll = translatedReplyMessageObject.originalPoll;
                                 if (messageObject.replyMessageObject.updateTranslation(true)) {
                                     update = true;
                                 }
@@ -18630,6 +18640,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             if (pinnedMessageObject != null && pinnedMessageObject.getId() == messageObject.getId()) {
                 pinnedMessageObject.messageOwner.translatedText = messageObject.messageOwner.translatedText;
                 pinnedMessageObject.messageOwner.translatedToLanguage = messageObject.messageOwner.translatedToLanguage;
+                pinnedMessageObject.messageOwner.originalLanguage = messageObject.messageOwner.originalLanguage;
+                pinnedMessageObject.translatedReplyMarkupRows = messageObject.translatedReplyMarkupRows;
+                pinnedMessageObject.originalReplyMarkupRows = messageObject.originalReplyMarkupRows;
+                pinnedMessageObject.translatedPoll = messageObject.translatedPoll;
+                pinnedMessageObject.originalPoll = messageObject.originalPoll;
                 if (pinnedMessageObject.updateTranslation(true)) {
                     updatePinnedMessageView(true, 1);
                     updated = true;
@@ -18652,6 +18667,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (cellMessageObject.getId() == messageObject.getId()) {
                     cellMessageObject.messageOwner.translatedText = messageObject.messageOwner.translatedText;
                     cellMessageObject.messageOwner.translatedToLanguage = messageObject.messageOwner.translatedToLanguage;
+                    cellMessageObject.messageOwner.originalLanguage = messageObject.messageOwner.originalLanguage;
+                    cellMessageObject.translatedReplyMarkupRows = messageObject.translatedReplyMarkupRows;
+                    cellMessageObject.originalReplyMarkupRows = messageObject.originalReplyMarkupRows;
+                    cellMessageObject.translatedPoll = messageObject.translatedPoll;
+                    cellMessageObject.originalPoll = messageObject.originalPoll;
                     if (cellMessageObject.updateTranslation(false)) {
                         update = true;
                         ArrayList<Integer> dependentMessages = replyMessageOwners.get(cellMessageObject.getId());
@@ -18673,6 +18693,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (cellMessageObject.replyMessageObject != null && cellMessageObject.replyMessageObject.getId() == messageObject.getId() && cellMessageObject.replyMessageObject.getDialogId() == messageObject.getDialogId()) {
                     cellMessageObject.replyMessageObject.messageOwner.translatedText = messageObject.messageOwner.translatedText;
                     cellMessageObject.replyMessageObject.messageOwner.translatedToLanguage = messageObject.messageOwner.translatedToLanguage;
+                    cellMessageObject.replyMessageObject.messageOwner.originalLanguage = messageObject.messageOwner.originalLanguage;
+                    cellMessageObject.translatedReplyMarkupRows = messageObject.translatedReplyMarkupRows;
+                    cellMessageObject.originalReplyMarkupRows = messageObject.originalReplyMarkupRows;
+                    cellMessageObject.translatedPoll = messageObject.translatedPoll;
+                    cellMessageObject.originalPoll = messageObject.originalPoll;
                     if (cellMessageObject.replyMessageObject.updateTranslation(false)) {
                         update = true;
                     }
@@ -18710,6 +18735,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (cellMessageObject != null && messageIds.contains(cellMessageObject.getId()) && cellMessageObject.replyMessageObject != null && cellMessageObject.replyMessageObject.getId() == translatedReplyMessageObject.getId()) {
                     cellMessageObject.replyMessageObject.messageOwner.translatedText = translatedReplyMessageObject.messageOwner.translatedText;
                     cellMessageObject.replyMessageObject.messageOwner.translatedToLanguage = translatedReplyMessageObject.messageOwner.translatedToLanguage;
+                    cellMessageObject.replyMessageObject.messageOwner.originalLanguage = translatedReplyMessageObject.messageOwner.originalLanguage;
+                    cellMessageObject.replyMessageObject.translatedReplyMarkupRows = translatedReplyMessageObject.translatedReplyMarkupRows;
+                    cellMessageObject.replyMessageObject.originalReplyMarkupRows = translatedReplyMessageObject.originalReplyMarkupRows;
+                    cellMessageObject.translatedPoll = translatedReplyMessageObject.translatedPoll;
+                    cellMessageObject.originalPoll = translatedReplyMessageObject.originalPoll;
                     if (cellMessageObject.replyMessageObject.updateTranslation(false)) {
                         update = true;
                     }
@@ -23416,9 +23446,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         messageTextToTranslate = null; // message fully consists of emojis, do not translate
                     }
                 }
-                if (selectedObject.translated) {
+                /*if (selectedObject.translated) {
                     messageTextToTranslate = null;
-                }
+                }*/
 
                 if (message.isSponsored() && !getMessagesController().premiumLocked) {
                     items.add(LocaleController.getString("HideAd", R.string.HideAd));
@@ -23473,8 +23503,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             icons.add(R.drawable.msg_translate);
                         }*/
                         if (messageObject != null && messageObject.contentType == 0 && !(editingMessageObject != null && editingMessageObject.getId() == messageObject.getId()) && (messageTextToTranslate != null && messageTextToTranslate.length() > 0 && !messageObject.isAnimatedEmoji() && !messageObject.isDice()) && OwlConfig.showTranslate) {
-                            String currentID = messageObject.getChatId()+"_"+messageObject.getId();
-                            if (!TranslatorHelper.isTranslating(currentID)) {
+                            if (!TranslatorHelper.isTranslating(messageObject)) {
                                 items.add(messageObject.translated && !messageObject.isVoiceTranscriptionOpen() ? LocaleController.getString("UndoTranslate", R.string.UndoTranslate) : LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
                                 options.add(201);
                                 icons.add(R.drawable.msg_translate);
@@ -23842,8 +23871,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             icons.add(R.drawable.msg_translate);
                         }*/
                         if (messageObject != null && messageObject.contentType == 0 && !(editingMessageObject != null && editingMessageObject.getId() == messageObject.getId()) && (messageTextToTranslate != null && messageTextToTranslate.length() > 0 && !messageObject.isAnimatedEmoji() && !messageObject.isDice()) && OwlConfig.showTranslate) {
-                            String currentID = messageObject.getChatId()+"_"+messageObject.getId();
-                            if (!TranslatorHelper.isTranslating(currentID)) {
+                            if (!TranslatorHelper.isTranslating(messageObject)) {
                                 items.add(messageObject.translated && !messageObject.isVoiceTranscriptionOpen() ? LocaleController.getString("UndoTranslate", R.string.UndoTranslate) : LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
                                 options.add(201);
                                 icons.add(R.drawable.msg_translate);
@@ -24534,7 +24562,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             cell.setVisibility(View.GONE);
                             waitForLangDetection.set(true);
                             LanguageDetector.detectLanguage(
-                                    messageTextToTranslate.toString(),
+                                    messageObject.messageOwner.message,
                                     (String lang) -> {
                                         fromLang[0] = lang;
                                         if (fromLang[0] != null) {
@@ -24567,11 +24595,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         }
                         cell.setOnClickListener(v1 -> {
                             closeMenu(true);
-                            if (messageObject.translated && messageObject.originalMessage != null) {
-                                TranslatorHelper.resetTranslatedMessage(dialog_id, ChatActivity.this, messageObject);
+                            if (messageObject.isDoneTranslation() && messageObject.translated) {
+                                TranslatorHelper.resetTranslatedMessage(messageObject);
                             } else {
                                 if (OwlConfig.translatorStyle == BaseTranslator.DIALOG_STYLE) {
-                                    // TODO: ADD KEEP_FORMATTING FLAG
                                     TranslateAlert2 alert = TranslateAlert2.showAlert(getParentActivity(), this, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], getMessageHelper().getPlainText(messageObject), null, noforwards, onLinkPress, () -> dimBehindView(false));
                                     alert.setDimBehind(false);
                                     return;
@@ -24580,7 +24607,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             }
                         });
                         cell.setOnLongClickListener(v1 -> {
-                            if (messageObject.translated && messageObject.originalMessage != null) return false;
+                            if (messageObject.isDoneTranslation() && messageObject.translated) return false;
                             Translator.showTranslationTargetSelector(getParentActivity(), cell::performClick, themeDelegate);
                             closeMenu(true);
                             return true;
@@ -25168,8 +25195,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (messageObject == null || getParentActivity() == null) {
             return;
         }
-        if (messageObject.translated && messageObject.originalMessage != null) {
-            messageObject = TranslatorHelper.resetTranslatedMessage(dialog_id, ChatActivity.this, messageObject);
+        if (messageObject.translated) {
+            TranslatorHelper.resetTranslatedMessage(messageObject, true);
         }
         if (searchItem != null && actionBar.isSearchFieldVisible()) {
             actionBar.closeSearchField();
@@ -25359,24 +25386,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         MediaController.saveFile(path, getParentActivity(), messageObject.isVideo() ? 1 : 0, null, null);
     }
 
-    private void handleAutoTranslate(MessageObject messageObject) {
-        if (AutoTranslateConfig.isAutoTranslateEnabled(dialog_id, getTopicId()) && LanguageDetector.hasSupport() && TranslatorHelper.isSupportAutoTranslate()) {
-            if (!messageObject.translated && !messageObject.translating && !messageObject.canceledTranslation && getMessageHelper().isMessageObjectAutoTranslatable(messageObject)) {
-                LanguageDetector.detectLanguage(
-                        messageObject.messageOwner.message,
-                        (String lang) -> {
-                            if (!DoNotTranslateSettings.getRestrictedLanguages().contains(lang.split("-")[0])) {
-                                translateMessage(messageObject, true);
-                            }
-                        },
-                        (Exception e) -> {
-                            FileLog.e("mlkit: failed to detect language in message");
-                            e.printStackTrace();
-                        });
-            }
-        }
-    }
-
     private void multiTranslateMessage() {
         ArrayList<MessageObject> selectedMessagesObject = new ArrayList<>();
         for (int a = 1; a >= 0; a--) {
@@ -25394,7 +25403,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     (String lang) -> {
                         boolean isUntranslatable = false;
                         if ((lang != null && DoNotTranslateSettings.getRestrictedLanguages().contains(lang.split("-")[0]))
-                                || messageObject.translating || messageObject.translated) {
+                                || TranslatorHelper.isTranslating(messageObject)
+                                || messageObject.isDoneTranslation()) {
                             untranslatedCount.getAndIncrement();
                             isUntranslatable = true;
                         }
@@ -25432,31 +25442,31 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }).start();
     }
 
-    private void translateMessage(MessageObject messageObject, boolean isAutoTranslate) {
-        if (messageObject.translated || messageObject.translating) return;
-        TranslatorHelper.translate(new TranslatorHelper.TranslatorContext(messageObject), new TranslatorHelper.TranslateCallback() {
-            @Override
-            public void onTranslate(BaseTranslator.Result result) {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        TranslatorHelper.applyTranslatedMessage(result, messageObject, dialog_id, ChatActivity.this, isAutoTranslate);
-                    }
-                }.start();
-            }
-
-            @Override
-            public void onPreTranslate() {
-                ChatActivity.this.getMessageHelper().setTranslating(dialog_id, messageObject, true);
-            }
-
-            @Override
-            public void onError(Exception error) {
-                ChatActivity.this.getMessageHelper().resetMessageContent(dialog_id, messageObject, false, true);
-                if (isAutoTranslate) return;
-                Translator.handleTranslationError(ChatActivity.this.getParentActivity(), error, () -> translateMessage(messageObject, false), themeDelegate);
-            }
-        });
+    private void translateMessage(MessageObject messageObject, boolean noError) {
+        TranslateController controller = MessagesController.getInstance(currentAccount).getTranslateController();
+        controller.addManualTranslation(messageObject);
+        controller.unHideTranslation(messageObject);
+        if (!TextUtils.equals(messageObject.messageOwner.translatedToLanguage, controller.getDialogTranslateTo(-1))) {
+            messageObject.messageOwner.translatedText = null;
+            messageObject.translatedPoll = null;
+        }
+        if (messageObject.messageOwner.translatedText != null || messageObject.translatedPoll != null) {
+            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslated, messageObject);
+        } else {
+            controller.addTranslatingMessage(messageObject);
+            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, messageObject);
+            Translator.translate(messageObject, (e, result) -> {
+                controller.removeTranslatingMessage(messageObject);
+                NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, messageObject);
+                if (e != null) {
+                    if (noError) return;
+                    Translator.handleTranslationError(ChatActivity.this.getParentActivity(), e, () -> translateMessage(messageObject, false), themeDelegate);
+                } else {
+                    controller.applyTranslationResult(messageObject, result);
+                    NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslated, messageObject);
+                }
+            });
+        }
     }
 
     private void processSelectedOption(int option) {
@@ -29846,7 +29856,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         startMessageUnselect();
                     }
                 }
-                handleAutoTranslate(messageCell.getMessageObject());
             }
 
             int position = holder.getAdapterPosition();

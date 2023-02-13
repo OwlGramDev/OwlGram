@@ -160,6 +160,7 @@ import org.telegram.messenger.R;
 import org.telegram.messenger.SecureDocument;
 import org.telegram.messenger.SendMessagesHelper;
 import org.telegram.messenger.SharedConfig;
+import org.telegram.messenger.TranslateController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.messenger.Utilities;
@@ -17686,9 +17687,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         if (currentMessageObject == null) {
             return;
         }
-        if (currentMessageObject.translated && currentMessageObject.originalMessage != null) {
-            final String finalMessage = (String) currentMessageObject.originalMessage;
-            setCurrentCaption(TranslatorHelper.resetTranslatedCaption(currentMessageObject), finalMessage, true);
+        TranslateController controller = MessagesController.getInstance(currentAccount).getTranslateController();
+        if (currentMessageObject.translated && currentMessageObject.isDoneTranslation()) {
+            TranslatorHelper.resetTranslatedMessage(currentMessageObject);
+            setCurrentCaption(currentMessageObject, currentMessageObject.messageOwner.message, true);
+            currentMessageObject.translated = false;
             translateItem.setText(LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
             return;
         }
@@ -17699,31 +17702,37 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         try {
             progressDialog.dismiss();
         } catch (Throwable ignore) {}
-        progressDialog = new AlertDialog(parentActivity, 3, resourcesProvider);
-        progressDialog.showDelayed(400);
-
-        TranslatorHelper.translate(new TranslatorHelper.TranslatorContext(currentMessageObject), new TranslatorHelper.TranslateCallback() {
-
-            @Override
-            public void onTranslate(BaseTranslator.Result result) {
+        controller.addManualTranslation(currentMessageObject);
+        controller.unHideTranslation(currentMessageObject);
+        if (!TextUtils.equals(currentMessageObject.messageOwner.translatedToLanguage, controller.getDialogTranslateTo(-1))) {
+            currentMessageObject.messageOwner.translatedText = null;
+        }
+        if (currentMessageObject.messageOwner.translatedText != null) {
+            setCurrentCaption(currentMessageObject, currentMessageObject.messageOwner.translatedText.text, true);
+            translateItem.setText(LocaleController.getString("UndoTranslate", R.string.UndoTranslate));
+            currentMessageObject.translated = true;
+            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslated, currentMessageObject);
+        } else {
+            progressDialog = new AlertDialog(parentActivity, 3, resourcesProvider);
+            progressDialog.showDelayed(400);
+            controller.addTranslatingMessage(currentMessageObject);
+            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, currentMessageObject);
+            Translator.translate(currentMessageObject, (error, result) -> {
+                controller.applyTranslationResult(currentMessageObject, result);
+                controller.removeTranslatingMessage(currentMessageObject);
+                NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, currentMessageObject);
                 try {
                     progressDialog.dismiss();
                 } catch (Throwable ignore) {}
-                TranslatorHelper.applyTranslatedMessage(result, currentMessageObject);
-                setCurrentCaption(currentMessageObject, currentMessageObject.messageOwner.message, true);
+                if (error != null) {
+                    Translator.handleTranslationError(parentActivity, error, this::translateCaption, resourcesProvider);
+                    return;
+                }
+                setCurrentCaption(currentMessageObject, currentMessageObject.messageOwner.translatedText.text, true);
                 translateItem.setText(LocaleController.getString("UndoTranslate", R.string.UndoTranslate));
-            }
-
-            @Override
-            public void onPreTranslate() {}
-
-            @Override
-            public void onError(Exception error) {
-                try {
-                    progressDialog.dismiss();
-                } catch (Throwable ignore) {}
-                Translator.handleTranslationError(parentActivity, error, () -> translateCaption(), resourcesProvider);
-            }
-        });
+                currentMessageObject.translated = true;
+                NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslated, currentMessageObject);
+            });
+        }
     }
 }

@@ -254,7 +254,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
     }
 
     public void translate() {
-        if (reqId != null) {
+        /*if (reqId != null) {
             ConnectionsManager.getInstance(currentAccount).cancelRequest(reqId, true);
             reqId = null;
         }
@@ -308,7 +308,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
                     adapter.updateMainView(textViewContainer);
                 }
             });
-        });
+        });*/
     }
 
     public static TLRPC.TL_textWithEntities preprocess(TLRPC.TL_textWithEntities source, TLRPC.TL_textWithEntities received) {

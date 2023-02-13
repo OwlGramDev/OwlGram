@@ -38,8 +38,8 @@ public class DuckDuckGoTranslator extends BaseTranslator {
     }
 
     @Override
-    protected Result translate(String query, String tl) throws IOException, JSONException {
-        ArrayList<String> blocks = getStringBlocks(query, 999);
+    protected Result singleTranslate(Object query, String tl) throws IOException, JSONException {
+        ArrayList<String> blocks = getStringBlocks((String) query, 999);
         StringBuilder resultString = new StringBuilder();
         String resultLang = "";
         String urlAuth = "https://duckduckgo.com/?q=translate&ia=web";
@@ -53,7 +53,7 @@ public class DuckDuckGoTranslator extends BaseTranslator {
         int start = responseAuth.indexOf("vqd=");
         int end = responseAuth.indexOf(";", start);
         String uidRaw = responseAuth.substring(start + "vqd=".length(), end);
-        Pattern p = Pattern.compile("[0-9-]+");
+        Pattern p = Pattern.compile("[\\d-]+");
         Matcher m = p.matcher(uidRaw);
         if (m.find()) {
             String uid = m.group(0);

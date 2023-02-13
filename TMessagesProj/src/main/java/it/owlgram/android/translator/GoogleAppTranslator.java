@@ -9,7 +9,6 @@ import org.telegram.messenger.FileLog;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,8 +59,8 @@ public class GoogleAppTranslator extends BaseTranslator {
     }
 
     @Override
-    protected Result translate(String query, String tl) throws IOException, JSONException {
-        ArrayList<String> blocks = getStringBlocks(query, 2500);
+    protected Result singleTranslate(Object query, String tl) throws IOException, JSONException {
+        ArrayList<String> blocks = getStringBlocks((String) query, 2500);
         StringBuilder resultString = new StringBuilder();
         String resultLang = "";
         for (String block : blocks) {

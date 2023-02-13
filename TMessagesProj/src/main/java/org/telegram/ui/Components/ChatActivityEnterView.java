@@ -3992,16 +3992,12 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
     }
 
     public void translatePreSend() {
-        Translator.translate(messageEditText.getText().toString(), true, new Translator.TranslateCallBack() {
-            @Override
-            public void onSuccess(BaseTranslator.Result result) {
-                messageEditText.setText((String) result.translation);
+        Translator.translate(messageEditText.getText().toString(), true, (error, text) -> {
+            if (error != null) {
+                Translator.handleTranslationError(getContext(), error, this::translatePreSend, resourcesProvider);
+                return;
             }
-
-            @Override
-            public void onError(Exception e) {
-                Translator.handleTranslationError(getContext(), e, () -> translatePreSend(), resourcesProvider);
-            }
+            messageEditText.setText((String) text.translation);
         });
     }
 
