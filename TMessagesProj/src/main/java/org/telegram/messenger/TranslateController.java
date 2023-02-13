@@ -518,6 +518,13 @@ public class TranslateController extends BaseController {
         return TextUtils.equals(language, messageOwner.translatedToLanguage) && OwlConfig.translationProvider == messageOwner.translationProvider;
     }
 
+    private boolean isRestrictedLanguage(MessageObject messageObject) {
+        if (messageObject.messageOwner.originalLanguage == null) {
+            return false;
+        }
+        return DoNotTranslateSettings.getRestrictedLanguages().contains(messageObject.messageOwner.originalLanguage.split("-")[0]);
+    }
+
     private void checkTranslation(MessageObject messageObject, boolean onScreen, boolean keepReply) {
         if (!isFeatureAvailable()) {
             return;
@@ -554,7 +561,7 @@ public class TranslateController extends BaseController {
             messageObject = potentialReplyMessageObject;
         }
 
-        if (onScreen && isTranslatingDialog(dialogId)) {
+        if (onScreen && isTranslatingDialog(dialogId) && !isRestrictedLanguage(messageObject)) {
             final MessageObject finalMessageObject = messageObject;
             if (finalMessageObject.messageOwner.translatedText == null || !isValidTranslation(language, finalMessageObject)) {
                 NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, finalMessageObject);
@@ -686,7 +693,22 @@ public class TranslateController extends BaseController {
             return;
         }
 
-        checkDialogTranslatable(messageObject);
+        pendingLanguageChecks.add(hash);
+
+        LanguageDetector.detectLanguage(messageObject.messageOwner.message, lng -> AndroidUtilities.runOnUIThread(() -> {
+            String detectedLanguage = lng;
+            if (detectedLanguage == null) {
+                detectedLanguage = UNKNOWN_LANGUAGE;
+            }
+            messageObject.messageOwner.originalLanguage = detectedLanguage;
+            getMessagesStorage().updateMessageCustomParams(dialogId, messageObject.messageOwner);
+            pendingLanguageChecks.remove((Integer) hash);
+            checkDialogTranslatable(messageObject);
+        }), err -> AndroidUtilities.runOnUIThread(() -> {
+            messageObject.messageOwner.originalLanguage = UNKNOWN_LANGUAGE;
+            getMessagesStorage().updateMessageCustomParams(dialogId, messageObject.messageOwner);
+            pendingLanguageChecks.remove((Integer) hash);
+        }));
     }
 
     private void checkDialogTranslatable(MessageObject messageObject) {
