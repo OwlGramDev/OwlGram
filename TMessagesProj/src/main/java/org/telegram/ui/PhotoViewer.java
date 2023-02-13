@@ -17728,11 +17728,11 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             Translator.translate(currentMessageObject, (error, result) -> {
                 controller.applyTranslationResult(currentMessageObject, result);
                 controller.removeTranslatingMessage(currentMessageObject);
-                NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, currentMessageObject);
                 try {
                     progressDialog.dismiss();
                 } catch (Throwable ignore) {}
                 if (error != null) {
+                    NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, currentMessageObject);
                     Translator.handleTranslationError(parentActivity, error, this::translateCaption, resourcesProvider);
                     return;
                 }
