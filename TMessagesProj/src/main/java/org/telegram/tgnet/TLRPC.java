@@ -59643,6 +59643,7 @@ public class TLRPC {
         public MessageHelper.ReplyMarkupButtonsTexts translatedReplyMarkupRows; // custom
         public MessageHelper.PollTexts originalPoll; // custom
         public MessageHelper.PollTexts translatedPoll; // custom
+        public int translationProvider; // custom
 
         public static Message TLdeserialize(AbstractSerializedData stream, int constructor, boolean exception) {
             Message result = null;

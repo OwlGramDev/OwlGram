@@ -486,6 +486,7 @@ public class TranslateController extends BaseController {
     public void applyTranslationResult(MessageObject messageObject, BaseTranslator.Result result) {
         messageObject.messageOwner.originalLanguage = result.sourceLanguage;
         messageObject.messageOwner.translatedToLanguage = getDialogTranslateTo(messageObject.getDialogId());
+        messageObject.messageOwner.translationProvider = OwlConfig.translationProvider;
         if (result.translation instanceof String || result.translation instanceof TLRPC.TL_textWithEntities) {
             TLRPC.TL_textWithEntities textWithEntities;
             if (result.translation instanceof String) {
@@ -507,6 +508,14 @@ public class TranslateController extends BaseController {
         } else if (result.translation instanceof MessageHelper.PollTexts) {
             messageObject.messageOwner.translatedPoll = (MessageHelper.PollTexts) result.translation;
         }
+    }
+
+    public static boolean isValidTranslation(String language, MessageObject messageObject) {
+        return isValidTranslation(language, messageObject.messageOwner);
+    }
+
+    public static boolean isValidTranslation(String language, TLRPC.Message messageOwner) {
+        return TextUtils.equals(language, messageOwner.translatedToLanguage) && OwlConfig.translationProvider == messageOwner.translationProvider;
     }
 
     private void checkTranslation(MessageObject messageObject, boolean onScreen, boolean keepReply) {
@@ -534,7 +543,7 @@ public class TranslateController extends BaseController {
 
         final String language = getDialogTranslateTo(dialogId);
         MessageObject potentialReplyMessageObject;
-        if (!keepReply && (messageObject.messageOwner.translatedText == null || !language.equals(messageObject.messageOwner.translatedToLanguage)) && (potentialReplyMessageObject = findReplyMessageObject(dialogId, messageObject.getId())) != null) {
+        if (!keepReply && (messageObject.messageOwner.translatedText == null || !isValidTranslation(language, messageObject)) && (potentialReplyMessageObject = findReplyMessageObject(dialogId, messageObject.getId())) != null) {
             messageObject.messageOwner.translatedToLanguage = potentialReplyMessageObject.messageOwner.translatedToLanguage;
             messageObject.messageOwner.originalLanguage = potentialReplyMessageObject.messageOwner.originalLanguage;
             messageObject.messageOwner.translatedReplyMarkupRows = potentialReplyMessageObject.messageOwner.translatedReplyMarkupRows;
@@ -547,7 +556,7 @@ public class TranslateController extends BaseController {
 
         if (onScreen && isTranslatingDialog(dialogId)) {
             final MessageObject finalMessageObject = messageObject;
-            if (finalMessageObject.messageOwner.translatedText == null || !language.equals(finalMessageObject.messageOwner.translatedToLanguage)) {
+            if (finalMessageObject.messageOwner.translatedText == null || !isValidTranslation(language, finalMessageObject)) {
                 NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, finalMessageObject);
                 pushToTranslate(finalMessageObject, result -> {
                     applyTranslationResult(finalMessageObject, result);

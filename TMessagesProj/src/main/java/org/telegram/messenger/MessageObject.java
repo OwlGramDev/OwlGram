@@ -2539,7 +2539,7 @@ public class MessageObject {
                 !MessagesController.getInstance(currentAccount).getTranslateController().isHiddenTranslation(this) &&
                 messageOwner != null &&
                 (messageOwner.translatedText != null || messageOwner.translatedPoll != null) &&
-                TextUtils.equals(MessagesController.getInstance(currentAccount).getTranslateController().getDialogTranslateTo(getDialogId()), messageOwner.translatedToLanguage);
+                TranslateController.isValidTranslation(MessagesController.getInstance(currentAccount).getTranslateController().getDialogTranslateTo(getDialogId()), messageOwner);
     }
 
     public boolean updateTranslation(boolean force) {

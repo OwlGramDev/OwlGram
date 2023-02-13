@@ -25490,7 +25490,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         TranslateController controller = MessagesController.getInstance(currentAccount).getTranslateController();
         controller.addManualTranslation(messageObject);
         controller.unHideTranslation(messageObject);
-        if (!TextUtils.equals(messageObject.messageOwner.translatedToLanguage, controller.getDialogTranslateTo(-1))) {
+        if (!TranslateController.isValidTranslation(controller.getDialogTranslateTo(-1), messageObject.messageOwner)) {
             messageObject.messageOwner.translatedText = null;
             messageObject.messageOwner.translatedPoll = null;
         }

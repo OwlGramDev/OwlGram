@@ -23,7 +23,8 @@ public class MessageCustomParamsHelper {
                 message.translatedPoll == null &&
                 message.originalPoll == null &&
                 message.translatedReplyMarkupRows == null &&
-                message.originalReplyMarkupRows == null;
+                message.originalReplyMarkupRows == null &&
+                message.translationProvider == 0;
     }
 
     public static void copyParams(TLRPC.Message fromMessage, TLRPC.Message toMessage) {
@@ -41,6 +42,7 @@ public class MessageCustomParamsHelper {
         toMessage.originalPoll = fromMessage.originalPoll;
         toMessage.translatedReplyMarkupRows = fromMessage.translatedReplyMarkupRows;
         toMessage.originalReplyMarkupRows = fromMessage.originalReplyMarkupRows;
+        toMessage.translationProvider = fromMessage.translationProvider;
     }
 
 
@@ -93,6 +95,7 @@ public class MessageCustomParamsHelper {
             flags += message.originalPoll != null ? 64 : 0;
             flags += message.translatedReplyMarkupRows != null ? 128 : 0;
             flags += message.originalReplyMarkupRows != null ? 256 : 0;
+            flags += message.translationProvider != 0 ? 512 : 0;
         }
 
         @Override
@@ -131,6 +134,9 @@ public class MessageCustomParamsHelper {
             if ((flags & 256) != 0) {
                 message.originalReplyMarkupRows.serializeToStream(stream);
             }
+            if ((flags & 512) != 0) {
+                stream.writeInt32(message.translationProvider);
+            }
         }
 
         @Override
@@ -167,6 +173,9 @@ public class MessageCustomParamsHelper {
             }
             if ((flags & 256) != 0) {
                 message.originalReplyMarkupRows = MessageHelper.ReplyMarkupButtonsTexts.TLdeserialize(stream, stream.readInt32(exception), exception);
+            }
+            if ((flags & 512) != 0) {
+                message.translationProvider = stream.readInt32(exception);
             }
         }
 
