@@ -3289,7 +3289,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             fragment.forwardContext = () -> fmessages;
             ForwardContext.ForwardParams forwardParams = fragment.forwardContext.getForwardParams();
             forwardParams.noQuote = id == forward_noquote;
-            fragment.setDelegate((fragment1, dids, message, param) -> {
+            fragment.setDelegate((fragment1, dids, message, param, topicsFragment) -> {
                 for (int a = 1; a >= 0; a--) {
                     selectedFiles[a].clear();
                 }

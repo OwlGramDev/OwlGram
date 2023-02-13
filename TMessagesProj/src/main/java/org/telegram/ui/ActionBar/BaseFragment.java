@@ -313,6 +313,10 @@ public abstract class BaseFragment {
     }
 
     public void removeSelfFromStack() {
+        removeSelfFromStack(false);
+    }
+
+    public void removeSelfFromStack(boolean immediate) {
         if (isFinished || parentLayout == null) {
             return;
         }
@@ -320,7 +324,11 @@ public abstract class BaseFragment {
             parentDialog.dismiss();
             return;
         }
-        parentLayout.removeFragmentFromStack(this);
+        parentLayout.removeFragmentFromStack(this, immediate);
+    }
+
+    public boolean allowFinishFragmentInsteadOfRemoveFromStack() {
+        return true;
     }
 
     protected boolean isFinishing() {
