@@ -546,9 +546,6 @@ public class TranslateController extends BaseController {
             if (finalMessageObject.messageOwner.translatedText == null || !language.equals(finalMessageObject.messageOwner.translatedToLanguage)) {
                 NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, finalMessageObject);
                 pushToTranslate(finalMessageObject, result -> {
-                    if (result == null) {
-                        return;
-                    }
                     applyTranslationResult(finalMessageObject, result);
                     if (keepReply) {
                         keepReplyMessage(finalMessageObject);
@@ -747,7 +744,7 @@ public class TranslateController extends BaseController {
 
         int symbolsCount;
 
-        int reqId = -1;
+        String token;
     }
 
     private void pushToTranslate(
@@ -804,7 +801,7 @@ public class TranslateController extends BaseController {
                         }
                     }
                 }
-                Translator.translate(pendingTranslation1.messagesData, (error, results) -> {
+                String token = Translator.translate(pendingTranslation1.messagesData, (error, results) -> {
                     final ArrayList<Integer> ids;
                     final ArrayList<Utilities.Callback<BaseTranslator.Result>> callbacks;
                     synchronized (TranslateController.this) {
@@ -819,9 +816,8 @@ public class TranslateController extends BaseController {
 
                     } else {
                         FileLog.e("TranslateController", error);
-                        for (int i = 0; i < callbacks.size(); ++i) {
-                            callbacks.get(i).run(null);
-                        }
+                        toggleTranslatingDialog(dialogId, false);
+                        NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, LocaleController.getString("TranslationFailedAlert2", R.string.TranslationFailedAlert2));
                     }
 
                     synchronized (TranslateController.this) {
@@ -830,6 +826,9 @@ public class TranslateController extends BaseController {
                         }
                     }
                 });
+                synchronized (TranslateController.this) {
+                    pendingTranslation1.token = token;
+                }
             };
             AndroidUtilities.runOnUIThread(pendingTranslation.runnable, GROUPING_TRANSLATIONS_TIMEOUT);
         }
@@ -869,8 +868,8 @@ public class TranslateController extends BaseController {
                 if (translations != null) {
                     for (PendingTranslation pendingTranslation : translations) {
                         AndroidUtilities.cancelRunOnUIThread(pendingTranslation.runnable);
-                        if (pendingTranslation.reqId != -1) {
-                            getConnectionsManager().cancelRequest(pendingTranslation.reqId, true);
+                        if (!TextUtils.isEmpty(pendingTranslation.token)) {
+                            Translator.getCurrentTranslator().cancelRequest(pendingTranslation.token);
                             for (Integer messageId : pendingTranslation.messageIds) {
                                 loadingTranslations.remove(messageId);
                             }
@@ -887,8 +886,8 @@ public class TranslateController extends BaseController {
             if (translations != null) {
                 for (PendingTranslation pendingTranslation : translations) {
                     AndroidUtilities.cancelRunOnUIThread(pendingTranslation.runnable);
-                    if (pendingTranslation.reqId != -1) {
-                        getConnectionsManager().cancelRequest(pendingTranslation.reqId, true);
+                    if (!TextUtils.isEmpty(pendingTranslation.token)) {
+                        Translator.getCurrentTranslator().cancelRequest(pendingTranslation.token);
                         for (Integer messageId : pendingTranslation.messageIds) {
                             loadingTranslations.remove(messageId);
                         }

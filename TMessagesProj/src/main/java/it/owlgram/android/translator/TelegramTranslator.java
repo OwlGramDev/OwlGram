@@ -3,6 +3,7 @@ package it.owlgram.android.translator;
 import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.TranslateController;
 import org.telegram.messenger.UserConfig;
+import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.Components.TranslateAlert2;
@@ -16,10 +17,12 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 import it.owlgram.android.helpers.MessageHelper;
+import kotlin.NotImplementedError;
 
 public class TelegramTranslator extends BaseTranslator {
 
     private final List<String> targetLanguages = GoogleAppTranslator.getInstance().getTargetLanguages();
+    private final HashMap<String, HashMap<String, Integer>> translatingProcess = new HashMap<>();
 
     private static final class InstanceHolder {
         private static final TelegramTranslator instance = new TelegramTranslator();
@@ -30,11 +33,11 @@ public class TelegramTranslator extends BaseTranslator {
     }
 
     @Override
-    protected Result singleTranslate(Object query, String tl) throws Exception {
-        return internalTranslate(new ArrayList<>(Collections.singletonList(query)), tl).get(0);
+    protected Result singleTranslate(Object query, String tl) {
+        throw new NotImplementedError();
     }
 
-    private ArrayList<Result> internalTranslate(ArrayList<Object> query, String tl) throws Exception {
+    private ArrayList<Result> internalTranslate(ArrayList<Object> query, String tl, String subToken) throws Exception {
         int count = query.size();
         final CountDownLatch waitDetect = new CountDownLatch(count);
         final ArrayList<String> languages = new ArrayList<>(Collections.nCopies(count, null));
@@ -72,7 +75,7 @@ public class TelegramTranslator extends BaseTranslator {
             }
             req.text.add(textWithEntities);
         }
-        ConnectionsManager.getInstance(UserConfig.selectedAccount).sendRequest(req, (res, err) -> {
+        int reqId = ConnectionsManager.getInstance(UserConfig.selectedAccount).sendRequest(req, (res, err) -> {
             if (res instanceof TLRPC.TL_messages_translateResult &&
                     !((TLRPC.TL_messages_translateResult) res).result.isEmpty()) {
                 TLRPC.TL_messages_translateResult result = (TLRPC.TL_messages_translateResult) res;
@@ -85,12 +88,44 @@ public class TelegramTranslator extends BaseTranslator {
                 exception.set(new Exception("Unknown error"));
             }
             waitTranslate.countDown();
+            removeTokenTranslation(subToken);
         });
+        addSubTokenTranslation(subToken, reqId);
         waitTranslate.await();
         if (exception.get() != null) {
             throw exception.get();
         }
         return results;
+    }
+
+    private void removeTokenTranslation(String subToken) {
+        HashMap<String, Integer> map = translatingProcess.get(token);
+        if (map != null) {
+            map.remove(subToken);
+        }
+        if (map != null && map.isEmpty()) {
+            translatingProcess.remove(token);
+        }
+    }
+
+    private void addSubTokenTranslation(String subToken, int reqId) {
+        HashMap<String, Integer> map = translatingProcess.get(token);
+        if (map == null) {
+            map = new HashMap<>();
+            translatingProcess.put(token, map);
+        }
+        map.put(subToken, reqId);
+    }
+
+    @Override
+    public void cancelRequest(String token) {
+        HashMap<String, Integer> map = translatingProcess.get(token);
+        if (map != null) {
+            for (Integer reqId : map.values()) {
+                ConnectionsManager.getInstance(UserConfig.selectedAccount).cancelRequest(reqId, true);
+            }
+            translatingProcess.remove(token);
+        }
     }
 
     @Override
@@ -121,15 +156,16 @@ public class TelegramTranslator extends BaseTranslator {
                 }
             }
         }
-        for (int i = 0; i < textMessagesQuery.size(); i += TranslateController.MAX_MESSAGES_PER_REQUEST) {
-            chunks.add(new ArrayList<>(textMessagesQuery.subList(i, Math.min(i + TranslateController.MAX_MESSAGES_PER_REQUEST, textMessagesQuery.size()))));
+        int maxSize = UserConfig.getInstance(UserConfig.selectedAccount).isPremium() ? TranslateController.MAX_MESSAGES_PER_REQUEST:1;
+        for (int i = 0; i < textMessagesQuery.size(); i += maxSize) {
+            chunks.add(new ArrayList<>(textMessagesQuery.subList(i, Math.min(i + maxSize, textMessagesQuery.size()))));
         }
         final CountDownLatch semaphore = new CountDownLatch(chunks.size());
         for (ArrayList<Object> chunk : chunks) {
             new Thread(() -> {
                 if (exception.get() == null) {
                     try {
-                        ArrayList<Result> chunkResults = internalTranslate(chunk, tl);
+                        ArrayList<Result> chunkResults = internalTranslate(chunk, tl, Utilities.generateRandomString());
                         for (int i = 0; i < chunkResults.size(); i++) {
                             rawResults.put(textMessagesQuery.indexOf(chunk.get(i)), chunkResults.get(i));
                         }

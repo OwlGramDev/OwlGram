@@ -33,6 +33,8 @@ abstract public class BaseTranslator {
     public static final int INLINE_STYLE = 0;
     public static final int DIALOG_STYLE = 1;
 
+    protected String token;
+
     abstract protected Result singleTranslate(Object query, String tl) throws Exception;
 
     protected ArrayList<Result> multiTranslate(ArrayList<Object> translations, String tl) throws Exception {
@@ -62,6 +64,8 @@ abstract public class BaseTranslator {
         }
         return results;
     }
+
+    public void cancelRequest(String token) {}
 
     abstract public List<String> getTargetLanguages();
 
@@ -183,11 +187,12 @@ abstract public class BaseTranslator {
         throw new UnsupportedOperationException("Unsupported translation query: " + query.getClass().getSimpleName());
     }
 
-    public void startTask(ArrayList<Object> translations, String toLang, Translator.MultiTranslateCallBack translateCallBack) {
+    public void startTask(ArrayList<Object> translations, String toLang, Translator.MultiTranslateCallBack translateCallBack, String token) {
         new Thread() {
             @Override
             public void run() {
                 try {
+                    BaseTranslator.this.token = token;
                     ArrayList<Result> results = multiTranslate(translations, toLang);
                     AndroidUtilities.runOnUIThread(() -> translateCallBack.onSuccess(null, results));
                 } catch (Exception e) {

@@ -11,6 +11,7 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.R;
+import org.telegram.messenger.Utilities;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
 
@@ -170,20 +171,20 @@ public class Translator {
         }
     }
 
-    public static void translate(MessageObject query, TranslateCallBack translateCallBack) {
-        translate(new ArrayList<>(Collections.singletonList((new TranslatorHelper.TranslatorContext(query)).getTranslateObject())), singleTranslateCallback(translateCallBack));
+    public static String translate(MessageObject query, TranslateCallBack translateCallBack) {
+        return translate(new ArrayList<>(Collections.singletonList((new TranslatorHelper.TranslatorContext(query)).getTranslateObject())), singleTranslateCallback(translateCallBack));
     }
 
-    public static void translate(String query, TranslateCallBack translateCallBack) {
-        translate(new ArrayList<>(Collections.singletonList(query)), singleTranslateCallback(translateCallBack));
+    public static String translate(String query, TranslateCallBack translateCallBack) {
+        return translate(new ArrayList<>(Collections.singletonList(query)), singleTranslateCallback(translateCallBack));
     }
 
-    public static void translate(ArrayList<Object> translations, MultiTranslateCallBack translateCallBack) {
-        translate(translations, false, translateCallBack);
+    public static String translate(ArrayList<Object> translations, MultiTranslateCallBack translateCallBack) {
+        return translate(translations, false, translateCallBack);
     }
 
-    public static void translate(String query, boolean isKeyboard, TranslateCallBack translateCallBack) {
-        translate(new ArrayList<>(Collections.singletonList(query)), isKeyboard, singleTranslateCallback(translateCallBack));
+    public static String translate(String query, boolean isKeyboard, TranslateCallBack translateCallBack) {
+        return translate(new ArrayList<>(Collections.singletonList(query)), isKeyboard, singleTranslateCallback(translateCallBack));
     }
 
     private static MultiTranslateCallBack singleTranslateCallback(TranslateCallBack callBack) {
@@ -196,14 +197,16 @@ public class Translator {
         };
     }
 
-    public static void translate(ArrayList<Object> translations, boolean isKeyboard, MultiTranslateCallBack translateCallBack) {
+    public static String translate(ArrayList<Object> translations, boolean isKeyboard, MultiTranslateCallBack translateCallBack) {
         BaseTranslator translator = getCurrentTranslator();
         String language = isKeyboard ? translator.getCurrentTargetKeyboardLanguage() : translator.getCurrentTargetLanguage();
+        String token = Utilities.generateRandomString();
         if (!translator.supportLanguage(language)) {
             translateCallBack.onSuccess(new UnsupportedTargetLanguageException(), null);
         } else {
-            translator.startTask(translations, language, translateCallBack);
+            translator.startTask(translations, language, translateCallBack, token);
         }
+        return token;
     }
 
     public interface MultiTranslateCallBack {
