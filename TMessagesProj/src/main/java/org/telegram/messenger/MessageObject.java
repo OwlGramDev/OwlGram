@@ -76,6 +76,7 @@ import java.util.regex.Pattern;
 
 import it.owlgram.android.helpers.MessageHelper;
 import it.owlgram.android.entities.syntax_highlight.SyntaxHighlight;
+import it.owlgram.android.settings.DoNotTranslateSettings;
 
 public class MessageObject {
 
@@ -2534,12 +2535,14 @@ public class MessageObject {
     }
 
     public boolean isDoneTranslation() {
+        TranslateController translateController = MessagesController.getInstance(currentAccount).getTranslateController();
         return TranslateController.isTranslatable(this, true) &&
-                (MessagesController.getInstance(currentAccount).getTranslateController().isGeneralTranslating(this)) &&
-                !MessagesController.getInstance(currentAccount).getTranslateController().isHiddenTranslation(this) &&
+                (translateController.isGeneralTranslating(this)) &&
+                !translateController.isHiddenTranslation(this) &&
                 messageOwner != null &&
+                (!DoNotTranslateSettings.getRestrictedLanguages().contains(messageOwner.originalLanguage) || translateController.isManualTranslation(this)) &&
                 (messageOwner.translatedText != null || messageOwner.translatedPoll != null) &&
-                TranslateController.isValidTranslation(MessagesController.getInstance(currentAccount).getTranslateController().getDialogTranslateTo(getDialogId()), messageOwner);
+                TranslateController.isValidTranslation(translateController.getDialogTranslateTo(getDialogId()), messageOwner);
     }
 
     public boolean updateTranslation(boolean force) {

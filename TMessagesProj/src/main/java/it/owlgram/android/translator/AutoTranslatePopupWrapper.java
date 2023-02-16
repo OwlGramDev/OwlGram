@@ -62,6 +62,7 @@ public class AutoTranslatePopupWrapper {
                 AutoTranslateConfig.setEnabled(dialogId, topicId, true);
                 updateItems();
                 updateLastFragment();
+                fragment.getMessagesController().getTranslateController().toggleTranslatingDialog(dialogId, topicId, true);
             });
         }
 

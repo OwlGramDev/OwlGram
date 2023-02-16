@@ -34,10 +34,14 @@ import org.telegram.ui.RestrictedLanguagesSelectActivity;
 
 import java.util.ArrayList;
 
+import it.owlgram.android.OwlConfig;
+import it.owlgram.android.settings.DoNotTranslateSettings;
+
 public class TranslateButton extends FrameLayout {
 
     private final int currentAccount;
     private final long dialogId;
+    private final int topicId;
     private final BaseFragment fragment;
 
     private Theme.ResourcesProvider resourcesProvider;
@@ -50,14 +54,15 @@ public class TranslateButton extends FrameLayout {
     private boolean[] accusative = new boolean[1];
 
     public TranslateButton(Context context, ChatActivity chatActivity, Theme.ResourcesProvider resourcesProvider) {
-        this(context, chatActivity.getCurrentAccount(), chatActivity.getDialogId(), chatActivity, resourcesProvider);
+        this(context, chatActivity.getCurrentAccount(), chatActivity.getDialogId(), chatActivity.getTopicId(), chatActivity, resourcesProvider);
     }
 
-    public TranslateButton(Context context, int currentAccount, long dialogId, BaseFragment fragment, Theme.ResourcesProvider resourcesProvider) {
+    public TranslateButton(Context context, int currentAccount, long dialogId, int topicId, BaseFragment fragment, Theme.ResourcesProvider resourcesProvider) {
         super(context);
 
         this.currentAccount = currentAccount;
         this.dialogId = dialogId;
+        this.topicId = topicId;
         this.fragment = fragment;
         this.resourcesProvider = resourcesProvider;
 
@@ -142,7 +147,7 @@ public class TranslateButton extends FrameLayout {
 
         ActionBarMenuSubItem translateToButton = new ActionBarMenuSubItem(getContext(), true, false, resourcesProvider);
         translateToButton.setTextAndIcon(LocaleController.getString("TranslateTo", R.string.TranslateTo), R.drawable.msg_translate);
-        translateToButton.setSubtext(TranslateAlert2.capitalFirst(TranslateAlert2.languageName(translateController.getDialogTranslateTo(dialogId))));
+        translateToButton.setSubtext(TranslateAlert2.capitalFirst(TranslateAlert2.languageName(OwlConfig.translationTarget)));
         translateToButton.setItemHeight(56);
         translateToButton.setOnClickListener(e -> popupLayout.getSwipeBack().openForeground(swipeBackIndex));
         popupLayout.addView(translateToButton);
@@ -154,10 +159,10 @@ public class TranslateButton extends FrameLayout {
 
         swipeBack.addView(swipeBackScrollView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 420));
 
-        String detectedLanguage = translateController.getDialogDetectedLanguage(dialogId);
+        String detectedLanguage = translateController.getDialogDetectedLanguage(dialogId, topicId);
         String detectedLanguageName = TranslateAlert2.languageName(detectedLanguage);
         String detectedLanguageNameAccusative = TranslateAlert2.languageName(detectedLanguage, accusative);
-        String currentTranslateTo = translateController.getDialogTranslateTo(dialogId);
+        String currentTranslateTo = OwlConfig.translationTarget;
 
         ArrayList<TranslateController.Language> suggestedLanguages = TranslateController.getSuggestedLanguages(currentTranslateTo);
         ArrayList<TranslateController.Language> allLanguages = TranslateController.getLanguages();
@@ -183,7 +188,7 @@ public class TranslateButton extends FrameLayout {
             button.setText(lng.displayName);
             if (!checked) {
                 button.setOnClickListener(e -> {
-                    translateController.setDialogTranslateTo(dialogId, code);
+                    translateController.setDialogTranslateTo(dialogId, topicId, code);
                     popupWindow.dismiss();
                     updateText();
                 });
@@ -203,7 +208,7 @@ public class TranslateButton extends FrameLayout {
             button.setText(lng.displayName);
             if (!checked) {
                 button.setOnClickListener(e -> {
-                    translateController.setDialogTranslateTo(dialogId, code);
+                    translateController.setDialogTranslateTo(dialogId, topicId, code);
                     popupWindow.dismiss();
                     updateText();
                 });
@@ -221,7 +226,7 @@ public class TranslateButton extends FrameLayout {
 
         popupLayout.addView(new ActionBarPopupWindow.GapView(getContext(), resourcesProvider), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 8));
 
-        if (detectedLanguageNameAccusative != null) {
+        if (detectedLanguageNameAccusative != null && detectedLanguage != null) {
             ActionBarMenuSubItem dontTranslateButton = new ActionBarMenuSubItem(getContext(), true, false, resourcesProvider);
             String text;
             if (accusative[0]) {
@@ -231,9 +236,9 @@ public class TranslateButton extends FrameLayout {
             }
             dontTranslateButton.setTextAndIcon(text, R.drawable.msg_block2);
             dontTranslateButton.setOnClickListener(e -> {
-                RestrictedLanguagesSelectActivity.toggleLanguage(detectedLanguage, true);
+                DoNotTranslateSettings.restrictLanguage(detectedLanguage);
                 translateController.checkRestrictedLanguagesUpdate();
-                translateController.setHideTranslateDialog(dialogId, true);
+                translateController.setHideTranslateDialog(dialogId, topicId, true);
                 String bulletinText;
                 if (accusative[0]) {
                     bulletinText = LocaleController.formatString("AddedToDoNotTranslate", R.string.AddedToDoNotTranslate, TranslateAlert2.capitalFirst(detectedLanguageNameAccusative));
@@ -242,9 +247,9 @@ public class TranslateButton extends FrameLayout {
                 }
                 BulletinFactory.of(fragment).createSimpleBulletin(
                     R.raw.msg_translate,
-                    bulletinText,
+                    AndroidUtilities.replaceTags(bulletinText),
                     LocaleController.getString("Settings", R.string.Settings),
-                    () -> fragment.presentFragment(new RestrictedLanguagesSelectActivity())
+                    () -> fragment.presentFragment(new DoNotTranslateSettings())
                 ).show();
                 popupWindow.dismiss();
             });
@@ -254,7 +259,7 @@ public class TranslateButton extends FrameLayout {
         ActionBarMenuSubItem hideButton = new ActionBarMenuSubItem(getContext(), true, false, resourcesProvider);
         hideButton.setTextAndIcon(LocaleController.getString("Hide", R.string.Hide), R.drawable.msg_cancel);
         hideButton.setOnClickListener(e -> {
-            translateController.setHideTranslateDialog(dialogId, true);
+            translateController.setHideTranslateDialog(dialogId, topicId, true);
             TLRPC.Chat chat = MessagesController.getInstance(currentAccount).getChat(-dialogId);
             final boolean isChannel = chat != null && ChatObject.isChannelAndNotMegaGroup(chat);
             final CharSequence message = AndroidUtilities.replaceTags(
@@ -265,7 +270,7 @@ public class TranslateButton extends FrameLayout {
                         LocaleController.getString("TranslationBarHiddenForChat", R.string.TranslationBarHiddenForChat)
             );
             BulletinFactory.of(fragment).createSimpleBulletin(R.raw.msg_translate, message, LocaleController.getString("Undo", R.string.Undo), () -> {
-                translateController.setHideTranslateDialog(dialogId, false);
+                translateController.setHideTranslateDialog(dialogId, topicId, false);
             }).show();
             popupWindow.dismiss();
         });
@@ -284,7 +289,7 @@ public class TranslateButton extends FrameLayout {
 
     public void updateText() {
         TranslateController translateController = MessagesController.getInstance(currentAccount).getTranslateController();
-        if (translateController.isTranslatingDialog(dialogId)) {
+        if (translateController.isTranslatingDialog(dialogId, topicId)) {
             textView.setText(TextUtils.concat(translateIcon, " ", LocaleController.getString("ShowOriginalButton", R.string.ShowOriginalButton)));
         } else {
             String lng = translateController.getDialogTranslateTo(dialogId);

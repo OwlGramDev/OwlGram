@@ -5,13 +5,16 @@ import android.text.TextUtils;
 import androidx.core.text.HtmlCompat;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
+import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLRPC;
 
 import java.util.Locale;
+import java.util.Objects;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.entities.HTMLKeeper;
@@ -114,8 +117,17 @@ public class TranslatorHelper {
     }
 
     public static String languageName(String code) {
+        if (TextUtils.isEmpty(code)) {
+            return null;
+        }
+        if (TextUtils.equals(code, "app")) {
+            return LocaleController.getString("Default", R.string.Default);
+        }
         Locale language = Locale.forLanguageTag(code);
         String fromString = !TextUtils.isEmpty(language.getScript()) ? String.valueOf(HtmlCompat.fromHtml(language.getDisplayScript(), HtmlCompat.FROM_HTML_MODE_LEGACY)) : language.getDisplayName();
+        if (TextUtils.isEmpty(fromString)) {
+            return null;
+        }
         return AndroidUtilities.capitalize(fromString);
     }
 }

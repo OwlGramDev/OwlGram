@@ -61,6 +61,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
+import it.owlgram.android.translator.TranslatorHelper;
+
 public class TranslateAlert2 extends BottomSheet implements NotificationCenter.NotificationCenterDelegate {
 
     private Integer reqId;
@@ -979,53 +981,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
     }
 
     public static String languageName(String locale, boolean[] accusative) {
-        if (locale == null || locale.equals(TranslateController.UNKNOWN_LANGUAGE) || locale.equals("auto")) {
-            return null;
-        }
-
-        String simplifiedLocale = locale.split("_")[0];
-        if ("nb".equals(simplifiedLocale)) {
-            simplifiedLocale = "no";
-        }
-
-        // getting localized language name in accusative case
-        if (accusative != null) {
-            String localed = LocaleController.getString("TranslateLanguage" + simplifiedLocale.toUpperCase());
-            if (accusative[0] = (localed != null && !localed.startsWith("LOC_ERR"))) {
-                return localed;
-            }
-        }
-
-        // getting language name from system
-        try {
-            Locale[] allLocales = Locale.getAvailableLocales();
-            Locale found = null;
-            for (int i = 0; i < allLocales.length; ++i) {
-                if (TextUtils.equals(simplifiedLocale, allLocales[i].getLanguage())) {
-                    found = allLocales[i];
-                    break;
-                }
-            }
-            if (found != null) {
-                return found.getDisplayLanguage(Locale.getDefault());
-            }
-        } catch (Exception ignore) {}
-
-        // getting language name from lang packs
-        if ("no".equals(locale)) {
-            locale = "nb";
-        }
-        final LocaleController.LocaleInfo currentLanguageInfo = LocaleController.getInstance().getCurrentLocaleInfo();
-        final LocaleController.LocaleInfo thisLanguageInfo = LocaleController.getInstance().getBuiltinLanguageByPlural(locale);
-        if (thisLanguageInfo == null) {
-            return null;
-        }
-        boolean isCurrentLanguageEnglish = currentLanguageInfo != null && "en".equals(currentLanguageInfo.pluralLangCode);
-        if (isCurrentLanguageEnglish) {
-            return thisLanguageInfo.nameEnglish;
-        } else {
-            return thisLanguageInfo.name;
-        }
+        return TranslatorHelper.languageName(locale);
     }
 
     @Override

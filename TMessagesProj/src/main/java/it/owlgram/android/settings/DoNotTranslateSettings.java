@@ -53,8 +53,14 @@ public class DoNotTranslateSettings extends BaseSettingsActivity {
                 selectedLanguages.remove(targetLanguages.get(position - languagesStartRow));
             }
             saveRestrictedLanguages(selectedLanguages);
-            MessagesController.getInstance(currentAccount).getTranslateController().checkRestrictedLanguagesUpdate();
+            getMessagesController().getTranslateController().checkRestrictedLanguagesUpdate();
         }
+    }
+
+    public static void restrictLanguage(String lang) {
+        HashSet<String> languages = getRestrictedLanguages(false);
+        languages.add(lang);
+        saveRestrictedLanguages(languages);
     }
 
     @Override

@@ -49,15 +49,15 @@ public class TranslateController extends BaseController {
     public static final int MAX_MESSAGES_PER_REQUEST = 20;
     private static final int GROUPING_TRANSLATIONS_TIMEOUT = 200;
 
-    private final HashMap<Long, Set<Integer>> hideTranslations = new HashMap<>();
-    private final HashMap<Long, Set<Integer>> manualTranslations = new HashMap<>();
-    private final Set<Long> translatingDialogs = new HashSet<>();
-    private final Set<Long> translatableDialogs = new HashSet<>();
-    private final HashMap<Long, TranslatableDecision> translatableDialogMessages = new HashMap<>();
-    private final HashMap<Long, String> translateDialogLanguage = new HashMap<>();
-    private final HashMap<Long, String> detectedDialogLanguage = new HashMap<>();
-    private final HashMap<Long, HashMap<Integer, MessageObject>> keptReplyMessageObjects = new HashMap<>();
-    private final Set<Long> hideTranslateDialogs = new HashSet<>();
+    private final HashMap<Pair<Long, Integer>, Set<Integer>> hideTranslations = new HashMap<>();
+    private final HashMap<Pair<Long, Integer>, Set<Integer>> manualTranslations = new HashMap<>();
+    private final Set<Pair<Long, Integer>> translatingDialogs = new HashSet<>();
+    private final Set<Pair<Long, Integer>> translatableDialogs = new HashSet<>();
+    private final HashMap<Pair<Long, Integer>, TranslatableDecision> translatableDialogMessages = new HashMap<>();
+    private final HashMap<Pair<Long, Integer>, String> translateDialogLanguage = new HashMap<>();
+    private final HashMap<Pair<Long, Integer>, String> detectedDialogLanguage = new HashMap<>();
+    private final HashMap<Pair<Long, Integer>, HashMap<Integer, MessageObject>> keptReplyMessageObjects = new HashMap<>();
+    private final Set<Pair<Long, Integer>> hideTranslateDialogs = new HashSet<>();
 
     class TranslatableDecision {
         Set<Integer> certainlyTranslatable = new HashSet<>();
@@ -106,45 +106,66 @@ public class TranslateController extends BaseController {
     }
 
     public boolean isHiddenTranslation(MessageObject messageObject) {
-        return hideTranslations.containsKey(messageObject.getDialogId()) && Objects.requireNonNull(hideTranslations.get(messageObject.getDialogId())).contains(messageObject.getId());
+        return hideTranslations.containsKey(getIdWithTopic(messageObject)) && Objects.requireNonNull(hideTranslations.get(getIdWithTopic(messageObject))).contains(messageObject.getId());
     }
 
     public void hideTranslation(MessageObject messageObject) {
-        if (!hideTranslations.containsKey(messageObject.getDialogId())) {
-            hideTranslations.put(messageObject.getDialogId(), new HashSet<>());
+        if (!hideTranslations.containsKey(getIdWithTopic(messageObject))) {
+            hideTranslations.put(getIdWithTopic(messageObject), new HashSet<>());
         }
-        Objects.requireNonNull(hideTranslations.get(messageObject.getDialogId())).add(messageObject.getId());
+        Objects.requireNonNull(hideTranslations.get(getIdWithTopic(messageObject))).add(messageObject.getId());
+    }
+
+    private int getTopicId(MessageObject messageObject) {
+        return getIdWithTopic(messageObject).second;
+    }
+
+    private Pair<Long, Integer> getIdWithTopic(MessageObject messageObject) {
+        int topicId = 0;
+        boolean isForum = ChatObject.isForum(currentAccount, messageObject.getDialogId());
+        if (isForum) {
+            if (messageObject.replyToForumTopic != null) {
+                topicId = messageObject.replyToForumTopic.id;
+            } else {
+                topicId = MessageObject.getTopicId(messageObject.messageOwner, true);
+            }
+        }
+        return getIdWithTopic(messageObject.getDialogId(), topicId);
+    }
+
+    private Pair<Long, Integer> getIdWithTopic(long dialogId, int topicId) {
+        return new Pair<>(dialogId, topicId);
     }
 
     public void unHideTranslation(MessageObject messageObject) {
-        if (hideTranslations.containsKey(messageObject.getDialogId())) {
-            Objects.requireNonNull(hideTranslations.get(messageObject.getDialogId())).remove(messageObject.getId());
-            if (Objects.requireNonNull(hideTranslations.get(messageObject.getDialogId())).isEmpty()) {
-                hideTranslations.remove(messageObject.getDialogId());
+        if (hideTranslations.containsKey(getIdWithTopic(messageObject))) {
+            Objects.requireNonNull(hideTranslations.get(getIdWithTopic(messageObject))).remove(messageObject.getId());
+            if (Objects.requireNonNull(hideTranslations.get(getIdWithTopic(messageObject))).isEmpty()) {
+                hideTranslations.remove(getIdWithTopic(messageObject));
             }
         }
     }
     public boolean isManualTranslation(MessageObject messageObject) {
-        return manualTranslations.containsKey(messageObject.getDialogId()) && Objects.requireNonNull(manualTranslations.get(messageObject.getDialogId())).contains(messageObject.getId());
+        return manualTranslations.containsKey(getIdWithTopic(messageObject)) && Objects.requireNonNull(manualTranslations.get(getIdWithTopic(messageObject))).contains(messageObject.getId());
     }
     public void addManualTranslation(MessageObject messageObject) {
-        if (!manualTranslations.containsKey(messageObject.getDialogId())) {
-            manualTranslations.put(messageObject.getDialogId(), new HashSet<>());
+        if (!manualTranslations.containsKey(getIdWithTopic(messageObject))) {
+            manualTranslations.put(getIdWithTopic(messageObject), new HashSet<>());
         }
-        Objects.requireNonNull(manualTranslations.get(messageObject.getDialogId())).add(messageObject.getId());
+        Objects.requireNonNull(manualTranslations.get(getIdWithTopic(messageObject))).add(messageObject.getId());
     }
 
-    public boolean isDialogTranslatable(long dialogId) {
+    public boolean isDialogTranslatable(long dialogId, int topicId) {
         return (
             isFeatureAvailable() &&
             getUserConfig().getClientUserId() != dialogId &&
             /* DialogObject.isChatDialog(dialogId) &&*/
-            translatableDialogs.contains(dialogId)
+            translatableDialogs.contains(getIdWithTopic(dialogId, topicId))
         );
     }
 
-    public boolean isTranslateDialogHidden(long dialogId) {
-        if (hideTranslateDialogs.contains(dialogId)) {
+    public boolean isTranslateDialogHidden(long dialogId, int topicId) {
+        if (hideTranslateDialogs.contains(getIdWithTopic(dialogId, topicId))) {
             return true;
         }
         TLRPC.ChatFull chatFull = getMessagesController().getChatFull(-dialogId);
@@ -158,29 +179,30 @@ public class TranslateController extends BaseController {
         return false;
     }
 
-    public boolean isTranslatingDialog(long dialogId) {
-        return isFeatureAvailable() && translatingDialogs.contains(dialogId);
+    public boolean isTranslatingDialog(long dialogId, int topicId) {
+        return isFeatureAvailable() && translatingDialogs.contains(getIdWithTopic(dialogId, topicId));
     }
 
     public boolean isGeneralTranslating(MessageObject messageObject) {
-        return isManualTranslation(messageObject) || isTranslatingDialog(messageObject.getDialogId());
+        return isManualTranslation(messageObject) || isTranslatingDialog(messageObject.getDialogId(), getTopicId(messageObject));
     }
 
-    public void toggleTranslatingDialog(long dialogId) {
-        toggleTranslatingDialog(dialogId, !isTranslatingDialog(dialogId));
+    public void toggleTranslatingDialog(long dialogId, int topicId) {
+        toggleTranslatingDialog(dialogId, topicId, !isTranslatingDialog(dialogId, topicId));
     }
 
-    public boolean toggleTranslatingDialog(long dialogId, boolean value) {
-        boolean currentValue = isTranslatingDialog(dialogId), notified = false;
+    public boolean toggleTranslatingDialog(long dialogId, int topicId, boolean value) {
+        boolean currentValue = isTranslatingDialog(dialogId, topicId), notified = false;
         if (value && !currentValue) {
-            translatingDialogs.add(dialogId);
-            hideTranslations.remove(dialogId);
-            manualTranslations.remove(dialogId);
+            translatingDialogs.add(getIdWithTopic(dialogId, topicId));
+            hideTranslations.remove(getIdWithTopic(dialogId, topicId));
+            manualTranslations.remove(getIdWithTopic(dialogId, topicId));
+            translatableDialogs.add(getIdWithTopic(dialogId, topicId));
             NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.dialogTranslate, dialogId, true);
             notified = true;
         } else if (!value && currentValue) {
-            translatingDialogs.remove((Long) dialogId);
-            manualTranslations.remove(dialogId);
+            translatingDialogs.remove(getIdWithTopic(dialogId, topicId));
+            manualTranslations.remove(getIdWithTopic(dialogId, topicId));
             NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.dialogTranslate, dialogId, false);
             cancelTranslations(dialogId);
             notified = true;
@@ -219,43 +241,45 @@ public class TranslateController extends BaseController {
         return Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage();
     }
 
-    public void setDialogTranslateTo(long dialogId, String language) {
-        if (TextUtils.equals(getDialogTranslateTo(dialogId), language)) {
+    public void setDialogTranslateTo(long dialogId, int topicId, String language) {
+        if (TextUtils.equals(OwlConfig.translationTarget, language)) {
             return;
         }
 
-        boolean wasTranslating = isTranslatingDialog(dialogId);
+        boolean wasTranslating = isTranslatingDialog(dialogId, topicId);
 
         if (wasTranslating) {
             AndroidUtilities.runOnUIThread(() -> {
                 synchronized (TranslateController.this) {
-                    translateDialogLanguage.put(dialogId, language);
-                    translatingDialogs.add(dialogId);
-                    saveTranslatingDialogsCache();
+                    translateDialogLanguage.put(getIdWithTopic(dialogId, topicId), language);
+                    translatingDialogs.add(new Pair<>(dialogId, topicId));
                 }
                 NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.dialogTranslate, dialogId, true);
             }, 150);
         } else {
             synchronized (TranslateController.this) {
-                translateDialogLanguage.put(dialogId, language);
+                translateDialogLanguage.put(getIdWithTopic(dialogId, topicId), language);
             }
         }
 
         cancelTranslations(dialogId);
         synchronized (this) {
-            translatingDialogs.remove(dialogId);
+            translatingDialogs.remove(getIdWithTopic(dialogId, topicId));
         }
         NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.dialogTranslate, dialogId, false);
-
-        TranslateAlert2.setToLanguage(language);
+        OwlConfig.setTranslationTarget(language);
     }
 
     public void updateDialogFull(long dialogId) {
-        if (!isFeatureAvailable() || !isDialogTranslatable(dialogId)) {
+        updateDialogFull(dialogId, 0);
+    }
+
+    public void updateDialogFull(long dialogId, int topicId) {
+        if (!isFeatureAvailable() || !isDialogTranslatable(dialogId, topicId)) {
             return;
         }
 
-        final boolean wasHidden = hideTranslateDialogs.contains(dialogId);
+        final boolean wasHidden = hideTranslateDialogs.contains(getIdWithTopic(dialogId, topicId));
 
         boolean hidden = false;
         TLRPC.ChatFull chatFull = getMessagesController().getChatFull(-dialogId);
@@ -270,23 +294,23 @@ public class TranslateController extends BaseController {
 
         synchronized (this) {
             if (hidden) {
-                hideTranslateDialogs.add(dialogId);
+                hideTranslateDialogs.add(getIdWithTopic(dialogId, topicId));
             } else {
-                hideTranslateDialogs.remove(dialogId);
+                hideTranslateDialogs.remove(getIdWithTopic(dialogId, topicId));
             }
         }
 
         if (wasHidden != hidden) {
             saveTranslatingDialogsCache();
-            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.dialogTranslate, dialogId, isTranslatingDialog(dialogId));
+            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.dialogTranslate, dialogId, isTranslatingDialog(dialogId, topicId));
         }
     }
 
-    public void setHideTranslateDialog(long dialogId, boolean hide) {
-        setHideTranslateDialog(dialogId, hide, false);
+    public void setHideTranslateDialog(long dialogId, int topicId, boolean hide) {
+        setHideTranslateDialog(dialogId, topicId, hide, false);
     }
 
-    public void setHideTranslateDialog(long dialogId, boolean hide, boolean doNotNotify) {
+    public void setHideTranslateDialog(long dialogId, int topicId, boolean hide, boolean doNotNotify) {
         TLRPC.TL_messages_togglePeerTranslations req = new TLRPC.TL_messages_togglePeerTranslations();
         req.peer = getMessagesController().getInputPeer(dialogId);
         req.disabled = hide;
@@ -305,15 +329,15 @@ public class TranslateController extends BaseController {
 
         synchronized (this) {
             if (hide) {
-                hideTranslateDialogs.add(dialogId);
+                hideTranslateDialogs.add(getIdWithTopic(dialogId, topicId));
             } else {
-                hideTranslateDialogs.remove(dialogId);
+                hideTranslateDialogs.remove(getIdWithTopic(dialogId, topicId));
             }
         }
         saveTranslatingDialogsCache();
 
         if (!doNotNotify) {
-            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.dialogTranslate, dialogId, isTranslatingDialog(dialogId));
+            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.dialogTranslate, dialogId, isTranslatingDialog(dialogId, topicId));
         }
     }
 
@@ -332,21 +356,17 @@ public class TranslateController extends BaseController {
 
     public static ArrayList<Language> getLanguages() {
         ArrayList<Language> result = new ArrayList<>();
-        for (int i = 0; i < allLanguages.size(); ++i) {
+        ArrayList<String> languagesOrder = new ArrayList<>(Translator.getCurrentTranslator().getTargetLanguages());
+        for (int i = 0; i < languagesOrder.size(); ++i) {
             Language language = new Language();
-            language.code = allLanguages.get(i);
+            language.code = languagesOrder.get(i);
             language.displayName = TranslateAlert2.capitalFirst(TranslateAlert2.languageName(language.code));
             if (language.displayName == null) {
                 continue;
             }
             result.add(language);
         }
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            Collator collator = Collator.getInstance(Locale.getDefault());
-            Collections.sort(result, (lng1, lng2) -> collator.compare(lng1.displayName, lng2.displayName));
-        } else {
-            Collections.sort(result, Comparator.comparing(lng -> lng.displayName));
-        }
+        Collections.sort(result, Comparator.comparing(o -> o.displayName));
         return result;
     }
 
@@ -373,7 +393,7 @@ public class TranslateController extends BaseController {
                             currentLocale = currentLocale.split("_")[0];
                         }
                         if (TranslateAlert2.languageName(currentLocale) != null) {
-                            langs.add(currentLocale.split("-")[0]);
+                            langs.add(currentLocale);
                         }
                     }
                 }
@@ -385,25 +405,19 @@ public class TranslateController extends BaseController {
     }
 
     public static ArrayList<Language> getSuggestedLanguages(String except) {
+        String appLanguage = Translator.getCurrentTranslator().getCurrentAppLanguage();
         ArrayList<Language> result = new ArrayList<>();
-        if (suggestedLanguageCodes == null) {
-            analyzeSuggestedLanguageCodes();
-            if (suggestedLanguageCodes == null) {
-                return result;
-            }
+        Language language = new Language();
+        if (!except.equals("app")) {
+            language.code = "app";
+            language.displayName = LocaleController.getString("Default", R.string.Default);
+            result.add(language);
         }
-        Iterator<String> i = suggestedLanguageCodes.iterator();
-        while (i.hasNext()) {
-            final String code = i.next();
-            if (TextUtils.equals(code, except) || "no".equals(except) && "nb".equals(code) || "nb".equals(except) && "no".equals(code)) {
-                continue;
-            }
-            Language language = new Language();
-            language.code = code;
-            language.displayName = TranslateAlert2.capitalFirst(TranslateAlert2.languageName(language.code));
-            if (language.displayName == null) {
-                continue;
-            }
+
+        if (!except.equals(appLanguage)) {
+            language = new Language();
+            language.code = appLanguage;
+            language.displayName = TranslatorHelper.languageName(language.code);
             result.add(language);
         }
         return result;
@@ -457,15 +471,15 @@ public class TranslateController extends BaseController {
 
             ArrayList<Long> toNotify = new ArrayList<>();
             HashSet<String> languages = DoNotTranslateSettings.getRestrictedLanguages();
-            for (long dialogId : translatableDialogs) {
+            for (Pair<Long, Integer> dialogId : translatableDialogs) {
                 String language = detectedDialogLanguage.get(dialogId);
-                if (language != null && languages.contains(language.split("-")[0])) {
-                    cancelTranslations(dialogId);
+                if (language != null && languages.contains(language)) {
+                    cancelTranslations(dialogId.first);
                     translatingDialogs.remove(dialogId);
-                    toNotify.add(dialogId);
+                    toNotify.add(dialogId.first);
                 }
             }
-            translatableDialogs.clear();
+            //translatableDialogs.clear();
             saveTranslatingDialogsCache();
 
             for (long dialogId : toNotify) {
@@ -475,8 +489,8 @@ public class TranslateController extends BaseController {
     }
 
     @Nullable
-    public String getDialogDetectedLanguage(long dialogId) {
-        return detectedDialogLanguage.get(dialogId);
+    public String getDialogDetectedLanguage(long dialogId, int topicId) {
+        return detectedDialogLanguage.get(getIdWithTopic(dialogId, topicId));
     }
 
     public void checkTranslation(MessageObject messageObject, boolean onScreen) {
@@ -534,6 +548,7 @@ public class TranslateController extends BaseController {
         }
 
         long dialogId = messageObject.getDialogId();
+        int topicId = getTopicId(messageObject);
 
         if (!keepReply && messageObject.replyMessageObject != null) {
             checkTranslation(messageObject.replyMessageObject, onScreen, true);
@@ -543,14 +558,14 @@ public class TranslateController extends BaseController {
             return;
         }
 
-        if (!isTranslatingDialog(dialogId)) {
+        if (!isTranslatingDialog(dialogId, topicId)) {
             checkLanguage(messageObject);
             return;
         }
 
         final String language = getDialogTranslateTo(dialogId);
         MessageObject potentialReplyMessageObject;
-        if (!keepReply && (messageObject.messageOwner.translatedText == null || !isValidTranslation(language, messageObject)) && (potentialReplyMessageObject = findReplyMessageObject(dialogId, messageObject.getId())) != null) {
+        if (!keepReply && (messageObject.messageOwner.translatedText == null || !isValidTranslation(language, messageObject)) && (potentialReplyMessageObject = findReplyMessageObject(dialogId, topicId, messageObject.getId())) != null) {
             messageObject.messageOwner.translatedToLanguage = potentialReplyMessageObject.messageOwner.translatedToLanguage;
             messageObject.messageOwner.originalLanguage = potentialReplyMessageObject.messageOwner.originalLanguage;
             messageObject.messageOwner.translatedReplyMarkupRows = potentialReplyMessageObject.messageOwner.translatedReplyMarkupRows;
@@ -561,11 +576,17 @@ public class TranslateController extends BaseController {
             messageObject = potentialReplyMessageObject;
         }
 
-        if (onScreen && isTranslatingDialog(dialogId) && !isRestrictedLanguage(messageObject)) {
+        if (onScreen && isTranslatingDialog(dialogId, topicId) && !isRestrictedLanguage(messageObject)) {
             final MessageObject finalMessageObject = messageObject;
             if (finalMessageObject.messageOwner.translatedText == null || !isValidTranslation(language, finalMessageObject)) {
                 NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, finalMessageObject);
                 pushToTranslate(finalMessageObject, result -> {
+                    if (DoNotTranslateSettings.getRestrictedLanguages().contains(result.sourceLanguage)) {
+                        finalMessageObject.messageOwner.originalLanguage = result.sourceLanguage;
+                        getMessagesStorage().updateMessageCustomParams(dialogId, finalMessageObject.messageOwner);
+                        NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, finalMessageObject);
+                        return;
+                    }
                     applyTranslationResult(finalMessageObject, result);
                     if (keepReply) {
                         keepReplyMessage(finalMessageObject);
@@ -608,13 +629,14 @@ public class TranslateController extends BaseController {
             return;
         }
         final long dialogId = messageObject.getDialogId();
+        final int topicId = getTopicId(messageObject);
         messageObject.messageOwner.translatedToLanguage = null;
         messageObject.messageOwner.translatedText = null;
         messageObject.messageOwner.translatedReplyMarkupRows = null;
         messageObject.messageOwner.translatedPoll = null;
         getMessagesStorage().updateMessageCustomParams(dialogId, messageObject.messageOwner);
         AndroidUtilities.runOnUIThread(() -> {
-            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslated, messageObject, isTranslatingDialog(dialogId));
+            NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslated, messageObject, isTranslatingDialog(dialogId, topicId));
         });
     }
 
@@ -683,10 +705,15 @@ public class TranslateController extends BaseController {
         if (!isTranslatable(messageObject) || messageObject.messageOwner == null || TextUtils.isEmpty(messageObject.messageOwner.message)) {
             return;
         }
+        if (messageObject.messageOwner.originalLanguage != null) {
+            checkDialogTranslatable(messageObject);
+            return;
+        }
 
         final long dialogId = messageObject.getDialogId();
+        final int topicId = getTopicId(messageObject);
         final int hash = hash(messageObject);
-        if (isDialogTranslatable(dialogId)) {
+        if (isDialogTranslatable(dialogId, topicId)) {
             return;
         }
         if (pendingLanguageChecks.contains(hash)) {
@@ -717,9 +744,9 @@ public class TranslateController extends BaseController {
         }
 
         final long dialogId = messageObject.getDialogId();
-        TranslatableDecision translatableMessages = translatableDialogMessages.get(dialogId);
+        TranslatableDecision translatableMessages = translatableDialogMessages.get(getIdWithTopic(messageObject));
         if (translatableMessages == null) {
-            translatableDialogMessages.put(dialogId, translatableMessages = new TranslatableDecision());
+            translatableDialogMessages.put(getIdWithTopic(messageObject), translatableMessages = new TranslatableDecision());
         }
 
         final boolean isUnknown = isTranslatable(messageObject) && (
@@ -729,7 +756,7 @@ public class TranslateController extends BaseController {
         final boolean translatable = (
             isTranslatable(messageObject) &&
             messageObject.messageOwner.originalLanguage != null &&
-            !DoNotTranslateSettings.getRestrictedLanguages().contains(messageObject.messageOwner.originalLanguage.split("-")[0])
+            !DoNotTranslateSettings.getRestrictedLanguages().contains(messageObject.messageOwner.originalLanguage)
         );
 
         if (isUnknown) {
@@ -739,24 +766,24 @@ public class TranslateController extends BaseController {
         }
 
         if (!isUnknown) {
-            detectedDialogLanguage.put(dialogId, messageObject.messageOwner.originalLanguage);
+            detectedDialogLanguage.put(getIdWithTopic(messageObject), messageObject.messageOwner.originalLanguage);
         }
 
         final int translatableCount = translatableMessages.certainlyTranslatable.size();
         final int unknownCount = translatableMessages.unknown.size();
         final int notTranslatableCount = translatableMessages.certainlyNotTranslatable.size();
         final int totalCount = translatableCount + unknownCount + notTranslatableCount;
-        /*if (
+        if (
             totalCount >= REQUIRED_TOTAL_MESSAGES_CHECKED &&
             (translatableCount / (float) (translatableCount + notTranslatableCount)) >= REQUIRED_PERCENTAGE_MESSAGES_TRANSLATABLE &&
             (unknownCount / (float) totalCount) < REQUIRED_MIN_PERCENTAGE_MESSAGES_UNKNOWN
-        ) {*/
-            translatableDialogs.add(dialogId);
-            translatableDialogMessages.remove((Long) dialogId);
+        ) {
+            translatableDialogs.add(getIdWithTopic(messageObject));
+            translatableDialogMessages.remove(getIdWithTopic(messageObject));
             AndroidUtilities.runOnUIThread(() -> {
                 NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.dialogIsTranslatable, dialogId);
             }, 450);
-        //}
+        }
     }
 
     public void addTranslatingMessage(MessageObject messageObject) {
@@ -789,6 +816,7 @@ public class TranslateController extends BaseController {
         if (message == null || callback == null) {
             return;
         }
+        int topicId = getTopicId(message);
         long dialogId = message.getDialogId();
 
         PendingTranslation pendingTranslation;
@@ -851,7 +879,7 @@ public class TranslateController extends BaseController {
 
                     } else {
                         FileLog.e("TranslateController", error);
-                        toggleTranslatingDialog(dialogId, false);
+                        toggleTranslatingDialog(dialogId, topicId, false);
                         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, LocaleController.getString("TranslationFailedAlert2", R.string.TranslationFailedAlert2));
                     }
 
@@ -937,23 +965,23 @@ public class TranslateController extends BaseController {
         if (messageObject == null) {
             return;
         }
-        HashMap<Integer, MessageObject> map = keptReplyMessageObjects.get(messageObject.getDialogId());
+        HashMap<Integer, MessageObject> map = keptReplyMessageObjects.get(getIdWithTopic(messageObject));
         if (map == null) {
-            keptReplyMessageObjects.put(messageObject.getDialogId(), map = new HashMap<>());
+            keptReplyMessageObjects.put(getIdWithTopic(messageObject), map = new HashMap<>());
         }
         map.put(messageObject.getId(), messageObject);
     }
 
-    public MessageObject findReplyMessageObject(long dialogId, int messageId) {
-        HashMap<Integer, MessageObject> map = keptReplyMessageObjects.get(dialogId);
+    public MessageObject findReplyMessageObject(long dialogId, int topicId, int messageId) {
+        HashMap<Integer, MessageObject> map = keptReplyMessageObjects.get(getIdWithTopic(dialogId, topicId));
         if (map == null) {
             return null;
         }
         return map.get(messageId);
     }
 
-    private void clearAllKeptReplyMessages(long dialogId) {
-        keptReplyMessageObjects.remove(dialogId);
+    private void clearAllKeptReplyMessages(long dialogId, int topicId) {
+        keptReplyMessageObjects.remove(getIdWithTopic(dialogId, topicId));
     }
 
 
