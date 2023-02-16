@@ -9750,7 +9750,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (translateItem == null) {
             return;
         }
-        translateItem.setVisibility(getMessagesController().getTranslateController().isTranslateDialogHidden(getDialogId(), getTopicId()) || !getMessagesController().getTranslateController().isDialogTranslatable(getDialogId(), getTopicId()) ? View.VISIBLE : View.GONE);
+        if (!getMessagesController().getTranslateController().isFeatureAvailable()) {
+            translateItem.setVisibility(View.GONE);
+        } else {
+            translateItem.setVisibility(getMessagesController().getTranslateController().isTranslateDialogHidden(getDialogId(), getTopicId()) || !getMessagesController().getTranslateController().isDialogTranslatable(getDialogId(), getTopicId()) ? View.VISIBLE : View.GONE);
+        }
     }
 
     private Animator infoTopViewAnimator;

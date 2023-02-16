@@ -74,13 +74,17 @@ public class TranslateController extends BaseController {
         AndroidUtilities.runOnUIThread(this::loadTranslatingDialogsCached, 150);
     }
 
+
+    public boolean supportMultiTranslate() {
+        return !(!UserConfig.getInstance(currentAccount).isPremium() && OwlConfig.translationProvider == Translator.PROVIDER_TELEGRAM);
+    }
+
     public boolean isFeatureAvailable() {
-        return /*UserConfig.getInstance(currentAccount).isPremium() &&*/ isChatTranslateEnabled();
+        return supportMultiTranslate() && isChatTranslateEnabled();
     }
 
     public boolean isChatTranslateEnabled() {
-        //return MessagesController.getMainSettings(currentAccount).getBoolean("translate_chat_button", true);
-        return true;
+        return OwlConfig.translateEntireChat;
     }
 
     public boolean isContextTranslateEnabled() {

@@ -90,6 +90,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean hideSendAsChannel;
     public static boolean showNameInActionBar;
     public static boolean stickersSorting;
+    public static boolean translateEntireChat;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -225,6 +226,7 @@ public class OwlConfig extends SettingsManager {
             stickersSorting = getBoolean("stickersSorting", true);
             emojiPackSelected = getString("emojiPackSelected", "default");
             lastSelectedCompression = getInt("lastSelectedCompression", 3);
+            translateEntireChat = getBoolean("translateEntireChat", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -472,6 +474,10 @@ public class OwlConfig extends SettingsManager {
 
     public static void toggleStickersSorting() {
         putValue("stickersSorting", stickersSorting ^= true);
+    }
+
+    public static void toggleTranslateEntireChat() {
+        putValue("translateEntireChat", translateEntireChat ^= true);
     }
 
     public static void unlockChupa() {

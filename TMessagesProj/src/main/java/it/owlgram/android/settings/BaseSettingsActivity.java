@@ -107,9 +107,6 @@ public abstract class BaseSettingsActivity extends BaseFragment {
         itemAnimator.setDelayAnimations(false);
         listView.setItemAnimator(itemAnimator);
         listView.setAdapter(listAdapter = createAdapter());
-        if (listView.getItemAnimator() != null) {
-            ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
-        }
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         listView.setOnItemClickListener(this::onItemClick);
         listView.setOnItemLongClickListener(this::onItemLongClick);

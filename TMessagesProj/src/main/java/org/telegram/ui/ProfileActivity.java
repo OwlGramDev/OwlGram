@@ -8632,7 +8632,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         createAutoTranslateItem(context, dialogId, 0, null);
     }
     private void createAutoTranslateItem(BaseFragment context, long dialogId, int topicId, TLRPC.Chat chat) {
-        if (LanguageDetector.hasSupport() && TranslatorHelper.isSupportAutoTranslate()) {
+        boolean supportAutoTranslate = LanguageDetector.hasSupport() && TranslatorHelper.isSupportAutoTranslate() && getMessagesController().getTranslateController().supportMultiTranslate();
+        if (supportAutoTranslate) {
             AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, ChatObject.isForum(currentChat), otherItem, dialogId, topicId, arguments.getBoolean("isAlwaysShare", false), getResourceProvider());
             if (arguments.getBoolean("isSettings")) {
                 BaseFragment parentFragment = parentLayout.getFragmentStack().get(parentLayout.getFragmentStack().size() - 2);
@@ -8650,7 +8651,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             }
             otherItem.addSwipeBackItem(R.drawable.msg_translate, null, LocaleController.getString("AutoTranslate", R.string.AutoTranslate), autoTranslatePopupWrapper.windowLayout);
         }
-        if (chatInfo == null || !chatInfo.participants_hidden || ChatObject.hasAdminRights(chat) || !isTopic) {
+        if ((chatInfo == null || !chatInfo.participants_hidden || ChatObject.hasAdminRights(chat) || !isTopic) && (autoDeleteItem != null || supportAutoTranslate)) {
             otherItem.addColoredGap();
         }
     }

@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import androidx.core.text.HtmlCompat;
 
+import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessageObject;
@@ -14,7 +15,6 @@ import org.telegram.messenger.UserConfig;
 import org.telegram.tgnet.TLRPC;
 
 import java.util.Locale;
-import java.util.Objects;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.entities.HTMLKeeper;
@@ -46,15 +46,35 @@ public class TranslatorHelper {
                 provider == Translator.PROVIDER_DEEPL;
     }
 
+    public static boolean isSupportMarkdown(int provider) {
+        return (isSupportHTMLMode(provider) || provider == Translator.PROVIDER_TELEGRAM) && showPremiumFeatures(provider);
+    }
+
+    public static boolean isSupportMarkdown() {
+        return isSupportMarkdown(OwlConfig.translationProvider);
+    }
+
+    public static boolean showPremiumFeatures() {
+        return showPremiumFeatures(OwlConfig.translationProvider);
+    }
+
+    public static boolean showPremiumFeatures(int provider) {
+        UserConfig userConfig = UserConfig.getInstance(UserConfig.selectedAccount);
+        MessagesController messagesController = AccountInstance.getInstance(UserConfig.selectedAccount).getMessagesController();
+        return provider != Translator.PROVIDER_TELEGRAM || userConfig.isPremium() || !messagesController.premiumLocked;
+    }
+
     public static boolean isSupportAutoTranslate() {
         return isSupportAutoTranslate(OwlConfig.translationProvider);
     }
 
     public static boolean isSupportAutoTranslate(int provider) {
-        return provider == Translator.PROVIDER_GOOGLE ||
+        return (provider == Translator.PROVIDER_GOOGLE ||
                 provider == Translator.PROVIDER_YANDEX ||
                 provider == Translator.PROVIDER_DEEPL ||
-                provider == Translator.PROVIDER_DUCKDUCKGO;
+                provider == Translator.PROVIDER_DUCKDUCKGO ||
+                provider == Translator.PROVIDER_TELEGRAM) &&
+                showPremiumFeatures();
     }
 
     public static class TranslatorContext {

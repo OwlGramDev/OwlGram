@@ -330,4 +330,5 @@
     <string name="EmojiSetAlreadyApplied">Emoji set already applied.</string>
     <string name="EmojiSetErrorDownloading">Error downloading emoji set.</string>
     <string name="ChatHeader">Chat Header</string>
+    <string name="ShowTranslateChatButtonDesc">Show the translate button in the chat header</string>
 </resources>

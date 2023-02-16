@@ -171,7 +171,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                     int backgroundColor = Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider);
                     drawItemBackground(canvas, 0, translateSettingsBackgroundHeight, backgroundColor);
 //                    drawItemBackground(canvas, 1, Theme.getColor(Theme.key_windowBackgroundWhite, resourcesProvider));
-                    drawSectionBackground(canvas, 1, 2, backgroundColor);
+                    drawSectionBackground(canvas, 0, 1, backgroundColor);
                 }
                 super.dispatchDraw(canvas);
             }
@@ -233,7 +233,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                     }
                     return;
                 } else if (view instanceof TextSettingsCell) {
-                    presentFragment(new RestrictedLanguagesSelectActivity());
+                    presentFragment(new OwlgramGeneralSettings());
                     return;
                 }
                 if (getParentActivity() == null || parentLayout == null || !(view instanceof TextRadioCell)) {
@@ -241,7 +241,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                 }
                 boolean search = listView.getAdapter() == searchListViewAdapter;
                 if (!search) {
-                    position -= (7 - (!(getChatValue() || getContextValue()) ? 1 : 0) - (getMessagesController().premiumLocked ? 1 : 0));
+                    position -= 4;
                 }
                 LocaleController.LocaleInfo localeInfo;
                 if (search) {
@@ -307,7 +307,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                 }
                 boolean search = listView.getAdapter() == searchListViewAdapter;
                 if (!search) {
-                    position -= (7 - (!(getChatValue() || getContextValue()) ? 1 : 0) - (getMessagesController().premiumLocked ? 1 : 0));
+                    position -= 4;
                 }
                 LocaleController.LocaleInfo localeInfo;
                 if (search) {
@@ -531,7 +531,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                 if (!unofficialLanguages.isEmpty()) {
                     count += unofficialLanguages.size() + 1;
                 }
-                return 4 + (getMessagesController().premiumLocked ? 0 : 1) + (getChatValue() || getContextValue() ? 1 : 0) + 1 + count;
+                return 2 + count;
             }
         }
 
@@ -584,7 +584,7 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
             switch (holder.getItemViewType()) {
                 case VIEW_TYPE_LANGUAGE: {
                     if (!search) {
-                        position -= (7 - (!(getChatValue() || getContextValue()) ? 1 : 0) - (getMessagesController().premiumLocked ? 1 : 0));
+                        position -= 4;
                     }
                     TextRadioCell textSettingsCell = (TextRadioCell) holder.itemView;
                     textSettingsCell.updateRTL();
@@ -629,9 +629,9 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                     break;
                 }
                 case VIEW_TYPE_SETTINGS: {
-                    TranslateSettings translateSettings = (TranslateSettings) holder.itemView;
-                    translateSettings.setVisibility(searching ? View.GONE : View.VISIBLE);
-                    //translateSettings.updateTranslations();
+                    TextSettingsCell translateSettings = (TextSettingsCell) holder.itemView;
+                    translateSettings.setText(LocaleController.getString("OwlSetting", R.string.OwlSetting), false);
+                    translateSettings.setBackground(Theme.createSelectorWithBackgroundDrawable(Theme.getColor(Theme.key_windowBackgroundWhite), Theme.getColor(Theme.key_listSelector)));
                     break;
                 }
                 case VIEW_TYPE_SWITCH: {
@@ -675,15 +675,16 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
                 return VIEW_TYPE_LANGUAGE;
             } else {
                 if (i-- == 0) return VIEW_TYPE_HEADER;
-                if (i-- == 0) return VIEW_TYPE_SWITCH;
+                /*if (i-- == 0) return VIEW_TYPE_SWITCH;
                 if (!getMessagesController().premiumLocked) {
                     if (i-- == 0) return VIEW_TYPE_SWITCH;
                 }
-                if (getChatValue() || getContextValue()) {
-                    if (i-- == 0) return VIEW_TYPE_SETTINGS;
-                }
+                if (getChatValue() || getContextValue()) {*/
+                if (i-- == 0) return VIEW_TYPE_SETTINGS;
+                if (i-- == 0) return VIEW_TYPE_SHADOW;
+                /**}
                 if (i-- == 0) return VIEW_TYPE_INFO;
-                if (i-- == 0) return VIEW_TYPE_INFO;
+                if (i-- == 0) return VIEW_TYPE_INFO;*/
                 if (i-- == 0) return VIEW_TYPE_HEADER;
                 if (!unofficialLanguages.isEmpty() && (i == unofficialLanguages.size() || i == unofficialLanguages.size() + sortedLanguages.size() + 1) || unofficialLanguages.isEmpty() && i == sortedLanguages.size()) {
                     return VIEW_TYPE_SHADOW;
