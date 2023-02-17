@@ -112,7 +112,6 @@ import org.telegram.messenger.video.VideoPlayerRewinder;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
-import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.AnimatedEmojiDrawable;
@@ -139,7 +138,6 @@ import org.telegram.ui.Components.MessageBackgroundDrawable;
 import org.telegram.ui.Components.MotionBackgroundDrawable;
 import org.telegram.ui.Components.MsgClockDrawable;
 import org.telegram.ui.Components.Point;
-import org.telegram.ui.Components.Premium.PremiumGradient;
 import org.telegram.ui.Components.RLottieDrawable;
 import org.telegram.ui.Components.RadialProgress2;
 import org.telegram.ui.Components.Reactions.ReactionsLayoutInBubble;
@@ -1250,7 +1248,6 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     VideoForwardDrawable videoForwardDrawable;
     VideoPlayerRewinder videoPlayerRewinder;
 
-    private final BaseFragment baseFragment;
     private final Theme.ResourcesProvider resourcesProvider;
     private final boolean canDrawBackgroundInParent;
 
@@ -1264,17 +1261,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     public boolean isBlurred;
 
     public ChatMessageCell(Context context) {
-        this(null, context, false, null);
+        this(context, false, null);
     }
 
     public ChatMessageCell(Context context, boolean canDrawBackgroundInParent, Theme.ResourcesProvider resourcesProvider) {
-        this(null, context, false, null);
-    }
-
-    public ChatMessageCell(BaseFragment baseFragment, Context context, boolean canDrawBackgroundInParent, Theme.ResourcesProvider resourcesProvider) {
         super(context);
         this.resourcesProvider = resourcesProvider;
-        this.baseFragment = baseFragment;
         this.canDrawBackgroundInParent = canDrawBackgroundInParent;
 
         backgroundDrawable = new MessageBackgroundDrawable(this);
@@ -15365,7 +15357,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 captionX += transitionParams.deltaLeft;
             }
         }
-        
+
         if (isRoundVideo && transitionParams.animateDrawBackground) {
             captionY += (1f - getVideoTranscriptionProgress()) * AndroidUtilities.roundMessageSize;
         }

@@ -67,9 +67,22 @@ public class CustomEmojiHelper {
     private static Bulletin emojiPackBulletin;
 
     private final static String EMOJI_PACKS_CACHE_DIR = AndroidUtilities.getCacheDir().getAbsolutePath() + "/emojis/";
-    private final static String EMOJI_PACKS_FILE_DIR = ApplicationLoader.applicationContext.getExternalFilesDir(null).getAbsolutePath() + "/emojis/";
-    private final static String EMOJI_PACKS_TMP_DIR = AndroidUtilities.getCacheDir().getAbsolutePath() + "/emojis/tmp/";
+    private final static String EMOJI_PACKS_FILE_DIR;
+    private final static String EMOJI_PACKS_TMP_DIR;
     private static final Runnable invalidateUiRunnable = () -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
+
+    static {
+        var files = ApplicationLoader.applicationContext.getExternalFilesDir(null);
+        var cache = ApplicationLoader.applicationContext.getExternalCacheDir();
+        if (files != null) {
+            EMOJI_PACKS_FILE_DIR = files.getAbsolutePath() + "/emojis/";
+            EMOJI_PACKS_TMP_DIR = cache.getAbsolutePath() + "/emojis/tmp/";
+        } else {
+            EMOJI_PACKS_FILE_DIR = ApplicationLoader.applicationContext.getFilesDir().getAbsolutePath() + "/emojis/";
+            EMOJI_PACKS_TMP_DIR = ApplicationLoader.applicationContext.getCacheDir().getAbsolutePath() + "/emojis/tmp/";
+        }
+    }
+
     private static final String[] previewEmojis = {
             "\uD83D\uDE00",
             "\uD83D\uDE09",

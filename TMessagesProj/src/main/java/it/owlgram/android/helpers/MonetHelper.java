@@ -11,6 +11,7 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 
@@ -134,7 +135,11 @@ public class MonetHelper {
     }
 
     public static void unregisterReceiver(Context context) {
-        overlayChangeReceiver.unregister(context);
+        try {
+            overlayChangeReceiver.unregister(context);
+        } catch (IllegalArgumentException e) {
+            FileLog.e(e);
+        }
     }
 }
 
