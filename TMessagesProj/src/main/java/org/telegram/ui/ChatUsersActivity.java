@@ -337,14 +337,14 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                 sendMediaVideosRow = rowCount++;
                 sendStickersRow = rowCount++;
                 sendGifsRow = rowCount++;
+                sendGamesRow = rowCount++;
+                useInlineBotRow = rowCount++;
                 sendMediaMusicRow = rowCount++;
                 sendMediaFilesRow = rowCount++;
                 sendMediaVoiceMessagesRow = rowCount++;
                 sendMediaVideoMessagesRow = rowCount++;
                 sendMediaEmbededLinksRow = rowCount++;
                 sendPollsRow = rowCount++;
-                sendGamesRow = rowCount++;
-                useInlineBotRow = rowCount++;
             }
             addUsersRow = rowCount++;
             pinMessagesRow = rowCount++;
@@ -3524,13 +3524,13 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                     } else if (position == sendMediaEmbededLinksRow) {
                         checkBoxCell.setText(LocaleController.getString("SendMediaEmbededLinks", R.string.SendMediaEmbededLinks), "", !defaultBannedRights.embed_links && !defaultBannedRights.send_plain, true, animated);
                     }else if (position == sendPollsRow) {
-                        checkBoxCell.setText(LocaleController.getString("SendMediaPolls", R.string.SendMediaPolls), "", !defaultBannedRights.send_polls, true, animated);
+                        checkBoxCell.setText(LocaleController.getString("SendMediaPolls", R.string.SendMediaPolls), "", !defaultBannedRights.send_polls, false, animated);
                     } else if (position == sendGifsRow) {
                         checkBoxCell.setText(LocaleController.getString("SendMediaPermissionGifs", R.string.SendMediaPermissionGifs), "", !defaultBannedRights.send_gifs, true, animated);
                     } else if (position == sendGamesRow) {
                         checkBoxCell.setText(LocaleController.getString("SendMediaPermissionGames", R.string.SendMediaPermissionGames), "", !defaultBannedRights.send_games, true, animated);
                     } else if (position == useInlineBotRow) {
-                        checkBoxCell.setText(LocaleController.getString("SendMediaPermissionInline", R.string.SendMediaPermissionInline), "", !defaultBannedRights.send_inline, false, animated);
+                        checkBoxCell.setText(LocaleController.getString("SendMediaPermissionInline", R.string.SendMediaPermissionInline), "", !defaultBannedRights.send_inline, true, animated);
                     }
                     //  checkBoxCell.setText(getCheckBoxTitle(item.headerName, percents[item.index < 0 ? 8 : item.index], item.index < 0), AndroidUtilities.formatFileSize(item.size), selected, item.index < 0 ? !collapsed : !item.last);
                     checkBoxCell.setPad(1);
