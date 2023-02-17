@@ -166,6 +166,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PushbackInputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -188,6 +189,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.ImportSettingsDialog;
@@ -5016,5 +5018,17 @@ public class AndroidUtilities {
 
     public static Spanned fromHtml(@NonNull String source) {
         return HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY);
+    }
+
+    public static InputStream decompressStream(InputStream input) throws IOException {
+        PushbackInputStream pb = new PushbackInputStream(input, 2);
+        byte[] signature = new byte[2];
+        int len = pb.read(signature);
+        pb.unread(signature, 0, len);
+        if (signature[0] == (byte) 0x1f && signature[1] == (byte) 0x8b) {
+            return new GZIPInputStream(pb);
+        } else {
+            return pb;
+        }
     }
 }
