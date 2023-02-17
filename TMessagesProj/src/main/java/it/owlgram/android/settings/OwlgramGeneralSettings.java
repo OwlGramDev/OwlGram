@@ -1,14 +1,21 @@
 package it.owlgram.android.settings;
 
+import android.annotation.SuppressLint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.text.TextUtils;
+import android.util.SparseIntArray;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.core.text.HtmlCompat;
 import androidx.core.util.Pair;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
@@ -18,6 +25,8 @@ import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 import org.telegram.ui.Components.BulletinFactory;
+import org.telegram.ui.Components.Premium.PremiumFeatureBottomSheet;
+import org.telegram.ui.PremiumPreviewFragment;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -62,6 +71,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
     private int callHeaderRow;
     private int confirmCallSwitchRow;
     private int deepLFormalityRow;
+    private int translateEntireChatRow;
 
     public OwlgramGeneralSettings() {
         supportLanguageDetector = LanguageDetector.hasSupport();
@@ -113,46 +123,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                 }
                 listAdapter.notifyItemChanged(hintTranslation2);
                 if (oldProvider != OwlConfig.translationProvider) {
-                    int index = deepLFormalityRow;
-                    index = index == -1 ? doNotTranslateSelectRow: index;
-
-                    boolean oldProviderSupportAuto = TranslatorHelper.isSupportAutoTranslate(oldProvider);
-                    boolean newProviderSupportAuto = TranslatorHelper.isSupportAutoTranslate();
-                    boolean oldProviderSupportHtml = TranslatorHelper.isSupportHTMLMode(oldProvider);
-                    boolean newProviderSupportHtml = TranslatorHelper.isSupportHTMLMode();
-
-                    if (oldProviderSupportAuto != newProviderSupportAuto && oldProviderSupportHtml != newProviderSupportHtml) {
-                        listAdapter.notifyItemChanged(index + 1);
-                    } else if (oldProviderSupportAuto != newProviderSupportAuto) {
-                        if (newProviderSupportAuto) {
-                            listAdapter.notifyItemInserted(index + 1);
-                        } else {
-                            listAdapter.notifyItemRemoved(index + 1);
-                        }
-                        listAdapter.notifyItemChanged(index);
-                    }else if (oldProviderSupportHtml != newProviderSupportHtml) {
-                        if (newProviderSupportHtml) {
-                            listAdapter.notifyItemInserted(index + 2);
-                        } else {
-                            listAdapter.notifyItemRemoved(index + 2);
-                        }
-                        listAdapter.notifyItemChanged(index + 1);
-                    }
-
-                    if (oldProvider == Translator.PROVIDER_DEEPL) {
-                        listAdapter.notifyItemChanged(destinationLanguageSelectRow, PARTIAL);
-                        listAdapter.notifyItemRemoved(deepLFormalityRow);
-                        updateRowsId();
-                    } else if (OwlConfig.translationProvider == Translator.PROVIDER_DEEPL) {
-                        updateRowsId();
-                        listAdapter.notifyItemChanged(destinationLanguageSelectRow, PARTIAL);
-                        listAdapter.notifyItemInserted(deepLFormalityRow);
-                    } else if (oldProviderSupportHtml != newProviderSupportHtml) {
-                        updateRowsId();
-                    } else if (oldProviderSupportAuto != newProviderSupportAuto) {
-                        updateRowsId();
-                    }
-                    listAdapter.notifyItemChanged(doNotTranslateSelectRow, PARTIAL);
+                    updateListAnimated();
                 }
             });
         } else if (position == destinationLanguageSelectRow) {
@@ -199,12 +170,20 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                 reloadInterface();
             });
         } else if (position == autoTranslateRow) {
+            if (!getUserConfig().isPremium() && OwlConfig.translationProvider == Translator.PROVIDER_TELEGRAM) {
+                showDialog(new PremiumFeatureBottomSheet(OwlgramGeneralSettings.this, PremiumPreviewFragment.PREMIUM_FEATURE_TRANSLATIONS, false));
+                return;
+            }
             if (!supportLanguageDetector) {
                 BulletinFactory.of(this).createErrorBulletinSubtitle(LocaleController.getString("BrokenMLKit", R.string.BrokenMLKit), LocaleController.getString("BrokenMLKitDetail", R.string.BrokenMLKitDetail), null).show();
                 return;
             }
             presentFragment(new AutoTranslateSettings());
         } else if (position == keepMarkdownRow) {
+            if (!getUserConfig().isPremium() && OwlConfig.translationProvider == Translator.PROVIDER_TELEGRAM) {
+                showDialog(new PremiumFeatureBottomSheet(OwlgramGeneralSettings.this, PremiumPreviewFragment.PREMIUM_FEATURE_TRANSLATIONS, false));
+                return;
+            }
             OwlConfig.toggleKeepTranslationMarkdown();
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.keepTranslationMarkdown);
@@ -213,6 +192,15 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
             OwlConfig.toggleShowTranslate();
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.showTranslate);
+            }
+        } else if (position == translateEntireChatRow) {
+            if (!getUserConfig().isPremium() && OwlConfig.translationProvider == Translator.PROVIDER_TELEGRAM) {
+                showDialog(new PremiumFeatureBottomSheet(OwlgramGeneralSettings.this, PremiumPreviewFragment.PREMIUM_FEATURE_TRANSLATIONS, false));
+            } else {
+                OwlConfig.toggleTranslateEntireChat();
+                if (view instanceof TextCheckCell) {
+                    ((TextCheckCell) view).setChecked(OwlConfig.translateEntireChat);
+                }
             }
         }
     }
@@ -226,13 +214,14 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
         divisorPrivacyRow = rowCount++;
         translationHeaderRow = rowCount++;
         showTranslateButtonRow = rowCount++;
+        translateEntireChatRow = TranslatorHelper.showPremiumFeatures() && TranslatorHelper.isSupportAutoTranslate() ? rowCount++: -1;
         translationStyle = rowCount++;
         translationProviderSelectRow = rowCount++;
         destinationLanguageSelectRow = rowCount++;
         doNotTranslateSelectRow = rowCount++;
         deepLFormalityRow = OwlConfig.translationProvider == Translator.PROVIDER_DEEPL ? rowCount++ : -1;
         autoTranslateRow = TranslatorHelper.isSupportAutoTranslate() ? rowCount++ : -1;
-        keepMarkdownRow = TranslatorHelper.isSupportHTMLMode() ? rowCount++ : -1;
+        keepMarkdownRow = TranslatorHelper.isSupportMarkdown() ? rowCount++ : -1;
         divisorTranslationRow = rowCount++;
         hintTranslation1 = rowCount++;
         hintTranslation2 = rowCount++;
@@ -279,6 +268,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                 case SWITCH:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
                     textCheckCell.setEnabled(true, null);
+                    boolean isLocked = !getUserConfig().isPremium() && OwlConfig.translationProvider == Translator.PROVIDER_TELEGRAM;
                     if (position == phoneNumberSwitchRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("HidePhone", R.string.HidePhone), LocaleController.getString("HidePhoneDesc", R.string.HidePhoneDesc), OwlConfig.hidePhoneNumber, true, true);
                     } else if (position == phoneContactsSwitchRow) {
@@ -291,8 +281,12 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                         textCheckCell.setTextAndCheck(LocaleController.getString("AccentAsNotificationColor", R.string.AccentAsNotificationColor), OwlConfig.accentAsNotificationColor, true);
                     } else if (position == keepMarkdownRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("KeepMarkdown", R.string.KeepMarkdown), LocaleController.getString("KeepMarkdownDesc", R.string.KeepMarkdownDesc), OwlConfig.keepTranslationMarkdown, true, false);
+                        textCheckCell.setCheckBoxIcon(isLocked ? R.drawable.permission_locked : 0);
                     } else if (position == showTranslateButtonRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ShowTranslateButton", R.string.ShowTranslateButton), OwlConfig.showTranslate, true);
+                    } else if (position == translateEntireChatRow) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("ShowTranslateChatButton", R.string.ShowTranslateChatButton), LocaleController.getString("ShowTranslateChatButtonDesc", R.string.ShowTranslateChatButtonDesc), OwlConfig.translateEntireChat, true, true);
+                        textCheckCell.setCheckBoxIcon(isLocked ? R.drawable.permission_locked : 0);
                     }
                     break;
                 case SETTINGS:
@@ -410,6 +404,16 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                         }
                         textSettingsCell.setTextAndValue(LocaleController.getString("AutoTranslate", R.string.AutoTranslate), value, keepMarkdownRow != -1);
                         if (!supportLanguageDetector) textSettingsCell.setAlpha(0.5f);
+                        ImageView imageView = textSettingsCell.getValueImageView();
+                        if (!getUserConfig().isPremium() && OwlConfig.translationProvider == Translator.PROVIDER_TELEGRAM) {
+                            imageView.setVisibility(View.VISIBLE);
+                            imageView.setImageResource(R.drawable.msg_mini_premiumlock);
+                            imageView.setTranslationY(AndroidUtilities.dp(1));
+                            imageView.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteValueText), PorterDuff.Mode.MULTIPLY));
+                        } else {
+                            imageView.setVisibility(View.GONE);
+                            imageView.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_windowBackgroundWhiteGrayIcon), PorterDuff.Mode.MULTIPLY));
+                        }
                     }
                     break;
                 case TEXT_HINT_WITH_PADDING:
@@ -472,7 +476,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                 return ViewType.HEADER;
             } else if (position == phoneNumberSwitchRow || position == phoneContactsSwitchRow || position == dcIdRow ||
                     position == confirmCallSwitchRow || position == notificationAccentRow || position == keepMarkdownRow ||
-                    position == showTranslateButtonRow) {
+                    position == showTranslateButtonRow || position == translateEntireChatRow) {
                 return ViewType.SWITCH;
             } else if (position == translationProviderSelectRow || position == destinationLanguageSelectRow || position == deepLFormalityRow ||
                     position == translationStyle || position == doNotTranslateSelectRow || position == idTypeRow || position == autoTranslateRow) {
@@ -483,6 +487,130 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                 return ViewType.DC_STYLE_SELECTOR;
             }
             throw new IllegalArgumentException("Invalid position");
+        }
+    }
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateListAnimated() {
+        if (listAdapter == null) {
+            updateRowsId();
+            return;
+        }
+        DiffCallback diffCallback = new DiffCallback();
+        diffCallback.oldRowCount = rowCount;
+        diffCallback.fillPositions(diffCallback.oldPositionToItem);
+        diffCallback.oldFeatures.addAll(diffCallback.getNewFeatures());
+        diffCallback.oldFeaturesStart = showTranslateButtonRow + 1;
+        diffCallback.oldFeaturesEnd = divisorTranslationRow - 1;
+        updateRowsId();
+        diffCallback.fillPositions(diffCallback.newPositionToItem);
+        try {
+            DiffUtil.calculateDiff(diffCallback).dispatchUpdatesTo(listAdapter);
+        } catch (Exception e) {
+            FileLog.e(e);
+            listAdapter.notifyDataSetChanged();
+        }
+        AndroidUtilities.updateVisibleRows(listView);
+    }
+
+    private class DiffCallback extends DiffUtil.Callback {
+
+        SparseIntArray oldPositionToItem = new SparseIntArray();
+        SparseIntArray newPositionToItem = new SparseIntArray();
+
+        int oldRowCount;
+        ArrayList<String> oldFeatures = new ArrayList<>();
+        int oldFeaturesStart;
+        int oldFeaturesEnd;
+
+        @Override
+        public int getOldListSize() {
+            return oldRowCount;
+        }
+
+        @Override
+        public int getNewListSize() {
+            return rowCount;
+        }
+
+        public ArrayList<String> getNewFeatures() {
+            ArrayList<String> newFeatures = new ArrayList<>();
+            if (TranslatorHelper.isSupportAutoTranslate()) {
+                newFeatures.add("Auto");
+            }
+            newFeatures.add("Style");
+            newFeatures.add("Provider");
+            newFeatures.add("Language");
+            newFeatures.add("DoNotTranslate");
+            if (OwlConfig.translationProvider == Translator.PROVIDER_DEEPL) {
+                newFeatures.add("Formality");
+            }
+            if (TranslatorHelper.isSupportMarkdown()) {
+                newFeatures.add("Markdown");
+            }
+            if (TranslatorHelper.showPremiumFeatures() && TranslatorHelper.isSupportAutoTranslate()) {
+                newFeatures.add("EntireChat");
+            }
+            return newFeatures;
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            ArrayList<String> newFeatures = getNewFeatures();
+            int featuresStart = showTranslateButtonRow + 1;
+            int featuresEnd = divisorTranslationRow - 1;
+            if (newItemPosition >= featuresStart && newItemPosition < featuresEnd) {
+                if (oldItemPosition >= oldFeaturesStart && oldItemPosition < oldFeaturesEnd) {
+                    String oldItem = oldFeatures.get(oldItemPosition - oldFeaturesStart);
+                    String newItem = newFeatures.get(newItemPosition - featuresStart);
+                    return TextUtils.equals(oldItem, newItem);
+                }
+            }
+            int oldIndex = oldPositionToItem.get(oldItemPosition, -1);
+            int newIndex = newPositionToItem.get(newItemPosition, -1);
+            return oldIndex == newIndex && oldIndex >= 0;
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return areItemsTheSame(oldItemPosition, newItemPosition);
+        }
+
+        public void fillPositions(SparseIntArray sparseIntArray) {
+            sparseIntArray.clear();
+            int pointer = 0;
+
+            put(++pointer, privacyHeaderRow, sparseIntArray);
+            put(++pointer, phoneNumberSwitchRow, sparseIntArray);
+            put(++pointer, phoneContactsSwitchRow, sparseIntArray);
+            put(++pointer, divisorPrivacyRow, sparseIntArray);
+            put(++pointer, translationHeaderRow, sparseIntArray);
+            put(++pointer, showTranslateButtonRow, sparseIntArray);
+            put(++pointer, translationStyle, sparseIntArray);
+            put(++pointer, translationProviderSelectRow, sparseIntArray);
+            put(++pointer, destinationLanguageSelectRow, sparseIntArray);
+            put(++pointer, doNotTranslateSelectRow, sparseIntArray);
+            put(++pointer, divisorTranslationRow, sparseIntArray);
+            put(++pointer, hintTranslation1, sparseIntArray);
+            put(++pointer, hintTranslation2, sparseIntArray);
+            put(++pointer, dcIdSettingsHeaderRow, sparseIntArray);
+            put(++pointer, dcStyleSelectorRow, sparseIntArray);
+            put(++pointer, dcIdRow, sparseIntArray);
+            put(++pointer, idTypeRow, sparseIntArray);
+            put(++pointer, divisorDCIdRow, sparseIntArray);
+            put(++pointer, hintIdRow, sparseIntArray);
+            put(++pointer, notificationHeaderRow, sparseIntArray);
+            put(++pointer, notificationAccentRow, sparseIntArray);
+            put(++pointer, dividerNotificationRow, sparseIntArray);
+            put(++pointer, callHeaderRow, sparseIntArray);
+            put(++pointer, confirmCallSwitchRow, sparseIntArray);
+        }
+
+        private void put(int id, int position, SparseIntArray sparseIntArray) {
+            if (position >= 0) {
+                sparseIntArray.put(position, id);
+            }
         }
     }
 }

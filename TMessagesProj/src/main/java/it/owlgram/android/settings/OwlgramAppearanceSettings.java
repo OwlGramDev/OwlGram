@@ -153,10 +153,10 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
             }
         } else if (position == appBarShadowRow) {
             OwlConfig.toggleAppBarShadow();
-            parentLayout.setHeaderShadow(OwlConfig.disableAppBarShadow ? null : parentLayout.getView().getResources().getDrawable(R.drawable.header_shadow).mutate());
+            parentLayout.setHeaderShadow(OwlConfig.showAppBarShadow ? parentLayout.getView().getResources().getDrawable(R.drawable.header_shadow).mutate():null);
             rebuildAllFragmentsWithLast();
             if (view instanceof TextCheckCell) {
-                ((TextCheckCell) view).setChecked(OwlConfig.disableAppBarShadow);
+                ((TextCheckCell) view).setChecked(OwlConfig.showAppBarShadow);
             }
         } else if (position == showSantaHatRow) {
             OwlConfig.toggleShowSantaHat();
@@ -282,7 +282,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.emojiPacksLoaded) {
-            if (CustomEmojiHelper.isFailedLoading()) {
+            if (CustomEmojiHelper.getLoadingStatus() == CustomEmojiHelper.FAILED) {
                 AndroidUtilities.runOnUIThread(CustomEmojiHelper::loadEmojisInfo, 1000);
             } else {
                 listAdapter.notifyItemChanged(chooseEmojiPackRow, PARTIAL);
@@ -337,7 +337,7 @@ public class OwlgramAppearanceSettings extends BaseSettingsActivity implements N
                     } else if (position == smartButtonsRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ShortcutsForAdmins", R.string.ShortcutsForAdmins), OwlConfig.smartButtons, false);
                     } else if (position == appBarShadowRow) {
-                        textCheckCell.setTextAndCheck(LocaleController.getString("AppBarShadow", R.string.AppBarShadow), OwlConfig.disableAppBarShadow, true);
+                        textCheckCell.setTextAndCheck(LocaleController.getString("AppBarShadow", R.string.AppBarShadow), OwlConfig.showAppBarShadow, true);
                     } else if (position == showSantaHatRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("ChristmasHat", R.string.ChristmasHat), OwlConfig.showSantaHat, true);
                     } else if (position == showFallingSnowRow) {

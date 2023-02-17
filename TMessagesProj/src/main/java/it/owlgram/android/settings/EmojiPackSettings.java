@@ -269,7 +269,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         useSystemEmojiRow = rowCount++;
         emojiDividerRow = rowCount++;
         useCustomEmojiHeaderRow = rowCount++;
-        if (customEmojiPacks.size() > 0) {
+        if (CustomEmojiHelper.getLoadingStatus() >= CustomEmojiHelper.LOADED_LOCAL || !customEmojiPacks.isEmpty()) {
             customEmojiStartRow = rowCount;
             rowCount += customEmojiPacks.size();
             customEmojiEndRow = rowCount;
@@ -283,7 +283,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
         customEmojiHintRow = rowCount++;
 
         emojiPackHeaderRow = rowCount++;
-        if (emojiPacks.size() > 0) {
+        if (CustomEmojiHelper.getLoadingStatus() == CustomEmojiHelper.LOADED_REMOTE || !emojiPacks.isEmpty()) {
             emojiPacksStartRow = rowCount;
             rowCount += emojiPacks.size();
             emojiPacksEndRow = rowCount;
@@ -311,7 +311,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.emojiPacksLoaded) {
-            if (CustomEmojiHelper.isFailedLoading()) {
+            if (CustomEmojiHelper.getLoadingStatus() == CustomEmojiHelper.FAILED) {
                 AndroidUtilities.runOnUIThread(CustomEmojiHelper::loadEmojisInfo, 1000);
             } else {
                 updateListAnimated();

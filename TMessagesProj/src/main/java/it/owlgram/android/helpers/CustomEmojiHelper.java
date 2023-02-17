@@ -55,23 +55,44 @@ public class CustomEmojiHelper {
     private static Typeface systemEmojiTypeface;
     private static boolean loadSystemEmojiFailed = false;
     private static final String EMOJI_FONT_AOSP = "NotoColorEmoji.ttf";
-    private static boolean loadingPack = false;
-    private static boolean loadingPackFailed = false;
+
+    public static final int FAILED = -1;
+    public static final int LOADING = 0;
+    public static final int LOADED_LOCAL = 1;
+    public static final int LOADED_REMOTE = 2;
+    private static int statusLoading = FAILED;
     private static String pendingDeleteEmojiPackId;
     private static final ArrayList<EmojiPackBase> emojiPacksInfo = new ArrayList<>();
     private static final SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("customEmojiCache", Activity.MODE_PRIVATE);
     private static Bulletin emojiPackBulletin;
 
     private final static String EMOJI_PACKS_CACHE_DIR = AndroidUtilities.getCacheDir().getAbsolutePath() + "/emojis/";
-    private final static String EMOJI_PACKS_FILE_DIR = ApplicationLoader.applicationContext.getExternalFilesDir(null).getAbsolutePath() + "/emojis/";
-    private final static String EMOJI_PACKS_TMP_DIR = AndroidUtilities.getCacheDir().getAbsolutePath() + "/emojis/tmp/";
+    private final static String EMOJI_PACKS_FILE_DIR;
+    private final static String EMOJI_PACKS_TMP_DIR;
     private static final Runnable invalidateUiRunnable = () -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.emojiLoaded);
+
+    static {
+        var files = ApplicationLoader.applicationContext.getExternalFilesDir(null);
+        var cache = ApplicationLoader.applicationContext.getExternalCacheDir();
+        if (files != null) {
+            EMOJI_PACKS_FILE_DIR = files.getAbsolutePath() + "/emojis/";
+            EMOJI_PACKS_TMP_DIR = cache.getAbsolutePath() + "/emojis/tmp/";
+        } else {
+            EMOJI_PACKS_FILE_DIR = ApplicationLoader.applicationContext.getFilesDir().getAbsolutePath() + "/emojis/";
+            EMOJI_PACKS_TMP_DIR = ApplicationLoader.applicationContext.getCacheDir().getAbsolutePath() + "/emojis/tmp/";
+        }
+    }
+
     private static final String[] previewEmojis = {
             "\uD83D\uDE00",
             "\uD83D\uDE09",
             "\uD83D\uDE14",
             "\uD83D\uDE28"
     };
+
+    public static boolean isLoading() {
+        return statusLoading >= LOADING && statusLoading < LOADED_REMOTE;
+    }
 
     public static Typeface getCurrentTypeface() {
         if (OwlConfig.useSystemEmoji) return getSystemEmojiTypeface();
@@ -153,12 +174,8 @@ public class CustomEmojiHelper {
                 ? OwlConfig.emojiPackSelected : "default";
     }
 
-    public static boolean isFailedLoading() {
-        return loadingPackFailed;
-    }
-
-    public static boolean isLoading() {
-        return loadingPack;
+    public static int getLoadingStatus() {
+        return statusLoading;
     }
 
     public static void loadEmojisInfo() {
@@ -172,16 +189,16 @@ public class CustomEmojiHelper {
     }
 
     public static void loadEmojisInfo(EmojiPackListener listener) {
-        if (loadingPack) {
+        if (isLoading()) {
             return;
         }
-        loadingPack = true;
-        loadingPackFailed = false;
+        statusLoading = LOADING;
         new Thread() {
             @Override
             public void run() {
                 ArrayList<EmojiPackBase> tmp = loadCustomEmojiPacks();
                 invalidateCache(false);
+                statusLoading = LOADED_LOCAL;
                 emojiPacksInfo.addAll(tmp);
                 AndroidUtilities.runOnUIThread(listener::onLoaded);
                 try {
@@ -194,11 +211,11 @@ public class CustomEmojiHelper {
                         invalidateCache(true);
                         emojiPacksInfo.addAll(loadFromJson(preferences.getString("emoji_packs", "[]")));
                     } catch (JSONException ignored) {
-                        loadingPackFailed = true;
+                        statusLoading = FAILED;
                     }
                     FileLog.e("Error loading emoji packs", e);
                 } finally {
-                    loadingPack = false;
+                    statusLoading = LOADED_REMOTE;
                     AndroidUtilities.runOnUIThread(listener::onLoaded);
                 }
             }

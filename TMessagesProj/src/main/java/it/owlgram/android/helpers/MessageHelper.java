@@ -14,7 +14,6 @@ import android.text.TextUtils;
 
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.core.util.Pair;
 
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BaseController;
@@ -25,10 +24,13 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
+import org.telegram.messenger.TranslateController;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.Utilities;
+import org.telegram.tgnet.AbstractSerializedData;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.AnimatedEmojiSpan;
@@ -151,17 +153,6 @@ public class MessageHelper extends BaseController {
         return !TextUtils.isEmpty(messageObject.messageOwner.message) && !isLinkOrEmojiOnlyMessage(messageObject);
     }
 
-    public boolean isMessageObjectAutoTranslatable(MessageObject messageObject) {
-        if (messageObject.translated ||
-                messageObject.translating ||
-                messageObject.isOutOwner() ||
-                messageObject.messageOwner.message != null && EntitiesHelper.isEmoji(messageObject.messageOwner.message)
-        ) {
-            return false;
-        }
-        return isMessageTranslatable(messageObject);
-    }
-
     public boolean isLinkOrEmojiOnlyMessage(MessageObject messageObject) {
         var entities = messageObject.messageOwner.entities;
         if (entities != null) {
@@ -208,40 +199,6 @@ public class MessageHelper extends BaseController {
         return messageObject;
     }
 
-    public MessageObject resetMessageContent(long dialogId, MessageObject messageObject, boolean translated) {
-        return resetMessageContent(dialogId, messageObject, translated, false);
-    }
-
-    public MessageObject resetMessageContent(long dialogId, MessageObject messageObject, boolean translated, boolean canceled) {
-        TLRPC.Message message = messageObject.messageOwner;
-        MessageObject obj = new MessageObject(currentAccount, message, true, true);
-        obj.originalMessage = messageObject.originalMessage;
-        obj.originalEntities = messageObject.originalEntities;
-        obj.originalReplyMarkupRows = messageObject.originalReplyMarkupRows;
-        obj.translating = false;
-        obj.translated = translated;
-        obj.translatedLanguage = messageObject.translatedLanguage;
-        obj.canceledTranslation = canceled;
-        if (messageObject.isSponsored()) {
-            obj.sponsoredId = messageObject.sponsoredId;
-            obj.botStartParam = messageObject.botStartParam;
-        }
-        ArrayList<MessageObject> arrayList = new ArrayList<>();
-        arrayList.add(obj);
-        getNotificationCenter().postNotificationName(NotificationCenter.replaceMessagesObjects, dialogId, arrayList, false);
-        return obj;
-    }
-
-    public MessageObject setTranslating(long dialogId, MessageObject messageObject, boolean translating) {
-        TLRPC.Message message = messageObject.messageOwner;
-        MessageObject obj = new MessageObject(currentAccount, message, true, true);
-        obj.translating = translating;
-        ArrayList<MessageObject> arrayList = new ArrayList<>();
-        arrayList.add(obj);
-        getNotificationCenter().postNotificationName(NotificationCenter.replaceMessagesObjects, dialogId, arrayList, false);
-        return obj;
-    }
-
     public static CharSequence createEditedString(MessageObject messageObject) {
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
         if (editedDrawable == null) {
@@ -260,13 +217,19 @@ public class MessageHelper extends BaseController {
     }
 
     public static CharSequence createTranslateString(MessageObject messageObject) {
-        if (messageObject.translating) {
-            return LocaleController.getString("MessageTranslateProgress", R.string.MessageTranslateProgress) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
+        String time = LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
+        String fromLanguage = messageObject.messageOwner.originalLanguage;
+        String toLanguage = messageObject.messageOwner.translatedToLanguage;
+        if (messageObject.messageOwner.translatedText != null &&
+                TextUtils.equals(messageObject.messageOwner.message, messageObject.messageOwner.translatedText.text) &&
+                !MessagesController.getInstance(UserConfig.selectedAccount).getTranslateController().isManualTranslation(messageObject)
+        ) {
+            return null;
         }
-        Pair<String, String> translatedLanguage = messageObject.translatedLanguage;
-        if (translatedLanguage == null || TextUtils.isEmpty(translatedLanguage.first) || TextUtils.isEmpty(translatedLanguage.second)) {
-            return LocaleController.getString("MessageTranslated", R.string.MessageTranslated) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
+        if (TextUtils.isEmpty(fromLanguage) || TextUtils.isEmpty(toLanguage) || TextUtils.equals(fromLanguage, TranslateController.UNKNOWN_LANGUAGE)) {
+            return LocaleController.getString("MessageTranslated", R.string.MessageTranslated) + " " + time;
         }
+        fromLanguage = fromLanguage.split("-")[0];
         if (arrowDrawable == null) {
             arrowDrawable = Objects.requireNonNull(ContextCompat.getDrawable(ApplicationLoader.applicationContext, R.drawable.search_arrow)).mutate();
         }
@@ -276,13 +239,13 @@ public class MessageHelper extends BaseController {
         }
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
         spannableStringBuilder
-                .append(TranslatorHelper.languageName(translatedLanguage.first))
+                .append(TranslatorHelper.languageName(fromLanguage))
                 .append(' ')
                 .append(arrowSpan)
                 .append(' ')
-                .append(TranslatorHelper.languageName(translatedLanguage.second))
+                .append(TranslatorHelper.languageName(toLanguage))
                 .append(' ')
-                .append(LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000));
+                .append(time);
         return spannableStringBuilder;
     }
 
@@ -314,8 +277,80 @@ public class MessageHelper extends BaseController {
         return plainText.toString();
     }
 
+    public static class PollTexts {
+        private final ArrayList<String> texts = new ArrayList<>();
+        public static int constructor = 0xca;
+
+        public PollTexts(TLRPC.Poll source) {
+            texts.add(source.question);
+            for (int a = 0; a < source.answers.size(); a++) {
+                texts.add(source.answers.get(a).text);
+            }
+        }
+
+        public PollTexts() {}
+
+        public ArrayList<String> getTexts() {
+            return texts;
+        }
+
+        public PollTexts copy() {
+            PollTexts pollTexts = new PollTexts();
+            pollTexts.texts.addAll(texts);
+            return pollTexts;
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt32(0x1cb5c415);
+            stream.writeInt32(texts.size());
+            for (int a = 0; a < texts.size(); a++) {
+                stream.writeString(texts.get(a));
+            }
+        }
+
+        public static PollTexts TLdeserialize(AbstractSerializedData stream, int constructor, boolean exception) {
+            if (constructor != PollTexts.constructor) {
+                if (exception) {
+                    throw new RuntimeException(String.format("can't parse magic %x in PollTexts", constructor));
+                } else {
+                    return null;
+                }
+            }
+            PollTexts result = new PollTexts();
+            result.readParams(stream, exception);
+            return result;
+        }
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            int magic = stream.readInt32(exception);
+            if (magic != 0x1cb5c415) {
+                if (exception) {
+                    throw new RuntimeException(String.format("wrong Vector magic, got %x", magic));
+                }
+                return;
+            }
+            int count = stream.readInt32(exception);
+            for (int a = 0; a < count; a++) {
+                texts.add(stream.readString(exception));
+            }
+        }
+
+        public int size() {
+            return texts.size();
+        }
+
+        public void applyTextToPoll(TLRPC.Poll poll) {
+            poll.question = texts.get(0);
+            for (int a = 0; a < poll.answers.size(); a++) {
+                poll.answers.get(a).text = texts.get(a + 1);
+            }
+        }
+    }
+
     public static class ReplyMarkupButtonsTexts {
         private final ArrayList<ArrayList<String>> texts = new ArrayList<>();
+        public static int constructor = 0xc9;
 
         public ReplyMarkupButtonsTexts(ArrayList<TLRPC.TL_keyboardButtonRow> source) {
             for (int a = 0; a < source.size(); a++) {
@@ -329,8 +364,80 @@ public class MessageHelper extends BaseController {
             }
         }
 
+        public ReplyMarkupButtonsTexts() {}
+
+        public int size() {
+            int total = 0;
+            for (int a = 0; a < texts.size(); a++) {
+                total += texts.get(a).size();
+            }
+            return total;
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt32(0x1cb5c415);
+            stream.writeInt32(texts.size());
+            for (int a = 0; a < texts.size(); a++) {
+                stream.writeInt32(0x1cb5c415);
+                stream.writeInt32(texts.get(a).size());
+                for (int b = 0; b < texts.get(a).size(); b++) {
+                    stream.writeString(texts.get(a).get(b));
+                }
+            }
+        }
+
+        public static ReplyMarkupButtonsTexts TLdeserialize(AbstractSerializedData stream, int constructor, boolean exception) {
+            if (constructor != ReplyMarkupButtonsTexts.constructor) {
+                if (exception) {
+                    throw new RuntimeException(String.format("can't parse magic %x in ReplyMarkupButtonsTexts", constructor));
+                } else {
+                    return null;
+                }
+            }
+            ReplyMarkupButtonsTexts result = new ReplyMarkupButtonsTexts();
+            result.readParams(stream, exception);
+            return result;
+        }
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            int magic = stream.readInt32(exception);
+            if (magic != 0x1cb5c415) {
+                if (exception) {
+                    throw new RuntimeException(String.format("wrong Vector magic, got %x", magic));
+                }
+                return;
+            }
+            int count = stream.readInt32(exception);
+            for (int a = 0; a < count; a++) {
+                int subMagic = stream.readInt32(exception);
+                if (subMagic != 0x1cb5c415) {
+                    if (exception) {
+                        throw new RuntimeException(String.format("wrong Vector magic, got %x", magic));
+                    }
+                    return;
+                }
+                int subCount = stream.readInt32(exception);
+                texts.add(new ArrayList<>());
+                for (int b = 0; b < subCount; b++) {
+                    String text = stream.readString(exception);
+                    texts.get(a).add(text);
+                }
+            }
+        }
+
         public ArrayList<ArrayList<String>> getTexts() {
             return texts;
+        }
+
+        public ReplyMarkupButtonsTexts copy() {
+            ReplyMarkupButtonsTexts replyMarkupButtonsTexts = new ReplyMarkupButtonsTexts();
+            ArrayList<ArrayList<String>> textsNew = new ArrayList<>();
+            for (int a = 0; a < texts.size(); a++) {
+                textsNew.add(new ArrayList<>(texts.get(a)));
+            }
+            replyMarkupButtonsTexts.texts.addAll(textsNew);
+            return replyMarkupButtonsTexts;
         }
 
         public void applyTextToKeyboard(ArrayList<TLRPC.TL_keyboardButtonRow> rows) {

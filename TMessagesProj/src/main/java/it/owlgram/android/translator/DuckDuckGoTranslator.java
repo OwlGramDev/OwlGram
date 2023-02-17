@@ -1,5 +1,6 @@
 package it.owlgram.android.translator;
 
+import android.os.SystemClock;
 import android.text.TextUtils;
 
 import org.json.JSONException;
@@ -38,8 +39,8 @@ public class DuckDuckGoTranslator extends BaseTranslator {
     }
 
     @Override
-    protected Result translate(String query, String tl) throws IOException, JSONException {
-        ArrayList<String> blocks = getStringBlocks(query, 999);
+    protected Result singleTranslate(Object query, String tl) throws IOException, JSONException {
+        ArrayList<String> blocks = getStringBlocks((String) query, 999);
         StringBuilder resultString = new StringBuilder();
         String resultLang = "";
         String urlAuth = "https://duckduckgo.com/?q=translate&ia=web";
@@ -53,7 +54,7 @@ public class DuckDuckGoTranslator extends BaseTranslator {
         int start = responseAuth.indexOf("vqd=");
         int end = responseAuth.indexOf(";", start);
         String uidRaw = responseAuth.substring(start + "vqd=".length(), end);
-        Pattern p = Pattern.compile("[0-9-]+");
+        Pattern p = Pattern.compile("[\\d-]+");
         Matcher m = p.matcher(uidRaw);
         if (m.find()) {
             String uid = m.group(0);
@@ -62,19 +63,32 @@ public class DuckDuckGoTranslator extends BaseTranslator {
                     "&query=translate" +
                     "&to=" + tl;
             for (String block : blocks) {
-                String response = new StandardHTTPRequest(url)
-                        .header("User-Agent", userAgent)
-                        .header("Content-Length", String.valueOf(block.getBytes(Charset.defaultCharset()).length))
-                        .data(block)
-                        .request();
-                if (TextUtils.isEmpty(response)) {
-                    return null;
+                boolean worked = false;
+                for (int i = 0; i < 60; i++) {
+                    String response = new StandardHTTPRequest(url)
+                            .header("User-Agent", userAgent)
+                            .header("Content-Length", String.valueOf(block.getBytes(Charset.defaultCharset()).length))
+                            .data(block)
+                            .request();
+                    if (TextUtils.isEmpty(response)) {
+                        return null;
+                    }
+                    try {
+                        Result result = getResult(response);
+                        if (TextUtils.isEmpty(resultLang)) {
+                            resultLang = result.sourceLanguage;
+                        }
+                        resultString.append(buildTranslatedString(block, ((String) result.translation)));
+                    } catch (Http429Exception e) {
+                        SystemClock.sleep(1000);
+                        continue;
+                    }
+                    worked = true;
+                    break;
                 }
-                Result result = getResult(response);
-                if (TextUtils.isEmpty(resultLang)) {
-                    resultLang = result.sourceLanguage;
+                if (!worked) {
+                    throw new Http429Exception();
                 }
-                resultString.append(buildTranslatedString(block, ((String) result.translation)));
             }
         }
         return new Result(
@@ -111,8 +125,13 @@ public class DuckDuckGoTranslator extends BaseTranslator {
         return code;
     }
 
-    private Result getResult(String string) throws JSONException {
+    private Result getResult(String string) throws JSONException, Http429Exception {
         JSONObject object = new JSONObject(string);
+        if (object.has("error")) {
+            if (object.getString("error").equals("Forbidden")) {
+               throw new Http429Exception();
+            }
+        }
         return new Result(object.getString("translated"), object.getString("detected_language"));
     }
 }

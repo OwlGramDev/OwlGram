@@ -166,6 +166,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PushbackInputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -188,6 +189,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.components.ImportSettingsDialog;
@@ -546,6 +548,27 @@ public class AndroidUtilities {
 
     public static void recycleBitmap(Bitmap image) {
         recycleBitmaps(Collections.singletonList(image));
+    }
+
+    public static boolean findClickableView(ViewGroup container, float x, float y) {
+        for (int i = 0; i < container.getChildCount(); i++) {
+            View child = container.getChildAt(i);
+            if (child.getVisibility() != View.VISIBLE) {
+                continue;
+            }
+            if (child.isClickable()) {
+                return true;
+            } else if (child instanceof ViewGroup && findClickableView((ViewGroup) child, x - child.getX(), y - child.getY())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void removeFromParent(View child) {
+        if (child.getParent() != null) {
+            ((ViewGroup) child.getParent()).removeView(child);
+        }
     }
 
     private static class LinkSpec {
@@ -2231,12 +2254,20 @@ public class AndroidUtilities {
         if (!hasCallPermissions) {
             return null;
         }
+        String order;
+        Bundle selectionArgs;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            order = "date DESC";
+        } else {
+            order = "date DESC LIMIT 5";
+        }
         try (Cursor cursor = ApplicationLoader.applicationContext.getContentResolver().query(
                 CallLog.Calls.CONTENT_URI,
                 new String[]{CallLog.Calls.NUMBER, CallLog.Calls.DATE},
                 CallLog.Calls.TYPE + " IN (" + CallLog.Calls.MISSED_TYPE + "," + CallLog.Calls.INCOMING_TYPE + "," + CallLog.Calls.REJECTED_TYPE + ")",
                 null,
-                "date DESC LIMIT 5")) {
+                order
+        )) {
             while (cursor.moveToNext()) {
                 String number = cursor.getString(0);
                 long date = cursor.getLong(1);
@@ -2964,7 +2995,9 @@ public class AndroidUtilities {
     }
 
     public static String formatFileSize(long size, boolean removeZero) {
-        if (size < 1024) {
+        if (size == 0) {
+            return String.format("%d KB", 0);
+        } else if (size < 1024) {
             return String.format("%d B", size);
         } else if (size < 1024 * 1024) {
             float value = size / 1024.0f;
@@ -2973,7 +3006,7 @@ public class AndroidUtilities {
             } else {
                 return String.format("%.1f KB", value);
             }
-        } else if (size < 1024 * 1024 * 1024) {
+        } else if (size < 1000 * 1024 * 1024) {
             float value = size / 1024.0f / 1024.0f;
             if (removeZero && (value - (int) value) * 10 == 0) {
                 return String.format("%d MB", (int) value);
@@ -3680,7 +3713,7 @@ public class AndroidUtilities {
             lineView.setBackgroundColor(Theme.getColor(Theme.key_divider));
             linearLayout.addView(lineView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 1));
         }
-        for (int a = 0; a < 5; a++) {
+        for (int a = 0; a < 6; a++) {
             String text = null;
             String detail = null;
             if (a == 0) {
@@ -3698,6 +3731,9 @@ public class AndroidUtilities {
             } else if (a == 4) {
                 text = password;
                 detail = LocaleController.getString("UseProxyPassword", R.string.UseProxyPassword);
+            } else if (a == 5) {
+                text = LocaleController.getString(R.string.Checking);
+                detail = LocaleController.getString(R.string.ProxyStatus);
             }
             if (TextUtils.isEmpty(text)) {
                 continue;
@@ -3707,8 +3743,22 @@ public class AndroidUtilities {
             cell.getTextView().setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
             cell.getValueTextView().setTextColor(Theme.getColor(Theme.key_dialogTextGray3));
             linearLayout.addView(cell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-            if (a == 2) {
-                break;
+
+            if (a == 5) {
+                try {
+                    ConnectionsManager.getInstance(UserConfig.selectedAccount).checkProxy(address, Integer.parseInt(port), user, password, secret, time -> AndroidUtilities.runOnUIThread(() -> {
+                        if (time == -1) {
+                            cell.getTextView().setText(LocaleController.getString(R.string.Unavailable));
+                            cell.getTextView().setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteRedText4));
+                        } else {
+                            cell.getTextView().setText(LocaleController.getString(R.string.Available) + ", " + LocaleController.formatString(R.string.Ping, time));
+                            cell.getTextView().setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteGreenText));
+                        }
+                    }));
+                } catch (NumberFormatException ignored) {
+                    cell.getTextView().setText(LocaleController.getString(R.string.Unavailable));
+                    cell.getTextView().setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteRedText4));
+                }
             }
         }
 
@@ -4754,18 +4804,36 @@ public class AndroidUtilities {
         return spannableStringBuilder;
     }
 
+    public static CharSequence replaceMultipleCharSequence(String what, CharSequence from, CharSequence obj) {
+        SpannableStringBuilder spannableStringBuilder;
+        if (from instanceof SpannableStringBuilder) {
+            spannableStringBuilder = (SpannableStringBuilder) from;
+        } else {
+            spannableStringBuilder = new SpannableStringBuilder(from);
+        }
+        int index = TextUtils.indexOf(from, what);
+        while (index >= 0) {
+            spannableStringBuilder.replace(index, index + what.length(), obj);
+            index = TextUtils.indexOf(spannableStringBuilder, what);
+        }
+        return spannableStringBuilder;
+    }
+
     public static Bitmap makeBlurBitmap(View view) {
+        return makeBlurBitmap(view, 6f, 7);
+    }
+    public static Bitmap makeBlurBitmap(View view, float downscale, int maxRadius) {
         if (view == null) {
             return null;
         }
-        int w = (int) (view.getWidth() / 6.0f);
-        int h = (int) (view.getHeight() / 6.0f);
+        int w = (int) (view.getWidth() / downscale);
+        int h = (int) (view.getHeight() / downscale);
         Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
-        canvas.scale(1.0f / 6.0f, 1.0f / 6.0f);
+        canvas.scale(1.0f / downscale, 1.0f / downscale);
         canvas.drawColor(Theme.getColor(Theme.key_windowBackgroundWhite));
         view.draw(canvas);
-        Utilities.stackBlurBitmap(bitmap, Math.max(7, Math.max(w, h) / 180));
+        Utilities.stackBlurBitmap(bitmap, Math.max(maxRadius, Math.max(w, h) / 180));
         return bitmap;
     }
 
@@ -4899,7 +4967,68 @@ public class AndroidUtilities {
         return output;
     }
 
+    public static boolean isRTL(CharSequence text) {
+        if (text == null || text.length() <= 0) {
+            return false;
+        }
+        char c;
+        for (int i = 0; i < text.length(); ++i) {
+            c = text.charAt(i);
+            if (c >= 0x590 && c <= 0x6ff) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static Pattern uriParse;
+    private static Pattern getURIParsePattern() {
+        if (uriParse == null) {
+            uriParse = Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?"); // RFC 3986 B
+        }
+        return uriParse;
+    }
+
+    public static String getHostAuthority(String uri) {
+        if (uri == null) {
+            return null;
+        }
+        // CVE-2017-13274
+        Matcher matcher = getURIParsePattern().matcher(uri);
+        if (matcher.matches()) {
+            String authority = matcher.group(4);
+            if (authority != null) {
+                authority = authority.toLowerCase();
+            }
+            return authority;
+        }
+        return null;
+    }
+
+    public static String getHostAuthority(Uri uri) {
+        if (uri == null) {
+            return null;
+        }
+        return getHostAuthority(uri.toString());
+    }
+
+    public static boolean intersect1d(int x1, int x2, int y1, int y2) {
+        return Math.max(x1, x2) >= Math.min(y1, y2) && Math.max(y1, y2) >= Math.min(x1, x2);
+    }
+
     public static Spanned fromHtml(@NonNull String source) {
         return HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY);
+    }
+
+    public static InputStream decompressStream(InputStream input) throws IOException {
+        PushbackInputStream pb = new PushbackInputStream(input, 2);
+        byte[] signature = new byte[2];
+        int len = pb.read(signature);
+        pb.unread(signature, 0, len);
+        if (signature[0] == (byte) 0x1f && signature[1] == (byte) 0x8b) {
+            return new GZIPInputStream(pb);
+        } else {
+            return pb;
+        }
     }
 }

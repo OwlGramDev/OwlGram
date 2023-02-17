@@ -2,9 +2,11 @@ package it.owlgram.android.translator.raw;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.telegram.messenger.AndroidUtilities;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
@@ -19,7 +21,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.GZIPInputStream;
 
 public class RawDeepLTranslator {
     private final AtomicLong id = new AtomicLong(ThreadLocalRandom.current().nextLong(Long.parseLong("10000000000")));
@@ -28,7 +29,7 @@ public class RawDeepLTranslator {
     private static int retry_429 = 3;
     private static int retry_timeout = 10;
     private static long sleepTime_429 = 1000L;
-    private static final Pattern iPattern = Pattern.compile("[i]");
+    private static final Pattern iPattern = Pattern.compile("i");
     private static final String xInstance = UUID.randomUUID().toString();
 
     public RawDeepLTranslator() {
@@ -156,12 +157,12 @@ public class RawDeepLTranslator {
         httpConnection.getOutputStream().flush();
         httpConnection.getOutputStream().close();
 
-        GZIPInputStream httpConnectionStream;
+        InputStream httpConnectionStream;
         try {
-            httpConnectionStream = new GZIPInputStream(httpConnection.getInputStream());
+            httpConnectionStream = AndroidUtilities.decompressStream(httpConnection.getInputStream());
         } catch (IOException var12) {
             errorOccurred = true;
-            httpConnectionStream = new GZIPInputStream(httpConnection.getErrorStream());
+            httpConnectionStream = AndroidUtilities.decompressStream(httpConnection.getErrorStream());
         }
 
         if (!errorOccurred) {

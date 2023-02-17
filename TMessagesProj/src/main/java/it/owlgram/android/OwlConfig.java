@@ -60,7 +60,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean owlEasterSound;
     public static boolean pacmanForced;
     public static boolean smartButtons;
-    public static boolean disableAppBarShadow;
+    public static boolean showAppBarShadow;
     public static boolean accentAsNotificationColor;
     public static boolean showDeleteDownloadedFile;
     public static boolean isChineseUser = false;
@@ -90,6 +90,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean hideSendAsChannel;
     public static boolean showNameInActionBar;
     public static boolean stickersSorting;
+    public static boolean translateEntireChat;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
     public static String updateData;
@@ -171,7 +172,7 @@ public class OwlConfig extends SettingsManager {
             owlEasterSound = getBoolean("owlEasterSound", true);
             pacmanForced = getBoolean("pacmanForced", false);
             smartButtons = getBoolean("smartButtons", false);
-            disableAppBarShadow = getBoolean("disableAppBarShadow", false);
+            showAppBarShadow = getBoolean("showAppBarShadow", true);
             accentAsNotificationColor = getBoolean("accentAsNotificationColor", false);
             showDeleteDownloadedFile = getBoolean("showDeleteDownloadedFile", false);
             lastUpdateCheck = getLong("lastUpdateCheck", 0);
@@ -225,6 +226,7 @@ public class OwlConfig extends SettingsManager {
             stickersSorting = getBoolean("stickersSorting", true);
             emojiPackSelected = getString("emojiPackSelected", "default");
             lastSelectedCompression = getInt("lastSelectedCompression", 3);
+            translateEntireChat = getBoolean("translateEntireChat", false);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -375,7 +377,7 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static void toggleAppBarShadow() {
-        putValue("disableAppBarShadow", disableAppBarShadow ^= true);
+        putValue("showAppBarShadow", showAppBarShadow ^= true);
     }
 
     public static void toggleAccentColor() {
@@ -472,6 +474,10 @@ public class OwlConfig extends SettingsManager {
 
     public static void toggleStickersSorting() {
         putValue("stickersSorting", stickersSorting ^= true);
+    }
+
+    public static void toggleTranslateEntireChat() {
+        putValue("translateEntireChat", translateEntireChat ^= true);
     }
 
     public static void unlockChupa() {

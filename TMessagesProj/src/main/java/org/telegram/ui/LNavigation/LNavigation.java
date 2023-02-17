@@ -302,7 +302,7 @@ public class LNavigation extends FrameLayout implements INavigationLayout, Float
         overlayLayout = new FrameLayout(context);
         addView(overlayLayout);
 
-        headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : getResources().getDrawable(R.drawable.header_shadow).mutate();
+        headerShadowDrawable = OwlConfig.showAppBarShadow ? getResources().getDrawable(R.drawable.header_shadow).mutate():null;
         layerShadowDrawable = getResources().getDrawable(R.drawable.layer_shadow).mutate();
 
         dimmPaint.setColor(0x7a000000);
@@ -1080,7 +1080,7 @@ public class LNavigation extends FrameLayout implements INavigationLayout, Float
     }
 
     @Override
-    public void removeFragmentFromStack(BaseFragment fragment) {
+    public void removeFragmentFromStack(BaseFragment fragment, boolean immediate) {
         int i = fragmentStack.indexOf(fragment);
         if (i == -1) {
             return;

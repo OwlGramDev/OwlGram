@@ -8,8 +8,6 @@
 
 package org.telegram.messenger;
 
-import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -31,7 +29,6 @@ import android.text.util.Linkify;
 import android.util.Base64;
 
 import androidx.collection.LongSparseArray;
-import androidx.core.util.Pair;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.browser.Browser;
@@ -59,6 +56,7 @@ import org.telegram.ui.Components.URLSpanNoUnderlineBold;
 import org.telegram.ui.Components.URLSpanReplacement;
 import org.telegram.ui.Components.URLSpanUserMention;
 import org.telegram.ui.Components.spoilers.SpoilerEffect;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -78,6 +76,7 @@ import java.util.regex.Pattern;
 
 import it.owlgram.android.helpers.MessageHelper;
 import it.owlgram.android.entities.syntax_highlight.SyntaxHighlight;
+import it.owlgram.android.settings.DoNotTranslateSettings;
 
 public class MessageObject {
 
@@ -120,6 +119,7 @@ public class MessageObject {
     public Long emojiAnimatedStickerId;
     public boolean isTopicMainMessage;
     public boolean settingAvatar;
+    public TLRPC.VideoSize emojiMarkup;
     private boolean emojiAnimatedStickerLoading;
     public String emojiAnimatedStickerColor;
     public CharSequence messageText;
@@ -202,14 +202,6 @@ public class MessageObject {
     public boolean scheduled;
     public boolean preview;
 
-    public boolean translated;
-    public Pair<String, String> translatedLanguage;
-    public boolean translating;
-    public Object originalMessage;
-    public ArrayList<TLRPC.MessageEntity> originalEntities;
-    public MessageHelper.ReplyMarkupButtonsTexts originalReplyMarkupRows;
-    public boolean canceledTranslation;
-
     public ArrayList<TLRPC.TL_pollAnswer> checkedVotes;
 
     public CharSequence editingMessage;
@@ -236,7 +228,6 @@ public class MessageObject {
     public int textHeight;
     public boolean hasRtl;
     public float textXOffset;
-    public int linesCount;
 
     public SendAnimationData sendAnimationData;
 
@@ -1184,6 +1175,7 @@ public class MessageObject {
 
         updateMessageText(users, chats, sUsers, sChats);
         setType();
+        updateTranslation(false);
         measureInlineBotButtons();
 
         Calendar rightNow = new GregorianCalendar();
@@ -1205,7 +1197,7 @@ public class MessageObject {
             }
             int[] emojiOnly = allowsBigEmoji() ? new int[1] : null;
             messageText = Emoji.replaceEmoji(messageText, paint.getFontMetricsInt(), AndroidUtilities.dp(20), false, emojiOnly);
-            messageText = replaceAnimatedEmoji(messageText, messageOwner.entities, paint.getFontMetricsInt());
+            messageText = replaceAnimatedEmoji(messageText, paint.getFontMetricsInt());
             if (emojiOnly != null && emojiOnly[0] > 1) {
                 replaceEmojiToLottieFrame(messageText, emojiOnly);
             }
@@ -2429,7 +2421,7 @@ public class MessageObject {
 
         int[] emojiOnly = allowsBigEmoji() ? new int[1] : null;
         messageText = Emoji.replaceEmoji(messageText, paint.getFontMetricsInt(), AndroidUtilities.dp(20), false, emojiOnly);
-        messageText = replaceAnimatedEmoji(messageText, messageOwner.entities, paint.getFontMetricsInt());
+        messageText = replaceAnimatedEmoji(messageText, paint.getFontMetricsInt());
         if (emojiOnly != null && emojiOnly[0] > 1) {
             replaceEmojiToLottieFrame(messageText, emojiOnly);
         }
@@ -2525,7 +2517,67 @@ public class MessageObject {
         return name;
     }
 
+    public boolean updateTranslation() {
+        return updateTranslation(true);
+    }
+
+    public boolean translated = false;
+
+    private boolean updatePoll(boolean translated) {
+        if (messageOwner.media instanceof TLRPC.TL_messageMediaPoll) {
+            MessageHelper.PollTexts poll = translated ? messageOwner.translatedPoll:messageOwner.originalPoll;
+            if (poll != null) {
+                poll.applyTextToPoll(((TLRPC.TL_messageMediaPoll) messageOwner.media).poll);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isDoneTranslation() {
+        TranslateController translateController = MessagesController.getInstance(currentAccount).getTranslateController();
+        return TranslateController.isTranslatable(this, true) &&
+                (translateController.isGeneralTranslating(this)) &&
+                !translateController.isHiddenTranslation(this) &&
+                messageOwner != null &&
+                (!DoNotTranslateSettings.getRestrictedLanguages().contains(messageOwner.originalLanguage) || translateController.isManualTranslation(this)) &&
+                (messageOwner.translatedText != null || messageOwner.translatedPoll != null) &&
+                TranslateController.isValidTranslation(translateController.getDialogTranslateTo(getDialogId()), messageOwner);
+    }
+
+    public boolean updateTranslation(boolean force) {
+        boolean replyUpdated = replyMessageObject != null && replyMessageObject.updateTranslation(force);
+        if (isDoneTranslation()) {
+            if (translated) {
+                return replyUpdated || false;
+            }
+            translated = true;
+            if (updatePoll(true)) {
+                applyNewText(messageOwner.translatedText.text);
+                generateCaption();
+                if (messageOwner.translatedReplyMarkupRows != null && messageOwner.reply_markup != null) {
+                    messageOwner.translatedReplyMarkupRows.applyTextToKeyboard(messageOwner.reply_markup.rows);
+                    measureInlineBotButtons();
+                }
+            }
+            return replyUpdated || true;
+        } else if (messageOwner != null && (force || translated)) {
+            translated = false;
+            if (updatePoll(false)) {
+                applyNewText(messageOwner.message);
+                generateCaption();
+                if (messageOwner.originalReplyMarkupRows != null) {
+                    messageOwner.originalReplyMarkupRows.applyTextToKeyboard(messageOwner.reply_markup.rows);
+                    measureInlineBotButtons();
+                }
+            }
+            return replyUpdated || true;
+        }
+        return replyUpdated || false;
+    }
+
     public void applyNewText() {
+        translated = false;
         applyNewText(messageOwner.message);
     }
 
@@ -2538,6 +2590,7 @@ public class MessageObject {
             fromUser = MessagesController.getInstance(currentAccount).getUser(messageOwner.from_id.user_id);
         }
         messageText = text;
+        ArrayList<TLRPC.MessageEntity> entities = translated && messageOwner.translatedText != null ? messageOwner.translatedText.entities : messageOwner.entities;
         TextPaint paint;
         if (getMedia(messageOwner) instanceof TLRPC.TL_messageMediaGame) {
             paint = Theme.chat_msgGameTextPaint;
@@ -2546,7 +2599,7 @@ public class MessageObject {
         }
         int[] emojiOnly = allowsBigEmoji() ? new int[1] : null;
         messageText = Emoji.replaceEmoji(messageText, paint.getFontMetricsInt(), AndroidUtilities.dp(20), false, emojiOnly);
-        messageText = replaceAnimatedEmoji(messageText, messageOwner.entities, paint.getFontMetricsInt());
+        messageText = replaceAnimatedEmoji(messageText, entities, paint.getFontMetricsInt());
         if (emojiOnly != null && emojiOnly[0] > 1) {
             replaceEmojiToLottieFrame(messageText, emojiOnly);
         }
@@ -2682,7 +2735,7 @@ public class MessageObject {
                 }
                 mess = Emoji.replaceEmoji(mess, Theme.chat_msgTextPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
                 if (replyMessageObject != null && replyMessageObject.messageOwner != null) {
-                    mess = replaceAnimatedEmoji(mess, replyMessageObject.messageOwner.entities, Theme.chat_msgTextPaint.getFontMetricsInt());
+                    mess = replyMessageObject.replaceAnimatedEmoji(mess, Theme.chat_msgTextPaint.getFontMetricsInt());
                 }
                 MediaDataController.addTextStyleRuns(replyMessageObject, (Spannable) mess);
                 if (ellipsize) {
@@ -3389,6 +3442,41 @@ public class MessageObject {
                     }
                 } else if (messageOwner.action instanceof TLRPC.TL_messageActionAttachMenuBotAllowed) {
                     messageText = LocaleController.getString(R.string.ActionAttachMenuBotAllowed);
+                } else if (messageOwner.action instanceof TLRPC.TL_messageActionRequestedPeer) {
+                    TLRPC.Peer peer = ((TLRPC.TL_messageActionRequestedPeer) messageOwner.action).peer;
+                    TLObject peerObject = null;
+                    if (peer instanceof TLRPC.TL_peerUser) {
+                        peerObject = MessagesController.getInstance(currentAccount).getUser(peer.user_id);
+                        if (peerObject == null) {
+                            peerObject = getUser(users, sUsers, peer.user_id);
+                        }
+                    } else if (peer instanceof TLRPC.TL_peerChat) {
+                        peerObject = MessagesController.getInstance(currentAccount).getChat(peer.chat_id);
+                        if (peerObject == null) {
+                            peerObject = getChat(chats, sChats, peer.chat_id);
+                        }
+                    } else if (peer instanceof TLRPC.TL_peerChannel) {
+                        peerObject = MessagesController.getInstance(currentAccount).getChat(peer.channel_id);
+                        if (peerObject == null) {
+                            peerObject = getChat(chats, sChats, peer.channel_id);
+                        }
+                    }
+                    TLRPC.User bot = MessagesController.getInstance(currentAccount).getUser(getDialogId());
+                    if (bot == null) {
+                        bot = getUser(users, sUsers, getDialogId());
+                    }
+                    if (peerObject == null) {
+                        if (peer instanceof TLRPC.TL_peerUser) {
+                            messageText = LocaleController.getString(R.string.ActionRequestedPeerUser);
+                        } else if (peer instanceof TLRPC.TL_peerChat) {
+                            messageText = LocaleController.getString(R.string.ActionRequestedPeerChat);
+                        } else {
+                            messageText = LocaleController.getString(R.string.ActionRequestedPeerChannel);
+                        }
+                    } else {
+                        messageText = replaceWithLink(LocaleController.getString(R.string.ActionRequestedPeer), "un1", peerObject);
+                    }
+                    messageText = replaceWithLink(messageText, "un2", bot);
                 } else if (messageOwner.action instanceof TLRPC.TL_messageActionSetMessagesTTL) {
                     TLRPC.TL_messageActionSetMessagesTTL action = (TLRPC.TL_messageActionSetMessagesTTL) messageOwner.action;
                     TLRPC.Chat chat = messageOwner.peer_id != null && messageOwner.peer_id.channel_id != 0 ? getChat(chats, sChats, messageOwner.peer_id.channel_id) : null;
@@ -3838,7 +3926,7 @@ public class MessageObject {
                 } else {
                     type = TYPE_ANIMATED_STICKER;
                 }
-            } else if (!isDice() && emojiOnlyCount >= 1 && !hasUnwrappedEmoji) {
+            } else if (isMediaEmpty() && !isDice() && emojiOnlyCount >= 1 && !hasUnwrappedEmoji) {
                 type = TYPE_EMOJIS;
             } else if (isMediaEmpty()) {
                 type = TYPE_TEXT;
@@ -3965,7 +4053,7 @@ public class MessageObject {
             }
             int[] emojiOnly = allowsBigEmoji() ? new int[1] : null;
             messageText = Emoji.replaceEmoji(messageText, paint.getFontMetricsInt(), AndroidUtilities.dp(20), false, emojiOnly);
-            messageText = replaceAnimatedEmoji(messageText, messageOwner.entities, paint.getFontMetricsInt());
+            messageText = replaceAnimatedEmoji(messageText, paint.getFontMetricsInt());
             if (emojiOnly != null && emojiOnly[0] > 1) {
                 replaceEmojiToLottieFrame(messageText, emojiOnly);
             }
@@ -4560,22 +4648,38 @@ public class MessageObject {
         );
     }
 
+    private boolean captionTranslated;
+
     public void generateCaption() {
-        if (caption != null || isRoundVideo()) {
+        if (caption != null && translated == captionTranslated || isRoundVideo()) {
             return;
         }
-        if (hasExtendedMedia()) {
-            messageOwner.message = messageOwner.media.description;
+        if (messageOwner.media instanceof TLRPC.TL_messageMediaPoll) {
+            if (translated == captionTranslated) {
+                return;
+            }
+            updatePoll(translated);
+            captionTranslated = translated;
+            return;
         }
-        if (!isMediaEmpty() && !(getMedia(messageOwner) instanceof TLRPC.TL_messageMediaGame) && !TextUtils.isEmpty(messageOwner.message)) {
-            caption = Emoji.replaceEmoji(messageOwner.message, Theme.chat_msgTextPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
-            caption = replaceAnimatedEmoji(caption, messageOwner.entities, Theme.chat_msgTextPaint.getFontMetricsInt());
+        String text = messageOwner.message;
+        ArrayList<TLRPC.MessageEntity> entities = messageOwner.entities;
+        if (hasExtendedMedia()) {
+            text = messageOwner.message = messageOwner.media.description;
+        }
+        if (captionTranslated = translated) {
+            text = messageOwner.translatedText.text;
+            entities = messageOwner.translatedText.entities;
+        }
+        if (!isMediaEmpty() && !(getMedia(messageOwner) instanceof TLRPC.TL_messageMediaGame) && !TextUtils.isEmpty(text)) {
+            caption = Emoji.replaceEmoji(text, Theme.chat_msgTextPaint.getFontMetricsInt(), AndroidUtilities.dp(20), false);
+            caption = replaceAnimatedEmoji(caption, Theme.chat_msgTextPaint.getFontMetricsInt());
 
             boolean hasEntities;
             if (messageOwner.send_state != MESSAGE_SEND_STATE_SENT) {
                 hasEntities = false;
             } else {
-                hasEntities = !messageOwner.entities.isEmpty();
+                hasEntities = !entities.isEmpty();
             }
 
             boolean useManualParse = !hasEntities && (
@@ -4833,7 +4937,17 @@ public class MessageObject {
             entities.add(entityItalic);
             return addEntitiesToText(text, entities, isOutOwner(), true, photoViewer, useManualParse);
         } else {
-            return addEntitiesToText(text, messageOwner.entities, isOutOwner(), true, photoViewer, useManualParse);
+            ArrayList<TLRPC.MessageEntity> entities;
+            if (translated) {
+                if (messageOwner.translatedText == null) {
+                    entities = null;
+                } else {
+                    entities = messageOwner.translatedText.entities;
+                }
+            } else {
+                entities = messageOwner.entities;
+            }
+            return addEntitiesToText(text, entities, isOutOwner(), true, photoViewer, useManualParse);
         }
     }
 
@@ -4861,6 +4975,11 @@ public class MessageObject {
         }
     }
 
+    public Spannable replaceAnimatedEmoji(CharSequence text, Paint.FontMetricsInt fontMetricsInt) {
+        ArrayList<TLRPC.MessageEntity> entities = translated && messageOwner.translatedText != null ? messageOwner.translatedText.entities : messageOwner.entities;
+        return replaceAnimatedEmoji(text, entities, fontMetricsInt, false);
+    }
+
     public static Spannable replaceAnimatedEmoji(CharSequence text, ArrayList<TLRPC.MessageEntity> entities, Paint.FontMetricsInt fontMetricsInt) {
         return replaceAnimatedEmoji(text, entities, fontMetricsInt, false);
     }
@@ -4880,8 +4999,7 @@ public class MessageObject {
                     if (span != null) {
                         int start = spannable.getSpanStart(span);
                         int end = spannable.getSpanEnd(span);
-
-                        if (entity.offset == start && entity.length == (end - start)) {
+                        if (AndroidUtilities.intersect1d(entity.offset, entity.offset + entity.length, start, end)) {
                             spannable.removeSpan(span);
                             emojiSpans[j] = null;
                         }
@@ -4917,7 +5035,7 @@ public class MessageObject {
         Spannable spannable = (Spannable) text;
         URLSpan[] spans = spannable.getSpans(0, text.length(), URLSpan.class);
         boolean hasUrls = spans != null && spans.length > 0;
-        if (entities.isEmpty()) {
+        if (entities == null || entities.isEmpty()) {
             return hasUrls;
         }
 
@@ -5245,11 +5363,13 @@ public class MessageObject {
         textLayoutBlocks = new ArrayList<>();
         textWidth = 0;
 
+        ArrayList<TLRPC.MessageEntity> entities = translated && messageOwner.translatedText != null ? messageOwner.translatedText.entities : messageOwner.entities;
+
         boolean hasEntities;
         if (messageOwner.send_state != MESSAGE_SEND_STATE_SENT) {
             hasEntities = false;
         } else {
-            hasEntities = !messageOwner.entities.isEmpty();
+            hasEntities = !entities.isEmpty();
         }
 
         boolean useManualParse = !hasEntities && (
@@ -5326,7 +5446,7 @@ public class MessageObject {
         }
 
         textHeight = textLayout.getHeight();
-        linesCount = textLayout.getLineCount();
+        int linesCount = textLayout.getLineCount();
         int linesPreBlock = totalAnimatedEmojiCount >= 50 ? LINES_PER_BLOCK_WITH_EMOJI : LINES_PER_BLOCK;
 
         int blocksCount;
@@ -5977,7 +6097,7 @@ public class MessageObject {
             for (int a = 0; a < document.attributes.size(); a++) {
                 TLRPC.DocumentAttribute attribute = document.attributes.get(a);
                 if (attribute instanceof TLRPC.TL_documentAttributeSticker ||
-                        attribute instanceof TLRPC.TL_documentAttributeCustomEmoji) {
+                    attribute instanceof TLRPC.TL_documentAttributeCustomEmoji) {
                     return "video/webm".equals(document.mime_type);
                 }
             }
@@ -7406,7 +7526,6 @@ public class MessageObject {
     public boolean equals(MessageObject obj) {
         return getId() == obj.getId() && getDialogId() == obj.getDialogId();
     }
-
 
     public boolean isReactionsAvailable() {
         return !isEditing() && !isSponsored() && isSent() && messageOwner.action == null;

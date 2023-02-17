@@ -5,6 +5,8 @@ import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 
+import it.owlgram.android.helpers.MessageHelper;
+
 public class MessageCustomParamsHelper {
 
     public static boolean isEmpty(TLRPC.Message message) {
@@ -14,7 +16,15 @@ public class MessageCustomParamsHelper {
                 !message.voiceTranscriptionRated &&
                 !message.voiceTranscriptionForce &&
                 message.voiceTranscriptionId == 0 &&
-                !message.premiumEffectWasPlayed;
+                !message.premiumEffectWasPlayed &&
+                message.originalLanguage == null &&
+                message.translatedToLanguage == null &&
+                message.translatedText == null &&
+                message.translatedPoll == null &&
+                message.originalPoll == null &&
+                message.translatedReplyMarkupRows == null &&
+                message.originalReplyMarkupRows == null &&
+                message.translationProvider == 0;
     }
 
     public static void copyParams(TLRPC.Message fromMessage, TLRPC.Message toMessage) {
@@ -25,6 +35,14 @@ public class MessageCustomParamsHelper {
         toMessage.voiceTranscriptionRated = fromMessage.voiceTranscriptionRated;
         toMessage.voiceTranscriptionId = fromMessage.voiceTranscriptionId;
         toMessage.premiumEffectWasPlayed = fromMessage.premiumEffectWasPlayed;
+        toMessage.originalLanguage = fromMessage.originalLanguage;
+        toMessage.translatedToLanguage = fromMessage.translatedToLanguage;
+        toMessage.translatedText = fromMessage.translatedText;
+        toMessage.translatedPoll = fromMessage.translatedPoll;
+        toMessage.originalPoll = fromMessage.originalPoll;
+        toMessage.translatedReplyMarkupRows = fromMessage.translatedReplyMarkupRows;
+        toMessage.originalReplyMarkupRows = fromMessage.originalReplyMarkupRows;
+        toMessage.translationProvider = fromMessage.translationProvider;
     }
 
 
@@ -69,6 +87,15 @@ public class MessageCustomParamsHelper {
             this.message = message;
             flags += message.voiceTranscription != null ? 1 : 0;
             flags += message.voiceTranscriptionForce ? 2 : 0;
+
+            flags += message.originalLanguage != null ? 4 : 0;
+            flags += message.translatedToLanguage != null ? 8 : 0;
+            flags += message.translatedText != null ? 16 : 0;
+            flags += message.translatedPoll != null ? 32 : 0;
+            flags += message.originalPoll != null ? 64 : 0;
+            flags += message.translatedReplyMarkupRows != null ? 128 : 0;
+            flags += message.originalReplyMarkupRows != null ? 256 : 0;
+            flags += message.translationProvider != 0 ? 512 : 0;
         }
 
         @Override
@@ -85,6 +112,31 @@ public class MessageCustomParamsHelper {
             stream.writeInt64(message.voiceTranscriptionId);
 
             stream.writeBool(message.premiumEffectWasPlayed);
+
+            if ((flags & 4) != 0) {
+                stream.writeString(message.originalLanguage);
+            }
+            if ((flags & 8) != 0) {
+                stream.writeString(message.translatedToLanguage);
+            }
+            if ((flags & 16) != 0) {
+                message.translatedText.serializeToStream(stream);
+            }
+            if ((flags & 32) != 0) {
+                message.translatedPoll.serializeToStream(stream);
+            }
+            if ((flags & 64) != 0) {
+                message.originalPoll.serializeToStream(stream);
+            }
+            if ((flags & 128) != 0) {
+                message.translatedReplyMarkupRows.serializeToStream(stream);
+            }
+            if ((flags & 256) != 0) {
+                message.originalReplyMarkupRows.serializeToStream(stream);
+            }
+            if ((flags & 512) != 0) {
+                stream.writeInt32(message.translationProvider);
+            }
         }
 
         @Override
@@ -100,6 +152,31 @@ public class MessageCustomParamsHelper {
             message.voiceTranscriptionId = stream.readInt64(exception);
 
             message.premiumEffectWasPlayed = stream.readBool(exception);
+
+            if ((flags & 4) != 0) {
+                message.originalLanguage = stream.readString(exception);
+            }
+            if ((flags & 8) != 0) {
+                message.translatedToLanguage = stream.readString(exception);
+            }
+            if ((flags & 16) != 0) {
+                message.translatedText = TLRPC.TL_textWithEntities.TLdeserialize(stream, stream.readInt32(exception), exception);
+            }
+            if ((flags & 32) != 0) {
+                message.translatedPoll = MessageHelper.PollTexts.TLdeserialize(stream, stream.readInt32(exception), exception);
+            }
+            if ((flags & 64) != 0) {
+                message.originalPoll = MessageHelper.PollTexts.TLdeserialize(stream, stream.readInt32(exception), exception);
+            }
+            if ((flags & 128) != 0) {
+                message.translatedReplyMarkupRows = MessageHelper.ReplyMarkupButtonsTexts.TLdeserialize(stream, stream.readInt32(exception), exception);
+            }
+            if ((flags & 256) != 0) {
+                message.originalReplyMarkupRows = MessageHelper.ReplyMarkupButtonsTexts.TLdeserialize(stream, stream.readInt32(exception), exception);
+            }
+            if ((flags & 512) != 0) {
+                message.translationProvider = stream.readInt32(exception);
+            }
         }
 
     }
