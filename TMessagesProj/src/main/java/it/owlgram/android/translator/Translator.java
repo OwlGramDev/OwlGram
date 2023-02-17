@@ -12,6 +12,7 @@ import org.telegram.messenger.MessageObject;
 import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
+import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
 
@@ -20,6 +21,7 @@ import java.util.Collections;
 import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.entities.HTMLKeeper;
 import it.owlgram.android.helpers.PopupHelper;
 
 public class Translator {
@@ -169,6 +171,14 @@ public class Translator {
             default:
                 return GoogleAppTranslator.getInstance();
         }
+    }
+
+    public static String translate(TLRPC.TL_textWithEntities query, TranslateCallBack translateCallBack) {
+        Object additionalObjectTranslation = query;
+        if (TranslatorHelper.isSupportHTMLMode()) {
+            additionalObjectTranslation = HTMLKeeper.entitiesToHtml(query.text, query.entities, true);
+        }
+        return translate(new ArrayList<>(Collections.singletonList(additionalObjectTranslation)), singleTranslateCallback(translateCallBack));
     }
 
     public static String translate(MessageObject query, TranslateCallBack translateCallBack) {

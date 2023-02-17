@@ -112,7 +112,7 @@ public class TranslatorHelper {
                 if (OwlConfig.keepTranslationMarkdown) {
                     if (isSupportHTMLMode()) {
                         additionalObjectTranslation.translation = HTMLKeeper.entitiesToHtml((String) additionalObjectTranslation.translation, messageObject.messageOwner.entities, false);
-                    } else if (OwlConfig.translationProvider == Translator.PROVIDER_TELEGRAM) { // Use Telegram entities
+                    } else if (isSupportMarkdown()) { // Use Telegram entities
                         TLRPC.TL_textWithEntities source = new TLRPC.TL_textWithEntities();
                         source.text = messageObject.messageOwner.message;
                         source.entities = messageObject.messageOwner.entities;

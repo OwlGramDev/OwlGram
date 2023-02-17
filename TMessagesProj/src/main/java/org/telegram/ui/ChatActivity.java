@@ -24609,7 +24609,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 getMessagesStorage().updateMessageCustomParams(messageObject.getDialogId(), messageObject.messageOwner);
                             } else {
                                 if (OwlConfig.translatorStyle == BaseTranslator.DIALOG_STYLE) {
-                                    TranslateAlert2 alert = TranslateAlert2.showAlert(getParentActivity(), this, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], getMessageHelper().getPlainText(messageObject), null, noforwards, onLinkPress, () -> dimBehindView(false));
+                                    TranslateAlert2 alert = TranslateAlert2.showAlert(getParentActivity(), this, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], getMessageHelper().getPlainText(messageObject), messageObject.messageOwner.entities, noforwards, onLinkPress, () -> dimBehindView(false));
                                     alert.setDimBehind(false);
                                     return;
                                 }
