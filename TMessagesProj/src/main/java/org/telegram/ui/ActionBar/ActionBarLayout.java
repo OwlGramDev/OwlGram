@@ -392,7 +392,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
         if (layerShadowDrawable == null) {
             layerShadowDrawable = getResources().getDrawable(R.drawable.layer_shadow);
-            headerShadowDrawable = OwlConfig.disableAppBarShadow ? null : getResources().getDrawable(R.drawable.header_shadow).mutate();
+            headerShadowDrawable = OwlConfig.showAppBarShadow ? getResources().getDrawable(R.drawable.header_shadow).mutate():null;
             scrimPaint = new Paint();
         }
     }

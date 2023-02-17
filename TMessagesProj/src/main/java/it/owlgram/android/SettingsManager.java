@@ -123,6 +123,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "disableStickersAutoReorder":
             case "NEED_UPDATE_CAMERAX":
             case "emojiPackSelected":
+            case "disableAppBarShadow":
                 return false;
             default:
                 return true;
@@ -386,7 +387,7 @@ public class SettingsManager extends SharedPreferencesHelper {
                     returnStatus = addWithCheck(returnStatus, NEED_RECREATE_FORMATTERS);
                     returnStatus = addWithCheck(returnStatus, NEED_FRAGMENT_REBASE_WITH_LAST);
                     break;
-                case "disableAppBarShadow":
+                case "showAppBarShadow":
                     returnStatus = addWithCheck(returnStatus, NEED_RECREATE_SHADOW);
                 case "roundedNumbers":
                 case "useSystemFont":
@@ -419,7 +420,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             LocaleController.getInstance().recreateFormatters();
         }
         if ((difference & NEED_RECREATE_SHADOW) > 0) {
-            parentLayout.setHeaderShadow(OwlConfig.disableAppBarShadow ? null : parentLayout.getView().getResources().getDrawable(R.drawable.header_shadow).mutate());
+            parentLayout.setHeaderShadow(OwlConfig.showAppBarShadow ? parentLayout.getView().getResources().getDrawable(R.drawable.header_shadow).mutate():null);
         }
         if ((difference & NEED_FRAGMENT_REBASE) > 0) {
             parentLayout.rebuildAllFragmentViews(false, false);

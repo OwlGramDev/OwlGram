@@ -60,7 +60,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean owlEasterSound;
     public static boolean pacmanForced;
     public static boolean smartButtons;
-    public static boolean disableAppBarShadow;
+    public static boolean showAppBarShadow;
     public static boolean accentAsNotificationColor;
     public static boolean showDeleteDownloadedFile;
     public static boolean isChineseUser = false;
@@ -172,7 +172,7 @@ public class OwlConfig extends SettingsManager {
             owlEasterSound = getBoolean("owlEasterSound", true);
             pacmanForced = getBoolean("pacmanForced", false);
             smartButtons = getBoolean("smartButtons", false);
-            disableAppBarShadow = getBoolean("disableAppBarShadow", false);
+            showAppBarShadow = getBoolean("showAppBarShadow", true);
             accentAsNotificationColor = getBoolean("accentAsNotificationColor", false);
             showDeleteDownloadedFile = getBoolean("showDeleteDownloadedFile", false);
             lastUpdateCheck = getLong("lastUpdateCheck", 0);
@@ -377,7 +377,7 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static void toggleAppBarShadow() {
-        putValue("disableAppBarShadow", disableAppBarShadow ^= true);
+        putValue("showAppBarShadow", showAppBarShadow ^= true);
     }
 
     public static void toggleAccentColor() {
