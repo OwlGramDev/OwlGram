@@ -54,6 +54,7 @@ public class AutoTranslatePopupWrapper {
             }
             updateItems();
             updateLastFragment();
+            fragment.getMessagesController().getTranslateController().toggleTranslatingDialog(dialogId, topicId, AutoTranslateConfig.isAutoTranslateEnabled(dialogId, topicId));
         });
 
         if (topicId == 0 || AutoTranslateConfig.isLastTopicAvailable(dialogId, topicId, false)) {
@@ -72,6 +73,7 @@ public class AutoTranslatePopupWrapper {
                 AutoTranslateConfig.setEnabled(dialogId, topicId, false);
                 updateItems();
                 updateLastFragment();
+                fragment.getMessagesController().getTranslateController().toggleTranslatingDialog(dialogId, topicId, false);
             });
         }
         updateItems();

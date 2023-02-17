@@ -8632,7 +8632,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         createAutoTranslateItem(context, dialogId, 0, null);
     }
     private void createAutoTranslateItem(BaseFragment context, long dialogId, int topicId, TLRPC.Chat chat) {
-        boolean supportAutoTranslate = LanguageDetector.hasSupport() && TranslatorHelper.isSupportAutoTranslate() && getMessagesController().getTranslateController().availableMultiTranslate();
+        boolean supportAutoTranslate = LanguageDetector.hasSupport() && TranslatorHelper.isSupportAutoTranslate() && getMessagesController().getTranslateController().isFeatureAvailable();
         if (supportAutoTranslate) {
             AutoTranslatePopupWrapper autoTranslatePopupWrapper = new AutoTranslatePopupWrapper(context, ChatObject.isForum(currentChat), otherItem, dialogId, topicId, arguments.getBoolean("isAlwaysShare", false), getResourceProvider());
             if (arguments.getBoolean("isSettings")) {

@@ -74,13 +74,8 @@ public class TranslateController extends BaseController {
         AndroidUtilities.runOnUIThread(this::loadTranslatingDialogsCached, 150);
     }
 
-
-    public boolean availableMultiTranslate() {
-        return !(!UserConfig.getInstance(currentAccount).isPremium() && OwlConfig.translationProvider == Translator.PROVIDER_TELEGRAM);
-    }
-
     public boolean isFeatureAvailable() {
-        return availableMultiTranslate() && isChatTranslateEnabled();
+        return !(!UserConfig.getInstance(currentAccount).isPremium() && OwlConfig.translationProvider == Translator.PROVIDER_TELEGRAM);
     }
 
     public boolean isChatTranslateEnabled() {
