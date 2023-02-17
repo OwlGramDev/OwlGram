@@ -96,6 +96,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
 
     private BaseFragment fragment;
     private Utilities.CallbackReturn<URLSpan, Boolean> onLinkPress;
+    private Utilities.CallbackNoReturn onLanguageSelect;
     private boolean firstTranslation = true;
 
     public TranslateAlert2(
@@ -479,6 +480,10 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
         super.dismissInternal();
     }
 
+    public void setOnLanguageSelect(Utilities.CallbackNoReturn listener) {
+        onLanguageSelect = listener;
+    }
+
     public void setFragment(BaseFragment fragment) {
         this.fragment = fragment;
     }
@@ -834,6 +839,9 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
                     toLanguageTextView.setText(language.second);
                     adapter.updateMainView(loadingTextView);
                     setToLanguage(toLanguage);
+                    if (onLanguageSelect != null) {
+                        onLanguageSelect.run();
+                    }
                     translate();
                 });
                 layout.addView(button);

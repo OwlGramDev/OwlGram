@@ -24611,6 +24611,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 if (OwlConfig.translatorStyle == BaseTranslator.DIALOG_STYLE) {
                                     TranslateAlert2 alert = TranslateAlert2.showAlert(getParentActivity(), this, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], getMessageHelper().getPlainText(messageObject), messageObject.messageOwner.entities, noforwards, onLinkPress, () -> dimBehindView(false));
                                     alert.setDimBehind(false);
+                                    alert.setOnLanguageSelect(() -> translateButton.updateText());
                                     return;
                                 }
                                 translateMessage(messageObject);
@@ -24618,7 +24619,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         });
                         cell.setOnLongClickListener(v1 -> {
                             if (messageObject.isDoneTranslation() && messageObject.translated) return false;
-                            Translator.showTranslationTargetSelector(getParentActivity(), cell::performClick, themeDelegate);
+                            Translator.showTranslationTargetSelector(getParentActivity(), () -> {
+                                cell.performClick();
+                                translateButton.updateText();
+                            }, themeDelegate);
                             closeMenu(true);
                             return true;
                         });
