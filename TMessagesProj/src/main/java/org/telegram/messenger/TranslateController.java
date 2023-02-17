@@ -251,7 +251,7 @@ public class TranslateController extends BaseController {
             AndroidUtilities.runOnUIThread(() -> {
                 synchronized (TranslateController.this) {
                     translateDialogLanguage.put(getIdWithTopic(dialogId, topicId), language);
-                    translatingDialogs.add(new Pair<>(dialogId, topicId));
+                    translatingDialogs.add(getIdWithTopic(dialogId, topicId));
                 }
                 NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.dialogTranslate, dialogId, true);
             }, 150);
@@ -584,6 +584,9 @@ public class TranslateController extends BaseController {
                         finalMessageObject.messageOwner.originalLanguage = result.sourceLanguage;
                         getMessagesStorage().updateMessageCustomParams(dialogId, finalMessageObject.messageOwner);
                         NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, finalMessageObject);
+                        if (keepReply) {
+                            keepReplyMessage(finalMessageObject);
+                        }
                         return;
                     }
                     applyTranslationResult(finalMessageObject, result);
@@ -755,6 +758,7 @@ public class TranslateController extends BaseController {
         final boolean translatable = (
             isTranslatable(messageObject) &&
             messageObject.messageOwner.originalLanguage != null &&
+            !UNKNOWN_LANGUAGE.equals(messageObject.messageOwner.originalLanguage) &&
             !DoNotTranslateSettings.getRestrictedLanguages().contains(messageObject.messageOwner.originalLanguage)
         );
 
@@ -838,14 +842,13 @@ public class TranslateController extends BaseController {
             int messageSymbolsCount = context.getSymbolsCount();
 
             if (pendingTranslation.symbolsCount + messageSymbolsCount >= MAX_SYMBOLS_PER_REQUEST ||
-                    pendingTranslation.messageIds.size() + 1 >= MAX_MESSAGES_PER_REQUEST) {
+                pendingTranslation.messageIds.size() + 1 >= MAX_MESSAGES_PER_REQUEST) {
                 dialogPendingTranslations.add(pendingTranslation = new PendingTranslation());
             }
 
             if (pendingTranslation.runnable != null) {
                 AndroidUtilities.cancelRunOnUIThread(pendingTranslation.runnable);
             }
-
             loadingTranslations.add(message.getId());
             pendingTranslation.messageIds.add(message.getId());
             pendingTranslation.callbacks.add(callback);
@@ -875,13 +878,11 @@ public class TranslateController extends BaseController {
                         for (int i = 0; i < count; ++i) {
                             callbacks.get(i).run(results.get(i));
                         }
-
                     } else {
                         FileLog.e("TranslateController", error);
                         toggleTranslatingDialog(dialogId, topicId, false);
                         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, LocaleController.getString("TranslationFailedAlert2", R.string.TranslationFailedAlert2));
                     }
-
                     synchronized (TranslateController.this) {
                         for (int i = 0; i < ids.size(); ++i) {
                             loadingTranslations.remove(ids.get(i));

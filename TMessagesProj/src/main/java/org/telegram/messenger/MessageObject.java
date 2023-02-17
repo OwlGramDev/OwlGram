@@ -2555,7 +2555,7 @@ public class MessageObject {
             if (updatePoll(true)) {
                 applyNewText(messageOwner.translatedText.text);
                 generateCaption();
-                if (messageOwner.translatedReplyMarkupRows != null) {
+                if (messageOwner.translatedReplyMarkupRows != null && messageOwner.reply_markup != null) {
                     messageOwner.translatedReplyMarkupRows.applyTextToKeyboard(messageOwner.reply_markup.rows);
                     measureInlineBotButtons();
                 }
