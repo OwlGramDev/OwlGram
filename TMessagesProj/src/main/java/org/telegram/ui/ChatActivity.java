@@ -22091,7 +22091,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         boolean showAddMembersToGroup = preferences.getBoolean("dialog_bar_invite" + did, false);
         TLRPC.EmojiStatus showEmojiStatusReport = currentUser != null && (showReport || showBlock) && (currentUser.emoji_status instanceof TLRPC.TL_emojiStatus || currentUser.emoji_status instanceof TLRPC.TL_emojiStatusUntil && ((TLRPC.TL_emojiStatusUntil) currentUser.emoji_status).until > (int) (System.currentTimeMillis() / 1000)) ? currentUser.emoji_status : null;
         boolean showRestartTopic = !isInPreviewMode() && forumTopic != null && forumTopic.closed && !forumTopic.hidden && ChatObject.canManageTopic(currentAccount, currentChat, forumTopic);
-        boolean showTranslate = getMessagesController().getTranslateController().isDialogTranslatable(getDialogId(), getTopicId()) && !getMessagesController().getTranslateController().isTranslateDialogHidden(getDialogId(), getTopicId()) && getMessagesController().getTranslateController().isChatTranslateEnabled();
+        boolean showTranslate = getMessagesController().getTranslateController().isDialogTranslatable(getDialogId(), getTopicId()) && !getMessagesController().getTranslateController().isTranslateDialogHidden(getDialogId(), getTopicId()) && getMessagesController().getTranslateController().isChatTranslateEnabled() && TranslatorHelper.isSupportAutoTranslate();
         if (showRestartTopic) {
             shownRestartTopic = true;
         }
