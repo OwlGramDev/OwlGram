@@ -133,6 +133,7 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.Bitmaps;
@@ -17694,11 +17695,12 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             return;
         }
         TranslateController controller = MessagesController.getInstance(currentAccount).getTranslateController();
+        MessagesStorage storage = AccountInstance.getInstance(currentAccount).getMessagesStorage();
         if (currentMessageObject.translated) {
             TranslatorHelper.resetTranslatedMessage(currentMessageObject);
             currentMessageObject.updateTranslation();
             setCurrentCaption(currentMessageObject, currentMessageObject.messageText, true);
-            parentChatActivity.getAccountInstance().getMessagesStorage().updateMessageCustomParams(currentMessageObject.getDialogId(), currentMessageObject.messageOwner);
+            storage.updateMessageCustomParams(currentMessageObject.getDialogId(), currentMessageObject.messageOwner);
             translateItem.setText(LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
             return;
         }
@@ -17718,7 +17720,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
             currentMessageObject.updateTranslation();
             setCurrentCaption(currentMessageObject, currentMessageObject.messageText, true);
             translateItem.setText(LocaleController.getString("UndoTranslate", R.string.UndoTranslate));
-            parentChatActivity.getAccountInstance().getMessagesStorage().updateMessageCustomParams(currentMessageObject.getDialogId(), currentMessageObject.messageOwner);
+            storage.updateMessageCustomParams(currentMessageObject.getDialogId(), currentMessageObject.messageOwner);
             NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslated, currentMessageObject);
         } else {
             progressDialog = new AlertDialog(parentActivity, 3, resourcesProvider);
@@ -17739,7 +17741,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 currentMessageObject.updateTranslation();
                 setCurrentCaption(currentMessageObject, currentMessageObject.messageText, true);
                 translateItem.setText(LocaleController.getString("UndoTranslate", R.string.UndoTranslate));
-                parentChatActivity.getAccountInstance().getMessagesStorage().updateMessageCustomParams(currentMessageObject.getDialogId(), currentMessageObject.messageOwner);
+                storage.updateMessageCustomParams(currentMessageObject.getDialogId(), currentMessageObject.messageOwner);
                 NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslated, currentMessageObject);
             });
         }
