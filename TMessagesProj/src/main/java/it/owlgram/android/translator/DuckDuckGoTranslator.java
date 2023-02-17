@@ -1,5 +1,6 @@
 package it.owlgram.android.translator;
 
+import android.os.SystemClock;
 import android.text.TextUtils;
 
 import org.json.JSONException;
@@ -62,19 +63,32 @@ public class DuckDuckGoTranslator extends BaseTranslator {
                     "&query=translate" +
                     "&to=" + tl;
             for (String block : blocks) {
-                String response = new StandardHTTPRequest(url)
-                        .header("User-Agent", userAgent)
-                        .header("Content-Length", String.valueOf(block.getBytes(Charset.defaultCharset()).length))
-                        .data(block)
-                        .request();
-                if (TextUtils.isEmpty(response)) {
-                    return null;
+                boolean worked = false;
+                for (int i = 0; i < 60; i++) {
+                    String response = new StandardHTTPRequest(url)
+                            .header("User-Agent", userAgent)
+                            .header("Content-Length", String.valueOf(block.getBytes(Charset.defaultCharset()).length))
+                            .data(block)
+                            .request();
+                    if (TextUtils.isEmpty(response)) {
+                        return null;
+                    }
+                    try {
+                        Result result = getResult(response);
+                        if (TextUtils.isEmpty(resultLang)) {
+                            resultLang = result.sourceLanguage;
+                        }
+                        resultString.append(buildTranslatedString(block, ((String) result.translation)));
+                    } catch (Http429Exception e) {
+                        SystemClock.sleep(1000);
+                        continue;
+                    }
+                    worked = true;
+                    break;
                 }
-                Result result = getResult(response);
-                if (TextUtils.isEmpty(resultLang)) {
-                    resultLang = result.sourceLanguage;
+                if (!worked) {
+                    throw new Http429Exception();
                 }
-                resultString.append(buildTranslatedString(block, ((String) result.translation)));
             }
         }
         return new Result(
@@ -111,8 +125,13 @@ public class DuckDuckGoTranslator extends BaseTranslator {
         return code;
     }
 
-    private Result getResult(String string) throws JSONException {
+    private Result getResult(String string) throws JSONException, Http429Exception {
         JSONObject object = new JSONObject(string);
+        if (object.has("error")) {
+            if (object.getString("error").equals("Forbidden")) {
+               throw new Http429Exception();
+            }
+        }
         return new Result(object.getString("translated"), object.getString("detected_language"));
     }
 }

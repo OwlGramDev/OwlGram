@@ -72,7 +72,6 @@ public class TranslatorHelper {
         return (provider == Translator.PROVIDER_GOOGLE ||
                 provider == Translator.PROVIDER_YANDEX ||
                 provider == Translator.PROVIDER_DEEPL ||
-                provider == Translator.PROVIDER_DUCKDUCKGO ||
                 provider == Translator.PROVIDER_TELEGRAM) &&
                 showPremiumFeatures();
     }

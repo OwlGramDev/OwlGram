@@ -75,12 +75,12 @@ public class TranslateController extends BaseController {
     }
 
 
-    public boolean supportMultiTranslate() {
+    public boolean availableMultiTranslate() {
         return !(!UserConfig.getInstance(currentAccount).isPremium() && OwlConfig.translationProvider == Translator.PROVIDER_TELEGRAM);
     }
 
     public boolean isFeatureAvailable() {
-        return supportMultiTranslate() && isChatTranslateEnabled();
+        return availableMultiTranslate() && isChatTranslateEnabled();
     }
 
     public boolean isChatTranslateEnabled() {

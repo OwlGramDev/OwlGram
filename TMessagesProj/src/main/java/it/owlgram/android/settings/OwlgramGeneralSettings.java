@@ -214,7 +214,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
         divisorPrivacyRow = rowCount++;
         translationHeaderRow = rowCount++;
         showTranslateButtonRow = rowCount++;
-        translateEntireChatRow = TranslatorHelper.showPremiumFeatures() ? rowCount++: -1;
+        translateEntireChatRow = TranslatorHelper.showPremiumFeatures() && TranslatorHelper.isSupportAutoTranslate() ? rowCount++: -1;
         translationStyle = rowCount++;
         translationProviderSelectRow = rowCount++;
         destinationLanguageSelectRow = rowCount++;
@@ -549,7 +549,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
             if (TranslatorHelper.isSupportMarkdown()) {
                 newFeatures.add("Markdown");
             }
-            if (TranslatorHelper.showPremiumFeatures()) {
+            if (TranslatorHelper.showPremiumFeatures() && TranslatorHelper.isSupportAutoTranslate()) {
                 newFeatures.add("EntireChat");
             }
             return newFeatures;
