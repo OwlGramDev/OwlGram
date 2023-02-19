@@ -193,7 +193,7 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
                     } else if (position == uploadSpeedBoostRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("FasterUploadSpeed", R.string.FasterUploadSpeed), OwlConfig.uploadSpeedBoost, false);
                     } else if (position == sendLargePhotosRow) {
-                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("SendLargePhotos", R.string.SendLargePhotos), LocaleController.getString("SendLargePhotosDesc", R.string.SendLargePhotosDesc), OwlConfig.sendLargePhotos, true, true);
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("HRPhotos", R.string.HRPhotos), LocaleController.getString("HRPhotosDesc", R.string.HRPhotosDesc), OwlConfig.sendLargePhotos, true, true);
                     } else if (position == reduceCameraXLatency) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("ZeroShutterLag", R.string.ZeroShutterLag), LocaleController.getString("ZeroShutterLagDesc", R.string.ZeroShutterLagDesc), OwlConfig.reduceCameraXLatency, true, true);
                     }
