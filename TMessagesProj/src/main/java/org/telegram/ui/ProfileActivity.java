@@ -5443,7 +5443,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     return;
                 }
                 translatingBio = false;
-                currentBio = (String) result.translation;
+                currentBio = BaseTranslator.stringFromTranslation(result.translation);
                 originalBio = bio;
                 aboutLinkCell.setTextAndValue((String) currentBio, channelInfoRow != -1 ? null:LocaleController.getString("UserBio", R.string.UserBio), true);
                 if (userInfoRow != -1) {
