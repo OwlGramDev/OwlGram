@@ -3287,7 +3287,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                     if (!TextUtils.isEmpty(name)) {
                         SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("media_saved_pos", Activity.MODE_PRIVATE);
                         float pos = preferences.getFloat(name, -1);
-                        if (pos > 0 && pos < 0.999f && messageObject.getDuration() >= 10 * 60) {
+                        if (pos > 0 && pos < 0.999f) {
                             messageObject.audioProgress = seekToProgressPending = pos;
                         }
                         shouldSavePositionForCurrentAudio = name;
