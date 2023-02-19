@@ -30348,18 +30348,27 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         scrollToPositionOnRecreate = -1;
                     }
                 }
-                boolean handled = false;
-                if (message.canPreviewDocument()) {
-                    PhotoViewer.getInstance().setParentActivity(ChatActivity.this, themeDelegate);
-                    PhotoViewer.getInstance().openPhoto(message, ChatActivity.this, message.type != 0 ? dialog_id : 0, message.type != 0 ? mergeDialogId : 0, message.type != 0 ? getTopicId() : 0, photoViewerProvider);
-                    handled = true;
-                }
-                if (!handled) {
-                    try {
-                        AndroidUtilities.openForView(message, getParentActivity(), themeDelegate);
-                    } catch (Exception e) {
-                        FileLog.e(e);
-                        alertUserOpenError(message);
+                int statusConf = OwlConfig.isValidFileSettings(message);
+                if (message.getDocumentName().toLowerCase().endsWith("owl") && statusConf >= OwlConfig.VALID_CONFIGURATION) {
+                    if (statusConf == OwlConfig.VALID_CONFIGURATION) {
+                        new ImportSettingsDialog(ChatActivity.this, message).checkCanShowDialog();
+                    } else {
+                        BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.gigagroup_convert, LocaleController.getString("UpdateToImport", R.string.UpdateToImport), true).show();
+                    }
+                } else {
+                    boolean handled = false;
+                    if (message.canPreviewDocument()) {
+                        PhotoViewer.getInstance().setParentActivity(ChatActivity.this, themeDelegate);
+                        PhotoViewer.getInstance().openPhoto(message, ChatActivity.this, message.type != 0 ? dialog_id : 0, message.type != 0 ? mergeDialogId : 0, message.type != 0 ? getTopicId() : 0, photoViewerProvider);
+                        handled = true;
+                    }
+                    if (!handled) {
+                        try {
+                            AndroidUtilities.openForView(message, getParentActivity(), themeDelegate);
+                        } catch (Exception e) {
+                            FileLog.e(e);
+                            alertUserOpenError(message);
+                        }
                     }
                 }
             }
