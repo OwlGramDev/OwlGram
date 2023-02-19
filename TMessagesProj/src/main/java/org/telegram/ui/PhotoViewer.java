@@ -17166,6 +17166,8 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         }
         if (selectedCompression >= compressionsCount) {
             selectedCompression = compressionsCount - 1;
+        } else if (selectedCompression < 0) {
+            selectedCompression = 0;
         }
 
         if (sendPhotoType == SELECT_TYPE_AVATAR) {
