@@ -331,4 +331,6 @@
     <string name="EmojiSetErrorDownloading">Error downloading emoji set.</string>
     <string name="ChatHeader">Chat Header</string>
     <string name="ShowTranslateChatButtonDesc">Show the translate button in the chat header</string>
+    <string name="SendLargePhotos">Send large photos</string>
+    <string name="SendLargePhotosDesc">Increase the side limit on compressed images to 2560px.</string>
 </resources>

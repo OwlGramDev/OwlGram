@@ -90,6 +90,7 @@ public class OwlConfig extends SettingsManager {
     public static boolean hideSendAsChannel;
     public static boolean showNameInActionBar;
     public static boolean stickersSorting;
+    public static boolean sendLargePhotos;
     public static boolean translateEntireChat;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
@@ -236,6 +237,7 @@ public class OwlConfig extends SettingsManager {
             betterAudioQuality = getBoolean("betterAudioQuality" + dS, false);
             downloadSpeedBoost = getInt("downloadSpeedBoost" + dS, 0);
             uploadSpeedBoost = getBoolean("uploadSpeedBoost" + dS, false);
+            sendLargePhotos = getBoolean("sendLargePhotos" + dS, false);
             configLoaded = true;
             migrate();
         }
@@ -478,6 +480,10 @@ public class OwlConfig extends SettingsManager {
 
     public static void toggleTranslateEntireChat() {
         putValue("translateEntireChat", translateEntireChat ^= true);
+    }
+
+    public static void toggleSendLargePhotos() {
+        putValue("sendLargePhotos", sendLargePhotos ^= true);
     }
 
     public static void unlockChupa() {
