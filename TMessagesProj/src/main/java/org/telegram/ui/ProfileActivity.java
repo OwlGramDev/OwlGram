@@ -10299,8 +10299,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             if (position == infoHeaderRow || position == membersHeaderRow || position == settingsSectionRow2 ||
                     position == numberSectionRow || position == helpHeaderRow || position == debugHeaderRow) {
                 return VIEW_TYPE_HEADER;
-            } else if (position == phoneRow || position == usernameRow || position == locationRow ||
-                    position == numberRow || position == setUsernameRow || position == restrictionReasonRow ||
+            } else if (position == phoneRow || position == locationRow || position == numberRow || position == restrictionReasonRow ||
                     (position == datacenterRow && DcStyleSelector.getStyleSelected() == DcStyleSelector.TELEGRAM_DC)) {
                 return VIEW_TYPE_TEXT_DETAIL;
             } else if (position == usernameRow || position == setUsernameRow) {
