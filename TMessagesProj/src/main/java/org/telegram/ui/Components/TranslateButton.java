@@ -239,15 +239,17 @@ public class TranslateButton extends FrameLayout {
                 DoNotTranslateSettings.restrictLanguage(detectedLanguage);
                 translateController.checkRestrictedLanguagesUpdate();
                 translateController.setHideTranslateDialog(dialogId, topicId, true);
-                String bulletinText;
+                String bulletinTextString;
                 if (accusative[0]) {
-                    bulletinText = LocaleController.formatString("AddedToDoNotTranslate", R.string.AddedToDoNotTranslate, TranslateAlert2.capitalFirst(detectedLanguageNameAccusative));
+                    bulletinTextString = LocaleController.formatString("AddedToDoNotTranslate", R.string.AddedToDoNotTranslate, detectedLanguageNameAccusative);
                 } else {
-                    bulletinText = LocaleController.formatString("AddedToDoNotTranslateOther", R.string.AddedToDoNotTranslateOther, TranslateAlert2.capitalFirst(detectedLanguageNameAccusative));
+                    bulletinTextString = LocaleController.formatString("AddedToDoNotTranslateOther", R.string.AddedToDoNotTranslateOther, detectedLanguageNameAccusative);
                 }
+                CharSequence bulletinText = AndroidUtilities.replaceTags(bulletinTextString);
+                bulletinText = TranslateAlert2.capitalFirst(bulletinText);
                 BulletinFactory.of(fragment).createSimpleBulletin(
                     R.raw.msg_translate,
-                    AndroidUtilities.replaceTags(bulletinText),
+                    bulletinText,
                     LocaleController.getString("Settings", R.string.Settings),
                     () -> fragment.presentFragment(new DoNotTranslateSettings())
                 ).show();

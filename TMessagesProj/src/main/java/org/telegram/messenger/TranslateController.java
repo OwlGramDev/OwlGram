@@ -351,6 +351,9 @@ public class TranslateController extends BaseController {
     public static class Language {
         public String code;
         public String displayName;
+        public String ownDisplayName;
+
+        public String q;
     }
 
     public static ArrayList<Language> getLanguages() {
@@ -360,9 +363,11 @@ public class TranslateController extends BaseController {
             Language language = new Language();
             language.code = languagesOrder.get(i);
             language.displayName = TranslateAlert2.capitalFirst(TranslateAlert2.languageName(language.code));
+            language.ownDisplayName = TranslateAlert2.capitalFirst(TranslateAlert2.systemLanguageName(language.code, true));
             if (language.displayName == null) {
                 continue;
             }
+            language.q = (language.displayName + " " + (language.ownDisplayName == null ? "" : language.ownDisplayName)).toLowerCase();
             result.add(language);
         }
         Collections.sort(result, Comparator.comparing(o -> o.displayName));
@@ -724,20 +729,22 @@ public class TranslateController extends BaseController {
 
         pendingLanguageChecks.add(hash);
 
-        LanguageDetector.detectLanguage(messageObject.messageOwner.message, lng -> AndroidUtilities.runOnUIThread(() -> {
-            String detectedLanguage = lng;
-            if (detectedLanguage == null) {
-                detectedLanguage = UNKNOWN_LANGUAGE;
-            }
-            messageObject.messageOwner.originalLanguage = detectedLanguage;
-            getMessagesStorage().updateMessageCustomParams(dialogId, messageObject.messageOwner);
-            pendingLanguageChecks.remove((Integer) hash);
-            checkDialogTranslatable(messageObject);
-        }), err -> AndroidUtilities.runOnUIThread(() -> {
-            messageObject.messageOwner.originalLanguage = UNKNOWN_LANGUAGE;
-            getMessagesStorage().updateMessageCustomParams(dialogId, messageObject.messageOwner);
-            pendingLanguageChecks.remove((Integer) hash);
-        }));
+        Utilities.getStageQueue().postRunnable(() -> {
+            LanguageDetector.detectLanguage(messageObject.messageOwner.message, lng -> AndroidUtilities.runOnUIThread(() -> {
+                String detectedLanguage = lng;
+                if (detectedLanguage == null) {
+                    detectedLanguage = UNKNOWN_LANGUAGE;
+                }
+                messageObject.messageOwner.originalLanguage = detectedLanguage;
+                getMessagesStorage().updateMessageCustomParams(dialogId, messageObject.messageOwner);
+                pendingLanguageChecks.remove((Integer) hash);
+                checkDialogTranslatable(messageObject);
+            }), err -> AndroidUtilities.runOnUIThread(() -> {
+                messageObject.messageOwner.originalLanguage = UNKNOWN_LANGUAGE;
+                getMessagesStorage().updateMessageCustomParams(dialogId, messageObject.messageOwner);
+                pendingLanguageChecks.remove((Integer) hash);
+            }));
+        });
     }
 
     private void checkDialogTranslatable(MessageObject messageObject) {
