@@ -333,4 +333,6 @@
     <string name="ShowTranslateChatButtonDesc">Show the translate button in the chat header</string>
     <string name="SendLargePhotos">Send large photos</string>
     <string name="SendLargePhotosDesc">Increase the side limit on compressed images to 2560px.</string>
+    <string name="ZeroShutterLag">Zero-Shutter Lag</string>
+    <string name="ZeroShutterLagDesc">Minimize latency when taking photos by capturing multiple frames quickly before and after the shutter button is pressed.</string>
 </resources>
