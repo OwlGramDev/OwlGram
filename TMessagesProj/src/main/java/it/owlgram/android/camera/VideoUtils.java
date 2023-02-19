@@ -7,7 +7,8 @@ public class VideoUtils {
         HD,
         FULL_HD,
         QUAD_HD,
-        ULTRA_HD;
+        ULTRA_HD,
+        MAX;
 
         static Quality fromInt(int i) {
             return values()[i];
@@ -33,7 +34,23 @@ public class VideoUtils {
     }
 
     public static int getCompressionsCount(int width, int height) {
-        return getCompressionsCount(width * height).ordinal() + 1;
+        int count = getCompressionsCount(width * height).ordinal() + 1;
+        int oldSize = determineSize(width, height, count - 1, count);
+        int newSize = determineSize(width, height, count, count+1);
+        if (newSize > oldSize) {
+            count++;
+        }
+        return Math.min(count, Quality.MAX.ordinal());
+    }
+
+    private static int determineSize(int originalWidth, int originalHeight, int selectedCompression, int compressionsCount) {
+        float maxSize = getMaxSize(originalWidth, originalHeight, selectedCompression);
+        float scale = originalWidth > originalHeight ? maxSize / originalWidth : maxSize / originalHeight;
+        if (selectedCompression == compressionsCount - 1 && scale >= 1f) {
+            return originalWidth;
+        } else {
+            return Math.round(originalWidth * scale / 2) * 2;
+        }
     }
 
     private static Quality getCompressionsCount(int area) {
