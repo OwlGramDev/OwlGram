@@ -107,7 +107,7 @@ abstract public class BaseTranslator {
         return translated;
     }
 
-    protected String stringFromTranslation(Object translation) throws UnsupportedOperationException {
+    public static String stringFromTranslation(Object translation) throws UnsupportedOperationException {
         if (translation instanceof TLRPC.TL_textWithEntities) {
             return ((TLRPC.TL_textWithEntities) translation).text;
         } else if (translation instanceof CharSequence) {

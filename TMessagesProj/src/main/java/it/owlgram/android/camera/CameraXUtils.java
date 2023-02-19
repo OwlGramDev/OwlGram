@@ -27,6 +27,7 @@ import androidx.core.content.ContextCompat;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.SharedConfig;
 
 import java.util.ArrayList;
@@ -196,22 +197,26 @@ public class CameraXUtils {
         for (int i = 0; i < cameraInfoList.size(); i++) {
             CameraInfo cameraInfo = cameraInfoList.get(i);
             String id = Camera2CameraInfo.from(cameraInfo).getCameraId();
-            CameraCharacteristics cameraCharacteristics = Camera2CameraInfo.from(cameraInfo).getCameraCharacteristicsMap().get(id);
-            if (cameraCharacteristics != null) {
-                if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) == LENS_FACING_BACK) {
-                    availableBackCamera++;
-                    ZoomState zoomState = cameraInfo.getZoomState().getValue();
-                    if (zoomState != null && zoomState.getMinZoomRatio() < 1.0F && zoomState.getMinZoomRatio() > 0) {
-                        foundWideAngleOnPrimaryCamera = true;
-                    }
-                    float[] listLensAngle = cameraCharacteristics.get(LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
-                    if (listLensAngle.length > 0) {
-                        if (listLensAngle[0] < 3.0f && listLensAngle[0] < lowestAngledCamera) {
-                            lowestAngledCamera = listLensAngle[0];
-                            cameraId = id;
+            try {
+                CameraCharacteristics cameraCharacteristics = Camera2CameraInfo.from(cameraInfo).getCameraCharacteristicsMap().get(id);
+                if (cameraCharacteristics != null) {
+                    if (cameraCharacteristics.get(CameraCharacteristics.LENS_FACING) == LENS_FACING_BACK) {
+                        availableBackCamera++;
+                        ZoomState zoomState = cameraInfo.getZoomState().getValue();
+                        if (zoomState != null && zoomState.getMinZoomRatio() < 1.0F && zoomState.getMinZoomRatio() > 0) {
+                            foundWideAngleOnPrimaryCamera = true;
+                        }
+                        float[] listLensAngle = cameraCharacteristics.get(LENS_INFO_AVAILABLE_FOCAL_LENGTHS);
+                        if (listLensAngle.length > 0) {
+                            if (listLensAngle[0] < 3.0f && listLensAngle[0] < lowestAngledCamera) {
+                                lowestAngledCamera = listLensAngle[0];
+                                cameraId = id;
+                            }
                         }
                     }
                 }
+            } catch (Exception e) {
+                FileLog.e(e);
             }
         }
         return availableBackCamera >= 2 && !foundWideAngleOnPrimaryCamera ? cameraId : null;

@@ -331,4 +331,8 @@
     <string name="EmojiSetErrorDownloading">Error downloading emoji set.</string>
     <string name="ChatHeader">Chat Header</string>
     <string name="ShowTranslateChatButtonDesc">Show the translate button in the chat header</string>
+    <string name="HRPhotos">High-res Photos</string>
+    <string name="HRPhotosDesc">Increase the side limit on compressed images from 1280px to 2560px</string>
+    <string name="ZeroShutterLag">Zero-Shutter Lag</string>
+    <string name="ZeroShutterLagDesc">Minimize latency when taking photos by capturing multiple frames quickly before and after the shutter button is pressed.</string>
 </resources>

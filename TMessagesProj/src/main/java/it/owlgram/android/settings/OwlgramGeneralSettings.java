@@ -268,6 +268,7 @@ public class OwlgramGeneralSettings extends BaseSettingsActivity {
                 case SWITCH:
                     TextCheckCell textCheckCell = (TextCheckCell) holder.itemView;
                     textCheckCell.setEnabled(true, null);
+                    textCheckCell.setCheckBoxIcon(0);
                     boolean isLocked = !getUserConfig().isPremium() && OwlConfig.translationProvider == Translator.PROVIDER_TELEGRAM;
                     if (position == phoneNumberSwitchRow) {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("HidePhone", R.string.HidePhone), LocaleController.getString("HidePhoneDesc", R.string.HidePhoneDesc), OwlConfig.hidePhoneNumber, true, true);

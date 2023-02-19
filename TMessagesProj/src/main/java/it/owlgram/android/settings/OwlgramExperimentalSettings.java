@@ -31,7 +31,9 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
     private int bottomHeaderRow;
     private int headerExperimental;
     private int betterAudioCallRow;
+    private int sendLargePhotosRow;
     private int maxRecentStickersRow;
+    private int reduceCameraXLatency;
     private int experimentalMessageAlert;
     private int monetIconRow;
     private int downloadDividersRow;
@@ -96,6 +98,16 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
             if (view instanceof TextCheckCell) {
                 ((TextCheckCell) view).setChecked(OwlConfig.uploadSpeedBoost);
             }
+        } else if (position == sendLargePhotosRow) {
+            OwlConfig.toggleSendLargePhotos();
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(OwlConfig.sendLargePhotos);
+            }
+        } else if (position == reduceCameraXLatency) {
+            OwlConfig.toggleReduceCameraXLatency();
+            if (view instanceof TextCheckCell) {
+                ((TextCheckCell) view).setChecked(OwlConfig.reduceCameraXLatency);
+            }
         }
     }
 
@@ -123,6 +135,8 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
         bottomHeaderRow = -1;
         headerExperimental = -1;
         betterAudioCallRow = -1;
+        sendLargePhotosRow = -1;
+        reduceCameraXLatency = -1;
         maxRecentStickersRow = -1;
         monetIconRow = -1;
         downloadDividersRow = -1;
@@ -137,6 +151,8 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
             bottomHeaderRow = rowCount++;
             headerExperimental = rowCount++;
             betterAudioCallRow = rowCount++;
+            sendLargePhotosRow = rowCount++;
+            reduceCameraXLatency = rowCount++;
             if (Build.VERSION.SDK_INT == Build.VERSION_CODES.S || Build.VERSION.SDK_INT == Build.VERSION_CODES.S_V2) {
                 monetIconRow = rowCount++;
             }
@@ -176,6 +192,10 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
                         textCheckCell.setTextAndValueAndCheck(LocaleController.getString("MonetIcon", R.string.MonetIcon), LocaleController.getString("MonetIconDesc", R.string.MonetIconDesc), MonetIconsHelper.isSelectedMonet(), true, true);
                     } else if (position == uploadSpeedBoostRow) {
                         textCheckCell.setTextAndCheck(LocaleController.getString("FasterUploadSpeed", R.string.FasterUploadSpeed), OwlConfig.uploadSpeedBoost, false);
+                    } else if (position == sendLargePhotosRow) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("HRPhotos", R.string.HRPhotos), LocaleController.getString("HRPhotosDesc", R.string.HRPhotosDesc), OwlConfig.sendLargePhotos, true, true);
+                    } else if (position == reduceCameraXLatency) {
+                        textCheckCell.setTextAndValueAndCheck(LocaleController.getString("ZeroShutterLag", R.string.ZeroShutterLag), LocaleController.getString("ZeroShutterLagDesc", R.string.ZeroShutterLagDesc), OwlConfig.reduceCameraXLatency, true, true);
                     }
                     break;
                 case TEXT_HINT_WITH_PADDING:
@@ -241,7 +261,7 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
             if (position == downloadDividersRow) {
                 return ViewType.SHADOW;
             } else if (position == betterAudioCallRow || position == checkBoxExperimentalRow || position == monetIconRow ||
-                    position == uploadSpeedBoostRow) {
+                    position == uploadSpeedBoostRow || position == sendLargePhotosRow || position == reduceCameraXLatency) {
                 return ViewType.SWITCH;
             } else if (position == headerImageRow) {
                 return ViewType.IMAGE_HEADER;

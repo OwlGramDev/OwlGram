@@ -722,6 +722,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
             boolean listAdapter = listView.getAdapter() == listViewAdapter;
             if (listAdapter) {
                 if (isExpandableSendMediaRow(position)) {
+                    if (!ChatObject.canBlockUsers(currentChat)) return;
                     CheckBoxCell checkBoxCell = (CheckBoxCell) view;
                     if (position == sendMediaPhotosRow) {
                         defaultBannedRights.send_photos = !defaultBannedRights.send_photos;
@@ -3067,7 +3068,10 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
         @Override
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int viewType = holder.getItemViewType();
-            if (viewType == 7 || viewType == VIEW_TYPE_EXPANDABLE_SWITCH) {
+            if (viewType == VIEW_TYPE_EXPANDABLE_SWITCH) {
+                return true;
+            }
+            if (viewType == 7 || viewType == VIEW_TYPE_INNER_CHECK) {
                 return ChatObject.canBlockUsers(currentChat);
             } else if (viewType == 0) {
                 ManageChatUserCell cell = (ManageChatUserCell) holder.itemView;
@@ -3088,9 +3092,6 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                 } else if (position == hideMembersRow) {
                     return ChatObject.canUserDoAdminAction(currentChat, ChatObject.ACTION_BLOCK_USERS);
                 }
-            }
-            if (viewType == VIEW_TYPE_INNER_CHECK) {
-                return true;
             }
             return false;
         }
@@ -3202,7 +3203,7 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                     CheckBoxCell checkBoxCell = new CheckBoxCell(mContext, 4, 21, getResourceProvider());
                     checkBoxCell.getCheckBoxRound().setDrawBackgroundAsArc(14);
                     checkBoxCell.getCheckBoxRound().setColor(Theme.key_switch2TrackChecked, Theme.key_radioBackground, Theme.key_checkboxCheck);
-                    checkBoxCell.setEnabled(true);
+                    checkBoxCell.setEnabled(ChatObject.canBlockUsers(currentChat));
                     view = checkBoxCell;
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
                     break;
@@ -3436,12 +3437,15 @@ public class ChatUsersActivity extends BaseFragment implements NotificationCente
                         checkCell.setCollapseArrow(String.format(Locale.US, "%d/12", sentMediaCount), !sendMediaExpanded, new Runnable() {
                             @Override
                             public void run() {
-                                boolean checked = !checkCell.isChecked();
-                                checkCell.setChecked(checked);
-                                setSendMediaEnabled(checked);
-
+                                if (ChatObject.canBlockUsers(currentChat)) {
+                                    boolean checked = !checkCell.isChecked();
+                                    checkCell.setChecked(checked);
+                                    setSendMediaEnabled(checked);
+                                }
                             }
                         });
+                        checkCell.setAlpha(ChatObject.canBlockUsers(currentChat) ? 1.0f : 0.5f);
+                        checkCell.checkBoxClickArea.setEnabled(ChatObject.canBlockUsers(currentChat));
                     } else if (position == sendStickersRow) {
                         checkCell.setTextAndCheck(LocaleController.getString("SendMediaPermissionStickers", R.string.SendMediaPermissionStickers), !defaultBannedRights.send_stickers, true);
                     } else if (position == embedLinksRow) {
