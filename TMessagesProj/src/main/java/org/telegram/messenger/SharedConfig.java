@@ -506,6 +506,7 @@ public class SharedConfig {
             useThreeLinesLayout = preferences.getBoolean("useThreeLinesLayout", false);
             archiveHidden = preferences.getBoolean("archiveHidden", false);
             distanceSystemType = preferences.getInt("distanceSystemType", 0);
+            chatBlur = preferences.getBoolean("chatBlur", getDevicePerformanceClass() >= PERFORMANCE_CLASS_HIGH);
             loopStickers = preferences.getBoolean("loopStickers", true);
             keepMedia = preferences.getInt("keep_media", CacheByChatsController.KEEP_MEDIA_ONE_MONTH);
             noStatusBar = preferences.getBoolean("noStatusBar", true);
