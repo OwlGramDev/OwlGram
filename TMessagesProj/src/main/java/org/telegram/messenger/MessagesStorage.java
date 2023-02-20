@@ -422,7 +422,7 @@ public class MessagesStorage extends BaseController {
             "user_contacts_v7",
             "user_phones_v7",
             "dialogs",
-            "dialog_filter",
+            "dialog_filter_owl",
             "dialog_filter_ep",
             "dialog_filter_pin_v2",
             "randoms_v2",
