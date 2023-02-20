@@ -25769,8 +25769,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     if (caption != null) {
                         AndroidUtilities.addToClipboard(caption);
                     } else {
-                        CharSequence messageContent = getMessageContent(selectedObject, 0, false);
-                        AndroidUtilities.addToClipboard(messageContent);
+                        AndroidUtilities.addToClipboard(getMessageContent(selectedObject, 0, false));
                     }
                 }
                 createUndoView();
@@ -26372,7 +26371,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 AlertsCreator.showSendMediaAlert(result_send, this, themeDelegate);
                 selectedObject.messageOwner.reply_markup = botButtons;
                 if (result_send == 0) {
-                    undoView.showWithAction(my_user_id, UndoView.ACTION_FWD_MESSAGES, messages.size());
+                    createUndoView();
+                    if (undoView != null) {
+                        undoView.showWithAction(my_user_id, UndoView.ACTION_FWD_MESSAGES, messages.size());
+                    }
                 }
                 break;
             }
@@ -27075,7 +27077,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if ((threadMessageId == 0 || isTopic) && !UserObject.isReplyUser(currentUser)) {
             openSearchKeyboard = text == null;
             if (searchItem != null) {
-                searchItem.openSearch(true);
+                searchItem.openSearch(openSearchKeyboard);
             }
         }
         if (text != null) {
