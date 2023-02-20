@@ -7152,20 +7152,47 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         image.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_actionBarActionModeDefaultIcon), PorterDuff.Mode.MULTIPLY));
         replyButton.setCompoundDrawablesWithIntrinsicBounds(image, null, null, null);
         replyButton.setOnClickListener(v -> {
-            MessageObject messageObject = null;
-            for (int a = 1; a >= 0; a--) {
-                if (messageObject == null && selectedMessagesIds[a].size() != 0) {
-                    messageObject = messagesDict[a].get(selectedMessagesIds[a].keyAt(0));
+            if (v.getTag() == null || v.getTag().equals("reply")) {
+                MessageObject messageObject = null;
+                for (int a = 1; a >= 0; a--) {
+                    if (messageObject == null && selectedMessagesIds[a].size() != 0) {
+                        messageObject = messagesDict[a].get(selectedMessagesIds[a].keyAt(0));
+                    }
+                    selectedMessagesIds[a].clear();
+                    selectedMessagesCanCopyIds[a].clear();
+                    selectedMessagesCanStarIds[a].clear();
                 }
-                selectedMessagesIds[a].clear();
-                selectedMessagesCanCopyIds[a].clear();
-                selectedMessagesCanStarIds[a].clear();
+                hideActionMode();
+                if (messageObject != null && (messageObject.messageOwner.id > 0 || messageObject.messageOwner.id < 0 && currentEncryptedChat != null)) {
+                    showFieldPanelForReply(messageObject);
+                }
+                updatePinnedMessageView(true);
+            } else {
+                ArrayList<Integer> ids = new ArrayList<>();
+                for (int a = 1; a >= 0; a--) {
+                    for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
+                        ids.add(selectedMessagesIds[a].keyAt(b));
+                    }
+                }
+                Collections.sort(ids);
+                Integer begin = ids.get(0);
+                Integer end = ids.get(ids.size() - 1);
+                for (int i = 0; i < messages.size(); i++) {
+                    int msgId = messages.get(i).getId();
+                    if (msgId > begin && msgId < end && selectedMessagesIds[0].indexOfKey(msgId) < 0) {
+                        MessageObject message = messages.get(i);
+                        int type = getMessageType(message);
+                        if (type < 2 || type == 20) {
+                            continue;
+                        }
+                        addToSelectedMessages(message, true);
+                        if (selectedMessagesIds[0].size() + selectedMessagesIds[1].size() >= 100) {
+                            break;
+                        }
+                    }
+                }
+                updateActionModeTitle();
             }
-            hideActionMode();
-            if (messageObject != null && (messageObject.messageOwner.id > 0 || messageObject.messageOwner.id < 0 && currentEncryptedChat != null)) {
-                showFieldPanelForReply(messageObject);
-            }
-            updatePinnedMessageView(true);
             updateVisibleRows();
             updateSelectedMessageReactions();
         });
@@ -14556,7 +14583,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             public void onAnimationRepeat(Animator animation) {
                                 super.onAnimationRepeat(animation);
                                 Drawable image;
-                                if ("select_between".equals((String) replyButton.getTag())) {
+                                if ("select_between".equals(replyButton.getTag())) {
                                     image = ApplicationLoader.applicationContext.getResources().getDrawable(R.drawable.round_checklist_white_28).mutate();
                                     replyButton.setText(LocaleController.getString("ReportSelectMessages", R.string.ReportSelectMessages));
                                 } else {
