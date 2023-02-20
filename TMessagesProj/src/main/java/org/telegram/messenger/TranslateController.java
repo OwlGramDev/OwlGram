@@ -515,7 +515,7 @@ public class TranslateController extends BaseController {
                 TLRPC.TL_textWithEntities originalTextWithEntities = new TLRPC.TL_textWithEntities();
                 originalTextWithEntities.text = messageObject.messageOwner.message;
                 originalTextWithEntities.entities = messageObject.messageOwner.entities;
-                textWithEntities = TranslateAlert2.preprocess(originalTextWithEntities, textWithEntities);
+                textWithEntities = TranslateAlert2.preprocess(originalTextWithEntities, textWithEntities, true);
             } else {
                 textWithEntities = (TLRPC.TL_textWithEntities) result.translation;
             }

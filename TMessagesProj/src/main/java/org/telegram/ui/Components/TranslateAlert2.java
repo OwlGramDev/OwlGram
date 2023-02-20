@@ -305,6 +305,10 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
     }
 
     public static TLRPC.TL_textWithEntities preprocess(TLRPC.TL_textWithEntities source, TLRPC.TL_textWithEntities received) {
+        return preprocess(source, received, false);
+    }
+
+    public static TLRPC.TL_textWithEntities preprocess(TLRPC.TL_textWithEntities source, TLRPC.TL_textWithEntities received, boolean force) {
         if (received == null || received.text == null) {
             return null;
         }
@@ -376,7 +380,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
                             break;
                         }
                     }
-                    if (alreadyContainsOne) {
+                    if (alreadyContainsOne && !force) {
                         continue;
                     }
 
