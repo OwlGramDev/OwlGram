@@ -18476,6 +18476,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 pinnedMessageObject.messageOwner.originalReplyMarkupRows = messageObject.messageOwner.originalReplyMarkupRows;
                                 pinnedMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
                                 pinnedMessageObject.messageOwner.originalPoll = messageObject.messageOwner.originalPoll;
+                                pinnedMessageObject.messageOwner.translationProvider = messageObject.messageOwner.translationProvider;
                                 if (pinnedMessageObject.updateTranslation(currentPinnedMessageId == messageObject.getId())) {
                                     updatedPinned = true;
                                 }
@@ -18501,6 +18502,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 messageObject.messageOwner.originalReplyMarkupRows = translatedReplyMessageObject.messageOwner.originalReplyMarkupRows;
                                 messageObject.messageOwner.translatedPoll = translatedReplyMessageObject.messageOwner.translatedPoll;
                                 messageObject.messageOwner.originalPoll = translatedReplyMessageObject.messageOwner.originalPoll;
+                                messageObject.messageOwner.translationProvider = messageObject.messageOwner.translationProvider;
                                 if (messageObject.replyMessageObject.updateTranslation(true)) {
                                     update = true;
                                 }
@@ -18587,6 +18589,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 pinnedMessageObject.messageOwner.originalReplyMarkupRows = messageObject.messageOwner.originalReplyMarkupRows;
                 pinnedMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
                 pinnedMessageObject.messageOwner.originalPoll = messageObject.messageOwner.originalPoll;
+                pinnedMessageObject.messageOwner.translationProvider = messageObject.messageOwner.translationProvider;
                 if (pinnedMessageObject.updateTranslation(true)) {
                     updatePinnedMessageView(true, 1);
                     updated = true;
@@ -18614,6 +18617,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     cellMessageObject.messageOwner.originalReplyMarkupRows = messageObject.messageOwner.originalReplyMarkupRows;
                     cellMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
                     cellMessageObject.messageOwner.originalPoll = messageObject.messageOwner.originalPoll;
+                    cellMessageObject.messageOwner.translationProvider = messageObject.messageOwner.translationProvider;
                     if (cellMessageObject.updateTranslation(false)) {
                         update = true;
                         ArrayList<Integer> dependentMessages = replyMessageOwners.get(cellMessageObject.getId());
@@ -18640,6 +18644,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     cellMessageObject.messageOwner.originalReplyMarkupRows = messageObject.messageOwner.originalReplyMarkupRows;
                     cellMessageObject.messageOwner.translatedPoll = messageObject.messageOwner.translatedPoll;
                     cellMessageObject.messageOwner.originalPoll = messageObject.messageOwner.originalPoll;
+                    cellMessageObject.messageOwner.translationProvider = messageObject.messageOwner.translationProvider;
                     if (cellMessageObject.replyMessageObject.updateTranslation(false)) {
                         update = true;
                     }
@@ -18682,6 +18687,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     cellMessageObject.replyMessageObject.messageOwner.originalReplyMarkupRows = translatedReplyMessageObject.messageOwner.originalReplyMarkupRows;
                     cellMessageObject.replyMessageObject.messageOwner.translatedPoll = translatedReplyMessageObject.messageOwner.translatedPoll;
                     cellMessageObject.replyMessageObject.messageOwner.originalPoll = translatedReplyMessageObject.messageOwner.originalPoll;
+                    cellMessageObject.replyMessageObject.messageOwner.translationProvider = translatedReplyMessageObject.messageOwner.translationProvider;
                     if (cellMessageObject.replyMessageObject.updateTranslation(false)) {
                         update = true;
                     }
@@ -25682,7 +25688,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         TranslateController controller = MessagesController.getInstance(currentAccount).getTranslateController();
         controller.addManualTranslation(messageObject);
         controller.unHideTranslation(messageObject);
-        if (!TranslateController.isValidTranslation(controller.getDialogTranslateTo(-1), messageObject.messageOwner)) {
+        if (!TranslateController.isValidTranslation(messageObject.messageOwner)) {
             messageObject.messageOwner.translatedText = null;
             messageObject.messageOwner.translatedPoll = null;
         }

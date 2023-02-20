@@ -528,12 +528,13 @@ public class TranslateController extends BaseController {
         }
     }
 
-    public static boolean isValidTranslation(String language, MessageObject messageObject) {
-        return isValidTranslation(language, messageObject.messageOwner);
+    public static boolean isValidTranslation(MessageObject messageObject) {
+        return isValidTranslation(messageObject.messageOwner);
     }
 
-    public static boolean isValidTranslation(String language, TLRPC.Message messageOwner) {
-        return TextUtils.equals(language, messageOwner.translatedToLanguage) && OwlConfig.translationProvider == messageOwner.translationProvider;
+    public static boolean isValidTranslation(TLRPC.Message messageOwner) {
+        return TextUtils.equals(Translator.getTranslator(OwlConfig.translationProvider).getCurrentTargetLanguage(), messageOwner.translatedToLanguage)
+                && OwlConfig.translationProvider == messageOwner.translationProvider;
     }
 
     private boolean isRestrictedLanguage(MessageObject messageObject) {
@@ -567,9 +568,8 @@ public class TranslateController extends BaseController {
             return;
         }
 
-        final String language = getDialogTranslateTo(dialogId);
         MessageObject potentialReplyMessageObject;
-        if (!keepReply && (messageObject.messageOwner.translatedText == null || !isValidTranslation(language, messageObject)) && (potentialReplyMessageObject = findReplyMessageObject(dialogId, topicId, messageObject.getId())) != null) {
+        if (!keepReply && (messageObject.messageOwner.translatedText == null && messageObject.messageOwner.translatedPoll == null || !isValidTranslation(messageObject)) && (potentialReplyMessageObject = findReplyMessageObject(dialogId, topicId, messageObject.getId())) != null) {
             messageObject.messageOwner.translatedToLanguage = potentialReplyMessageObject.messageOwner.translatedToLanguage;
             messageObject.messageOwner.originalLanguage = potentialReplyMessageObject.messageOwner.originalLanguage;
             messageObject.messageOwner.translatedReplyMarkupRows = potentialReplyMessageObject.messageOwner.translatedReplyMarkupRows;
@@ -577,12 +577,13 @@ public class TranslateController extends BaseController {
             messageObject.messageOwner.translatedText = potentialReplyMessageObject.messageOwner.translatedText;
             messageObject.messageOwner.translatedPoll = potentialReplyMessageObject.messageOwner.translatedPoll;
             messageObject.messageOwner.originalPoll = potentialReplyMessageObject.messageOwner.originalPoll;
+            messageObject.messageOwner.translationProvider = potentialReplyMessageObject.messageOwner.translationProvider;
             messageObject = potentialReplyMessageObject;
         }
 
         if (onScreen && isTranslatingDialog(dialogId, topicId) && !isRestrictedLanguage(messageObject)) {
             final MessageObject finalMessageObject = messageObject;
-            if (finalMessageObject.messageOwner.translatedText == null || !isValidTranslation(language, finalMessageObject)) {
+            if (finalMessageObject.messageOwner.translatedText == null && finalMessageObject.messageOwner.translatedPoll == null || !isValidTranslation(finalMessageObject)) {
                 NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslating, finalMessageObject);
                 pushToTranslate(finalMessageObject, result -> {
                     if (DoNotTranslateSettings.getRestrictedLanguages().contains(result.sourceLanguage)) {
@@ -614,6 +615,7 @@ public class TranslateController extends BaseController {
                                 dialogMessage.messageOwner.originalReplyMarkupRows = finalMessageObject.messageOwner.originalReplyMarkupRows;
                                 dialogMessage.messageOwner.translatedPoll = finalMessageObject.messageOwner.translatedPoll;
                                 dialogMessage.messageOwner.originalPoll = finalMessageObject.messageOwner.originalPoll;
+                                dialogMessage.messageOwner.translationProvider = finalMessageObject.messageOwner.translationProvider;
                                 if (dialogMessage.updateTranslation()) {
                                     NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.updateInterfaces, 0);
                                 }

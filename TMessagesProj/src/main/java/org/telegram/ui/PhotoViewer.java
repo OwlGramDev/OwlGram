@@ -17717,7 +17717,7 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
         } catch (Throwable ignore) {}
         controller.addManualTranslation(currentMessageObject);
         controller.unHideTranslation(currentMessageObject);
-        if (!TranslateController.isValidTranslation(controller.getDialogTranslateTo(-1), currentMessageObject.messageOwner)) {
+        if (!TranslateController.isValidTranslation(currentMessageObject.messageOwner)) {
             currentMessageObject.messageOwner.translatedText = null;
         }
         if (currentMessageObject.messageOwner.translatedText != null) {
