@@ -573,7 +573,7 @@ public class CameraXController {
                         exif.rotate(orientation);
                     }
                     exif.save();
-                } catch (JpegImageUtils.CodecFailedException | IOException e) {
+                } catch (JpegImageUtils.CodecFailedException | IOException | IllegalStateException e) {
                     e.printStackTrace();
                     FileLog.e(e);
                 }
