@@ -178,9 +178,6 @@ public class TranslateButton extends FrameLayout {
         }
         for (TranslateController.Language lng : suggestedLanguages) {
             final String code = lng.code;
-            if (TextUtils.equals(code, detectedLanguage)) {
-                continue;
-            }
 
             ActionBarMenuSubItem button = new ActionBarMenuSubItem(getContext(), 2, false, false, resourcesProvider);
             final boolean checked = currentTranslateTo != null && currentTranslateTo.equals(code);
@@ -198,9 +195,6 @@ public class TranslateButton extends FrameLayout {
         swipeBackScroll.addView(new ActionBarPopupWindow.GapView(getContext(), resourcesProvider), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 8));
         for (TranslateController.Language lng : allLanguages) {
             final String code = lng.code;
-            if (TextUtils.equals(code, detectedLanguage)) {
-                continue;
-            }
 
             ActionBarMenuSubItem button = new ActionBarMenuSubItem(getContext(), 2, false, false, resourcesProvider);
             final boolean checked = currentTranslateTo != null && currentTranslateTo.equals(code);

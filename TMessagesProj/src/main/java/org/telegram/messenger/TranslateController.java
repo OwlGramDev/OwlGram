@@ -424,6 +424,13 @@ public class TranslateController extends BaseController {
             language.displayName = TranslatorHelper.languageName(language.code);
             result.add(language);
         }
+
+        if (!appLanguage.equals("en") && !except.equals("en")) {
+            language = new Language();
+            language.code = "en";
+            language.displayName = TranslatorHelper.languageName(language.code);
+            result.add(language);
+        }
         return result;
     }
 
