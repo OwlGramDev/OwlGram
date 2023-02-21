@@ -184,7 +184,7 @@ public class MessageHelper extends BaseController {
         return messageObject;
     }
 
-    private MessageObject getTargetMessageObjectFromGroup(MessageObject.GroupedMessages selectedObjectGroup) {
+    public static MessageObject getTargetMessageObjectFromGroup(MessageObject.GroupedMessages selectedObjectGroup) {
         MessageObject messageObject = null;
         for (MessageObject object : selectedObjectGroup.messages) {
             if (!TextUtils.isEmpty(object.messageOwner.message)) {

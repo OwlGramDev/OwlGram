@@ -42,9 +42,6 @@ public class HTMLKeeper {
             int end = messSpan.getSpanEnd(mSpan);
             boolean isBold = (((TextStyleSpan) mSpan).getStyleFlags() & TextStyleSpan.FLAG_STYLE_BOLD) > 0;
             boolean isItalic = (((TextStyleSpan) mSpan).getStyleFlags() & TextStyleSpan.FLAG_STYLE_ITALIC) > 0;
-            if (EntitiesHelper.isEmoji(text.substring(0, 1)) && mSpans[0] == mSpan && start > 0) {
-                start = 0;
-            }
             if (isBold && !isItalic || isBold && !includeLink) {
                 messSpan.setSpan(new StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             }

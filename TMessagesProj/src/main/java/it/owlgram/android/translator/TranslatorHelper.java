@@ -23,16 +23,7 @@ import it.owlgram.android.helpers.MessageHelper;
 public class TranslatorHelper {
 
     public static void resetTranslatedMessage(MessageObject messageObject) {
-        resetTranslatedMessage(messageObject, false);
-    }
-
-    public static void resetTranslatedMessage(MessageObject messageObject, boolean noCache) {
-        if (noCache) {
-            messageObject.messageOwner.translatedText = null;
-            messageObject.messageOwner.translatedPoll = null;
-        } else {
-            MessagesController.getInstance(UserConfig.selectedAccount).getTranslateController().hideTranslation(messageObject);
-        }
+        MessagesController.getInstance(UserConfig.selectedAccount).getTranslateController().hideTranslation(messageObject);
         NotificationCenter.getInstance(UserConfig.selectedAccount).postNotificationName(NotificationCenter.messageTranslated, messageObject);
     }
 

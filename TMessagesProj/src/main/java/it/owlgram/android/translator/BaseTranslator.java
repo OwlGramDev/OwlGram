@@ -1,5 +1,6 @@
 package it.owlgram.android.translator;
 
+import android.os.SystemClock;
 import android.util.LruCache;
 
 import androidx.annotation.Nullable;
@@ -48,10 +49,17 @@ abstract public class BaseTranslator {
                 @Override
                 public void run() {
                     if (exception.get() == null) {
-                        try {
-                            results.set(j, preProcessTranslation(translations.get(j), tl));
-                        } catch (Exception e) {
-                            exception.set(e);
+                        // retry 250 * 4 * 60 = 60 seconds
+                        for (int k = 0; k < 250 * 4 * 60; k++) {
+                            try {
+                                results.set(j, preProcessTranslation(translations.get(j), tl));
+                            } catch (Http429Exception e) {
+                                exception.set(e);
+                            } catch (Exception e) {
+                                SystemClock.sleep(250);
+                                continue;
+                            }
+                            break;
                         }
                     }
                     semaphore.countDown();

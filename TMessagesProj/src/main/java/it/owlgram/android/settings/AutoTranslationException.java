@@ -17,7 +17,6 @@ import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.Theme;
-import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.ManageChatTextCell;
 import org.telegram.ui.Cells.ManageChatUserCell;
 import org.telegram.ui.Cells.TextSettingsCell;
@@ -33,8 +32,6 @@ public class AutoTranslationException extends BaseSettingsActivity {
     private final boolean isAllow;
 
     private int addUsersOrGroupsRow;
-    private int spaceRow;
-    private int headerExceptionsRow;
     private int exceptionsStartRow;
     private int exceptionsEndRow;
     private int dividerRow;
@@ -96,8 +93,6 @@ public class AutoTranslationException extends BaseSettingsActivity {
         super.updateRowsId();
 
         addUsersOrGroupsRow = rowCount++;
-        spaceRow = rowCount++;
-        headerExceptionsRow = rowCount++;
         exceptionsStartRow = rowCount;
         rowCount += AutoTranslateConfig.getExceptions(isAllow).size();
         exceptionsEndRow = rowCount;
@@ -126,12 +121,6 @@ public class AutoTranslationException extends BaseSettingsActivity {
                     if (position == addUsersOrGroupsRow) {
                         actionCell.setColors(Theme.key_windowBackgroundWhiteBlueIcon, Theme.key_windowBackgroundWhiteBlueButton);
                         actionCell.setText(LocaleController.getString("PrivacyAddAnException", R.string.PrivacyAddAnException), null, R.drawable.msg_contact_add, false);
-                    }
-                    break;
-                case HEADER:
-                    HeaderCell headerCell = (HeaderCell) holder.itemView;
-                    if (position == headerExceptionsRow) {
-                        headerCell.setText(LocaleController.getString("PrivacyExceptions", R.string.PrivacyExceptions));
                     }
                     break;
                 case MANAGE_CHAT:
@@ -218,10 +207,6 @@ public class AutoTranslationException extends BaseSettingsActivity {
         public ViewType getViewType(int position) {
             if (position == addUsersOrGroupsRow) {
                 return ViewType.ADD_EXCEPTION;
-            } else if (position == spaceRow) {
-                return ViewType.TEXT_HINT;
-            } else if (position == headerExceptionsRow) {
-                return ViewType.HEADER;
             } else if (position >= exceptionsStartRow && position < exceptionsEndRow) {
                 return ViewType.MANAGE_CHAT;
             } else if (position == dividerRow || position == divider2Row) {
