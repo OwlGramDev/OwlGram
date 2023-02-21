@@ -641,8 +641,11 @@ public class TranslateController extends BaseController {
         final int topicId = getTopicId(messageObject);
         messageObject.messageOwner.translatedToLanguage = null;
         messageObject.messageOwner.translatedText = null;
+        messageObject.messageOwner.originalReplyMarkupRows = null;
         messageObject.messageOwner.translatedReplyMarkupRows = null;
+        messageObject.messageOwner.originalPoll = null;
         messageObject.messageOwner.translatedPoll = null;
+        messageObject.messageOwner.translationProvider = 0;
         getMessagesStorage().updateMessageCustomParams(dialogId, messageObject.messageOwner);
         AndroidUtilities.runOnUIThread(() -> {
             NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslated, messageObject, isTranslatingDialog(dialogId, topicId));
@@ -678,6 +681,11 @@ public class TranslateController extends BaseController {
                     dialogMessage.messageOwner.translatedText = props.translatedText;
                     dialogMessage.messageOwner.translatedToLanguage = props.translatedToLanguage;
                     dialogMessage.messageOwner.originalLanguage = props.originalLanguage;
+                    dialogMessage.messageOwner.originalReplyMarkupRows = props.originalReplyMarkupRows;
+                    dialogMessage.messageOwner.translatedReplyMarkupRows = props.translatedReplyMarkupRows;
+                    dialogMessage.messageOwner.originalPoll = props.originalPoll;
+                    dialogMessage.messageOwner.translatedPoll = props.translatedPoll;
+                    dialogMessage.messageOwner.translationProvider = props.translationProvider;
                     if (dialogMessage.updateTranslation(false)) {
                         updated = true;
                     }

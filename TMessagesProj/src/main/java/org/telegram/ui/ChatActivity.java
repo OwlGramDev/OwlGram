@@ -24718,7 +24718,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             closeMenu(true);
                             if (messageObject.isDoneTranslation() && messageObject.translated) {
                                 TranslatorHelper.resetTranslatedMessage(messageObject);
-                                getMessagesStorage().updateMessageCustomParams(messageObject.getDialogId(), messageObject.messageOwner);
                             } else {
                                 if (OwlConfig.translatorStyle == BaseTranslator.DIALOG_STYLE) {
                                     TranslateAlert2 alert = TranslateAlert2.showAlert(getParentActivity(), this, currentAccount, null, Translator.getCurrentTranslator().getCurrentTargetLanguage().split("-")[0], getMessageHelper().getPlainText(messageObject), messageObject.messageOwner.entities, noforwards, onLinkPress, () -> dimBehindView(false));
@@ -25724,7 +25723,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             messageObject.messageOwner.translatedPoll = null;
         }
         if (messageObject.messageOwner.translatedText != null || messageObject.messageOwner.translatedPoll != null) {
-            getMessagesStorage().updateMessageCustomParams(messageObject.getDialogId(), messageObject.messageOwner);
             NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.messageTranslated, messageObject);
         } else {
             controller.addTranslatingMessage(messageObject);

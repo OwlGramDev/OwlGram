@@ -3897,6 +3897,11 @@ public class MediaDataController extends BaseController {
                            messageObject.messageOwner.originalLanguage = message.originalLanguage;
                            messageObject.messageOwner.translatedToLanguage = message.translatedToLanguage;
                            messageObject.messageOwner.translatedText = message.translatedText;
+                           messageObject.messageOwner.originalReplyMarkupRows = message.originalReplyMarkupRows;
+                           messageObject.messageOwner.translatedReplyMarkupRows = message.translatedReplyMarkupRows;
+                           messageObject.messageOwner.originalPoll = message.originalPoll;
+                           messageObject.messageOwner.translatedPoll = message.translatedPoll;
+                           messageObject.messageOwner.translationProvider = message.translationProvider;
                            messageObject.updateTranslation();
                         }
                         notify.run();
