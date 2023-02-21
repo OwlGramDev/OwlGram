@@ -9211,9 +9211,6 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         for (int a = 0; a < 2; a++) {
             for (int b = 0; b < selectedMessagesIds[a].size(); b++) {
                 MessageObject messageObject = selectedMessagesIds[a].valueAt(b);
-                if (messageObject.translated && messageObject.messageOwner.translatedText != null) {
-                    TranslatorHelper.resetTranslatedMessage(messageObject, true);
-                }
                 if (messageObject.isPoll()) {
                     hasPoll = messageObject.isPublicPoll() ? 2 : 1;
                     if (hasPoll == 2) {
@@ -25429,7 +25426,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             selectionReactionsOverlay.setHiddenByScroll(true);
         }
         if (messageObject.translated) {
-            TranslatorHelper.resetTranslatedMessage(messageObject, true);
+            TranslatorHelper.resetTranslatedMessage(messageObject);
         }
         if (searchItem != null && actionBar.isSearchFieldVisible()) {
             actionBar.closeSearchField();
