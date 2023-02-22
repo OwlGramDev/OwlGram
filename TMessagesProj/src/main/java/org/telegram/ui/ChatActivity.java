@@ -3342,8 +3342,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             boolean allowShowPinned;
             if (currentChat != null) {
                 allowShowPinned = ChatObject.canUserDoAction(currentChat, ChatObject.ACTION_PIN) || ChatObject.isChannel(currentChat);
+            } else if (currentEncryptedChat == null) {
+                allowShowPinned = currentUser != null;
             } else {
-                allowShowPinned = currentUser != null && !isSecretChat();
+                allowShowPinned = false;
             }
             if (allowShowPinned) {
                 headerItem.addSubItem(show_pinned, R.drawable.msg_pin, LocaleController.getString("PinnedMessage", R.string.PinnedMessage));
@@ -8444,6 +8446,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
         pinnedMessageView.addView(pinnedListButton, LayoutHelper.createFrame(36, 48, Gravity.RIGHT | Gravity.TOP, 0, 0, 7, 0));
         pinnedListButton.setOnClickListener(v -> openPinnedMessagesList(false));
+        pinnedListButton.setOnLongClickListener(v -> {
+            SharedPreferences preferences = MessagesController.getNotificationsSettings(currentAccount);
+            preferences.edit().putInt("pin_" + dialog_id, pinnedMessageIds.get(0)).commit();
+            updatePinnedMessageView(true);
+            return true;
+        });
 
         closePinned = new ImageView(getContext());
         closePinned.setImageResource(R.drawable.miniplayer_close);
@@ -21424,6 +21432,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             changed = hidePinnedMessageView(animated);
             if (headerItem != null) headerItem.showSubItem(show_pinned);
         } else {
+            if (headerItem != null) headerItem.hideSubItem(show_pinned);
             if (pinnedMessageView == null) {
                 createPinnedMessageView();
             } else {
