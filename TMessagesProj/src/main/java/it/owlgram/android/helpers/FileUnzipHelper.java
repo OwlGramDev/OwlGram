@@ -85,7 +85,13 @@ public class FileUnzipHelper {
                         ZipInputStream zipIn = new ZipInputStream(new FileInputStream(inputFile));
                         ZipEntry entry = zipIn.getNextEntry();
                         while (entry != null) {
-                            String filePath = mOutput.getAbsolutePath() + File.separator + entry.getName();
+                            String filePath = mOutput.getCanonicalPath() + File.separator + entry.getName();
+                            if (!filePath.startsWith(mOutput.getCanonicalPath())) {
+                                zipIn.closeEntry();
+                                zipIn.close();
+                                AndroidUtilities.runOnUIThread(() -> onPostExecute(true));
+                                return;
+                            }
                             if (isUnzipCanceled) {
                                 zipIn.closeEntry();
                                 zipIn.close();
