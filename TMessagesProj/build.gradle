@@ -79,7 +79,7 @@ dependencies {
     implementation 'com.google.mlkit:language-id:17.0.4'
     implementation 'com.android.billingclient:billing:5.1.0'
     implementation 'org.apache.commons:commons-text:1.10.0'
-    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'org.codeberg.qwerty287:prism4j:003cb5e380'
 
     // CameraX Implementation
