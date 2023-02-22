@@ -516,10 +516,6 @@ public class Utilities {
         return ext;
     }
 
-    public static interface CallbackNoReturn {
-        public void run();
-    }
-
     public static interface Callback<T> {
         public void run(T arg);
     }

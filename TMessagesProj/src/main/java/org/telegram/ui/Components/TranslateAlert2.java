@@ -96,7 +96,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
 
     private BaseFragment fragment;
     private Utilities.CallbackReturn<URLSpan, Boolean> onLinkPress;
-    private Utilities.CallbackNoReturn onLanguageSelect;
+    private Runnable onLanguageSelect;
     private boolean firstTranslation = true;
 
     public TranslateAlert2(
@@ -484,7 +484,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
         super.dismissInternal();
     }
 
-    public void setOnLanguageSelect(Utilities.CallbackNoReturn listener) {
+    public void setOnLanguageSelect(Runnable listener) {
         onLanguageSelect = listener;
     }
 
