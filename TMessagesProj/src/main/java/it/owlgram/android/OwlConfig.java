@@ -140,7 +140,7 @@ public class OwlConfig extends SettingsManager {
                     restoreBackup(backupFile(), true);
                 }
                 putValue("DB_VERSION", DB_VERSION = BuildVars.BUILD_VERSION);
-                registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> executeBackup());
+                registerOnSharedPreferenceChangeListener(SettingsManager::executeBackup);
             }
             isChineseUser = ApplicationLoader.applicationContext.getResources().getBoolean(R.bool.isChineseUser);
             hidePhoneNumber = getBoolean("hidePhoneNumber", true);

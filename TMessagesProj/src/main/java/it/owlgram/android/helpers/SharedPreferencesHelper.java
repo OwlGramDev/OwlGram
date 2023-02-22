@@ -3,12 +3,16 @@ package it.owlgram.android.helpers;
 import android.app.Activity;
 import android.content.SharedPreferences;
 
+import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 
 import java.util.Map;
 
 public class SharedPreferencesHelper {
     private static final SharedPreferences preferences;
+    private static Runnable changeListener;
+    private final static int GROUPING_BACKUP_TIMEOUT = 250;
+    private static Runnable groupingRunnable;
 
     static {
         preferences = ApplicationLoader.applicationContext.getSharedPreferences("owlgram", Activity.MODE_PRIVATE);
@@ -26,6 +30,20 @@ public class SharedPreferencesHelper {
             editor.putLong(key, (Long) value);
         }
         editor.apply();
+        onSharedPreferenceChanged();
+    }
+
+    private static void onSharedPreferenceChanged() {
+        if (SharedPreferencesHelper.changeListener != null) {
+            if (groupingRunnable != null) {
+                AndroidUtilities.cancelRunOnUIThread(groupingRunnable);
+            }
+            groupingRunnable = () -> {
+                SharedPreferencesHelper.changeListener.run();
+                groupingRunnable = null;
+            };
+            AndroidUtilities.runOnUIThread(groupingRunnable, GROUPING_BACKUP_TIMEOUT);
+        }
     }
 
     protected static String getString(String key, String defaultValue) {
@@ -54,9 +72,10 @@ public class SharedPreferencesHelper {
     
     protected static void remove(String key) {
         preferences.edit().remove(key).apply();
+        onSharedPreferenceChanged();
     }
 
-    protected static void registerOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
-        preferences.registerOnSharedPreferenceChangeListener(listener);
+    protected static void registerOnSharedPreferenceChangeListener(Runnable listener) {
+        SharedPreferencesHelper.changeListener = listener;
     }
 }
