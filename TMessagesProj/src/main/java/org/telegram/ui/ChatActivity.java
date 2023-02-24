@@ -3122,7 +3122,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         avatarContainer.allowShorterStatus = true;
         avatarContainer.premiumIconHiddable = true;
         avatarContainer.setOnLongClickListener(v -> {
-            if (inPreviewMode || threadMessageId != 0 || UserObject.isReplyUser(currentUser)|| currentUser != null && currentUser.self || OwlConfig.searchIconInActionBar) {
+            if (inPreviewMode || threadMessageId != 0 || UserObject.isReplyUser(currentUser)|| currentUser != null && currentUser.self || OwlConfig.searchIconInActionBar || chatMode == MODE_PINNED) {
                 return false;
             }
             openSearchWithText(null);
