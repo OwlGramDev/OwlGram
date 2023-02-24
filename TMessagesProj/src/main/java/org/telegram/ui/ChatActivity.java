@@ -7607,6 +7607,17 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         final float paddingTop = Theme.chat_composeShadowDrawable.getIntrinsicHeight() / AndroidUtilities.density - 3f;
         searchContainer.addView(searchAsListTogglerView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.NO_GRAVITY, 0, paddingTop, 0, 0));
 
+        searchBeginningButton = new ImageView(getContext());
+        searchBeginningButton.setScaleType(ImageView.ScaleType.CENTER);
+        searchBeginningButton.setImageResource(R.drawable.round_arrow_upward_white_28);
+        searchBeginningButton.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_chat_searchPanelIcons), PorterDuff.Mode.MULTIPLY));
+        searchBeginningButton.setBackgroundDrawable(Theme.createSelectorDrawable(getThemedColor(Theme.key_actionBarActionModeDefaultSelector), 1));
+        searchContainer.addView(searchBeginningButton, LayoutHelper.createFrame(48, 48, Gravity.RIGHT | Gravity.TOP, 0, 0, 96, 0));
+        searchBeginningButton.setOnClickListener(view -> {
+            jumpToDate(1375315200);
+        });
+        searchBeginningButton.setContentDescription(LocaleController.getString("JumpToBeginning", R.string.JumpToBeginning));
+
         searchUpButton = new ImageView(getContext());
         searchUpButton.setScaleType(ImageView.ScaleType.CENTER);
         searchUpButton.setImageResource(R.drawable.msg_go_up);
