@@ -731,6 +731,10 @@ public class ContentPreviewViewer {
         }, 300);
     }
 
+    private boolean isCustomEmoji(View view) {
+        return view instanceof EmojiPacksAlert.EmojiImageView || view instanceof EmojiView.ImageViewEmoji && ((EmojiView.ImageViewEmoji) view).getSpan() != null;
+    }
+
     public boolean onTouch(MotionEvent event, final RecyclerListView listView, final int height, final Object listener, ContentPreviewViewerDelegate contentPreviewViewerDelegate, Theme.ResourcesProvider resourcesProvider) {
         delegate = contentPreviewViewerDelegate;
         this.resourcesProvider = resourcesProvider;
@@ -739,7 +743,7 @@ public class ContentPreviewViewer {
         }
         if (openPreviewRunnable != null || isVisible()) {
             if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_POINTER_UP) {
-                if (!OwlConfig.confirmStickersGIFs || delegate == null || !delegate.needSend(currentContentType)) {
+                if (!OwlConfig.confirmStickersGIFs || isCustomEmoji(currentPreviewCell) || delegate == null || !delegate.needSend(currentContentType)) {
                     AndroidUtilities.runOnUIThread(() -> {
                         if (listView != null) {
                             listView.setOnItemClickListener((RecyclerListView.OnItemClickListener) listener);
@@ -748,7 +752,7 @@ public class ContentPreviewViewer {
                 } else {
                     confirmSending();
                 }
-                if (openPreviewRunnable != null && (!OwlConfig.confirmStickersGIFs || delegate == null || !delegate.needSend(currentContentType))) {
+                if (openPreviewRunnable != null && (!OwlConfig.confirmStickersGIFs || isCustomEmoji(currentPreviewCell) || delegate == null || !delegate.needSend(currentContentType))) {
                     AndroidUtilities.cancelRunOnUIThread(openPreviewRunnable);
                     openPreviewRunnable = null;
                 } else if (openPreviewRunnable != null) {
