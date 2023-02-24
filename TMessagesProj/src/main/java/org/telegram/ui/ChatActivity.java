@@ -29957,20 +29957,23 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 } else if (which == 4) {
                     AndroidUtilities.addToClipboard(String.valueOf(button.user_id));
                 }
-                switch (which) {
-                    case 1:
-                    case 3:
-                        undoView.showWithAction(0, UndoView.ACTION_CALLBACK_COPIED, null);
-                        break;
-                    case 2:
-                        undoView.showWithAction(0, UndoView.ACTION_LINK_COPIED, null);
-                        break;
-                    case 4:
-                        undoView.showWithAction(0, UndoView.ACTION_ID_COPIED, null);
-                        break;
-                    default:
-                        undoView.showWithAction(0, UndoView.ACTION_TEXT_COPIED, null);
-                        break;
+                createUndoView();
+                if (undoView != null) {
+                    switch (which) {
+                        case 1:
+                        case 3:
+                            undoView.showWithAction(0, UndoView.ACTION_CALLBACK_COPIED, null);
+                            break;
+                        case 2:
+                            undoView.showWithAction(0, UndoView.ACTION_LINK_COPIED, null);
+                            break;
+                        case 4:
+                            undoView.showWithAction(0, UndoView.ACTION_ID_COPIED, null);
+                            break;
+                        default:
+                            undoView.showWithAction(0, UndoView.ACTION_TEXT_COPIED, null);
+                            break;
+                    }
                 }
             });
             showDialog(builder.create());
