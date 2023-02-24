@@ -4115,7 +4115,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 Translator.handleTranslationError(getContext(), error, this::translatePreSend, resourcesProvider);
                 return;
             }
-            messageEditText.setText((String) text.translation);
+            messageEditText.setText(BaseTranslator.stringFromTranslation(text.translation));
         });
     }
 
