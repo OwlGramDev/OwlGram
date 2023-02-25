@@ -44,6 +44,39 @@ def getVersionPBetaName = { ->
 }
 
 def isWindows = DefaultNativePlatform.currentOperatingSystem.toFamilyName() == OperatingSystemFamily.WINDOWS
+def isMacOs = DefaultNativePlatform.currentOperatingSystem.toFamilyName() == OperatingSystemFamily.MACOS
+
+def getCCachePath = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'which', 'ccache'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+def isAvailableCCacheFromHB = {
+    if (isMacOs) {
+        return new ProcessBuilder("which", "ccache").start().waitFor() == 0
+    }
+    return false
+}
+
+def getCCacheExecutable = {
+    if (isAvailableCCacheFromHB()) {
+        return Paths.get(getCCachePath()).toFile()
+    }
+    def pathName
+    if (isWindows) {
+        pathName = "windows"
+    } else if (isMacOs) {
+        return "macOs"
+    } else {
+        return "linux"
+    }
+    def executableFile = "ccache${if (isWindows) ".exe" else ""}"
+    return Paths.get(System.getProperty("user.dir"), "Tools", "ccache", pathName, executableFile).toFile()
+}
 
 dependencies {
     // AndroidX dependencies
@@ -145,7 +178,7 @@ android {
             cmake {
                 version '3.10.2'
                 arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-21'
-                var file = Paths.get("${System.getProperty("user.dir")}${File.separator}Tools${File.separator}ccache${if (isWindows) ".exe" else ""}").toFile()
+                var file = getCCacheExecutable()
                 if (file.exists()) {
                     println("Using ccache ${file.getAbsolutePath()}")
                     arguments += "-DANDROID_CCACHE=${file.getAbsolutePath()}"
