@@ -381,7 +381,7 @@ public class AnimatedFileDrawable extends BitmapDrawable implements Animatable, 
                                 return;
                             }
 
-                            if (oldTime != 0 && metaData[3] < lastTimeStamp && !SharedConfig.loopStickers && isWebmSticker && renderingWidth == 0) {
+                            if (oldTime != 0 && metaData[3] < lastTimeStamp && !SharedConfig.loopStickers() && isWebmSticker && renderingWidth == 0) {
                                 isRunning = false;
                                 wasStopped = true;
                             }
