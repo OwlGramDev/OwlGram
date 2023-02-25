@@ -290,8 +290,14 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
                 MessageObject.addEntitiesToText(translated, text.entities, false, true, false, false);
                 translated = preprocessText(translated);
                 textView.setText(translated);
-                headerView.arrowView.setVisibility(View.VISIBLE);
-                headerView.fromLanguageTextView.setText(capitalFirst(languageName(result.sourceLanguage)));
+                if (!TextUtils.isEmpty(result.sourceLanguage) && !result.sourceLanguage.equals(TranslateController.UNKNOWN_LANGUAGE)) {
+                    headerView.arrowView.setVisibility(View.VISIBLE);
+                    headerView.fromLanguageTextView.setVisibility(View.VISIBLE);
+                    headerView.fromLanguageTextView.setText(capitalFirst(languageName(result.sourceLanguage)));
+                } else {
+                    headerView.arrowView.setVisibility(View.GONE);
+                    headerView.fromLanguageTextView.setVisibility(View.GONE);
+                }
                 adapter.updateMainView(textViewContainer);
             } else if (firstTranslation) {
                 dismiss();
@@ -648,6 +654,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
     private class HeaderView extends FrameLayout {
 
         private ImageView backButton;
+        private ImageView copyButton;
         private TextView titleTextView;
         private LinearLayout subtitleView;
         private AnimatedTextView fromLanguageTextView;
@@ -664,6 +671,18 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
             backgroundView = new View(context);
             backgroundView.setBackgroundColor(getThemedColor(Theme.key_dialogBackground));
             addView(backgroundView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 44, Gravity.TOP | Gravity.FILL_HORIZONTAL, 0,  12, 0, 0));
+
+            copyButton = new ImageView(context);
+            copyButton.setImageResource(R.drawable.msg_copy);
+            copyButton.setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_player_actionBarSubtitle), PorterDuff.Mode.MULTIPLY));
+            copyButton.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            copyButton.setPadding(AndroidUtilities.dp(16), 0, AndroidUtilities.dp(16), 0);
+            copyButton.setBackground(Theme.createSelectorDrawable(Theme.getColor(Theme.key_dialogButtonSelector)));
+            addView(copyButton, LayoutHelper.createFrame(56, 56, !LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT, 0, 15, 0, 0));
+            copyButton.setOnClickListener(v -> {
+                AndroidUtilities.addToClipboard(textView.getText());
+                BulletinFactory.of((FrameLayout) containerView, resourcesProvider).createCopyBulletin(LocaleController.getString("TextCopied", R.string.TextCopied)).show();
+            });
 
             backButton = new ImageView(context);
             backButton.setScaleType(ImageView.ScaleType.CENTER);
@@ -710,6 +729,7 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
                 fromLanguageTextView.setTextColor(getThemedColor(Theme.key_player_actionBarSubtitle));
                 fromLanguageTextView.setTextSize(dp(14));
                 fromLanguageTextView.setPadding(0, dp(2), 0, dp(2));
+                fromLanguageTextView.setVisibility(View.GONE);
             //}
 
             arrowView = new ImageView(context);
@@ -776,17 +796,17 @@ public class TranslateAlert2 extends BottomSheet implements NotificationCenter.N
             toLanguageTextView.setOnClickListener(e -> openLanguagesSelect());
 
             if (LocaleController.isRTL) {
-                subtitleView.addView(toLanguageTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 0, fromLanguageTextView != null ? 3 : 0, 0));
+                subtitleView.addView(toLanguageTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 0, 0, 0));
                 if (fromLanguageTextView != null) {
-                    subtitleView.addView(arrowView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 1, 0, 0));
+                    subtitleView.addView(arrowView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 3, 1, 0, 0));
                     subtitleView.addView(fromLanguageTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 4, 0, 0, 0));
                 }
             } else {
                 if (fromLanguageTextView != null) {
                     subtitleView.addView(fromLanguageTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 0, 4, 0));
-                    subtitleView.addView(arrowView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 1, 0, 0));
+                    subtitleView.addView(arrowView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 1, 3, 0));
                 }
-                subtitleView.addView(toLanguageTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, fromLanguageTextView != null ? 3 : 0, 0, 0, 0));
+                subtitleView.addView(toLanguageTextView, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_VERTICAL, 0, 0, 0, 0));
             }
 
             addView(subtitleView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP | Gravity.FILL_HORIZONTAL, 22, 43, 22, 0));
