@@ -5147,7 +5147,10 @@ public class AndroidUtilities {
     }
 
     public static Spanned fromHtml(@NonNull String source) {
-        return HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY);
+        return fromHtml(source, null);
+    }
+    public static Spanned fromHtml(@NonNull String source, Html.TagHandler tagHandler) {
+        return HtmlCompat.fromHtml(source, HtmlCompat.FROM_HTML_MODE_LEGACY,null, tagHandler);
     }
 
     public static InputStream decompressStream(InputStream input) throws IOException {

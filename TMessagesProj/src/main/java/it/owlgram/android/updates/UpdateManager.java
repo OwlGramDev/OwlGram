@@ -64,7 +64,7 @@ public class UpdateManager {
                     JSONObject obj = new JSONObject(new StandardHTTPRequest(url).request());
                     String changelog_text = obj.getString("changelogs");
                     if (!changelog_text.equals("null")) {
-                        AndroidUtilities.runOnUIThread(() -> changelogCallback.onSuccess(HTMLKeeper.htmlToEntities(changelog_text, null, true)));
+                        AndroidUtilities.runOnUIThread(() -> changelogCallback.onSuccess(HTMLKeeper.htmlToEntities(changelog_text, null, true, false)));
                     }
                 } catch (Exception ignored) {
                 } finally {
