@@ -11605,17 +11605,19 @@ public class PhotoViewer implements NotificationCenter.NotificationCenterDelegat
                 menuItem.hideSubItem(gallery_menu_translate);
                 if (OwlConfig.showTranslate) {
                     if (newMessageObject != null) {
-                        if (!newMessageObject.isDoneTranslation() && !newMessageObject.translated && LanguageDetector.hasSupport()) {
-                            LanguageDetector.detectLanguage(
-                                    newMessageObject.messageOwner.message,
-                                    (String lang) -> {
-                                        if (!DoNotTranslateSettings.getRestrictedLanguages().contains(lang.split("-")[0])) {
-                                            menuItem.showSubItem(gallery_menu_translate);
-                                        }
-                                    }, e -> FileLog.e("mlkit: failed to detect language")
-                            );
-                        } else {
-                            menuItem.showSubItem(gallery_menu_translate);
+                        if (!TextUtils.isEmpty(newMessageObject.caption)) {
+                            if (!newMessageObject.isDoneTranslation() && !newMessageObject.translated && LanguageDetector.hasSupport()) {
+                                LanguageDetector.detectLanguage(
+                                        newMessageObject.messageOwner.message,
+                                        (String lang) -> {
+                                            if (!DoNotTranslateSettings.getRestrictedLanguages().contains(lang.split("-")[0])) {
+                                                menuItem.showSubItem(gallery_menu_translate);
+                                            }
+                                        }, e -> FileLog.e("mlkit: failed to detect language")
+                                );
+                            } else {
+                                menuItem.showSubItem(gallery_menu_translate);
+                            }
                         }
                         translateItem.setText(newMessageObject.isDoneTranslation() && newMessageObject.translated ? LocaleController.getString("UndoTranslate", R.string.UndoTranslate) : LocaleController.getString("TranslateMessage", R.string.TranslateMessage));
                     }
