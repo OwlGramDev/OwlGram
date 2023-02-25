@@ -89,7 +89,6 @@ public class OwlConfig extends SettingsManager {
     public static boolean hideAllTab;
     public static boolean hideSendAsChannel;
     public static boolean showNameInActionBar;
-    public static boolean stickersSorting;
     public static boolean sendLargePhotos;
     public static boolean reduceCameraXLatency;
     public static boolean translateEntireChat;
@@ -140,7 +139,7 @@ public class OwlConfig extends SettingsManager {
                     restoreBackup(backupFile(), true);
                 }
                 putValue("DB_VERSION", DB_VERSION = BuildVars.BUILD_VERSION);
-                registerOnSharedPreferenceChangeListener((sharedPreferences, s) -> executeBackup());
+                registerOnSharedPreferenceChangeListener(SettingsManager::executeBackup);
             }
             isChineseUser = ApplicationLoader.applicationContext.getResources().getBoolean(R.bool.isChineseUser);
             hidePhoneNumber = getBoolean("hidePhoneNumber", true);
@@ -225,7 +224,6 @@ public class OwlConfig extends SettingsManager {
             hideAllTab = getBoolean("hideAllTab", false);
             hideSendAsChannel = getBoolean("hideSendAsChannel", false);
             showNameInActionBar = getBoolean("showNameInActionBar", false);
-            stickersSorting = getBoolean("stickersSorting", true);
             emojiPackSelected = getString("emojiPackSelected", "default");
             lastSelectedCompression = getInt("lastSelectedCompression", 3);
             translateEntireChat = getBoolean("translateEntireChat", false);
@@ -478,10 +476,6 @@ public class OwlConfig extends SettingsManager {
 
     public static void toggleShowNameInActionBar() {
         putValue("showNameInActionBar", showNameInActionBar ^= true);
-    }
-
-    public static void toggleStickersSorting() {
-        putValue("stickersSorting", stickersSorting ^= true);
     }
 
     public static void toggleTranslateEntireChat() {

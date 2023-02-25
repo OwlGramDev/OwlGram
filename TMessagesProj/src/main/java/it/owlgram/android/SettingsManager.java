@@ -124,6 +124,7 @@ public class SettingsManager extends SharedPreferencesHelper {
             case "NEED_UPDATE_CAMERAX":
             case "emojiPackSelected":
             case "disableAppBarShadow":
+            case "stickersSorting":
                 return false;
             default:
                 return true;

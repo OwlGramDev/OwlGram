@@ -21,13 +21,14 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.MediaDataController;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.Theme;
+import org.telegram.ui.Components.AnimatedEmojiSpan;
 import org.telegram.ui.Components.TextStyleSpan;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class HTMLKeeper {
-    final private static String[] list_html_params = new String[]{"b", "i", "u", "s", "tt", "a", "q"};
+    final private static String[] list_html_params = new String[]{"b", "i", "u", "s", "tt", "a", "q", "tg-emoji"};
 
     public static String entitiesToHtml(String text, ArrayList<TLRPC.MessageEntity> entities, boolean includeLink) {
         text = text.replace("\n", "\u2029");
@@ -92,23 +93,29 @@ public class HTMLKeeper {
     }
 
     public static Pair<String, ArrayList<TLRPC.MessageEntity>> htmlToEntities(String text, ArrayList<TLRPC.MessageEntity> entities, boolean internalLinks) {
+        return htmlToEntities(text, entities, internalLinks, true);
+    }
+
+    public static Pair<String, ArrayList<TLRPC.MessageEntity>> htmlToEntities(String text, ArrayList<TLRPC.MessageEntity> entities, boolean internalLinks, boolean withFixes) {
         ArrayList<TLRPC.MessageEntity> returnEntities = new ArrayList<>();
         ArrayList<TLRPC.MessageEntity> copyEntities = null;
         if (entities != null) {
             copyEntities = new ArrayList<>(entities);
         }
-        text = fixDoubleSpace(text);
-        text = fixDoubleHtmlElement(text);
-        text = fixStrangeSpace(text);
-        text = fixHtmlCorrupted(text);
+        if (withFixes) {
+            text = fixDoubleSpace(text);
+            text = fixDoubleHtmlElement(text);
+            text = fixStrangeSpace(text);
+            text = fixHtmlCorrupted(text);
+            text = text.replace("<a>", "<a href=\"https://telegram.org/\">");
+            text = text.replaceAll("<q>(.*?)</q>", "<span style=\"color:#000000;\">$1</span>");
+            text = text.replace("\u2027", "&lt;");
+            text = text.replace("\u0327", "<");
+        }
         text = text.replaceAll("[\n\r]$", "");
         text = text.replace("\n", "<br/>");
         text = text.replaceAll("\n", "<br/>");
-        text = text.replace("<a>", "<a href=\"https://telegram.org/\">");
-        text = text.replaceAll("<q>(.*?)</q>", "<span style=\"color:#000000;\">$1</span>");
-        text = text.replace("\u2027", "&lt;");
-        text = text.replace("\u0327", "<");
-        SpannableString htmlParsed = new SpannableString(AndroidUtilities.fromHtml(text));
+        SpannableString htmlParsed = new SpannableString(AndroidUtilities.fromHtml("<inject>" + text + "</inject>", new HTMLTagAttributesHandler(new CustomElementHandler())));
         if (internalLinks) {
             AndroidUtilities.addLinks(htmlParsed, Linkify.ALL);
         }
@@ -187,6 +194,11 @@ public class HTMLKeeper {
                 entity = new TLRPC.TL_messageEntityStrike();
             } else if (mSpan instanceof ForegroundColorSpan) {
                 entity = new TLRPC.TL_messageEntitySpoiler();
+            } else if (mSpan instanceof AnimatedEmojiSpan) {
+                AnimatedEmojiSpan animatedEmojiSpan = (AnimatedEmojiSpan) mSpan;
+                TLRPC.TL_messageEntityCustomEmoji customEmoji = new TLRPC.TL_messageEntityCustomEmoji();
+                customEmoji.document_id = animatedEmojiSpan.documentId;
+                entity = customEmoji;
             }
             if (entity != null) {
                 entity.offset = start;

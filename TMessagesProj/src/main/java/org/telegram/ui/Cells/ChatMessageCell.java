@@ -93,6 +93,7 @@ import org.telegram.messenger.FileLog;
 import org.telegram.messenger.ImageLoader;
 import org.telegram.messenger.ImageLocation;
 import org.telegram.messenger.ImageReceiver;
+import org.telegram.messenger.LiteMode;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MediaController;
 import org.telegram.messenger.MediaDataController;
@@ -3954,9 +3955,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             unregisterFlagSecure.run();
             unregisterFlagSecure = null;
         }
-
         if (topicButton != null) {
             topicButton.onDetached(this);
+        }
+        if (currentNameStatusDrawable != null) {
+            currentNameStatusDrawable.detach();
         }
     }
 
@@ -4030,9 +4033,11 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         if (currentMessageObject != null && currentMessageObject.type == MessageObject.TYPE_EXTENDED_MEDIA_PREVIEW && unlockLayout != null) {
             invalidate();
         }
-
         if (topicButton != null) {
             topicButton.onAttached(this);
+        }
+        if (currentNameStatusDrawable != null) {
+            currentNameStatusDrawable.attach();
         }
     }
 
@@ -4077,9 +4082,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 if (!loadDocumentFromImageReceiver) {
                     TLRPC.PhotoSize photo = document == null ? FileLoader.getClosestPhotoSizeWithSize(currentMessageObject.photoThumbs, AndroidUtilities.getPhotoSize()) : null;
                     if (canDownload == 2 || canDownload == 1 && currentMessageObject.isVideo()) {
-//                        if (document != null && !currentMessageObject.shouldEncryptPhotoOrVideo() && currentMessageObject.canStreamVideo()) {
-//                            FileLoader.getInstance(currentAccount).loadFile(document, currentMessageObject, FileLoader.PRIORITY_NORMAL, 10);
-//                        }
+                        if (document != null && !currentMessageObject.shouldEncryptPhotoOrVideo() && currentMessageObject.canStreamVideo()) {
+                            FileLoader.getInstance(currentAccount).loadFile(document, currentMessageObject, FileLoader.PRIORITY_NORMAL, 0);
+                        }
                     } else if (canDownload != 0) {
                         if (document != null) {
                             FileLoader.getInstance(currentAccount).loadFile(document, currentMessageObject, FileLoader.PRIORITY_NORMAL, MessageObject.isVideoDocument(document) && currentMessageObject.shouldEncryptPhotoOrVideo() ? 2 : 0);
@@ -7823,7 +7828,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
     }
 
     private boolean loopStickers() {
-        return SharedConfig.loopStickers && !SharedConfig.getLiteMode().enabled();
+        return LiteMode.isEnabled(LiteMode.FLAG_ANIMATED_STICKERS_CHAT);
     }
 
     private void highlightCaptionLink(URLSpan link) {
@@ -12524,6 +12529,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             }
             if (currentNameStatusDrawable == null) {
                 currentNameStatusDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(this, true, AndroidUtilities.dp(20));
+                if (attachedToWindow) {
+                    currentNameStatusDrawable.attach();
+                }
             }
             if (currentNameStatus == null) {
                 currentNameStatusDrawable.set((Drawable) null, false);
@@ -17986,14 +17994,14 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                             }
                         }
                     }
-                    if (!TextUtils.isEmpty(currentMessageObject.messageText)) {
-                        sb.append(currentMessageObject.messageText);
-                    }
                     if (documentAttach != null && documentAttachType == DOCUMENT_ATTACH_TYPE_DOCUMENT) {
                         String fileName = FileLoader.getAttachFileName(documentAttach);
                         if (fileName.indexOf('.') != -1) {
                             sb.append(LocaleController.formatString(R.string.AccDescrDocumentType, fileName.substring(fileName.lastIndexOf('.') + 1).toUpperCase(Locale.ROOT)));
                         }
+                    }
+                    if (!TextUtils.isEmpty(currentMessageObject.messageText)) {
+                        sb.append(currentMessageObject.messageText);
                     }
                     if (documentAttach != null && (documentAttachType == DOCUMENT_ATTACH_TYPE_DOCUMENT || documentAttachType == DOCUMENT_ATTACH_TYPE_GIF || documentAttachType == DOCUMENT_ATTACH_TYPE_VIDEO)) {
                         if (buttonState == 1 && loadingProgressLayout != null) {
@@ -18041,15 +18049,6 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         }
                         sb.append(title);
                     }
-                    if (currentMessageObject.isVoiceTranscriptionOpen()) {
-                        sb.append("\n");
-                        sb.append(currentMessageObject.getVoiceTranscription());
-                    } else {
-                        if (MessageObject.getMedia(currentMessageObject.messageOwner) != null && !TextUtils.isEmpty(currentMessageObject.caption)) {
-                            sb.append("\n");
-                            sb.append(currentMessageObject.caption);
-                        }
-                    }
                     if (documentAttach != null) {
                         if (documentAttachType == DOCUMENT_ATTACH_TYPE_VIDEO) {
                             sb.append(", ");
@@ -18058,6 +18057,15 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         if (buttonState == 0 || documentAttachType == DOCUMENT_ATTACH_TYPE_DOCUMENT) {
                             sb.append(", ");
                             sb.append(AndroidUtilities.formatFileSize(documentAttach.size));
+                        }
+                    }
+                    if (currentMessageObject.isVoiceTranscriptionOpen()) {
+                        sb.append("\n");
+                        sb.append(currentMessageObject.getVoiceTranscription());
+                    } else {
+                        if (MessageObject.getMedia(currentMessageObject.messageOwner) != null && !TextUtils.isEmpty(currentMessageObject.caption)) {
+                            sb.append("\n");
+                            sb.append(currentMessageObject.caption);
                         }
                     }
                     if (currentMessageObject.isOut()) {

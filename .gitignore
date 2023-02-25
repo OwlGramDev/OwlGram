@@ -13,5 +13,7 @@ signing.properties
 *.jsk
 *.zip
 *.pepk
+*.aab
+.DS_Store
 google-services.json
 agconnect-services.json
