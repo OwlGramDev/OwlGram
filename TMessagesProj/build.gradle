@@ -55,26 +55,28 @@ def getCCachePath = { ->
     return stdout.toString().trim()
 }
 
-def isAvailableCCacheFromHB = {
-    if (isMacOs) {
-        return new ProcessBuilder("which", "ccache").start().waitFor() == 0
-    }
-    return false
-}
-
 def getCCacheExecutable = {
-    if (isAvailableCCacheFromHB()) {
-        return Paths.get(getCCachePath()).toFile()
-    }
     def pathName
     if (isWindows) {
         pathName = "windows"
     } else if (isMacOs) {
+        // Check if ccache is installed
+        if (new ProcessBuilder("which", "ccache").start().waitFor() == 0) {
+            def stdout = new ByteArrayOutputStream()
+            exec {
+                commandLine 'which', 'ccache'
+                standardOutput = stdout
+            }
+            pathName = stdout.toString().trim()
+            // Get the path to the ccache executable
+            return Paths.get(pathName).toFile()
+        }
         return "macOs"
     } else {
         return "linux"
     }
     def executableFile = "ccache${if (isWindows) ".exe" else ""}"
+    // Build the path to the local ccache executable
     return Paths.get(System.getProperty("user.dir"), "Tools", "ccache", pathName, executableFile).toFile()
 }
 
