@@ -183,7 +183,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
     private boolean wasLight;
 
     private final static float[] speeds = new float[] {
-            .5f, 1f, 1.2f, 1.5f, 1.65f, 1.8f
+            .5f, 1f, 1.2f, 1.5f, 1.65f, 2f
     };
     private final static int[] speedIcons = new int[] {
             R.drawable.voice_mini_0_5,
@@ -691,10 +691,10 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
             if (id < 0 || id >= speeds.length) {
                 return;
             }
-            MediaController.getInstance().setPlaybackSpeed(true, speeds[id]);
+            MediaController.getInstance().setPlaybackSpeed(MediaController.getInstance().getPlayingMessageObject().isMusic(), speeds[id]);
             updatePlaybackButton(true);
         });
-        final float[] toggleSpeeds = new float[] { 1.0F, 1.5F, 1.8F };
+        final float[] toggleSpeeds = new float[] { 1.0F, 1.5F, 2.0F };
         speedItems[0] = playbackSpeedButton.addSubItem(0, R.drawable.msg_speed_slow, LocaleController.getString("SpeedSlow", R.string.SpeedSlow));
         speedItems[1] = playbackSpeedButton.addSubItem(1, R.drawable.msg_speed_normal, LocaleController.getString("SpeedNormal", R.string.SpeedNormal));
         speedItems[2] = playbackSpeedButton.addSubItem(2, R.drawable.msg_speed_medium, LocaleController.getString("SpeedMedium", R.string.SpeedMedium));
@@ -708,7 +708,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
         playbackSpeedButton.setShowedFromBottom(true);
         playerLayout.addView(playbackSpeedButton, LayoutHelper.createFrame(36, 36, Gravity.TOP | Gravity.RIGHT, 0, 86, 20, 0));
         playbackSpeedButton.setOnClickListener(v -> {
-            float currentPlaybackSpeed = MediaController.getInstance().getPlaybackSpeed(true);
+            float currentPlaybackSpeed = MediaController.getInstance().getPlaybackSpeed(MediaController.getInstance().getPlayingMessageObject().isMusic());
             int index = -1;
             for (int i = 0; i < toggleSpeeds.length; ++i) {
                 if (currentPlaybackSpeed - 0.1F <= toggleSpeeds[i]) {
@@ -720,7 +720,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
             if (index >= toggleSpeeds.length) {
                 index = 0;
             }
-            MediaController.getInstance().setPlaybackSpeed(true, toggleSpeeds[index]);
+            MediaController.getInstance().setPlaybackSpeed(MediaController.getInstance().getPlayingMessageObject().isMusic(), toggleSpeeds[index]);
         });
         playbackSpeedButton.setOnLongClickListener(view -> {
             playbackSpeedButton.toggleSubMenu();
@@ -983,13 +983,13 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
                             AndroidUtilities.cancelRunOnUIThread(forwardSeek);
                             lastUpdateRewindingPlayerTime = 0;
                         }
-                        MediaController.getInstance().setPlaybackSpeed(true, 4);
+                        MediaController.getInstance().setPlaybackSpeed(messageObject.isMusic(), 4);
                         AndroidUtilities.runOnUIThread(this, 2000);
                     } else if (rewindingForwardPressedCount == 2) {
-                        MediaController.getInstance().setPlaybackSpeed(true, 7);
+                        MediaController.getInstance().setPlaybackSpeed(messageObject.isMusic(), 7);
                         AndroidUtilities.runOnUIThread(this, 2000);
                     } else {
-                        MediaController.getInstance().setPlaybackSpeed(true, 13);
+                        MediaController.getInstance().setPlaybackSpeed(messageObject.isMusic(), 13);
                     }
                 }
             };
@@ -1031,7 +1031,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
                         }
                         AndroidUtilities.cancelRunOnUIThread(pressedRunnable);
                         if (rewindingForwardPressedCount > 0) {
-                            MediaController.getInstance().setPlaybackSpeed(true, 1f);
+                            MediaController.getInstance().setPlaybackSpeed(messageObject.isMusic(), 1f);
                             if (MediaController.getInstance().isMessagePaused()) {
                                 lastUpdateRewindingPlayerTime = 0;
                                 forwardSeek.run();
@@ -1372,7 +1372,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
         if (playbackSpeedButton == null) {
             return;
         }
-        float currentPlaybackSpeed = MediaController.getInstance().getPlaybackSpeed(true);
+        float currentPlaybackSpeed = MediaController.getInstance().getPlaybackSpeed(MediaController.getInstance().getPlayingMessageObject().isMusic());
         int index = -1;
         for (int i = 0; i < speeds.length; ++i) {
             if (equals(speeds[i], currentPlaybackSpeed)) {
@@ -1396,7 +1396,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
 
     public void updateColors() {
         if (playbackSpeedButton != null) {
-            float currentPlaybackSpeed = MediaController.getInstance().getPlaybackSpeed(true);
+            float currentPlaybackSpeed = MediaController.getInstance().getPlaybackSpeed(MediaController.getInstance().getPlayingMessageObject().isMusic());
             final int color = getThemedColor(!equals(currentPlaybackSpeed, 1.0f) ? Theme.key_featuredStickers_addButtonPressed : Theme.key_inappPlayerClose);
             playbackSpeedButton.setIconColor(color);
             if (Build.VERSION.SDK_INT >= 21) {
@@ -1969,6 +1969,7 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
                 optionsButton.showSubItem(5);
                 optionsButton.setAdditionalYOffset(-AndroidUtilities.dp(157));
             }
+
             checkIfMusicDownloaded(messageObject);
             updateProgress(messageObject, !sameMessageObject);
             updateCover(messageObject, !sameMessageObject);
@@ -1991,11 +1992,12 @@ public class AudioPlayerAlert extends BottomSheet implements NotificationCenter.
                 durationTextView.setText(duration != 0 ? AndroidUtilities.formatShortDuration(duration) : "-:--");
             }
 
-            if (duration > 60 * 10) {
+            /*if (duration > 60 * 10) {
                 playbackSpeedButton.setVisibility(View.VISIBLE);
             } else {
                 playbackSpeedButton.setVisibility(View.GONE);
-            }
+            }*/
+            playbackSpeedButton.setVisibility(View.VISIBLE);
 
             if (!sameMessageObject) {
                 preloadNeighboringThumbs();

@@ -929,8 +929,8 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             try {
                 currentPlaybackSpeed = MessagesController.getGlobalMainSettings().getFloat("playbackSpeed", 1.0f);
                 currentMusicPlaybackSpeed = MessagesController.getGlobalMainSettings().getFloat("musicPlaybackSpeed", 1.0f);
-                fastPlaybackSpeed = MessagesController.getGlobalMainSettings().getFloat("fastPlaybackSpeed", 1.8f);
-                fastMusicPlaybackSpeed = MessagesController.getGlobalMainSettings().getFloat("fastMusicPlaybackSpeed", 1.8f);
+                fastPlaybackSpeed = MessagesController.getGlobalMainSettings().getFloat("fastPlaybackSpeed", 2.0f);
+                fastMusicPlaybackSpeed = MessagesController.getGlobalMainSettings().getFloat("fastMusicPlaybackSpeed", 2.0f);
                 sensorManager = (SensorManager) ApplicationLoader.applicationContext.getSystemService(Context.SENSOR_SERVICE);
                 linearSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
                 gravitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
@@ -3275,7 +3275,9 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                         if (pos > 0 && pos < 0.999f && messageObject.getDuration() >= 10 * 60) {
                             messageObject.audioProgress = seekToProgressPending = pos;
                         }
-                        shouldSavePositionForCurrentAudio = name;
+                        if (messageObject.getDuration() >= 10 * 60) {
+                            shouldSavePositionForCurrentAudio = name;
+                        }
                         if (Math.abs(currentMusicPlaybackSpeed - 1.0f) > 0.001f) {
                             audioPlayer.setPlaybackSpeed(currentMusicPlaybackSpeed);
                         }
@@ -3653,8 +3655,6 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                 AndroidUtilities.runOnUIThread(() -> {
                     recordStartRunnable = null;
                     NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.recordStartError, guid);
-                    NotificationCenter.getInstance(recordingCurrentAccount).postNotificationName(NotificationCenter.audioDidSent, recordingGuid, null, null);
-
                 });
                 return;
             }
@@ -3663,7 +3663,6 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             AndroidUtilities.runOnUIThread(() -> {
                 recordStartRunnable = null;
                 NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.recordStarted, guid, true);
-                NotificationCenter.getInstance(recordingCurrentAccount).postNotificationName(NotificationCenter.audioDidSent, recordingGuid, null, null);
             });
         }, paused ? 500 : 50);
     }
@@ -5109,7 +5108,6 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
         try {
             retriever.setDataSource(path);
             bitrate = Integer.parseInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE));
-            retriever.release();
         } catch (Exception e) {
             FileLog.e(e);
         }
