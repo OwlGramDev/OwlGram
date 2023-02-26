@@ -973,7 +973,7 @@ public class FragmentContextView extends FrameLayout implements NotificationCent
         } else if (equals(newValue, 1.5f)) {
             text = LocaleController.getString("AudioSpeedMedium", R.string.AudioSpeedMedium);
             resId = R.raw.speed_1to15;
-        } else if (equals(newValue, 1.8f)) {
+        } else if (equals(newValue, 2f)) {
             text = LocaleController.getString("AudioSpeedFast", R.string.AudioSpeedFast);
             resId = R.raw.speed_15to2;
         } else {
