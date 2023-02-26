@@ -177,6 +177,8 @@ public class Translator {
         Object additionalObjectTranslation = query;
         if (TranslatorHelper.isSupportHTMLMode()) {
             additionalObjectTranslation = HTMLKeeper.entitiesToHtml(query.text, query.entities, true);
+        } else if (!TranslatorHelper.isSupportMarkdown()) {
+            additionalObjectTranslation = query.text;
         }
         return translate(new ArrayList<>(Collections.singletonList(additionalObjectTranslation)), singleTranslateCallback(translateCallBack));
     }
