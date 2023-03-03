@@ -11,9 +11,6 @@
 -keep class com.google.android.exoplayer2.metadata.flac.PictureFrame { *; }
 -keep class com.google.android.exoplayer2.decoder.SimpleOutputBuffer { *; }
 
-# https://developers.google.com/ml-kit/known-issues#android_issues
--keep class com.google.mlkit.nl.languageid.internal.ThickLanguageIdentifier { *; }
-
 # Constant folding for resource integers may mean that a resource passed to this method appears to be unused. Keep the method to prevent this from happening.
 -keep class com.google.android.exoplayer2.upstream.RawResourceDataSource {
   public static android.net.Uri buildRawResourceUri(int);
@@ -88,6 +85,9 @@
 -keepclassmembernames class org.telegram.ui.Components.* { <fields>; }
 -keep,allowshrinking,allowobfuscation class org.telegram.ui.Components.GroupCreateSpan {
     public void updateColors();
+ }
+-keep,allowshrinking,allowobfuscation class org.telegram.ui.Components.Premium.GLIcon.ObjLoader {
+    public <init>();
  }
 
 # Huawei Services
