@@ -7173,7 +7173,7 @@ public class Theme {
                     SharedPreferences preferences = MessagesController.getGlobalMainSettings();
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString("theme", themeInfo.getKey());
-                    editor.apply();
+                    editor.commit();
                 }
                 String[] wallpaperLink = new String[1];
                 if (themeInfo.assetName != null) {
@@ -7258,7 +7258,7 @@ public class Theme {
                     SharedPreferences preferences = MessagesController.getGlobalMainSettings();
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.remove("theme");
-                    editor.apply();
+                    editor.commit();
                 }
                 currentColorsNoAccent.clear();
                 themedWallpaperFileOffset = 0;

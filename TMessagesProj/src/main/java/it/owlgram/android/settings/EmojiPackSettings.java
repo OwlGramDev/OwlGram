@@ -176,7 +176,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
 
     private String getCurrentUnzipping() {
         return emojiPacks
-                .parallelStream()
+                .stream()
                 .map(CustomEmojiHelper.EmojiPackBase::getPackId)
                 .filter(FileUnzipHelper::isRunningUnzip)
                 .findFirst()
@@ -185,7 +185,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
 
     private String getCurrentDownloading() {
         return emojiPacks
-                .parallelStream()
+                .stream()
                 .map(CustomEmojiHelper.EmojiPackBase::getPackId)
                 .filter(FileDownloadHelper::isRunningDownload)
                 .findFirst()
@@ -593,7 +593,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                 if (chatAttachAlert != null) {
                     ArrayList<File> files = CustomEmojiHelper.getFilesFromActivityResult(data);
                     AndroidUtilities.runOnUIThread(() -> {
-                        boolean apply = files.parallelStream().allMatch(file -> chatAttachAlert.getDocumentLayout().isEmojiFont(file));
+                        boolean apply = files.stream().allMatch(file -> chatAttachAlert.getDocumentLayout().isEmojiFont(file));
                         if (apply && !files.isEmpty()) {
                             chatAttachAlert.dismiss();
                             processFiles(files);

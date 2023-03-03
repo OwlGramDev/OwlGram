@@ -587,15 +587,23 @@ public class AndroidUtilities {
                 return dir;
             }
         } catch (Exception e) {
-            ApplicationLoader.appCenterLog(e);
+
         }
         try {
             File dir = new File(ApplicationLoader.applicationContext.getCacheDir() + "/logs");
             dir.mkdirs();
             return dir;
         } catch (Exception e) {
-            ApplicationLoader.appCenterLog(e);
+
         }
+        try {
+            File dir = new File(ApplicationLoader.applicationContext.getFilesDir() + "/logs");
+            dir.mkdirs();
+            return dir;
+        } catch (Exception e) {
+
+        }
+        ApplicationLoader.appCenterLog(new RuntimeException("can't create logs directory"));
         return null;
     }
 
@@ -1925,9 +1933,6 @@ public class AndroidUtilities {
                             result = new ArrayList<>();
                         }
                         File file = new File(path.substring(0, idx));
-                        if (!file.canWrite()) {
-                            continue;
-                        }
                         for (int i = 0; i < result.size(); i++) {
                             if (result.get(i).getPath().equals(file.getPath())) {
                                 continue;
@@ -1962,7 +1967,7 @@ public class AndroidUtilities {
                     file = dirs[0];
                     if (!TextUtils.isEmpty(SharedConfig.storageCacheDir)) {
                         for (int a = 0; a < dirs.length; a++) {
-                            if (dirs[a] != null && dirs[a].getAbsolutePath().startsWith(SharedConfig.storageCacheDir) && dirs[a].canWrite()) {
+                            if (dirs[a] != null && dirs[a].getAbsolutePath().startsWith(SharedConfig.storageCacheDir)) {
                                 file = dirs[a];
                                 break;
                             }
@@ -1989,7 +1994,11 @@ public class AndroidUtilities {
         try {
             File file = ApplicationLoader.applicationContext.getFilesDir();
             if (file != null) {
-                return file;
+                File cacheFile = new File(file, "cache/");
+                cacheFile.mkdirs();
+                if ((file.exists() || file.mkdirs()) && file.canWrite()) {
+                    return cacheFile;
+                }
             }
         } catch (Exception e) {
 

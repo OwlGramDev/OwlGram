@@ -188,9 +188,9 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
             }
         } else if (position == cameraXQualityRow) {
             Map<Quality, Size> availableSizes = CameraXUtils.getAvailableVideoSizes();
-            Stream<Integer> tmp = availableSizes.values().parallelStream().sorted(Comparator.comparingInt(Size::getWidth).reversed()).map(Size::getHeight);
+            Stream<Integer> tmp = availableSizes.values().stream().sorted(Comparator.comparingInt(Size::getWidth).reversed()).map(Size::getHeight);
             ArrayList<Integer> types = tmp.collect(Collectors.toCollection(ArrayList::new));
-            ArrayList<String> arrayList = types.parallelStream().map(p -> p + "p").collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<String> arrayList = types.stream().map(p -> p + "p").collect(Collectors.toCollection(ArrayList::new));
             PopupHelper.show(arrayList, LocaleController.getString("CameraQuality", R.string.CameraQuality), types.indexOf(OwlConfig.cameraResolution), context, i -> {
                 OwlConfig.saveCameraResolution(types.get(i));
                 listAdapter.notifyItemChanged(cameraXQualityRow, PARTIAL);

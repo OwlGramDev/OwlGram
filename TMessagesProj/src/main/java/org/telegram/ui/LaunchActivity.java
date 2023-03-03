@@ -1148,7 +1148,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     }
 
     private BaseFragment getClientNotActivatedFragment() {
-        if (LoginActivity.loadCurrentState(false).getInt("currentViewNum", 0) != 0) {
+        if (LoginActivity.loadCurrentState(false, currentAccount).getInt("currentViewNum", 0) != 0) {
             return new LoginActivity();
         }
         return new IntroActivity();
@@ -3126,7 +3126,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             if (AndroidUtilities.isTablet()) {
                 if (!UserConfig.getInstance(currentAccount).isClientActivated()) {
                     if (layersActionBarLayout.getFragmentStack().isEmpty()) {
-                        layersActionBarLayout.addFragmentToStack(getClientNotActivatedFragment());
+                        layersActionBarLayout.addFragmentToStack(getClientNotActivatedFragment(), INavigationLayout.FORCE_NOT_ATTACH_VIEW);
                         drawerLayoutContainer.setAllowOpenDrawer(false, false);
                     }
                 } else {
@@ -3136,14 +3136,14 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         if (searchQuery != null) {
                             dialogsActivity.setInitialSearchString(searchQuery);
                         }
-                        actionBarLayout.addFragmentToStack(dialogsActivity);
+                        actionBarLayout.addFragmentToStack(dialogsActivity, INavigationLayout.FORCE_NOT_ATTACH_VIEW);
                         drawerLayoutContainer.setAllowOpenDrawer(true, false);
                     }
                 }
             } else {
                 if (actionBarLayout.getFragmentStack().isEmpty()) {
                     if (!UserConfig.getInstance(currentAccount).isClientActivated()) {
-                        actionBarLayout.addFragmentToStack(getClientNotActivatedFragment());
+                        actionBarLayout.addFragmentToStack(getClientNotActivatedFragment(), INavigationLayout.FORCE_NOT_ATTACH_VIEW);
                         drawerLayoutContainer.setAllowOpenDrawer(false, false);
                     } else {
                         DialogsActivity dialogsActivity = new DialogsActivity(null);
@@ -3151,7 +3151,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         if (searchQuery != null) {
                             dialogsActivity.setInitialSearchString(searchQuery);
                         }
-                        actionBarLayout.addFragmentToStack(dialogsActivity);
+                        actionBarLayout.addFragmentToStack(dialogsActivity, INavigationLayout.FORCE_NOT_ATTACH_VIEW);
                         drawerLayoutContainer.setAllowOpenDrawer(true, false);
                     }
                 }
