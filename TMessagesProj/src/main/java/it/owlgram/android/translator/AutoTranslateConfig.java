@@ -53,14 +53,14 @@ public class AutoTranslateConfig {
     }
 
     private static void deleteAllTopicExceptions(long dialogId) {
-        getAllExceptions().parallelStream()
+        getAllExceptions().stream()
                 .filter(e -> e.dialogId == dialogId)
                 .filter(e -> e.topicId != 0)
                 .forEach(e -> preferences.edit().remove(getExceptionsKey(e.dialogId, e.topicId)).apply());
     }
 
     public static void removeAllTypeExceptions(boolean isAllowed) {
-        getAllExceptions().parallelStream()
+        getAllExceptions().stream()
                 .filter(e -> e.isAllow == isAllowed)
                 .forEach(e -> preferences.edit().remove(getExceptionsKey(e.dialogId, e.topicId)).apply());
     }
@@ -68,7 +68,7 @@ public class AutoTranslateConfig {
     private static boolean isAllTopicEnabledOrDisabled(long dialogId, boolean enabled) {
         List<TLRPC.TL_forumTopic> topics = MessagesController.getInstance(UserConfig.selectedAccount).getTopicsController().getTopics(-dialogId);
         if (topics != null) {
-            return topics.parallelStream().allMatch(t -> isAutoTranslateEnabled(dialogId, t.id) == enabled);
+            return topics.stream().allMatch(t -> isAutoTranslateEnabled(dialogId, t.id) == enabled);
         } else {
             return true;
         }
@@ -77,7 +77,7 @@ public class AutoTranslateConfig {
     public static boolean isLastTopicAvailable(long dialogId, int topicId, boolean enabled) {
         List<TLRPC.TL_forumTopic> topics = MessagesController.getInstance(UserConfig.selectedAccount).getTopicsController().getTopics(-dialogId);
         if (topics != null) {
-            return topics.parallelStream().filter(t -> t.id != topicId).anyMatch(t -> isAutoTranslateEnabled(dialogId, t.id) == enabled);
+            return topics.stream().filter(t -> t.id != topicId).anyMatch(t -> isAutoTranslateEnabled(dialogId, t.id) == enabled);
         } else {
             return false;
         }
@@ -92,7 +92,7 @@ public class AutoTranslateConfig {
     }
 
     public static void migrate() {
-        preferences.getAll().entrySet().parallelStream()
+        preferences.getAll().entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith("autoTranslate_"))
                 .forEach(entry -> {
                     String key = entry.getKey();
@@ -124,7 +124,7 @@ public class AutoTranslateConfig {
     }
 
     public static List<AutoTranslateException> getAllExceptions() {
-        return preferences.getAll().entrySet().parallelStream()
+        return preferences.getAll().entrySet().stream()
                 .filter(entry -> entry.getKey().startsWith("exceptions_" + UserConfig.selectedAccount))
                 .map(entry -> new AutoTranslateException(
                         Long.parseLong(entry.getKey().split("_")[2]),
@@ -139,7 +139,7 @@ public class AutoTranslateConfig {
     }
 
     public static List<AutoTranslateException> getExceptions(boolean isAllow) {
-        return getAllExceptions().parallelStream()
+        return getAllExceptions().stream()
                 .filter(exception -> exception.isAllow == isAllow)
                 .filter(distinctByKey(exception -> exception.dialogId))
                 .filter(exception -> isAllTopicEnabledOrDisabled(exception.dialogId, isAllow) || isAllow)
@@ -147,7 +147,7 @@ public class AutoTranslateConfig {
     }
 
     public static boolean getExceptionsById(boolean allow, long dialogId) {
-        return getExceptions(allow).parallelStream().anyMatch(e -> e.dialogId == dialogId);
+        return getExceptions(allow).stream().anyMatch(e -> e.dialogId == dialogId);
     }
 
     private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
