@@ -80,7 +80,7 @@ public class LanguageDetector {
                 if (onFail != null) {
                     onFail.run(e);
                 }
-                FileLog.e(e);
+                FileLog.e(e, false);
             }
         } catch (Exception e) {
             if (onFail != null) {
@@ -91,7 +91,7 @@ public class LanguageDetector {
             if (onFail != null) {
                 onFail.run(null);
             }
-            FileLog.e(t);
+            FileLog.e(t, false);
         }
     }
 }
