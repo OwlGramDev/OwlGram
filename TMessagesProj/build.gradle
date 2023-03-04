@@ -46,15 +46,6 @@ def getVersionPBetaName = { ->
 def isWindows = DefaultNativePlatform.currentOperatingSystem.toFamilyName() == OperatingSystemFamily.WINDOWS
 def isMacOs = DefaultNativePlatform.currentOperatingSystem.toFamilyName() == OperatingSystemFamily.MACOS
 
-def getCCachePath = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'which', 'ccache'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
-
 def getCCacheExecutable = {
     def pathName
     if (isWindows) {
@@ -71,9 +62,9 @@ def getCCacheExecutable = {
             // Get the path to the ccache executable
             return Paths.get(pathName).toFile()
         }
-        return "macOs"
+        pathName = "macOs"
     } else {
-        return "linux"
+        pathName = "linux"
     }
     def executableFile = "ccache${if (isWindows) ".exe" else ""}"
     // Build the path to the local ccache executable
