@@ -66,7 +66,10 @@ def getCCacheExecutable = {
     } else {
         pathName = "linux"
     }
-    def executableFile = "ccache${if (isWindows) ".exe" else ""}"
+    def executableFile = "ccache"
+    if (isWindows) {
+        executableFile += ".exe"
+    }
     // Build the path to the local ccache executable
     return Paths.get(System.getProperty("user.dir"), "Tools", "ccache", pathName, executableFile).toFile()
 }
@@ -85,7 +88,7 @@ dependencies {
     compileOnly 'org.checkerframework:checker-compat-qual:2.5.5'
 
     // Firebase dependencies
-    implementation 'com.google.firebase:firebase-messaging:23.1.1'
+    implementation 'com.google.firebase:firebase-messaging:23.1.2'
     implementation 'com.google.firebase:firebase-config:21.2.1'
     implementation 'com.google.firebase:firebase-datatransport:18.1.7'
     implementation 'com.google.firebase:firebase-appindexing:20.0.0'
