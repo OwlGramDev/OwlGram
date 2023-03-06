@@ -162,7 +162,7 @@ import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.entities.EntitiesHelper;
-import it.owlgram.android.helpers.MessageHelper;
+import it.owlgram.android.MessageHelper;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
 

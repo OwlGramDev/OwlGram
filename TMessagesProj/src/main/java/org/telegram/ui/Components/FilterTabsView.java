@@ -46,8 +46,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScroller;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.LocaleController;
@@ -63,7 +61,7 @@ import org.telegram.ui.ActionBar.Theme;
 import java.util.ArrayList;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.helpers.FolderIconHelper;
+import it.owlgram.android.FolderIconController;
 
 public class FilterTabsView extends FrameLayout {
 
@@ -126,7 +124,7 @@ public class FilterTabsView extends FrameLayout {
         }
 
         public int getWidth(boolean store) {
-            iconWidth = FolderIconHelper.getTotalIconWidth();
+            iconWidth = FolderIconController.getTotalIconWidth();
             int width = titleWidth = (int) Math.ceil(textPaint.measureText(title));
             width += iconWidth;
             int c;
@@ -258,7 +256,7 @@ public class FilterTabsView extends FrameLayout {
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            int w = currentTab.getWidth(false) + FolderIconHelper.getPaddingTab() + additionalTabWidth;
+            int w = currentTab.getWidth(false) + FolderIconController.getPaddingTab() + additionalTabWidth;
             setMeasuredDimension(w, MeasureSpec.getSize(heightMeasureSpec));
         }
 
@@ -409,11 +407,11 @@ public class FilterTabsView extends FrameLayout {
             int iconTab = 0;
             // TAB ICON
             if (OwlConfig.tabMode != OwlConfig.TAB_TYPE_TEXT) {
-                int emoticonSize = FolderIconHelper.getIconWidth();
+                int emoticonSize = FolderIconController.getIconWidth();
                 if (!TextUtils.equals(currentTab.emoticon, currentEmoticon)) {
                     currentEmoticon = currentTab.emoticon;
                     android.graphics.Rect bounds = new android.graphics.Rect(0, 0, emoticonSize, emoticonSize);
-                    icon = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.id != getDefaultTabId() ? currentTab.emoticon:"\uD83D\uDCAC")).mutate();
+                    icon = getResources().getDrawable(FolderIconController.getTabIcon(currentTab.id != getDefaultTabId() ? currentTab.emoticon:"\uD83D\uDCAC")).mutate();
                     icon.setBounds(bounds);
                 }
                 if (icon != null) {
@@ -725,10 +723,10 @@ public class FilterTabsView extends FrameLayout {
                 }
 
                 if (lastEmoticon != null && !currentTab.emoticon.equals(lastEmoticon)) {
-                    int emoticonWidth = FolderIconHelper.getIconWidth();
+                    int emoticonWidth = FolderIconController.getIconWidth();
                     android.graphics.Rect bounds = new android.graphics.Rect(0, 0, emoticonWidth, emoticonWidth);
-                    iconAnimateOutDrawable = getResources().getDrawable(FolderIconHelper.getTabIcon(lastEmoticon)).mutate();
-                    iconAnimateInDrawable = getResources().getDrawable(FolderIconHelper.getTabIcon(currentTab.emoticon)).mutate();
+                    iconAnimateOutDrawable = getResources().getDrawable(FolderIconController.getTabIcon(lastEmoticon)).mutate();
+                    iconAnimateInDrawable = getResources().getDrawable(FolderIconController.getTabIcon(currentTab.emoticon)).mutate();
                     iconAnimateOutDrawable.setBounds(bounds);
                     iconAnimateInDrawable.setBounds(bounds);
                     iconAnimateOutDrawable.setTint(textPaint.getColor());
@@ -1261,7 +1259,7 @@ public class FilterTabsView extends FrameLayout {
         Tab tab = new Tab(id, text, emoticon);
         tab.isDefault = isDefault;
         tab.isLocked = isLocked;
-        allTabsWidth += tab.getWidth(true) + FolderIconHelper.getPaddingTab();
+        allTabsWidth += tab.getWidth(true) + FolderIconController.getPaddingTab();
         tabs.add(tab);
     }
 
@@ -1322,7 +1320,7 @@ public class FilterTabsView extends FrameLayout {
             int tabWidth = tabs.get(a).getWidth(false);
             positionToWidth.put(a, tabWidth);
             positionToX.put(a, xOffset + additionalTabWidth / 2);
-            xOffset += tabWidth + FolderIconHelper.getPaddingTab() + additionalTabWidth;
+            xOffset += tabWidth + FolderIconController.getPaddingTab() + additionalTabWidth;
         }
     }
 
@@ -1353,10 +1351,10 @@ public class FilterTabsView extends FrameLayout {
                         int prevW = positionToWidth.get(idx1);
                         int newW = positionToWidth.get(idx2);
                         if (additionalTabWidth != 0) {
-                            indicatorX = (int) (prevX + (newX - prevX) * animatingIndicatorProgress) + (FolderIconHelper.getPaddingTab() >> 1);
+                            indicatorX = (int) (prevX + (newX - prevX) * animatingIndicatorProgress) + (FolderIconController.getPaddingTab() >> 1);
                         } else {
                             int x = positionToX.get(position);
-                            indicatorX = (int) (prevX + (newX - prevX) * animatingIndicatorProgress) - (x - holder.itemView.getLeft()) + (FolderIconHelper.getPaddingTab() >> 1);
+                            indicatorX = (int) (prevX + (newX - prevX) * animatingIndicatorProgress) - (x - holder.itemView.getLeft()) + (FolderIconController.getPaddingTab() >> 1);
                         }
                         indicatorWidth = (int) (prevW + (newW - prevW) * animatingIndicatorProgress);
                     }
@@ -1616,7 +1614,7 @@ public class FilterTabsView extends FrameLayout {
                 allTabsWidth = 0;
                 if (!OwlConfig.hideAllTab) findDefaultTab().setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
                 for (int b = 0; b < N; b++) {
-                    allTabsWidth += tabs.get(b).getWidth(true) + FolderIconHelper.getPaddingTab();
+                    allTabsWidth += tabs.get(b).getWidth(true) + FolderIconController.getPaddingTab();
                 }
                 break;
             }
@@ -1647,7 +1645,7 @@ public class FilterTabsView extends FrameLayout {
             allTabsWidth = 0;
             if (!OwlConfig.hideAllTab) findDefaultTab().setTitle(LocaleController.getString("FilterAllChats", R.string.FilterAllChats));
             for (int b = 0, N = tabs.size(); b < N; b++) {
-                allTabsWidth += tabs.get(b).getWidth(true) + FolderIconHelper.getPaddingTab();
+                allTabsWidth += tabs.get(b).getWidth(true) + FolderIconController.getPaddingTab();
             }
         }
     }

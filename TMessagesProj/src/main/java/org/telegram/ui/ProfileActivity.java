@@ -236,20 +236,19 @@ import java.util.zip.ZipOutputStream;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.StoreUtils;
-import it.owlgram.android.components.ActionPanelCell;
-import it.owlgram.android.components.DatacenterCell;
-import it.owlgram.android.components.DcStyleSelector;
-import it.owlgram.android.components.dynamic.ThemeInfo;
-import it.owlgram.android.helpers.ActionButtonManager;
-import it.owlgram.android.helpers.DCHelper;
-import it.owlgram.android.settings.BaseSettingsActivity;
-import it.owlgram.android.settings.DoNotTranslateSettings;
-import it.owlgram.android.settings.OwlgramSettings;
-import it.owlgram.android.translator.AutoTranslatePopupWrapper;
+import it.owlgram.ui.Cells.ActionPanel;
+import it.owlgram.ui.Cells.Datacenter;
+import it.owlgram.ui.Cells.DcStyleSelector;
+import it.owlgram.ui.Cells.Dynamic.ThemeInfo;
+import it.owlgram.android.ActionButtonController;
+import it.owlgram.android.utils.DCHelper;
+import it.owlgram.ui.BaseSettingsActivity;
+import it.owlgram.ui.DoNotTranslateSettings;
+import it.owlgram.ui.OwlgramSettings;
+import it.owlgram.ui.Components.AutoTranslatePopupWrapper;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
 import it.owlgram.android.translator.TranslatorHelper;
-import it.owlgram.android.helpers.FileDownloadHelper;
 import it.owlgram.android.updates.UpdateManager;
 
 public class ProfileActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, SharedMediaLayout.SharedMediaPreloaderDelegate, ImageUpdater.ImageUpdaterDelegate, SharedMediaLayout.Delegate {
@@ -304,9 +303,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private PagerIndicatorView avatarsViewPagerIndicatorView;
     private AvatarDrawable avatarDrawable;
     private ImageUpdater imageUpdater;
-    private ActionPanelCell actionPanelCell;
+    private ActionPanel actionPanelCell;
     private DCHelper.TInfo tInfo;
-    private DatacenterCell datacenterCell;
+    private Datacenter datacenterCell;
     private int avatarColor;
     TimerDrawable autoDeleteItemDrawable;
 
@@ -582,7 +581,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private String vcardFirstName;
     private String vcardLastName;
 
-    private final ActionButtonManager actionButtonManager = new ActionButtonManager();
+    private final ActionButtonController actionButtonManager = new ActionButtonController();
     ChatActivityInterface previousTransitionFragment;
 
     HashSet<Integer> notificationsExceptionTopics = new HashSet<>();
@@ -1322,7 +1321,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     editItem.setScaleX(1f - value);
                     editItem.setScaleY(1f - value);
                     editItem.setAlpha(1f - value);
-                    if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
+                    if (ActionButtonController.canShowShortcuts(currentChat, isTopic)) {
                         adminItem.setScaleX(1f - value);
                         adminItem.setScaleY(1f - value);
                         adminItem.setAlpha(1f - value);
@@ -1362,7 +1361,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         }
                         if (editItemVisible) {
                             editItem.setVisibility(GONE);
-                            if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
+                            if (ActionButtonController.canShowShortcuts(currentChat, isTopic)) {
                                 adminItem.setVisibility(GONE);
                                 if (permissionItemVisible) {
                                     permissionItem.setVisibility(GONE);
@@ -1388,12 +1387,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     if (searchItem != null && !expanded) {
                         searchItem.setClickable(true);
                     }
-                    boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
+                    boolean canShowTopAction = ActionButtonController.canShowTopActions(currentChat, editItemVisible, isTopic);
                     if (editItemVisible) {
                         if (canShowTopAction) {
                             editItem.setVisibility(VISIBLE);
                         }
-                        if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
+                        if (ActionButtonController.canShowShortcuts(currentChat, isTopic)) {
                             adminItem.setVisibility(VISIBLE);
                             if (permissionItemVisible) {
                                 permissionItem.setVisibility(VISIBLE);
@@ -1403,7 +1402,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             }
                         }
                     }
-                    if (callItemVisible && !ActionButtonManager.canShowCall(currentChat, isTopic) && ActionButtonManager.canShowButtons(isTopic)) {
+                    if (callItemVisible && !ActionButtonController.canShowCall(currentChat, isTopic) && ActionButtonController.canShowButtons(isTopic)) {
                         callItem.setVisibility(VISIBLE);
                     }
                     if (videoCallItemVisible && canShowTopAction) {
@@ -1535,12 +1534,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
 
         private ActionBarMenuItem getSecondaryMenuItem() {
-            boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
-            if (callItemVisible && ActionButtonManager.canShowCall(currentChat, isTopic) && ActionButtonManager.canShowButtons(isTopic)) {
+            boolean canShowTopAction = ActionButtonController.canShowTopActions(currentChat, editItemVisible, isTopic);
+            if (callItemVisible && ActionButtonController.canShowCall(currentChat, isTopic) && ActionButtonController.canShowButtons(isTopic)) {
                 return callItem;
             } else if (editItemVisible && canShowTopAction) {
                 return editItem;
-            } else if (editItemVisible && ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
+            } else if (editItemVisible && ActionButtonController.canShowShortcuts(currentChat, isTopic)) {
                 return permissionItem;
             } else if (searchItem != null) {
                 return searchItem;
@@ -2772,14 +2771,14 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 avatarContainer2.setPivotY(avatarContainer.getPivotY() + avatarContainer.getMeasuredHeight() / 2f);
                 avatarContainer2.setPivotX(avatarContainer2.getMeasuredWidth() / 2f);
                 AndroidUtilities.updateViewVisibilityAnimated(avatarContainer2, !expanded, 0.95f, true);
-                boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
-                callItem.setVisibility(expanded || !(callItemVisible && ActionButtonManager.canShowButtons(isTopic)) ? GONE : INVISIBLE);
+                boolean canShowTopAction = ActionButtonController.canShowTopActions(currentChat, editItemVisible, isTopic);
+                callItem.setVisibility(expanded || !(callItemVisible && ActionButtonController.canShowButtons(isTopic)) ? GONE : INVISIBLE);
                 videoCallItem.setVisibility(expanded ||!(videoCallItemVisible && canShowTopAction) ? GONE : INVISIBLE);
                 editItem.setVisibility(expanded || !(editItemVisible && canShowTopAction) ? GONE : INVISIBLE);
                 otherItem.setVisibility(expanded ? GONE : INVISIBLE);
-                adminItem.setVisibility(expanded || !(editItemVisible && ActionButtonManager.canShowShortcuts(currentChat, isTopic)) ? GONE : INVISIBLE);
-                permissionItem.setVisibility(expanded || !(editItemVisible && permissionItemVisible && ActionButtonManager.canShowShortcuts(currentChat, isTopic)) ? GONE : INVISIBLE);
-                groupLogItem.setVisibility(expanded || !(editItemVisible && logItemVisible && ActionButtonManager.canShowShortcuts(currentChat, isTopic)) ? GONE : INVISIBLE);
+                adminItem.setVisibility(expanded || !(editItemVisible && ActionButtonController.canShowShortcuts(currentChat, isTopic)) ? GONE : INVISIBLE);
+                permissionItem.setVisibility(expanded || !(editItemVisible && permissionItemVisible && ActionButtonController.canShowShortcuts(currentChat, isTopic)) ? GONE : INVISIBLE);
+                groupLogItem.setVisibility(expanded || !(editItemVisible && logItemVisible && ActionButtonController.canShowShortcuts(currentChat, isTopic)) ? GONE : INVISIBLE);
                 if (qrItem != null) {
                     qrItem.setVisibility(expanded ? GONE : INVISIBLE);
                 }
@@ -2842,7 +2841,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         videoCallItem = menu.addItem(video_call_item, R.drawable.profile_video);
         videoCallItem.setContentDescription(LocaleController.getString("VideoCall", R.string.VideoCall));
         if (chatId != 0) {
-            callItem = menu.addItem(call_item, ActionButtonManager.canShowCall(currentChat, isTopic) ? R.drawable.msg_voicechat:R.drawable.msg_voicechat2);
+            callItem = menu.addItem(call_item, ActionButtonController.canShowCall(currentChat, isTopic) ? R.drawable.msg_voicechat:R.drawable.msg_voicechat2);
             if (ChatObject.isChannelOrGiga(currentChat)) {
                 callItem.setContentDescription(LocaleController.getString("VoipChannelVoiceChat", R.string.VoipChannelVoiceChat));
             } else {
@@ -5606,7 +5605,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
             updateEmojiStatusDrawableColor();
 
-            if (avatarsViewPagerIndicatorView.getSecondaryMenuItem() != null && ((videoCallItemVisible && ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic)) || editItemVisible || (callItemVisible && !ActionButtonManager.canShowCall(currentChat, isTopic) && ActionButtonManager.canShowButtons(isTopic)))) {
+            if (avatarsViewPagerIndicatorView.getSecondaryMenuItem() != null && ((videoCallItemVisible && ActionButtonController.canShowTopActions(currentChat, editItemVisible, isTopic)) || editItemVisible || (callItemVisible && !ActionButtonController.canShowCall(currentChat, isTopic) && ActionButtonController.canShowButtons(isTopic)))) {
                 needLayoutText(Math.min(1f, extraHeight / AndroidUtilities.dp(88f)));
             }
         }
@@ -5630,8 +5629,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
         ActionBarMenuItem mediaSearchItem = sharedMediaLayout.getSearchItem();
         if (!mediaHeaderVisible) {
-            boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
-            if (callItemVisible && !ActionButtonManager.canShowCall(currentChat, isTopic) && ActionButtonManager.canShowButtons(isTopic)) {
+            boolean canShowTopAction = ActionButtonController.canShowTopActions(currentChat, editItemVisible, isTopic);
+            if (callItemVisible && !ActionButtonController.canShowCall(currentChat, isTopic) && ActionButtonController.canShowButtons(isTopic)) {
                 callItem.setVisibility(View.VISIBLE);
             }
             if (videoCallItemVisible && canShowTopAction) {
@@ -5641,7 +5640,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (canShowTopAction) {
                     editItem.setVisibility(View.VISIBLE);
                 }
-                if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
+                if (ActionButtonController.canShowShortcuts(currentChat, isTopic)) {
                     adminItem.setVisibility(View.VISIBLE);
                     if (permissionItemVisible) {
                         permissionItem.setVisibility(View.VISIBLE);
@@ -5702,8 +5701,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             public void onAnimationEnd(Animator animation) {
                 if (headerAnimatorSet != null) {
                     if (mediaHeaderVisible) {
-                        boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
-                        if (callItemVisible && !ActionButtonManager.canShowCall(currentChat, isTopic) && ActionButtonManager.canShowButtons(isTopic)) {
+                        boolean canShowTopAction = ActionButtonController.canShowTopActions(currentChat, editItemVisible, isTopic);
+                        if (callItemVisible && !ActionButtonController.canShowCall(currentChat, isTopic) && ActionButtonController.canShowButtons(isTopic)) {
                             callItem.setVisibility(View.GONE);
                         }
                         if (videoCallItemVisible && canShowTopAction) {
@@ -5713,7 +5712,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             if (canShowTopAction) {
                                 editItem.setVisibility(View.GONE);
                             }
-                            if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
+                            if (ActionButtonController.canShowShortcuts(currentChat, isTopic)) {
                                 adminItem.setVisibility(View.GONE);
                                 if (permissionItemVisible) {
                                     permissionItem.setVisibility(View.GONE);
@@ -5923,7 +5922,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     if (setVisible && chatId != 0) {
                         setVisible = ChatObject.isChannel(currentChat) && /*  !currentChat.megagroup && */ chatInfo != null && chatInfo.linked_chat_id != 0 && infoHeaderRow != -1;
                     }
-                    setVisible = ActionButtonManager.canShowButtons(isTopic) && setVisible;
+                    setVisible = ActionButtonController.canShowButtons(isTopic) && setVisible;
                     boolean currentVisible = writeButton.getTag() == null;
                     if (setVisible != currentVisible) {
                         if (setVisible) {
@@ -5969,8 +5968,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             writeButton.setAlpha(setVisible ? 1.0f : 0.0f);
                         }
                     }
-                    if (callItem != null && callItemVisible && ActionButtonManager.canShowButtons(isTopic) && chatId != 0) {
-                        if (ActionButtonManager.canShowCall(currentChat, isTopic)) {
+                    if (callItem != null && callItemVisible && ActionButtonController.canShowButtons(isTopic) && chatId != 0) {
+                        if (ActionButtonController.canShowCall(currentChat, isTopic)) {
                             boolean setCallVisible = diff > 0.5f;
                             if (setCallVisible != isCallItemVisible) {
                                 isCallItemVisible = setCallVisible;
@@ -6370,12 +6369,12 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         int viewWidth = AndroidUtilities.isTablet() ? AndroidUtilities.dp(490) : AndroidUtilities.displaySize.x;
         ActionBarMenuItem item = avatarsViewPagerIndicatorView.getSecondaryMenuItem();
         int extra = 0;
-        boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
+        boolean canShowTopAction = ActionButtonController.canShowTopActions(currentChat, editItemVisible, isTopic);
         if (editItemVisible) {
             if (canShowTopAction) {
                 extra += 48;
             }
-            if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
+            if (ActionButtonController.canShowShortcuts(currentChat, isTopic)) {
                 extra += 48;
                 if (permissionItemVisible) {
                     extra += 48;
@@ -6385,7 +6384,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 }
             }
         }
-        if (callItemVisible && !ActionButtonManager.canShowCall(currentChat, isTopic) && ActionButtonManager.canShowButtons(isTopic)) {
+        if (callItemVisible && !ActionButtonController.canShowCall(currentChat, isTopic) && ActionButtonController.canShowButtons(isTopic)) {
             extra += 48;
         }
         if (videoCallItemVisible && canShowTopAction) {
@@ -7092,7 +7091,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (editItemVisible) {
                     editItem.setAlpha(0.0f);
                     animators.add(ObjectAnimator.ofFloat(editItem, View.ALPHA, 1.0f));
-                    if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
+                    if (ActionButtonController.canShowShortcuts(currentChat, isTopic)) {
                         adminItem.setAlpha(0.0f);
                         animators.add(ObjectAnimator.ofFloat(adminItem, View.ALPHA, 1.0f));
                         if (permissionItemVisible) {
@@ -7168,7 +7167,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (editItemVisible) {
                     editItem.setAlpha(1.0f);
                     animators.add(ObjectAnimator.ofFloat(editItem, View.ALPHA, 0.0f));
-                    if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
+                    if (ActionButtonController.canShowShortcuts(currentChat, isTopic)) {
                         adminItem.setAlpha(1.0f);
                         animators.add(ObjectAnimator.ofFloat(adminItem, View.ALPHA, 0.0f));
                         if (permissionItemVisible) {
@@ -7503,7 +7502,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     actionsSectionRow = rowCount++;
                     actionsSectionDivider = rowCount++;
                 }
-                if (ActionButtonManager.canShowButtons(isTopic) && avatarBig == null && (user.photo == null || !(user.photo.photo_big instanceof TLRPC.TL_fileLocation_layer97) && !(user.photo.photo_big instanceof TLRPC.TL_fileLocationToBeDeprecated)) && (avatarsViewPager == null || avatarsViewPager.getRealCount() == 0)) {
+                if (ActionButtonController.canShowButtons(isTopic) && avatarBig == null && (user.photo == null || !(user.photo.photo_big instanceof TLRPC.TL_fileLocation_layer97) && !(user.photo.photo_big instanceof TLRPC.TL_fileLocationToBeDeprecated)) && (avatarsViewPager == null || avatarsViewPager.getRealCount() == 0)) {
                     setAvatarRow = rowCount++;
                     setAvatarSectionRow = rowCount++;
                 }
@@ -7624,7 +7623,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                 }
 
-                if (user != null && isBot && !user.bot_nochats && ActionButtonManager.canShowButtons(isTopic)) {
+                if (user != null && isBot && !user.bot_nochats && ActionButtonController.canShowButtons(isTopic)) {
                     addToGroupButtonRow = rowCount++;
                     addToGroupInfoRow = rowCount++;
                 }
@@ -7726,7 +7725,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
             if (ChatObject.isChannel(currentChat)) {
                 if (!isTopic && chatInfo != null && currentChat.megagroup && chatInfo.participants != null && chatInfo.participants.participants != null && !chatInfo.participants.participants.isEmpty()) {
-                    if (!ChatObject.isNotInChat(currentChat) && ChatObject.canAddUsers(currentChat) && chatInfo.participants_count < getMessagesController().maxMegagroupCount && ActionButtonManager.canShowButtons(isTopic)) {
+                    if (!ChatObject.isNotInChat(currentChat) && ChatObject.canAddUsers(currentChat) && chatInfo.participants_count < getMessagesController().maxMegagroupCount && ActionButtonController.canShowButtons(isTopic)) {
                         addMemberRow = rowCount++;
                     }
                     int count = chatInfo.participants.participants.size();
@@ -7767,13 +7766,13 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                 }
 
-                if (lastSectionRow == -1 && currentChat.left && !currentChat.kicked && ActionButtonManager.canShowButtons(isTopic)) {
+                if (lastSectionRow == -1 && currentChat.left && !currentChat.kicked && ActionButtonController.canShowButtons(isTopic)) {
                     joinRow = rowCount++;
                     lastSectionRow = rowCount++;
                 }
             } else if (chatInfo != null) {
                 if (!isTopic && chatInfo.participants != null && chatInfo.participants.participants != null && !(chatInfo.participants instanceof TLRPC.TL_chatParticipantsForbidden)) {
-                    if ((ChatObject.canAddUsers(currentChat) || currentChat.default_banned_rights == null || !currentChat.default_banned_rights.invite_users) && ActionButtonManager.canShowButtons(isTopic)) {
+                    if ((ChatObject.canAddUsers(currentChat) || currentChat.default_banned_rights == null || !currentChat.default_banned_rights.invite_users) && ActionButtonController.canShowButtons(isTopic)) {
                         addMemberRow = rowCount++;
                     }
                     int count = chatInfo.participants.participants.size();
@@ -8426,7 +8425,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (isBot || getContactsController().contactsDict.get(userId) == null) {
                     if (MessagesController.isSupportUser(user)) {
                         createAutoTranslateItem(ProfileActivity.this, userId);
-                        if (userBlocked && ActionButtonManager.canShowButtons(isTopic)) {
+                        if (userBlocked && ActionButtonController.canShowButtons(isTopic)) {
                             otherItem.addSubItem(block_contact, R.drawable.msg_block, LocaleController.getString("Unblock", R.string.Unblock));
                         }
                     } else {
@@ -8451,7 +8450,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                                 otherItem.addSubItem(share_contact, R.drawable.msg_share, LocaleController.getString("ShareContact", R.string.ShareContact));
                             }
                         }
-                        if (ActionButtonManager.canShowButtons(isTopic)) {
+                        if (ActionButtonController.canShowButtons(isTopic)) {
                             if (isBot) {
                                 otherItem.addSubItem(block_contact, !userBlocked ? R.drawable.msg_block : R.drawable.msg_retry, !userBlocked ? LocaleController.getString("BotStop", R.string.BotStop) : LocaleController.getString("BotRestart", R.string.BotRestart));
                             } else {
@@ -8470,7 +8469,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             otherItem.addSubItem(share_contact, R.drawable.msg_share, LocaleController.getString("ShareContact", R.string.ShareContact));
                         }
                     }
-                    if (ActionButtonManager.canShowButtons(isTopic)) {
+                    if (ActionButtonController.canShowButtons(isTopic)) {
                         otherItem.addSubItem(block_contact, !userBlocked ? R.drawable.msg_block : R.drawable.msg_block, !userBlocked ? LocaleController.getString("BlockContact", R.string.BlockContact) : LocaleController.getString("Unblock", R.string.Unblock));
                     }
                     otherItem.addSubItem(edit_contact, R.drawable.msg_edit, LocaleController.getString("EditContact", R.string.EditContact));
@@ -8514,7 +8513,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                     ChatObject.Call call = getMessagesController().getGroupCall(chatId, false);
                     callItemVisible = call != null;
-                    if (callItemVisible && !ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic) && !actionButtonManager.hasItem("join_call") && (!ActionButtonManager.canShowCall(currentChat, isTopic) || callItem.getVisibility() != View.VISIBLE)) {
+                    if (callItemVisible && !ActionButtonController.canShowTopActions(currentChat, editItemVisible, isTopic) && !actionButtonManager.hasItem("join_call") && (!ActionButtonController.canShowCall(currentChat, isTopic) || callItem.getVisibility() != View.VISIBLE)) {
                         if (ChatObject.isChannelOrGiga(currentChat)) {
                             otherItem.addSubItem(call_item, R.drawable.msg_voicechat, LocaleController.getString("VoipChannelVoiceChat", R.string.VoipChannelVoiceChat));
                         } else {
@@ -8522,7 +8521,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         }
                     }
                 }
-                if (!ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic) && ActionButtonManager.canShowButtons(isTopic) && editItemVisible) {
+                if (!ActionButtonController.canShowTopActions(currentChat, editItemVisible, isTopic) && ActionButtonController.canShowButtons(isTopic) && editItemVisible) {
                     if (ChatObject.hasAdminRights(currentChat) || currentChat.megagroup && ChatObject.canChangeChatInfo(currentChat)) {
                         if (!actionButtonManager.hasItem("edit")) {
                             otherItem.addSubItem(edit_channel, R.drawable.msg_edit, LocaleController.getString("Edit", R.string.Edit));
@@ -8578,7 +8577,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     }
                     ChatObject.Call call = getMessagesController().getGroupCall(chatId, false);
                     callItemVisible = call != null;
-                    if (callItemVisible && !ActionButtonManager.canShowTopActions(currentChat, ChatObject.canChangeChatInfo(chat), isTopic) && !actionButtonManager.hasItem("join_call") && (!ActionButtonManager.canShowCall(currentChat, isTopic) || callItem.getVisibility() != View.VISIBLE)) {
+                    if (callItemVisible && !ActionButtonController.canShowTopActions(currentChat, ChatObject.canChangeChatInfo(chat), isTopic) && !actionButtonManager.hasItem("join_call") && (!ActionButtonController.canShowCall(currentChat, isTopic) || callItem.getVisibility() != View.VISIBLE)) {
                         if (ChatObject.isChannelOrGiga(currentChat)) {
                             otherItem.addSubItem(call_item, R.drawable.msg_voicechat, LocaleController.getString("VoipChannelVoiceChat", R.string.VoipChannelVoiceChat));
                         } else {
@@ -8589,7 +8588,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 //if (ChatObject.canChangeChatInfo(chat)) {
                 editItemVisible = true;
                 //}
-                if (!ActionButtonManager.canShowTopActions(currentChat,true, isTopic)) {
+                if (!ActionButtonController.canShowTopActions(currentChat,true, isTopic)) {
                     if (!actionButtonManager.hasItem("edit")) {
                         otherItem.addSubItem(edit_channel, R.drawable.msg_edit, LocaleController.getString("Edit", R.string.Edit));
                     }
@@ -8635,8 +8634,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             otherItem.hideSubItem(delete_avatar);
         }
         if (!mediaHeaderVisible) {
-            boolean canShowTopAction = ActionButtonManager.canShowTopActions(currentChat, editItemVisible, isTopic);
-            if (callItemVisible && ActionButtonManager.canShowButtons(isTopic)) {
+            boolean canShowTopAction = ActionButtonController.canShowTopActions(currentChat, editItemVisible, isTopic);
+            if (callItemVisible && ActionButtonController.canShowButtons(isTopic)) {
                 if (callItem.getVisibility() != View.VISIBLE) {
                     callItem.setVisibility(View.VISIBLE);
                     if (animated) {
@@ -8675,7 +8674,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     editItem.setVisibility(View.GONE);
                 }
             }
-            if (editItemVisible && ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
+            if (editItemVisible && ActionButtonController.canShowShortcuts(currentChat, isTopic)) {
                 if (adminItem.getVisibility() != View.VISIBLE) {
                     adminItem.setVisibility(View.VISIBLE);
                     if (animated) {
@@ -8723,7 +8722,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     editItem.setVisibility(View.GONE);
                     editItem.animate().cancel();
                     editItem.setAlpha(1f);
-                    if (ActionButtonManager.canShowShortcuts(currentChat, isTopic)) {
+                    if (ActionButtonController.canShowShortcuts(currentChat, isTopic)) {
                         adminItem.setVisibility(View.GONE);
                         adminItem.animate().cancel();
                         adminItem.setAlpha(1f);
@@ -9629,7 +9628,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     break;
                 }
                 case VIEW_TYPE_ACTIONS_BUTTON:
-                    view = actionPanelCell = new ActionPanelCell(mContext, resourcesProvider);
+                    view = actionPanelCell = new ActionPanel(mContext, resourcesProvider);
                     break;
                 case VIEW_TYPE_PLACEHOLDER:
                     view = new FlickerLoadingView(mContext, resourcesProvider);
@@ -9639,7 +9638,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     view.setPadding(AndroidUtilities.dp(16), AndroidUtilities.dp(infoHeaderRow != -1 || numberSectionRow != -1 ? 12:4), AndroidUtilities.dp(16), 0);
                     break;
                 case VIEW_TYPE_DATACENTER_INFO:
-                    view = datacenterCell = new DatacenterCell(mContext, resourcesProvider);
+                    view = datacenterCell = new Datacenter(mContext, resourcesProvider);
                     break;
                 case VIEW_TYPE_PREMIUM_TEXT_CELL:
                     view = new ProfilePremiumCell(mContext, resourcesProvider);
@@ -10139,9 +10138,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     suggestionCell.setType(position == passwordSuggestionRow ? SettingsSuggestionCell.TYPE_PASSWORD : SettingsSuggestionCell.TYPE_PHONE);
                     break;
                 case VIEW_TYPE_ACTIONS_BUTTON:
-                    actionPanelCell = (ActionPanelCell) holder.itemView;
+                    actionPanelCell = (ActionPanel) holder.itemView;
                     actionPanelCell.setOnItemClickListener(id -> {
-                        ActionButtonManager.ActionButtonInfo actionButtonInfo = actionButtonManager.getItemAt(id);
+                        ActionButtonController.ActionButtonInfo actionButtonInfo = actionButtonManager.getItemAt(id);
                         if (actionButtonInfo != null) {
                             switch (actionButtonInfo.id) {
                                 case "camera":
@@ -10218,8 +10217,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     flickerLoadingView.setIsSingleCell(true);
                     break;
                 case VIEW_TYPE_DATACENTER_INFO:
-                    DatacenterCell dc = (DatacenterCell) holder.itemView;
-                    if (ActionButtonManager.canShowButtons(isTopic)) {
+                    Datacenter dc = (Datacenter) holder.itemView;
+                    if (ActionButtonController.canShowButtons(isTopic)) {
                         dc.setTheme(new ThemeInfo(
                                 false,
                                 0
@@ -10403,7 +10402,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
     public void loadConfigActionButton(boolean updateActionBar) {
         actionButtonManager.reset();
-        if (ActionButtonManager.canShowButtons(isTopic)) return;
+        if (ActionButtonController.canShowButtons(isTopic)) return;
         actionButtonManager.load(
                 userInfo,
                 currentUser,
@@ -10429,7 +10428,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         }
         actionPanelCell.clear();
         for (int i = 0; i < actionButtonManager.size(); i++) {
-            ActionButtonManager.ActionButtonInfo actionButtonInfo = actionButtonManager.getItemAt(i);
+            ActionButtonController.ActionButtonInfo actionButtonInfo = actionButtonManager.getItemAt(i);
             if (actionButtonInfo != null) {
                 actionPanelCell.addItem(actionButtonInfo.text, actionButtonInfo.icon, actionButtonInfo.color);
             }
@@ -11236,7 +11235,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         arrayList.add(new ThemeDescription(avatarImage, 0, null, null, Theme.avatarDrawables, null, Theme.key_avatar_text));
         arrayList.add(new ThemeDescription(avatarImage, 0, null, null, new Drawable[]{avatarDrawable}, null, Theme.key_avatar_backgroundInProfileBlue));
 
-        if (ActionButtonManager.canShowButtons(isTopic)) {
+        if (ActionButtonController.canShowButtons(isTopic)) {
             arrayList.add(new ThemeDescription(writeButton, ThemeDescription.FLAG_IMAGECOLOR, null, null, null, null, Theme.key_profile_actionIcon));
             arrayList.add(new ThemeDescription(writeButton, ThemeDescription.FLAG_BACKGROUNDFILTER, null, null, null, null, Theme.key_profile_actionBackground));
             arrayList.add(new ThemeDescription(writeButton, ThemeDescription.FLAG_BACKGROUNDFILTER | ThemeDescription.FLAG_DRAWABLESELECTEDSTATE, null, null, null, null, Theme.key_profile_actionPressedBackground));
@@ -11322,16 +11321,16 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
         // CUSTOM ELEMENTS
         if (OwlConfig.showIDAndDC && DcStyleSelector.getStyleSelected() == DcStyleSelector.OWLGRAM_DC) {
-            arrayList.add(new ThemeDescription(listView, 0, new Class[]{DatacenterCell.class}, new String[]{"tv"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText));
-            arrayList.add(new ThemeDescription(listView, 0, new Class[]{DatacenterCell.class}, new String[]{"tv2"}, null, null, null, Theme.key_windowBackgroundWhiteGrayText2));
-            arrayList.add(new ThemeDescription(listView,0, new Class[]{DatacenterCell.class}, new String[]{"iv"}, null, null, null, Theme.key_switch2TrackChecked));
-            arrayList.add(new ThemeDescription(listView,0, new Class[]{DatacenterCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhite));
+            arrayList.add(new ThemeDescription(listView, 0, new Class[]{Datacenter.class}, new String[]{"tv"}, null, null, null, Theme.key_windowBackgroundWhiteBlackText));
+            arrayList.add(new ThemeDescription(listView, 0, new Class[]{Datacenter.class}, new String[]{"tv2"}, null, null, null, Theme.key_windowBackgroundWhiteGrayText2));
+            arrayList.add(new ThemeDescription(listView,0, new Class[]{Datacenter.class}, new String[]{"iv"}, null, null, null, Theme.key_switch2TrackChecked));
+            arrayList.add(new ThemeDescription(listView,0, new Class[]{Datacenter.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhite));
         }
         if (OwlConfig.buttonStyleType != 5) {
-            arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_switch2TrackChecked));
-            arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhiteRedText4));
-            arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_statisticChartLine_green));
-            arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanelCell.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhite));
+            arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanel.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_switch2TrackChecked));
+            arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanel.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhiteRedText4));
+            arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanel.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_statisticChartLine_green));
+            arrayList.add(new ThemeDescription(listView, 0, new Class[]{ActionPanel.class}, new String[]{"mainLayout"}, null, null, null, Theme.key_windowBackgroundWhite));
         }
         return arrayList;
     }

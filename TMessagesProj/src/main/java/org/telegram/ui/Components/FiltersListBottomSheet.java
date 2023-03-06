@@ -6,7 +6,6 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.RectF;
@@ -38,7 +37,7 @@ import org.telegram.ui.DialogsActivity;
 
 import java.util.ArrayList;
 
-import it.owlgram.android.helpers.FolderIconHelper;
+import it.owlgram.android.FolderIconController;
 
 public class FiltersListBottomSheet extends BottomSheet implements NotificationCenter.NotificationCenterDelegate {
 
@@ -403,7 +402,7 @@ public class FiltersListBottomSheet extends BottomSheet implements NotificationC
                 cell.getImageView().setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_dialogIcon), PorterDuff.Mode.MULTIPLY));
                 MessagesController.DialogFilter filter = dialogFilters.get(position);
                 cell.setTextColor(Theme.getColor(Theme.key_dialogTextBlack));
-                int icon = FolderIconHelper.getTabIcon(filter.emoticon);
+                int icon = FolderIconController.getTabIcon(filter.emoticon);
                 /*if ((filter.flags & MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS) == (MessagesController.DIALOG_FILTER_FLAG_CONTACTS | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS)) {
                     icon = R.drawable.msg_openprofile;
                 } else if ((filter.flags & MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ) != 0 && (filter.flags & MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS) == MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS) {

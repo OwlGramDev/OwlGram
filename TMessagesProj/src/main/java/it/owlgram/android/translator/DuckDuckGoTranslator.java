@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import it.owlgram.android.helpers.StandardHTTPRequest;
+import it.owlgram.android.http.StandardHTTPRequest;
 
 public class DuckDuckGoTranslator extends BaseTranslator {
 

@@ -206,21 +206,21 @@ import java.util.regex.Pattern;
 
 import it.owlgram.android.StoreUtils;
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.components.UpdateAlertDialog;
+import it.owlgram.ui.Components.Dialogs.UpdateAlertDialog;
 import it.owlgram.android.Crashlytics;
-import it.owlgram.android.helpers.CustomEmojiHelper;
-import it.owlgram.android.helpers.ForwardContext;
-import it.owlgram.android.helpers.LanguageHelper;
-import it.owlgram.android.helpers.MonetHelper;
-import it.owlgram.android.helpers.StickersHelper;
-import it.owlgram.android.helpers.UpdateSignaling;
-import it.owlgram.android.settings.OwlgramAppearanceSettings;
-import it.owlgram.android.settings.OwlgramChatSettings;
-import it.owlgram.android.settings.OwlgramExperimentalSettings;
-import it.owlgram.android.settings.OwlgramGeneralSettings;
-import it.owlgram.android.settings.OwlgramSettings;
-import it.owlgram.android.ui.DatacenterActivity;
-import it.owlgram.android.helpers.FileDownloadHelper;
+import it.owlgram.android.CustomEmojiController;
+import it.owlgram.android.utils.ForwardContext;
+import it.owlgram.android.LanguageController;
+import it.owlgram.android.MonetThemeController;
+import it.owlgram.android.StickersUtils;
+import it.owlgram.android.updates.UpdateSignaling;
+import it.owlgram.ui.OwlgramAppearanceSettings;
+import it.owlgram.ui.OwlgramChatSettings;
+import it.owlgram.ui.OwlgramExperimentalSettings;
+import it.owlgram.ui.OwlgramGeneralSettings;
+import it.owlgram.ui.OwlgramSettings;
+import it.owlgram.ui.DatacenterActivity;
+import it.owlgram.android.http.FileDownloader;
 import it.owlgram.android.updates.ApkInstaller;
 import it.owlgram.android.updates.AppDownloader;
 import it.owlgram.android.updates.PlayStoreAPI;
@@ -958,9 +958,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     });
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            MonetHelper.registerReceiver(this);
+            MonetThemeController.registerReceiver(this);
         }
-        CustomEmojiHelper.checkEmojiPacks();
+        CustomEmojiController.checkEmojiPacks();
         BackupAgent.requestBackup(this);
 
         RestrictedLanguagesSelectActivity.checkRestrictedLanguages(false);
@@ -2570,7 +2570,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                         bulletin.show();
                                     } else if (url.startsWith("tg:laky") || url.startsWith("tg://laky")) {
                                         BaseFragment fragment = mainFragmentsStack.get(mainFragmentsStack.size() - 1);
-                                        new StickersHelper().getStickerAsync(currentAccount, "ArcticFox", 7, document -> {
+                                        new StickersUtils().getStickerAsync(currentAccount, "ArcticFox", 7, document -> {
                                             StickerSetBulletinLayout layout = new StickerSetBulletinLayout(fragment.getParentActivity(), null, StickerSetBulletinLayout.TYPE_EMPTY, document, fragment.getResourceProvider());
                                             layout.subtitleTextView.setVisibility(View.GONE);
                                             String textEaster = "This is not the Fox DEVELOPER you were looking for!";
@@ -4874,8 +4874,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         updateLayout.setOnClickListener(v -> {
             if (!UpdateManager.isAvailableUpdate()) return;
             if (!StoreUtils.isDownloadedFromAnyStore()) {
-                if(FileDownloadHelper.isRunningDownload("appUpdate")) {
-                    FileDownloadHelper.cancel("appUpdate");
+                if(FileDownloader.isRunningDownload("appUpdate")) {
+                    FileDownloader.cancel("appUpdate");
                 } else if(UpdateManager.updateDownloaded()) {
                     UpdateManager.installUpdate(LaunchActivity.this);
                 } else {
@@ -4884,7 +4884,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         if(data.length() > 0) {
                             JSONObject jsonObject = new JSONObject(data);
                             UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(jsonObject);
-                            if (FileDownloadHelper.downloadFile(LaunchActivity.this, "appUpdate", UpdateManager.apkFile(), update.link_file))
+                            if (FileDownloader.downloadFile(LaunchActivity.this, "appUpdate", UpdateManager.apkFile(), update.link_file))
                                 OwlConfig.saveOldVersion(update.version);
                         }
                     } catch (Exception ignored){}
@@ -5701,7 +5701,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     @Override
     protected void onDestroy() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            MonetHelper.unregisterReceiver(this);
+            MonetThemeController.unregisterReceiver(this);
         }
         if (PhotoViewer.getPipInstance() != null) {
             PhotoViewer.getPipInstance().destroyPhotoViewer();
@@ -5842,7 +5842,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
             showUpdateActivity(UserConfig.selectedAccount, SharedConfig.pendingAppUpdate, true);
         }
         checkAppUpdate();
-        LanguageHelper.loadRemoteLanguageFromCache(LocaleController.getInstance().getCurrentLocale(), false);
+        LanguageController.loadRemoteLanguageFromCache(LocaleController.getInstance().getCurrentLocale(), false);
         UpdateSignaling.checkWasUpdated();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

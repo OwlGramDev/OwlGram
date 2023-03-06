@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import it.owlgram.android.helpers.StandardHTTPRequest;
+import it.owlgram.android.http.StandardHTTPRequest;
 
 public class YandexTranslator extends BaseTranslator {
 

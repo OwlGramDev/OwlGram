@@ -53,8 +53,8 @@ import org.telegram.ui.Components.RecyclerListView;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import it.owlgram.android.components.IconSelectorAlert;
-import it.owlgram.android.helpers.FolderIconHelper;
+import it.owlgram.ui.Components.Dialogs.IconSelectorAlert;
+import it.owlgram.android.FolderIconController;
 
 public class FilterCreateActivity extends BaseFragment {
 
@@ -446,7 +446,7 @@ public class FilterCreateActivity extends BaseFragment {
             return;
         }
         int flags = newFilterFlags & MessagesController.DIALOG_FILTER_FLAG_ALL_CHATS;
-        String[] result = FolderIconHelper.getEmoticonData(flags);
+        String[] result = FolderIconController.getEmoticonData(flags);
         String newName = result[0];
         String newEmoticon = result[1];
         if (newName != null && newName.length() > MAX_NAME_LENGTH) {
@@ -989,7 +989,7 @@ public class FilterCreateActivity extends BaseFragment {
                 }
                 case 2: {
                     PollEditTextCell cell = (PollEditTextCell) holder.itemView;
-                    cell.setIcon(FolderIconHelper.getTabIcon(newFilterEmoticon));
+                    cell.setIcon(FolderIconController.getTabIcon(newFilterEmoticon));
                     break;
                 }
                 case 4: {

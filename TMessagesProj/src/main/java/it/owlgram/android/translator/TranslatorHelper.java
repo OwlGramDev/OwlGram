@@ -18,7 +18,7 @@ import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.entities.HTMLKeeper;
-import it.owlgram.android.helpers.MessageHelper;
+import it.owlgram.android.MessageHelper;
 
 public class TranslatorHelper {
 

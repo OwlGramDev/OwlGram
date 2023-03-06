@@ -77,6 +77,8 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.ExecutionException;
 
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.media.JpegImageUtils;
+import it.owlgram.ui.Components.CameraXView;
 
 public class CameraXController {
 

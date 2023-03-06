@@ -1,6 +1,5 @@
 package org.telegram.ui;
 
-import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
@@ -11,7 +10,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -33,7 +31,6 @@ import android.text.Layout;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.StaticLayout;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.util.SparseArray;
@@ -41,7 +38,6 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -95,7 +91,7 @@ import org.telegram.ui.Components.URLSpanNoUnderline;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-import it.owlgram.android.helpers.PermissionHelper;
+import it.owlgram.android.PermissionsUtils;
 
 @TargetApi(18)
 public class CameraScanActivity extends BaseFragment {
@@ -653,8 +649,8 @@ public class CameraScanActivity extends BaseFragment {
                         return;
                     }
                     if (Build.VERSION.SDK_INT >= 23) {
-                        if (!PermissionHelper.isImagesAndVideoPermissionGranted()) {
-                            PermissionHelper.requestImagesAndVideoPermission(getParentActivity());
+                        if (!PermissionsUtils.isImagesAndVideoPermissionGranted()) {
+                            PermissionsUtils.requestImagesAndVideoPermission(getParentActivity());
                             return;
                         }
                     }

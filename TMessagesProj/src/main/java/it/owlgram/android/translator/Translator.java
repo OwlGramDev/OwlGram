@@ -22,7 +22,7 @@ import java.util.Locale;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.entities.HTMLKeeper;
-import it.owlgram.android.helpers.PopupHelper;
+import it.owlgram.android.AlertController;
 
 public class Translator {
 
@@ -97,7 +97,7 @@ public class Translator {
         targetLanguages.add(0, "app");
         names.add(0, LocaleController.getString("Default", R.string.Default));
 
-        PopupHelper.show(names, LocaleController.getString("TranslationLanguage", R.string.TranslationLanguage), targetLanguages.indexOf(isKeyboard ? OwlConfig.translationKeyboardTarget : OwlConfig.translationTarget), context, i -> {
+        AlertController.show(names, LocaleController.getString("TranslationLanguage", R.string.TranslationLanguage), targetLanguages.indexOf(isKeyboard ? OwlConfig.translationKeyboardTarget : OwlConfig.translationTarget), context, i -> {
             if (isKeyboard) {
                 OwlConfig.setTranslationKeyboardTarget(targetLanguages.get(i));
             } else {
@@ -122,7 +122,7 @@ public class Translator {
         if (index == -1) {
             index = types.indexOf(Translator.PROVIDER_GOOGLE);
         }
-        PopupHelper.show(names, LocaleController.getString("TranslationProvider", R.string.TranslationProvider), index, context, i -> {
+        AlertController.show(names, LocaleController.getString("TranslationProvider", R.string.TranslationProvider), index, context, i -> {
             BaseTranslator translator = getTranslator(types.get(i));
             String targetLanguage = translator.getTargetLanguage(OwlConfig.translationTarget);
 

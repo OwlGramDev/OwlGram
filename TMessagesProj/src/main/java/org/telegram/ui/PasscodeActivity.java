@@ -93,9 +93,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import it.owlgram.android.helpers.PasscodeHelper;
-import it.owlgram.android.settings.AccountProtectionSettings;
-import it.owlgram.android.ui.AccountProtectionIntro;
+import it.owlgram.android.PasscodeController;
+import it.owlgram.ui.AccountProtectionSettings;
+import it.owlgram.ui.AccountProtectionIntro;
 
 public class PasscodeActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
     public final static int TYPE_MANAGE_CODE_SETTINGS = 0,
@@ -392,7 +392,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
                             AlertsCreator.showSimpleAlert(PasscodeActivity.this, LocaleController.getString("ScreenCaptureAlert", R.string.ScreenCaptureAlert));
                         }
                     } else if (position == accountProtectionRow) {
-                        if (PasscodeHelper.existAtLeastOnePasscode()) {
+                        if (PasscodeController.existAtLeastOnePasscode()) {
                             presentFragment(new AccountProtectionSettings());
                         } else {
                             presentFragment(new AccountProtectionIntro(AccountProtectionIntro.CONFIRM_DOUBLE_BOTTOM));
@@ -1023,7 +1023,7 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
             return;
         }
 
-        if (PasscodeHelper.checkIsAlreadySetPasscode(isPinCode() ? codeFieldContainer.getCode() : passwordEditText.getText().toString())) {
+        if (PasscodeController.checkIsAlreadySetPasscode(isPinCode() ? codeFieldContainer.getCode() : passwordEditText.getText().toString())) {
             AndroidUtilities.updateViewVisibilityAnimated(passcodeAlreadyUsedTextView, true);
             for (CodeNumberField f : codeFieldContainer.codeField) {
                 f.setText("");
@@ -1094,8 +1094,8 @@ public class PasscodeActivity extends BaseFragment implements NotificationCenter
 
             boolean isFirst;
             if (accountId != -1) {
-                isFirst = !PasscodeHelper.existAtLeastOnePasscode();
-                PasscodeHelper.setPasscodeForAccount(firstPassword, accountId);
+                isFirst = !PasscodeController.existAtLeastOnePasscode();
+                PasscodeController.setPasscodeForAccount(firstPassword, accountId);
             } else {
                 isFirst = SharedConfig.passcodeHash.length() == 0;
                 try {

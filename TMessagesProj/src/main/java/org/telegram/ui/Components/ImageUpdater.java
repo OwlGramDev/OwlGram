@@ -63,7 +63,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import it.owlgram.android.helpers.PermissionHelper;
+import it.owlgram.android.PermissionsUtils;
 
 public class ImageUpdater implements NotificationCenter.NotificationCenterDelegate, PhotoCropActivity.PhotoEditActivityDelegate {
     private final static int ID_TAKE_PHOTO = 0,
@@ -690,11 +690,11 @@ public class ImageUpdater implements NotificationCenter.NotificationCenterDelega
             return;
         }
         if (Build.VERSION.SDK_INT >= 23 && parentFragment.getParentActivity() != null) {
-            if (canSelectVideo ? !PermissionHelper.isImagesAndVideoPermissionGranted() : !PermissionHelper.isImagesPermissionGranted()) {
+            if (canSelectVideo ? !PermissionsUtils.isImagesAndVideoPermissionGranted() : !PermissionsUtils.isImagesPermissionGranted()) {
                 if (canSelectVideo) {
-                    PermissionHelper.requestImagesAndVideoPermission(parentFragment.getParentActivity(), BasePermissionsActivity.REQUEST_CODE_EXTERNAL_STORAGE_FOR_AVATAR);
+                    PermissionsUtils.requestImagesAndVideoPermission(parentFragment.getParentActivity(), BasePermissionsActivity.REQUEST_CODE_EXTERNAL_STORAGE_FOR_AVATAR);
                 } else {
-                    PermissionHelper.requestImagesPermission(parentFragment.getParentActivity(), BasePermissionsActivity.REQUEST_CODE_EXTERNAL_STORAGE_FOR_AVATAR);
+                    PermissionsUtils.requestImagesPermission(parentFragment.getParentActivity(), BasePermissionsActivity.REQUEST_CODE_EXTERNAL_STORAGE_FOR_AVATAR);
                 }
                 return;
             }

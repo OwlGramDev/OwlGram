@@ -479,7 +479,7 @@
                   android:exported="true"
                 android:theme="@style/Theme.TMessages.TransparentWithAlerts"/>
         <activity
-            android:name="it.owlgram.android.helpers.AppRestartHelper"
+            android:name="it.owlgram.android.utils.AppRestartHelper"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:process=":owlgram"
             android:exported="false"

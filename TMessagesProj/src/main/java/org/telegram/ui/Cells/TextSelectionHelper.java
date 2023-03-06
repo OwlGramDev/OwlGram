@@ -16,7 +16,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Build;
 import android.text.Layout;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.StaticLayout;
@@ -63,7 +62,7 @@ import org.telegram.ui.Components.RecyclerListView;
 import java.util.ArrayList;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.settings.DoNotTranslateSettings;
+import it.owlgram.ui.DoNotTranslateSettings;
 
 public abstract class TextSelectionHelper<Cell extends TextSelectionHelper.SelectableView> {
 

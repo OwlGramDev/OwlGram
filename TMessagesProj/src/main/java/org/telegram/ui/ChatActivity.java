@@ -323,18 +323,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.components.EmojiSetBulletinLayout;
-import it.owlgram.android.components.ImportSettingsDialog;
-import it.owlgram.android.helpers.CustomEmojiHelper;
-import it.owlgram.android.helpers.ForwardContext;
-import it.owlgram.android.helpers.MessageHelper;
-import it.owlgram.android.helpers.PermissionHelper;
-import it.owlgram.android.settings.DoNotTranslateSettings;
+import it.owlgram.ui.Components.EmojiSetBulletinLayout;
+import it.owlgram.ui.Components.Dialogs.ImportSettingsDialog;
+import it.owlgram.android.CustomEmojiController;
+import it.owlgram.android.utils.ForwardContext;
+import it.owlgram.android.MessageHelper;
+import it.owlgram.android.PermissionsUtils;
+import it.owlgram.ui.DoNotTranslateSettings;
 import it.owlgram.android.translator.AutoTranslateConfig;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
 import it.owlgram.android.translator.TranslatorHelper;
-import it.owlgram.android.ui.DetailsActivity;
+import it.owlgram.ui.DetailsActivity;
 
 @SuppressWarnings("unchecked")
 public class ChatActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, DialogsActivity.DialogsActivityDelegate, LocationActivity.LocationActivityDelegate, ChatAttachAlertDocumentLayout.DocumentSelectActivityDelegate, ChatActivityInterface, FloatingDebugProvider, ForwardContext {
@@ -10630,8 +10630,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 FileLog.e(e);
             }
         } else if (which == attach_gallery) {
-            if (!PermissionHelper.isImagesAndVideoPermissionGranted()) {
-                PermissionHelper.requestImagesAndVideoPermission(getParentActivity());
+            if (!PermissionsUtils.isImagesAndVideoPermissionGranted()) {
+                PermissionsUtils.requestImagesAndVideoPermission(getParentActivity());
                 return;
             }
             boolean allowGifs;
@@ -25931,15 +25931,15 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             @Override
                             public void run() {
                                 boolean success = true;
-                                CustomEmojiHelper.EmojiPackBase emojiPackBase = null;
+                                CustomEmojiController.EmojiPackBase emojiPackBase = null;
                                 try {
-                                    emojiPackBase = CustomEmojiHelper.installEmoji(finalLocFile, false);
+                                    emojiPackBase = CustomEmojiController.installEmoji(finalLocFile, false);
                                 } catch (Exception e) {
                                     FileLog.e("Emoji Font install failed", e);
                                     success = false;
                                 }
                                 boolean finalSuccess = success;
-                                CustomEmojiHelper.EmojiPackBase finalEmojiPackBase = emojiPackBase;
+                                CustomEmojiController.EmojiPackBase finalEmojiPackBase = emojiPackBase;
                                 AndroidUtilities.runOnUIThread(() -> {
                                     progressDialog.dismiss();
                                     if (finalSuccess && finalEmojiPackBase != null) {

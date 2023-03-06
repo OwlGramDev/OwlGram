@@ -47,7 +47,6 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import androidx.core.graphics.ColorUtils;
@@ -81,7 +80,7 @@ import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL;
 
-import it.owlgram.android.camera.BaseCameraView;
+import it.owlgram.ui.Components.BaseCameraView;
 
 @SuppressLint("NewApi")
 public class CameraView extends BaseCameraView implements TextureView.SurfaceTextureListener {

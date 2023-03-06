@@ -125,7 +125,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import it.owlgram.android.helpers.PasscodeHelper;
+import it.owlgram.android.PasscodeController;
 
 public class AlertsCreator {
     public final static int PERMISSIONS_REQUEST_TOP_ICON_SIZE = 72;
@@ -5072,7 +5072,7 @@ public class AlertsCreator {
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
             TLRPC.User u = UserConfig.getInstance(a).getCurrentUser();
             if (u != null) {
-                if (PasscodeHelper.isProtectedAccount(u.id)) continue;
+                if (PasscodeController.isProtectedAccount(u.id)) continue;
                 AccountSelectCell cell = new AccountSelectCell(parentActivity, false);
                 cell.setAccount(a, false);
                 cell.setPadding(AndroidUtilities.dp(14), 0, AndroidUtilities.dp(14), 0);

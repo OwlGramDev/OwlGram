@@ -87,7 +87,6 @@ import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
-import org.telegram.ui.ActionBar.ActionBarMenuSubItem;
 import org.telegram.ui.ActionBar.ActionBarPopupWindow;
 import org.telegram.ui.ActionBar.AdjustPanLayoutHelper;
 import org.telegram.ui.ActionBar.AlertDialog;
@@ -113,8 +112,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import it.owlgram.android.components.SendOptionsMenuLayout;
-import it.owlgram.android.helpers.ForwardContext;
+import it.owlgram.ui.Components.SendOptionsMenuLayout;
+import it.owlgram.android.utils.ForwardContext;
 
 public class ShareAlert extends BottomSheet implements NotificationCenter.NotificationCenterDelegate {
 

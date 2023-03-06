@@ -27,7 +27,7 @@ import org.telegram.messenger.Utilities;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import it.owlgram.android.helpers.MessageHelper;
+import it.owlgram.android.MessageHelper;
 
 public class TLRPC {
 

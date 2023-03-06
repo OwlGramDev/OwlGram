@@ -206,14 +206,14 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.components.AppLinkVerifyBottomSheet;
-import it.owlgram.android.components.CrashReportBottomSheet;
-import it.owlgram.android.components.MonetAndroidFixDialog;
-import it.owlgram.android.components.SendOptionsMenuLayout;
+import it.owlgram.ui.Components.Dialogs.AppLinkVerifyBottomSheet;
+import it.owlgram.ui.Components.Dialogs.CrashReportBottomSheet;
+import it.owlgram.ui.Components.Dialogs.MonetAndroidFixDialog;
+import it.owlgram.ui.Components.SendOptionsMenuLayout;
 import it.owlgram.android.Crashlytics;
-import it.owlgram.android.helpers.ForwardContext;
-import it.owlgram.android.helpers.MonetIconsHelper;
-import it.owlgram.android.helpers.PasscodeHelper;
+import it.owlgram.android.utils.ForwardContext;
+import it.owlgram.android.MonetIconController;
+import it.owlgram.android.PasscodeController;
 import it.owlgram.android.updates.AppDownloader;
 import it.owlgram.android.updates.UpdateManager;
 
@@ -3228,7 +3228,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             });
         }
 
-        if (allowSwitchAccount && UserConfig.getActivatedAccountsCount() > 1 && PasscodeHelper.getUnprotectedAccounts() > 1) {
+        if (allowSwitchAccount && UserConfig.getActivatedAccountsCount() > 1 && PasscodeController.getUnprotectedAccounts() > 1) {
             switchItem = menu.addItemWithWidth(1, 0, AndroidUtilities.dp(56));
             AvatarDrawable avatarDrawable = new AvatarDrawable();
             avatarDrawable.setTextSize(AndroidUtilities.dp(12));
@@ -3246,7 +3246,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
                 TLRPC.User u = AccountInstance.getInstance(a).getUserConfig().getCurrentUser();
                 if (u != null) {
-                    if (PasscodeHelper.isProtectedAccount(u.id)) continue;
+                    if (PasscodeController.isProtectedAccount(u.id)) continue;
                     AccountSelectCell cell = new AccountSelectCell(context, false);
                     cell.setAccount(a, true);
                     switchItem.addSubItem(10 + a, cell, AndroidUtilities.dp(230), AndroidUtilities.dp(48));
@@ -4577,7 +4577,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             FilesMigrationService.checkBottomSheet(this);
         }
         boolean foundCrashReport = Crashlytics.isCrashed();
-        boolean needMonetMigration = MonetIconsHelper.needMonetMigration();
+        boolean needMonetMigration = MonetIconController.needMonetMigration();
         if (foundCrashReport) {
             CrashReportBottomSheet.checkBottomSheet(this);
         }else if (needMonetMigration) {

@@ -19,7 +19,6 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.text.Html;
-import android.view.ContextThemeWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -195,7 +194,7 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.components.ImportSettingsDialog;
+import it.owlgram.ui.Components.Dialogs.ImportSettingsDialog;
 
 public class AndroidUtilities {
     public final static int LIGHT_STATUS_BAR_OVERLAY = 0x0f000000, DARK_STATUS_BAR_OVERLAY = 0x33000000;

@@ -25,8 +25,7 @@ import java.io.OutputStream;
 import java.util.List;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.components.UpdateInstallingDialog;
-import it.owlgram.android.helpers.FileDownloadHelper;
+import it.owlgram.ui.Components.Dialogs.UpdateInstallingDialog;
 
 public class ApkInstaller {
     @SuppressLint("StaticFieldLeak")

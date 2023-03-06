@@ -56,7 +56,6 @@ import org.telegram.ui.Components.URLSpanNoUnderlineBold;
 import org.telegram.ui.Components.URLSpanReplacement;
 import org.telegram.ui.Components.URLSpanUserMention;
 import org.telegram.ui.Components.spoilers.SpoilerEffect;
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -74,9 +73,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import it.owlgram.android.helpers.MessageHelper;
+import it.owlgram.android.MessageHelper;
 import it.owlgram.android.entities.syntax_highlight.SyntaxHighlight;
-import it.owlgram.android.settings.DoNotTranslateSettings;
+import it.owlgram.ui.DoNotTranslateSettings;
 
 public class MessageObject {
 

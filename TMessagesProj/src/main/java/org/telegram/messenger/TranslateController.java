@@ -1,8 +1,6 @@
 package org.telegram.messenger;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.icu.text.Collator;
 import android.text.TextUtils;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -14,7 +12,6 @@ import androidx.core.util.Pair;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.Components.Bulletin;
 import org.telegram.ui.Components.TranslateAlert2;
-import org.telegram.ui.RestrictedLanguagesSelectActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,17 +19,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.entities.HTMLKeeper;
-import it.owlgram.android.helpers.MessageHelper;
-import it.owlgram.android.settings.DoNotTranslateSettings;
+import it.owlgram.android.MessageHelper;
+import it.owlgram.ui.DoNotTranslateSettings;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.Translator;
 import it.owlgram.android.translator.TranslatorHelper;

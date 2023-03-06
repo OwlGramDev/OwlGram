@@ -111,7 +111,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 
-import it.owlgram.android.helpers.CustomEmojiHelper;
+import it.owlgram.android.CustomEmojiController;
 
 public class CacheControlActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
@@ -353,7 +353,7 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
             if (canceled) {
                 return;
             }
-            cacheCustomEmojiSize = CustomEmojiHelper.getEmojiSize();
+            cacheCustomEmojiSize = CustomEmojiController.getEmojiSize();
             if (canceled) {
                 return;
             }
@@ -900,7 +900,7 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
                 }
             }
             if (type == 100) {
-                CustomEmojiHelper.deleteAll();
+                CustomEmojiController.deleteAll();
             }
             if (type == FileLoader.MEDIA_DIR_IMAGE || type == FileLoader.MEDIA_DIR_VIDEO) {
                 int publicDirectoryType;
@@ -947,7 +947,7 @@ public class CacheControlActivity extends BaseFragment implements NotificationCe
                 imagesCleared = true;
                 stickersCacheSize = getDirectorySize(new File(FileLoader.checkDirectory(FileLoader.MEDIA_DIR_CACHE), "acache"), documentsMusicType);
                 cacheEmojiSize = getDirectorySize(FileLoader.checkDirectory(FileLoader.MEDIA_DIR_CACHE), 3);
-                cacheCustomEmojiSize = CustomEmojiHelper.getEmojiSize();
+                cacheCustomEmojiSize = CustomEmojiController.getEmojiSize();
                 stickersCacheSize += cacheEmojiSize;
                 stickersCacheSize += cacheCustomEmojiSize;
             }

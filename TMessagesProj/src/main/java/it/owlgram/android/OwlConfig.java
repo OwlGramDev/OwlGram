@@ -11,13 +11,12 @@ import java.util.Calendar;
 import java.util.Date;
 
 import it.owlgram.android.camera.CameraXUtils;
-import it.owlgram.android.helpers.MonetIconsHelper;
 import it.owlgram.android.translator.AutoTranslateConfig;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.DeepLTranslator;
 import it.owlgram.android.translator.Translator;
 
-public class OwlConfig extends SettingsManager {
+public class OwlConfig extends SettingsController {
     public static final int TAB_TYPE_TEXT = 0;
     public static final int TAB_TYPE_MIX = 1;
     public static final int TAB_TYPE_ICON = 2;
@@ -139,7 +138,7 @@ public class OwlConfig extends SettingsManager {
                     restoreBackup(backupFile(), true);
                 }
                 putValue("DB_VERSION", DB_VERSION = BuildVars.BUILD_VERSION);
-                registerOnSharedPreferenceChangeListener(SettingsManager::executeBackup);
+                registerOnSharedPreferenceChangeListener(SettingsController::executeBackup);
             }
             isChineseUser = ApplicationLoader.applicationContext.getResources().getBoolean(R.bool.isChineseUser);
             hidePhoneNumber = getBoolean("hidePhoneNumber", true);
@@ -648,7 +647,7 @@ public class OwlConfig extends SettingsManager {
     }
 
     public static boolean isDevOptEnabled() {
-        return devOptEnabled || betterAudioQuality || MonetIconsHelper.isSelectedMonet() || maxRecentStickers != 20;
+        return devOptEnabled || betterAudioQuality || MonetIconController.isSelectedMonet() || maxRecentStickers != 20;
     }
 
     public static boolean canShowFireworks() {
