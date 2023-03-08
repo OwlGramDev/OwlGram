@@ -89,7 +89,7 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
-import it.owlgram.android.helpers.CustomEmojiHelper;
+import it.owlgram.android.CustomEmojiController;
 
 public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLayout {
 
@@ -837,7 +837,7 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
     }
 
     public boolean isEmojiFont(File file) {
-        boolean isValidEmojiFont = CustomEmojiHelper.isValidEmojiPack(file);
+        boolean isValidEmojiFont = CustomEmojiController.isValidEmojiPack(file);
         if (!isValidEmojiFont) BulletinFactory.of(parentAlert.getContainer(), null).createErrorBulletinSubtitle(LocaleController.formatString("InvalidFormatError", R.string.InvalidFormatError), LocaleController.formatString("ErrorEmojiFontInvalidFormat", R.string.ErrorEmojiFontInvalidFormat), null).show();
         return isValidEmojiFont;
     }
@@ -957,7 +957,7 @@ public class ChatAttachAlertDocumentLayout extends ChatAttachAlert.AttachAlertLa
                 try (Cursor cursor = ApplicationLoader.applicationContext.getContentResolver().query(MediaStore.Files.getContentUri("external"), projection, MediaStore.Files.FileColumns.MIME_TYPE + " LIKE 'font/%'", null, MediaStore.Files.FileColumns.DATE_ADDED + " DESC")) {
                     while (cursor.moveToNext()) {
                         File file = new File(cursor.getString(1));
-                        if (!CustomEmojiHelper.isValidEmojiPack(file)) continue;
+                        if (!CustomEmojiController.isValidEmojiPack(file)) continue;
                         ListItem item = new ListItem();
                         item.title = file.getName();
                         item.file = file;

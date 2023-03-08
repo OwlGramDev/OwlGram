@@ -27,8 +27,8 @@ import java.util.Locale;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.StoreUtils;
 import it.owlgram.android.entities.HTMLKeeper;
-import it.owlgram.android.helpers.FileDownloadHelper;
-import it.owlgram.android.helpers.StandardHTTPRequest;
+import it.owlgram.android.http.FileDownloader;
+import it.owlgram.android.http.StandardHTTPRequest;
 
 public class UpdateManager {
 
@@ -254,7 +254,7 @@ public class UpdateManager {
             }
         } catch (Exception ignored) {
         }
-        boolean isAvailableFile = apkFile().exists() && !FileDownloadHelper.isRunningDownload("appUpdate") && !isCorrupted;
+        boolean isAvailableFile = apkFile().exists() && !FileDownloader.isRunningDownload("appUpdate") && !isCorrupted;
         if ((BuildVars.BUILD_VERSION >= OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
             OwlConfig.setUpdateData("");
             return false;

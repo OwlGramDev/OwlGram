@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import it.owlgram.android.helpers.StandardHTTPRequest;
+import it.owlgram.android.http.StandardHTTPRequest;
 
 public class GoogleAppTranslator extends BaseTranslator {
 

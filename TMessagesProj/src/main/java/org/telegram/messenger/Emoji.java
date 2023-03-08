@@ -29,7 +29,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.helpers.CustomEmojiHelper;
+import it.owlgram.android.CustomEmojiController;
 
 import org.telegram.ui.Components.AnimatedEmojiSpan;
 
@@ -85,8 +85,8 @@ public class Emoji {
     private static boolean isSelectedEmojiPack;
 
     private static void reloadCache() {
-        isSelectedCustomEmojiPack = CustomEmojiHelper.isSelectedCustomEmojiPack();
-        emojiFile = CustomEmojiHelper.getCurrentEmojiPackOffline();
+        isSelectedCustomEmojiPack = CustomEmojiController.isSelectedCustomEmojiPack();
+        emojiFile = CustomEmojiController.getCurrentEmojiPackOffline();
         isSelectedEmojiPack = !OwlConfig.emojiPackSelected.equals("default") && emojiFile != null && emojiFile.exists();
     }
 
@@ -161,11 +161,11 @@ public class Emoji {
                     int emojiSize = 66;
                     bitmap = Bitmap.createBitmap(emojiSize, emojiSize, Bitmap.Config.ARGB_8888);
                     Canvas canvas = new Canvas(bitmap);
-                    CustomEmojiHelper.drawEmojiFont(
+                    CustomEmojiController.drawEmojiFont(
                             canvas,
                             0,
                             0,
-                            CustomEmojiHelper.getCurrentTypeface(),
+                            CustomEmojiController.getCurrentTypeface(),
                             fixEmoji(EmojiData.data[page][page2]),
                             emojiSize
                     );

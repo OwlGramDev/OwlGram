@@ -5,7 +5,7 @@ import org.telegram.tgnet.NativeByteBuffer;
 import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 
-import it.owlgram.android.helpers.MessageHelper;
+import it.owlgram.android.MessageHelper;
 
 public class MessageCustomParamsHelper {
 

@@ -44,7 +44,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.helpers.LanguageHelper;
+import it.owlgram.android.LanguageController;
 
 public class LocaleController {
 
@@ -967,7 +967,7 @@ public class LocaleController {
             currentLocaleInfo = localeInfo;
             FileLog.d("applyLanguage: currentLocaleInfo is set");
 
-            LanguageHelper.loadRemoteLanguageFromCache(newLocale, true);
+            LanguageController.loadRemoteLanguageFromCache(newLocale, true);
             if (!TextUtils.isEmpty(currentLocaleInfo.pluralLangCode)) {
                 currentPluralRules = allRules.get(currentLocaleInfo.pluralLangCode);
             }
@@ -2221,7 +2221,7 @@ public class LocaleController {
                         localeValues = valuesToSet;
                         currentLocale = newLocale;
                         currentLocaleInfo = localeInfo;
-                        LanguageHelper.loadRemoteLanguageFromCache(newLocale,true);
+                        LanguageController.loadRemoteLanguageFromCache(newLocale,true);
                         if (!TextUtils.isEmpty(currentLocaleInfo.pluralLangCode)) {
                             currentPluralRules = allRules.get(currentLocaleInfo.pluralLangCode);
                         }

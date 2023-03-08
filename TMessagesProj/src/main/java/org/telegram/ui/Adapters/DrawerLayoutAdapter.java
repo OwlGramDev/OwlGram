@@ -21,7 +21,6 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
-import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.DrawerLayoutContainer;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.DividerCell;
@@ -37,8 +36,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.helpers.MenuOrderManager;
-import it.owlgram.android.helpers.PasscodeHelper;
+import it.owlgram.android.MenuOrderController;
+import it.owlgram.android.PasscodeController;
 
 public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
 
@@ -237,7 +236,7 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
     private void resetItems() {
         accountNumbers.clear();
         for (int a = 0; a < UserConfig.MAX_ACCOUNT_COUNT; a++) {
-            if (PasscodeHelper.isProtectedAccount(UserConfig.getInstance(a).getClientUserId())) continue;
+            if (PasscodeController.isProtectedAccount(UserConfig.getInstance(a).getClientUserId())) continue;
             if (UserConfig.getInstance(a).isClientActivated()) {
                 accountNumbers.add(a);
             }
@@ -328,9 +327,9 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
             peopleNearbyIcon = R.drawable.msg_nearby;
         }
         UserConfig me = UserConfig.getInstance(UserConfig.selectedAccount);
-        int item_size = MenuOrderManager.sizeAvailable();
+        int item_size = MenuOrderController.sizeAvailable();
         for(int i = 0; i < item_size; i++) {
-            MenuOrderManager.EditableMenuItem data = MenuOrderManager.getSingleAvailableMenuItem(i);
+            MenuOrderController.EditableMenuItem data = MenuOrderController.getSingleAvailableMenuItem(i);
             if (data != null) {
                 switch (data.id) {
                     case "new_group":
@@ -389,7 +388,7 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
                     case "divider":
                         boolean foundPreviousDivider = false;
                         if (i > 0) {
-                            MenuOrderManager.EditableMenuItem previousData = MenuOrderManager.getSingleAvailableMenuItem(i - 1);
+                            MenuOrderController.EditableMenuItem previousData = MenuOrderController.getSingleAvailableMenuItem(i - 1);
                             if (previousData != null && previousData.id.equals("divider")) {
                                 foundPreviousDivider = true;
                             }

@@ -24,7 +24,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.helpers.MessageHelper;
+import it.owlgram.android.MessageHelper;
 
 
 abstract public class BaseTranslator {

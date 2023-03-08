@@ -135,7 +135,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.components.ImportSettingsDialog;
+import it.owlgram.ui.Components.Dialogs.ImportSettingsDialog;
 
 public class ChannelAdminLogActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 

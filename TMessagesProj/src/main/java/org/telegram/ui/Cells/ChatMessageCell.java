@@ -53,7 +53,6 @@ import android.text.TextUtils;
 import android.text.style.CharacterStyle;
 import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
-import android.util.Log;
 import android.util.Property;
 import android.util.SparseArray;
 import android.util.StateSet;
@@ -175,7 +174,7 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicReference;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.helpers.MessageHelper;
+import it.owlgram.android.MessageHelper;
 
 public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate, ImageReceiver.ImageReceiverDelegate, DownloadController.FileDownloadProgressListener, TextSelectionHelper.SelectableView, NotificationCenter.NotificationCenterDelegate {
     private final static int TIME_APPEAR_MS = 200;

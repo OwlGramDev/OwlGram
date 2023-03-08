@@ -8,7 +8,6 @@
 
 package org.telegram.messenger;
 
-import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
@@ -22,7 +21,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
@@ -33,7 +31,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.AudioDeviceInfo;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -53,7 +50,6 @@ import android.provider.OpenableColumns;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.HapticFeedbackConstants;
 import android.view.TextureView;
@@ -61,8 +57,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
 import android.widget.FrameLayout;
-
-import androidx.annotation.RequiresApi;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -99,15 +93,14 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.helpers.AudioEnhance;
-import it.owlgram.android.helpers.PermissionHelper;
+import it.owlgram.android.media.AudioEnhance;
+import it.owlgram.android.PermissionsUtils;
 
 public class MediaController implements AudioManager.OnAudioFocusChangeListener, NotificationCenter.NotificationCenterDelegate, SensorEventListener {
 
@@ -808,7 +801,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             int count = 0;
             Cursor cursor = null;
             try {
-                if (PermissionHelper.isImagesPermissionGranted()) {
+                if (PermissionsUtils.isImagesPermissionGranted()) {
                     cursor = MediaStore.Images.Media.query(ApplicationLoader.applicationContext.getContentResolver(), MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{"COUNT(_id)"}, null, null, null);
                     if (cursor != null) {
                         if (cursor.moveToNext()) {
@@ -824,7 +817,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
                 }
             }
             try {
-                if (PermissionHelper.isVideoPermissionGranted()) {
+                if (PermissionsUtils.isVideoPermissionGranted()) {
                     cursor = MediaStore.Images.Media.query(ApplicationLoader.applicationContext.getContentResolver(), MediaStore.Video.Media.EXTERNAL_CONTENT_URI, new String[]{"COUNT(_id)"}, null, null, null);
                     if (cursor != null) {
                         if (cursor.moveToNext()) {
@@ -4562,7 +4555,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
 
             Cursor cursor = null;
             try {
-                if (Build.VERSION.SDK_INT < 23 || PermissionHelper.isImagesPermissionGranted()) {
+                if (Build.VERSION.SDK_INT < 23 || PermissionsUtils.isImagesPermissionGranted()) {
                     cursor = MediaStore.Images.Media.query(ApplicationLoader.applicationContext.getContentResolver(), MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projectionPhotos, null, null, (Build.VERSION.SDK_INT > 28 ? MediaStore.Images.Media.DATE_MODIFIED : MediaStore.Images.Media.DATE_TAKEN) + " DESC");
                     if (cursor != null) {
                         int imageIdColumn = cursor.getColumnIndex(MediaStore.Images.Media._ID);
@@ -4644,7 +4637,7 @@ public class MediaController implements AudioManager.OnAudioFocusChangeListener,
             }
 
             try {
-                if (Build.VERSION.SDK_INT < 23 || PermissionHelper.isVideoPermissionGranted()) {
+                if (Build.VERSION.SDK_INT < 23 || PermissionsUtils.isVideoPermissionGranted()) {
                     cursor = MediaStore.Images.Media.query(ApplicationLoader.applicationContext.getContentResolver(), MediaStore.Video.Media.EXTERNAL_CONTENT_URI, projectionVideo, null, null, (Build.VERSION.SDK_INT > 28 ? MediaStore.Video.Media.DATE_MODIFIED : MediaStore.Video.Media.DATE_TAKEN) + " DESC");
                     if (cursor != null) {
                         int imageIdColumn = cursor.getColumnIndex(MediaStore.Video.Media._ID);

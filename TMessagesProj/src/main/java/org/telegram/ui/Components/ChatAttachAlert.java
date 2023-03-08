@@ -112,8 +112,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import it.owlgram.android.entities.EntitiesHelper;
-import it.owlgram.android.helpers.PermissionHelper;
+import it.owlgram.android.PermissionsUtils;
 
 public class ChatAttachAlert extends BottomSheet implements NotificationCenter.NotificationCenterDelegate, BottomSheet.BottomSheetDelegateInterface {
 
@@ -1979,14 +1978,14 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                     }
                     showLayout(photoLayout);
                 } else if (num == 3) {
-                    if (Build.VERSION.SDK_INT >= 23 && !PermissionHelper.isAudioPermissionGranted()) {
-                        PermissionHelper.requestAudioPermission(baseFragment.getParentActivity());
+                    if (Build.VERSION.SDK_INT >= 23 && !PermissionsUtils.isAudioPermissionGranted()) {
+                        PermissionsUtils.requestAudioPermission(baseFragment.getParentActivity());
                         return;
                     }
                     openAudioLayout(true);
                 } else if (num == 4) {
-                    if (Build.VERSION.SDK_INT >= 23 && !PermissionHelper.isStoragePermissionGranted()) {
-                        PermissionHelper.requestStoragePermission(baseFragment.getParentActivity());
+                    if (Build.VERSION.SDK_INT >= 23 && !PermissionsUtils.isStoragePermissionGranted()) {
+                        PermissionsUtils.requestStoragePermission(baseFragment.getParentActivity());
                         return;
                     }
                     openDocumentsLayout(true);

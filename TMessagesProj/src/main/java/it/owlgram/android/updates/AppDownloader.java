@@ -3,7 +3,7 @@ package it.owlgram.android.updates;
 import android.app.Activity;
 
 import it.owlgram.android.StoreUtils;
-import it.owlgram.android.helpers.FileDownloadHelper;
+import it.owlgram.android.http.FileDownloader;
 
 public class AppDownloader {
 
@@ -11,7 +11,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.getDownloadProgress();
         } else {
-            return FileDownloadHelper.getDownloadProgress("appUpdate");
+            return FileDownloader.getDownloadProgress("appUpdate");
         }
     }
 
@@ -19,7 +19,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.isRunningDownload();
         } else {
-            return FileDownloadHelper.isRunningDownload("appUpdate");
+            return FileDownloader.isRunningDownload("appUpdate");
         }
     }
 
@@ -35,7 +35,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.downloadedBytes();
         } else {
-            return FileDownloadHelper.downloadedBytes("appUpdate");
+            return FileDownloader.downloadedBytes("appUpdate");
         }
     }
 
@@ -43,7 +43,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             return PlayStoreAPI.totalBytes();
         } else {
-            return FileDownloadHelper.totalBytes("appUpdate");
+            return FileDownloader.totalBytes("appUpdate");
         }
     }
 
@@ -51,7 +51,7 @@ public class AppDownloader {
         if (StoreUtils.isFromPlayStore()) {
             PlayStoreAPI.addListener(id, listener);
         } else {
-            FileDownloadHelper.addListener("appUpdate", id, new FileDownloadHelper.FileDownloadListener() {
+            FileDownloader.addListener("appUpdate", id, new FileDownloader.FileDownloadListener() {
                 @Override
                 public void onPreStart(String id) {
                     listener.onPreStart();
