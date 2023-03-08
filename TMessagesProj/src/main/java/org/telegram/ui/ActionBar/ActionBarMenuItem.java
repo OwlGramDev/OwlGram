@@ -49,6 +49,7 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -60,6 +61,7 @@ import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
+import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.Adapters.FiltersView;
 import org.telegram.ui.Components.BackupImageView;
@@ -184,6 +186,7 @@ public class ActionBarMenuItem extends FrameLayout {
     private ArrayList<FiltersView.MediaFilterData> currentSearchFilters = new ArrayList<>();
     private int selectedFilterIndex = -1;
     private int notificationIndex = -1;
+    private float dimMenu;
 
     private float transitionOffset;
     private View showSubMenuFrom;
@@ -706,7 +709,7 @@ public class ActionBarMenuItem extends FrameLayout {
             linearLayout.setOrientation(LinearLayout.VERTICAL);
             FrameLayout frameLayout = new FrameLayout(getContext());
             frameLayout.setAlpha(0f);
-            frameLayout.animate().alpha(1f).setDuration(100).start();
+            frameLayout.animate().alpha(1f).setDuration(100).setStartDelay(popupLayout.shownFromBottom ? 165 : 0).start();
             if (topView.getParent() instanceof ViewGroup) {
                 ((ViewGroup) topView.getParent()).removeView(topView);
             }
@@ -717,7 +720,7 @@ public class ActionBarMenuItem extends FrameLayout {
             }
             frameLayout.addView(topView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
             linearLayout.addView(frameLayout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
-            linearLayout.addView(popupLayout, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 0, -AndroidUtilities.dp(4), 0, 0));
+            linearLayout.addView(popupLayout, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, 0, 0, -10, 0, 0));
             container = linearLayout;
             popupLayout.setTopView(frameLayout);
         }
@@ -764,9 +767,27 @@ public class ActionBarMenuItem extends FrameLayout {
             popupLayout.getSwipeBack().closeForeground(false);
         }
         popupWindow.startAnimation();
+        if (dimMenu > 0) {
+            popupWindow.dimBehind(dimMenu);
+        }
     }
+
+    public void setDimMenu(float dimAmount) {
+        dimMenu = dimAmount;
+    }
+
     public void toggleSubMenu() {
         toggleSubMenu(null, null);
+    }
+
+    public void setOnMenuDismiss(Utilities.Callback<Boolean> onMenuDismiss) {
+        if (popupWindow != null) {
+            popupWindow.setOnDismissListener(() -> {
+                if (onMenuDismiss != null) {
+                    onMenuDismiss.run(processedPopupClick);
+                }
+            });
+        }
     }
 
     public void openSearch(boolean openKeyboard) {
@@ -1437,7 +1458,7 @@ public class ActionBarMenuItem extends FrameLayout {
                 }
             });
 
-            searchField.setImeOptions(EditorInfo.IME_FLAG_NO_FULLSCREEN | EditorInfo.IME_ACTION_SEARCH);
+            searchField.setImeOptions(EditorInfo.IME_FLAG_NO_FULLSCREEN | EditorInfo.IME_ACTION_SEARCH | EditorInfo.IME_FLAG_NAVIGATE_PREVIOUS | EditorInfo.IME_FLAG_NAVIGATE_NEXT);
             searchField.setTextIsSelectable(false);
             searchField.setHighlightColor(getThemedColor(Theme.key_chat_inTextSelectionHighlight));
             searchField.setHandlesColor(getThemedColor(Theme.key_chat_TextSelectionCursor));
