@@ -17,8 +17,15 @@ public class NativeLoader {
     private final static int LIB_VERSION = 43;
     private final static String LIB_NAME = "owl." + LIB_VERSION;
 
+    private static volatile boolean nativeLoaded = false;
+
     public static synchronized void initNativeLibs(Context context) {
-        ReLinker.loadLibrary(context, LIB_NAME);
+        try {
+            ReLinker.loadLibrary(context, LIB_NAME);
+            nativeLoaded = true;
+        } catch (Error e) {
+            FileLog.e(e);
+        }
     }
 
     private static native void init(String path, boolean enable);
