@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Scanner;
@@ -268,8 +269,8 @@ public class SettingsController extends SharedPreferencesHelper {
                     String keyFound = field.getName();
                     if (jsonObject.has(keyFound)) {
                         Object result = jsonObject.get(keyFound);
-                        String typeCheck = field.getType().getSimpleName().toLowerCase().replace("float", "int");
-                        String originalCheck = result.getClass().getSimpleName().toLowerCase().replace("integer", "int");
+                        String typeCheck = field.getType().getSimpleName().toLowerCase(Locale.ENGLISH).replace("float", "int");
+                        String originalCheck = result.getClass().getSimpleName().toLowerCase(Locale.ENGLISH).replace("integer", "int");
                         foundValues++;
                         if (typeCheck.equals(originalCheck)) {
                             foundValidValues++;
