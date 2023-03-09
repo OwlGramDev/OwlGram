@@ -10,8 +10,6 @@ import org.telegram.ui.ActionBar.Theme;
 
 import java.util.ArrayList;
 
-import it.owlgram.android.OwlConfig;
-
 public class ActionButtonController {
 
     private final ArrayList<String> data = new ArrayList<>();
@@ -163,7 +161,7 @@ public class ActionButtonController {
                 return Theme.key_dialogTextRed;
             case "unblock":
             case "restart":
-                return Theme.key_wallet_greenText;
+                return Theme.key_windowBackgroundWhiteGreenText2;
         }
         return Theme.key_switch2TrackChecked;
     }
