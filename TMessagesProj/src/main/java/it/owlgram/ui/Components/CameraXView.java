@@ -128,7 +128,9 @@ public class CameraXView extends BaseCameraView {
         this.frontface = frontface;
         setWillNotDraw(!lazy);
         previewView = new PreviewView(context);
-        previewView.setAlpha(0);
+        if (lazy) {
+            previewView.setAlpha(0);
+        }
         placeholderView = new ImageView(context);
         placeholderView.setVisibility(View.GONE);
         placeholderView.setScaleType(ImageView.ScaleType.CENTER_CROP);
