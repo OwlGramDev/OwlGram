@@ -25,6 +25,10 @@ public class OwlConfig extends SettingsController {
     public static final int DOWNLOAD_BOOST_FAST = 1;
     public static final int DOWNLOAD_BOOST_EXTREME = 2;
 
+    public static final int TELEGRAM_CAMERA = 0;
+    public static final int CAMERA_X = 1;
+    public static final int SYSTEM_CAMERA = 2;
+
     private static final Object sync = new Object();
     public static boolean hidePhoneNumber;
     public static boolean hideContactNumber;

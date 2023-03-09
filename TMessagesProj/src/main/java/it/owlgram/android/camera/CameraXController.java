@@ -380,6 +380,7 @@ public class CameraXController {
 
     @SuppressLint("UnsafeExperimentalUsageError")
     public boolean isExposureCompensationSupported() {
+        if (camera == null) return false;
         return camera.getCameraInfo().getExposureState().isExposureCompensationSupported();
     }
 

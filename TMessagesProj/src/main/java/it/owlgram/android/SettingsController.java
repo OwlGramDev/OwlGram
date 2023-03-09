@@ -95,6 +95,9 @@ public class SettingsController extends SharedPreferencesHelper {
             case "NEED_UPDATE_CAMERAX":
             case "NEED_UPDATE_EMOJI":
             case "lastSelectedCompression":
+            case "TELEGRAM_CAMERA":
+            case "CAMERA_X":
+            case "SYSTEM_CAMERA":
                 return false;
             default:
                 return true;
