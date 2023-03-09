@@ -2384,10 +2384,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             databaseMigrationHint = null;
         }
 
-        if (initialDialogsType == DIALOGS_TYPE_DEFAULT) {
-            AndroidUtilities.runOnUIThread(DialogsActivity::preload, 350);
-        }
-
         return true;
     }
 
@@ -2406,14 +2402,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 accountInstance.getMediaDataController().loadStickersByEmojiOrName(emoji, true, true);
             }
             dialogsLoaded[currentAccount] = true;
-        }
-    }
-
-    private static void preload() {
-        if (SharedConfig.getDevicePerformanceClass() < SharedConfig.PERFORMANCE_CLASS_HIGH) {
-            SecretMediaViewer.getInstance();
-            ChatActivity.preload(ApplicationLoader.applicationContext);
-            ArticleViewer.hasInstance();
         }
     }
 
