@@ -173,7 +173,9 @@ public class CameraXView extends BaseCameraView {
     }
 
     public void closeCamera() {
-        controller.closeCamera();
+        if (controller != null) {
+            controller.closeCamera();
+        }
     }
 
     private void observeStream() {
@@ -416,7 +418,9 @@ public class CameraXView extends BaseCameraView {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        lifecycle.stop();
+        if (lifecycle != null) {
+            lifecycle.stop();
+        }
         ((DisplayManager) getContext().getSystemService(Context.DISPLAY_SERVICE)).unregisterDisplayListener(displayOrientationListener);
         worldOrientationListener.disable();
     }
