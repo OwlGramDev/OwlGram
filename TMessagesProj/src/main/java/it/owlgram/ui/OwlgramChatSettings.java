@@ -30,11 +30,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import it.owlgram.android.AlertController;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.camera.CameraXUtils;
 import it.owlgram.android.entities.EntitiesHelper;
 import it.owlgram.android.media.AudioEnhance;
-import it.owlgram.android.AlertController;
 import it.owlgram.ui.Cells.CameraTypeSelector;
 import it.owlgram.ui.Cells.StickerSize;
 

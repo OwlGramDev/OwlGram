@@ -1,15 +1,16 @@
 package it.owlgram.android.utils;
 
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Process;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
-import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public final class AppRestartHelper extends Activity {
     private static final String KEY_RESTART_INTENTS = "owlgram_restart_intents";

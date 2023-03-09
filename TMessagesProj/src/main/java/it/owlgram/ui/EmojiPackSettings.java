@@ -46,8 +46,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import it.owlgram.android.OwlConfig;
 import it.owlgram.android.CustomEmojiController;
+import it.owlgram.android.OwlConfig;
 import it.owlgram.android.http.FileDownloader;
 import it.owlgram.android.utils.FileUnzip;
 import it.owlgram.ui.Cells.EmojiSet;

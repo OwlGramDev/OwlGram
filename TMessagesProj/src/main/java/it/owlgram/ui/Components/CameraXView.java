@@ -605,9 +605,6 @@ public class CameraXView extends BaseCameraView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.RED);
-        canvas.drawCircle(getMeasuredWidth() / 2f, getMeasuredHeight() / 2f, getMeasuredWidth() / 2f, paint);
         if (thumbDrawable != null) {
             bounds.set(0, 0, getMeasuredWidth(), getMeasuredHeight());
             int W = thumbDrawable.getIntrinsicWidth(), H = thumbDrawable.getIntrinsicHeight();

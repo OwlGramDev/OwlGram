@@ -20,11 +20,11 @@ import org.telegram.ui.Cells.TextCheckCell;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.StoreUtils;
 import it.owlgram.android.http.FileDownloader;
-import it.owlgram.ui.Cells.UpdateAvailableCell;
-import it.owlgram.ui.Cells.UpdateCheckCell;
 import it.owlgram.android.updates.AppDownloader;
 import it.owlgram.android.updates.PlayStoreAPI;
 import it.owlgram.android.updates.UpdateManager;
+import it.owlgram.ui.Cells.UpdateAvailableCell;
+import it.owlgram.ui.Cells.UpdateCheckCell;
 
 public class OwlgramUpdateSettings extends BaseSettingsActivity {
 

@@ -38,9 +38,9 @@ import java.util.Objects;
 import java.util.Scanner;
 
 import it.owlgram.android.camera.CameraXUtils;
-import it.owlgram.ui.Components.Dialogs.FileSettingsNameDialog;
-import it.owlgram.android.utils.SharedPreferencesHelper;
 import it.owlgram.android.translator.Translator;
+import it.owlgram.android.utils.SharedPreferencesHelper;
+import it.owlgram.ui.Components.Dialogs.FileSettingsNameDialog;
 
 public class SettingsController extends SharedPreferencesHelper {
     protected static boolean configLoaded;

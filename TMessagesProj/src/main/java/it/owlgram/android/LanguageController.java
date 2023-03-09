@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
-import it.owlgram.android.OwlConfig;
 import it.owlgram.android.http.StandardHTTPRequest;
 
 public class LanguageController {

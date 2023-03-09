@@ -47,11 +47,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import it.owlgram.android.utils.FileUnzip;
+import it.owlgram.Fonts.FontFileReader;
 import it.owlgram.android.http.FileDownloader;
 import it.owlgram.android.http.StandardHTTPRequest;
+import it.owlgram.android.utils.FileUnzip;
 import it.owlgram.ui.Components.EmojiSetBulletinLayout;
-import it.owlgram.Fonts.FontFileReader;
 
 public class CustomEmojiController {
     private static Typeface systemEmojiTypeface;

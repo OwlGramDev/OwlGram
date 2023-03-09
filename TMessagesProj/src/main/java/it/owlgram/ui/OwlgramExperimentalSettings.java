@@ -19,9 +19,9 @@ import org.telegram.ui.Components.SlideChooseView;
 
 import java.util.ArrayList;
 
-import it.owlgram.android.OwlConfig;
-import it.owlgram.android.MonetIconController;
 import it.owlgram.android.AlertController;
+import it.owlgram.android.MonetIconController;
+import it.owlgram.android.OwlConfig;
 import it.owlgram.ui.Cells.LabsHeader;
 
 public class OwlgramExperimentalSettings extends BaseSettingsActivity {
