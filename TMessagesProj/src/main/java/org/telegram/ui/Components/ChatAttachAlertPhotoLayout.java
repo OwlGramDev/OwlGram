@@ -2248,6 +2248,9 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
         if (cameraView == null || cameraInitAnimation != null || parentAlert.isDismissed()) {
             return;
         }
+        if (!cameraView.isInited()) {
+            return;
+        }
         cameraView.initTexture();
         if (parentAlert.avatarPicker == 2 || parentAlert.baseFragment instanceof ChatActivity) {
             tooltipTextView.setVisibility(VISIBLE);
