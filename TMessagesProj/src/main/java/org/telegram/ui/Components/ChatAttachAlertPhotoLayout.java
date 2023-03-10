@@ -912,7 +912,6 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
         container.addView(recordTime, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL | Gravity.TOP, 0, 16, 0, 0));
 
         cameraPanel = new FrameLayout(context) {
-
             @Override
             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
                 int cx;
@@ -2219,6 +2218,9 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                 } else if (CameraXUtils.isCameraXSupported() && OwlConfig.cameraType == OwlConfig.CAMERA_X) {
                     deviceHasGoodCamera = CameraXView.hasGoodCamera(getContext());
                 } else {
+                    if (request || SharedConfig.hasCameraCache) {
+                        CameraController.getInstance().initCamera(null);
+                    }
                     deviceHasGoodCamera = CameraController.getInstance().isCameraInitied();
                 }
             } else if (CameraXUtils.isCameraXSupported() && OwlConfig.cameraType == OwlConfig.CAMERA_X) {
