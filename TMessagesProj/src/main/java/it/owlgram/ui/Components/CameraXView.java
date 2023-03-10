@@ -72,7 +72,6 @@ public class CameraXView extends BaseCameraView {
 
     private ValueAnimator flipAnimator;
     private boolean flipHalfReached;
-    private final boolean lazy;
     private Drawable thumbDrawable;
 
     private long mLastClickTime;
@@ -128,16 +127,14 @@ public class CameraXView extends BaseCameraView {
         this.frontface = frontface;
         setWillNotDraw(!lazy);
         previewView = new PreviewView(context);
-        if (lazy) {
-            previewView.setAlpha(0);
-        }
+        previewView.setAlpha(0);
         placeholderView = new ImageView(context);
         placeholderView.setVisibility(View.GONE);
         placeholderView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         previewView.setImplementationMode(PreviewView.ImplementationMode.COMPATIBLE);
         previewView.setFocusableInTouchMode(false);
         previewView.setBackgroundColor(Color.BLACK);
-        if (!(this.lazy = lazy)) {
+        if (!lazy) {
            initTexture();
         }
         addView(placeholderView);
@@ -189,10 +186,8 @@ public class CameraXView extends BaseCameraView {
                 placeholderView.setImageBitmap(null);
                 placeholderView.setVisibility(View.GONE);
                 AndroidUtilities.runOnUIThread(this::onFirstFrameRendered);
-                if (lazy) {
-                    previewView.setAlpha(0);
-                    showTexture(true, true);
-                }
+                previewView.setAlpha(0);
+                showTexture(true, true);
             }
         });
     }
