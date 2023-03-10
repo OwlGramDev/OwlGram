@@ -37,6 +37,7 @@ import androidx.camera.view.PreviewView;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.Utilities;
 import org.telegram.messenger.camera.CameraView;
 import org.telegram.messenger.camera.Size;
@@ -135,7 +136,9 @@ public class CameraXView extends BaseCameraView {
         previewView.setFocusableInTouchMode(false);
         previewView.setBackgroundColor(Color.BLACK);
         if (!lazy) {
-           initTexture();
+            initTexture();
+        } else {
+            AndroidUtilities.runOnUIThread(() -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.cameraInitied));
         }
         addView(placeholderView);
         blurredStubView = new ImageView(context);
@@ -186,9 +189,11 @@ public class CameraXView extends BaseCameraView {
                 placeholderView.setImageBitmap(null);
                 placeholderView.setVisibility(View.GONE);
                 AndroidUtilities.runOnUIThread(this::onFirstFrameRendered);
-                previewView.setAlpha(0);
-                showTexture(true, true);
+                if (previewView.getAlpha() == 0) {
+                    showTexture(true, true);
+                }
             }
+            AndroidUtilities.runOnUIThread(() -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.cameraInitied));
         });
     }
 

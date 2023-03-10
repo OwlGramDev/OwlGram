@@ -2199,10 +2199,10 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
         }
         boolean old = deviceHasGoodCamera;
         boolean old2 = noCameraPermissions;
-        if (!SharedConfig.inappCamera) {
+        if (!SharedConfig.inappCamera || OwlConfig.cameraType == OwlConfig.SYSTEM_CAMERA) {
             deviceHasGoodCamera = false;
         } else {
-            if (Build.VERSION.SDK_INT >= 23 && OwlConfig.cameraType == OwlConfig.TELEGRAM_CAMERA) {
+            if (Build.VERSION.SDK_INT >= 23) {
                 if (noCameraPermissions = (parentAlert.baseFragment.getParentActivity().checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
                     if (request) {
                         try {
@@ -2216,8 +2216,10 @@ public class ChatAttachAlertPhotoLayout extends ChatAttachAlert.AttachAlertLayou
                         }
                     }
                     deviceHasGoodCamera = false;
-                } else {
+                } else if (CameraXUtils.isCameraXSupported() && OwlConfig.cameraType == OwlConfig.CAMERA_X) {
                     deviceHasGoodCamera = CameraXView.hasGoodCamera(getContext());
+                } else {
+                    deviceHasGoodCamera = CameraController.getInstance().isCameraInitied();
                 }
             } else if (CameraXUtils.isCameraXSupported() && OwlConfig.cameraType == OwlConfig.CAMERA_X) {
                 deviceHasGoodCamera = CameraXView.hasGoodCamera(getContext());
