@@ -402,13 +402,13 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                     if (position == cameraAdviseRow) {
                         String advise;
                         switch (OwlConfig.cameraType) {
-                            case 0:
+                            case OwlConfig.TELEGRAM_CAMERA:
                                 advise = LocaleController.getString("DefaultCameraDesc", R.string.DefaultCameraDesc);
                                 break;
-                            case 1:
+                            case OwlConfig.CAMERA_X:
                                 advise = LocaleController.getString("CameraXDesc", R.string.CameraXDesc);
                                 break;
-                            case 2:
+                            case OwlConfig.SYSTEM_CAMERA:
                             default:
                                 advise = LocaleController.getString("SystemCameraDesc", R.string.SystemCameraDesc);
                                 break;
@@ -476,12 +476,12 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                             super.onSelectedCamera(cameraSelected);
                             int oldValue = OwlConfig.cameraType;
                             OwlConfig.saveCameraType(cameraSelected);
-                            if (cameraSelected == 1) {
+                            if (cameraSelected == OwlConfig.CAMERA_X) {
                                 updateRowsId();
                                 listAdapter.notifyItemInserted(cameraXOptimizeRow);
                                 listAdapter.notifyItemInserted(cameraXQualityRow);
                                 listAdapter.notifyItemChanged(cameraAdviseRow);
-                            } else if (oldValue == 1){
+                            } else if (oldValue == OwlConfig.CAMERA_X){
                                 listAdapter.notifyItemRemoved(cameraXOptimizeRow);
                                 listAdapter.notifyItemRemoved(cameraXQualityRow);
                                 listAdapter.notifyItemChanged(cameraAdviseRow - 1);
