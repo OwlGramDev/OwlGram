@@ -60,7 +60,6 @@ public class OwlConfig extends SettingsController {
     public static boolean showReportMessage;
     public static boolean showGradientColor;
     public static boolean showAvatarImage;
-    public static boolean owlEasterSound;
     public static boolean pacmanForced;
     public static boolean smartButtons;
     public static boolean showAppBarShadow;
@@ -173,7 +172,6 @@ public class OwlConfig extends SettingsController {
             showReportMessage = getBoolean("showReportMessage", true);
             showGradientColor = getBoolean("showGradientColor", false);
             showAvatarImage = getBoolean("showAvatarImage", true);
-            owlEasterSound = getBoolean("owlEasterSound", true);
             pacmanForced = getBoolean("pacmanForced", false);
             smartButtons = getBoolean("smartButtons", false);
             showAppBarShadow = getBoolean("showAppBarShadow", true);
@@ -367,10 +365,6 @@ public class OwlConfig extends SettingsController {
 
     public static void toggleShowAvatarImage() {
         putValue("showAvatarImage", showAvatarImage ^= true);
-    }
-
-    public static void toggleOwlEasterSound() {
-        putValue("owlEasterSound", owlEasterSound ^= true);
     }
 
     public static void togglePacmanForced() {

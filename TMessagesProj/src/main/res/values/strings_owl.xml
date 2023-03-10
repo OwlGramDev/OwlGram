@@ -253,8 +253,6 @@
     <string name="FoldersTypeIconsTitles">Icons with Titles</string>
     <string name="ChooseFolderIcon">Choose an Icon</string>
     <string name="OwlGramVersion">OwlGram %1$s\nBased on Telegram %2$s</string>
-    <string name="OwlSoundOn">Enable Owl Sound</string>
-    <string name="OwlSoundOff">Disable Owl Sound</string>
     <string name="MutualContact">Mutual Contact</string>
     <string name="MutualContactDesc">**%s** and you have added each other in the contacts list.</string>
     <string name="JumpToBeginning">Jump to Beginning</string>
