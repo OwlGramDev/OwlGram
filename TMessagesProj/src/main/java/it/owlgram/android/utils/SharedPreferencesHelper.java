@@ -2,6 +2,7 @@ package it.owlgram.android.utils;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.util.Base64;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -28,6 +29,8 @@ public class SharedPreferencesHelper {
             editor.putBoolean(key, (Boolean) value);
         } else if (value instanceof Long) {
             editor.putLong(key, (Long) value);
+        } else if (value instanceof byte[]) {
+            editor.putString(key, Base64.encodeToString((byte[]) value, Base64.DEFAULT));
         }
         editor.apply();
         onSharedPreferenceChanged();
@@ -48,6 +51,14 @@ public class SharedPreferencesHelper {
 
     protected static String getString(String key, String defaultValue) {
         return preferences.getString(key, defaultValue);
+    }
+
+    protected static byte[] getByteArray(String key) {
+        String value = preferences.getString(key, null);
+        if (value != null) {
+            return Base64.decode(value, Base64.DEFAULT);
+        }
+        return null;
     }
 
     protected static int getInt(String key, int defaultValue) {
