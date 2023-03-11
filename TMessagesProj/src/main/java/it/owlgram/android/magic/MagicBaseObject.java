@@ -37,8 +37,8 @@ public abstract class MagicBaseObject {
             }
             return;
         }
-        HashMap<String, Field> fields = Arrays.stream(getClass().getDeclaredFields()).
-                collect(HashMap::new, (m, v) -> m.put(v.getName(), v), HashMap::putAll);
+        HashMap<String, Field> fields = getFields(getClass()).stream()
+                .collect(HashMap::new, (m, v) -> m.put(v.getName(), v), HashMap::putAll);
         for (int a = 0; a < fields.size(); a++) {
             String keyFound = serializedData.readString(exception);
             int constructorFound = serializedData.readInt32(exception);
@@ -128,10 +128,18 @@ public abstract class MagicBaseObject {
         return stream.toByteArray();
     }
 
+    private ArrayList<Field> getFields(Class<?> context) {
+        ArrayList<Field> fields = new ArrayList<>(Arrays.asList(context.getDeclaredFields()));
+        Class<?> superclass = context.getSuperclass();
+        if (superclass != null && !superclass.getSimpleName().equals("MagicBaseObject")) {
+            fields.addAll(getFields(superclass));
+        }
+        return fields;
+    }
+
     private void serializeToStream(AbstractSerializedData stream) {
         stream.writeInt32(getConstructor());
-        Field[] fields = getClass().getDeclaredFields();
-        for (Field field : fields) {
+        for (Field field : getFields(getClass())) {
             String keyFound = field.getName();
             stream.writeString(keyFound);
             serializeObject(field, stream);
