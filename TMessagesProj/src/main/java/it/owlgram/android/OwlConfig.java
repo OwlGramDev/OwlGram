@@ -11,6 +11,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import it.owlgram.android.camera.CameraXUtils;
+import it.owlgram.android.magic.OWLENC;
+import it.owlgram.android.magic.OptionalMagic;
 import it.owlgram.android.translator.AutoTranslateConfig;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.DeepLTranslator;
@@ -96,11 +98,11 @@ public class OwlConfig extends SettingsController {
     public static boolean translateEntireChat;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
-    public static String updateData;
-    public static String drawerItems;
+    public static OptionalMagic<OWLENC.UpdateAvailable> updateData;
+    public static OWLENC.DrawerItems drawerItems = new OWLENC.DrawerItems();
     public static String oldBuildVersion = null;
-    public static String languagePackVersioning;
-    public static String doNotTranslateLanguages;
+    public static OWLENC.LanguagePacksVersions languagePackVersioning = new OWLENC.LanguagePacksVersions();
+    public static OWLENC.ExcludedLanguages doNotTranslateLanguages = new OWLENC.ExcludedLanguages();
     public static String emojiPackSelected;
     public static int deepLFormality;
     public static int translationProvider;
@@ -133,6 +135,7 @@ public class OwlConfig extends SettingsController {
             if (configLoaded) {
                 return;
             }
+            boolean magicException = BuildVars.MAGIC_OWL_EXCEPTIONS;
             //VERSION_CHECK
             if (firstLoad) {
                 boolean backupFileExist = backupFile().exists();
@@ -182,8 +185,8 @@ public class OwlConfig extends SettingsController {
             remindedUpdate = getInt("remindedUpdate", 0);
             translationTarget = getString("translationTarget", "app");
             translationKeyboardTarget = getString("translationKeyboardTarget", "app");
-            updateData = getString("updateData", "");
-            drawerItems = getString("drawerItems", "[]");
+            updateData = OptionalMagic.readParams(getByteArray("updateData"), new OWLENC.UpdateAvailable());
+            drawerItems.readParams(getByteArray("drawerItems"), magicException);
             oldDownloadedVersion = getInt("oldDownloadedVersion", 0);
             eventType = getInt("eventType", 0);
             buttonStyleType = getInt("buttonStyleType", 0);
@@ -201,15 +204,15 @@ public class OwlConfig extends SettingsController {
             useCameraXOptimizedMode = getBoolean("useCameraXOptimizedMode", SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_HIGH);
             disableProximityEvents = getBoolean("disableProximityEvents", false);
             verifyLinkTip = getBoolean("verifyLinkTip", false);
-            languagePackVersioning = getString("languagePackVersioning", "{}");
-            xiaomiBlockedInstaller = getBoolean("xiaomiBlockedInstaller", false);
+            languagePackVersioning.readParams(getByteArray("languagePackVersioning"), magicException);
+            xiaomiBlockedInstaller = getBoolean("xiaomiBlockedInstaller", magicException);
             voicesAgc = getBoolean("voicesAgc", false);
             turnSoundOnVDKey = getBoolean("turnSoundOnVDKey", true);
             openArchiveOnPull = getBoolean("openArchiveOnPull", false);
             slidingChatTitle = getBoolean("slidingChatTitle", false);
             confirmStickersGIFs = getBoolean("confirmStickersGIFs", false);
             showIDAndDC = getBoolean("showIDAndDC", false);
-            doNotTranslateLanguages = getString("doNotTranslateLanguages", "[\"app\"]");
+            doNotTranslateLanguages.readParams(getByteArray("doNotTranslateLanguages"), magicException, "app");
             dcStyleType = getInt("dcStyleType", 0);
             idType = getInt("idType", 0);
             searchIconInActionBar = getBoolean("searchIconInActionBar", false);
@@ -248,6 +251,12 @@ public class OwlConfig extends SettingsController {
         if (translationProvider == Translator.PROVIDER_NIU) {
             setTranslationProvider(Translator.PROVIDER_GOOGLE);
         }
+        drawerItems.migrate(getString("drawerItems", null));
+        applyDrawerItems();
+        doNotTranslateLanguages.migrate(getString("doNotTranslateLanguages", null));
+        applyDoNotTranslateLanguages();
+        languagePackVersioning.migrate(getString("languagePackVersioning", null));
+        applyLanguagePackVersioning();
         AutoTranslateConfig.migrate();
     }
 
@@ -596,20 +605,21 @@ public class OwlConfig extends SettingsController {
         putValue("lastSelectedCompression", lastSelectedCompression = compression);
     }
 
-    public static void setUpdateData(String data) {
-        putValue("updateData", updateData = data);
+
+    public static void applyUpdateData() {
+        putValue("updateData", updateData.serializeToStream());
     }
 
-    public static void setDrawerItems(String data) {
-        putValue("drawerItems", drawerItems = data);
+    public static void applyDrawerItems() {
+        putValue("drawerItems", drawerItems.serializeToStream());
     }
 
-    public static void setLanguagePackVersioning(String data) {
-        putValue("languagePackVersioning", languagePackVersioning = data);
+    public static void applyLanguagePackVersioning() {
+        putValue("languagePackVersioning", languagePackVersioning.serializeToStream());
     }
 
-    public static void setDoNotTranslateLanguages(String data) {
-        putValue("doNotTranslateLanguages", doNotTranslateLanguages = data);
+    public static void applyDoNotTranslateLanguages() {
+        putValue("doNotTranslateLanguages", doNotTranslateLanguages.serializeToStream());
     }
 
     public static void setDownloadSpeedBoost(int boost) {

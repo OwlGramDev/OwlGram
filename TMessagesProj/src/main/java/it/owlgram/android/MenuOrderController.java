@@ -1,7 +1,5 @@
 package it.owlgram.android;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 
@@ -11,7 +9,6 @@ public class MenuOrderController {
     private static final Object sync = new Object();
 
     private static boolean configLoaded;
-    private static JSONArray data;
     public static final String DIVIDER_ITEM = "divider";
     public static final String[] list_items = new String[]{
             "new_group",
@@ -45,13 +42,7 @@ public class MenuOrderController {
             if (configLoaded) {
                 return;
             }
-            String items = OwlConfig.drawerItems;
-            try {
-                data = new JSONArray(items);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            if (data.length() == 0) {
+            if (OwlConfig.drawerItems.size() == 0) {
                 loadDefaultItems();
             }
             configLoaded = true;
@@ -75,7 +66,7 @@ public class MenuOrderController {
     }
 
     public static void resetToDefaultPosition() {
-        data = new JSONArray();
+        OwlConfig.drawerItems.clear();
         loadDefaultItems();
     }
 
@@ -97,9 +88,9 @@ public class MenuOrderController {
     private static void loadDefaultItems() {
         String[] defaultItems = getDefaultItems();
         for (String defaultItem : defaultItems) {
-            data.put(defaultItem);
+            OwlConfig.drawerItems.add(defaultItem);
         }
-        OwlConfig.setDrawerItems(data.toString());
+        OwlConfig.applyDrawerItems();
     }
 
     private static int getArrayPosition(String id) {
@@ -107,13 +98,10 @@ public class MenuOrderController {
     }
 
     private static int getArrayPosition(String id, int startFrom) {
-        try {
-            for (int i = startFrom; i < data.length(); i++) {
-                if (data.getString(i).equals(id)) {
-                    return i;
-                }
+        for (int i = startFrom; i < OwlConfig.drawerItems.size(); i++) {
+            if (OwlConfig.drawerItems.get(i).equals(id)) {
+                return i;
             }
-        } catch (JSONException ignored) {
         }
         return -1;
     }
@@ -126,22 +114,18 @@ public class MenuOrderController {
         int position = getArrayPosition(id, startFrom);
         if (position == -1 && isDefault) {
             position = 0;
-            data.put(id);
-            OwlConfig.setDrawerItems(data.toString());
+            OwlConfig.drawerItems.add(id);
+            OwlConfig.applyDrawerItems();
         }
         return position;
     }
 
     public static void changePosition(int oldPosition, int newPosition) {
-        try {
-            String data1 = data.getString(newPosition);
-            String data2 = data.getString(oldPosition);
-            data.put(oldPosition, data1);
-            data.put(newPosition, data2);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        OwlConfig.setDrawerItems(data.toString());
+        String data1 = OwlConfig.drawerItems.get(newPosition);
+        String data2 = OwlConfig.drawerItems.get(oldPosition);
+        OwlConfig.drawerItems.add(oldPosition, data1);
+        OwlConfig.drawerItems.add(newPosition, data2);
+        OwlConfig.applyDrawerItems();
     }
 
     public static EditableMenuItem getSingleAvailableMenuItem(int position) {
@@ -335,18 +319,15 @@ public class MenuOrderController {
                         false
                 )
         );
-        for (int i = 0; i < data.length(); i++) {
-            try {
-                if (data.getString(i).equals(DIVIDER_ITEM)) {
-                    list.add(
-                            new EditableMenuItem(
-                                    DIVIDER_ITEM,
-                                    LocaleController.getString("Divider", R.string.Divider),
-                                    false
-                            )
-                    );
-                }
-            } catch (JSONException ignored) {
+        for (String id : OwlConfig.drawerItems) {
+            if (id.equals(DIVIDER_ITEM)) {
+                list.add(
+                        new EditableMenuItem(
+                                DIVIDER_ITEM,
+                                LocaleController.getString("Divider", R.string.Divider),
+                                false
+                        )
+                );
             }
         }
         return list;
@@ -359,33 +340,13 @@ public class MenuOrderController {
     }
 
     private static void addAsFirst(String id) {
-        JSONArray result = new JSONArray();
-        result.put(id);
-        for (int i = 0; i < data.length(); i++) {
-            try {
-                result.put(data.get(i));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        data = result;
-        OwlConfig.setDrawerItems(data.toString());
+        OwlConfig.drawerItems.add(0, id);
+        OwlConfig.applyDrawerItems();
     }
 
     public static void removeItem(int position) {
-        JSONArray result = new JSONArray();
-        for (int i = 0; i < data.length(); i++) {
-            try {
-                String idTmp = data.getString(i);
-                if (i != position) {
-                    result.put(idTmp);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        data = result;
-        OwlConfig.setDrawerItems(data.toString());
+        OwlConfig.drawerItems.remove(position);
+        OwlConfig.applyDrawerItems();
     }
 
     public static class EditableMenuItem {
@@ -405,5 +366,4 @@ public class MenuOrderController {
             isPremium = is_premium;
         }
     }
-
 }

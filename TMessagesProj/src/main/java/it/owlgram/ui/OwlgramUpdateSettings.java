@@ -5,7 +5,6 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.json.JSONObject;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
@@ -20,6 +19,7 @@ import org.telegram.ui.Cells.TextCheckCell;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.StoreUtils;
 import it.owlgram.android.http.FileDownloader;
+import it.owlgram.android.magic.OWLENC;
 import it.owlgram.android.updates.AppDownloader;
 import it.owlgram.android.updates.PlayStoreAPI;
 import it.owlgram.android.updates.UpdateManager;
@@ -38,25 +38,20 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
     private boolean checkingUpdates;
     private TextCheckCell changeBetaMode;
 
-    private UpdateManager.UpdateAvailable updateAvailable;
+    private OWLENC.UpdateAvailable updateAvailable;
     private UpdateCheckCell updateCheckCell;
     private UpdateAvailableCell updateCell;
 
     @Override
     public boolean onFragmentCreate() {
-        String data = OwlConfig.updateData;
-        try {
-            if (data.length() > 0) {
-                JSONObject jsonObject = new JSONObject(data);
-                updateAvailable = UpdateManager.loadUpdate(jsonObject);
-                if (updateAvailable.isReminded()) {
-                    updateAvailable = null;
-                } else if (updateAvailable.version <= BuildVars.BUILD_VERSION) {
-                    updateAvailable = null;
-                    OwlConfig.saveUpdateStatus(0);
-                }
+        if (OwlConfig.updateData.isPresent()) {
+            updateAvailable = OwlConfig.updateData.get();
+            if (updateAvailable.isReminded()) {
+                updateAvailable = null;
+            } else if (updateAvailable.version <= BuildVars.BUILD_VERSION) {
+                updateAvailable = null;
+                OwlConfig.saveUpdateStatus(0);
             }
-        } catch (Exception ignored) {
         }
         AppDownloader.setListener("settings", new AppDownloader.UpdateListener() {
             @Override
@@ -164,7 +159,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                     OwlgramUpdateSettings.this.updateCell = updateCell;
                     updateCell.setUpdate(
                             updateAvailable.title,
-                            updateAvailable.desc,
+                            updateAvailable.description,
                             updateAvailable.note,
                             updateAvailable.banner
                     );
@@ -233,7 +228,7 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                         protected void onConfirmUpdate() {
                             super.onConfirmUpdate();
                             if (!FileDownloader.isRunningDownload("appUpdate")) {
-                                if (FileDownloader.downloadFile(context, "appUpdate", UpdateManager.apkFile(), updateAvailable.link_file))
+                                if (FileDownloader.downloadFile(context, "appUpdate", UpdateManager.apkFile(), updateAvailable.fileLink))
                                     OwlConfig.saveOldVersion(updateAvailable.version);
                                 updateCell.setDownloadMode();
                             }
@@ -303,12 +298,13 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
             public void onSuccess(Object updateResult) {
                 checkingUpdates = false;
                 OwlConfig.saveLastUpdateCheck();
-                if (updateResult instanceof UpdateManager.UpdateAvailable) {
+                if (updateResult instanceof OWLENC.UpdateAvailable) {
                     if (updateAvailable == null) {
                         OwlConfig.saveUpdateStatus(1);
                         OwlConfig.remindUpdate(-1);
-                        OwlConfig.setUpdateData(updateResult.toString());
-                        updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
+                        updateAvailable = (OWLENC.UpdateAvailable) updateResult;
+                        OwlConfig.updateData.set(updateAvailable);
+                        OwlConfig.applyUpdateData();
                         if (StoreUtils.isFromPlayStore()) {
                             PlayStoreAPI.openUpdatePopup(getParentActivity());
                         } else {
@@ -323,7 +319,8 @@ public class OwlgramUpdateSettings extends BaseSettingsActivity {
                     OwlConfig.saveUpdateStatus(0);
                     updateCheckCell.setCheckTime();
                     if (updateAvailable != null) {
-                        OwlConfig.setUpdateData("");
+                        OwlConfig.updateData.set(null);
+                        OwlConfig.applyUpdateData();
                         updateAvailable = null;
                         if (!StoreUtils.isFromPlayStore()) {
                             listAdapter.notifyItemRangeRemoved(updateSectionAvailableRow, 2);

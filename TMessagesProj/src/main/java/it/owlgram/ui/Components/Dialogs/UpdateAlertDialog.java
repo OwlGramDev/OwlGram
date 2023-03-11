@@ -37,14 +37,15 @@ import org.telegram.ui.LaunchActivity;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.http.FileDownloader;
+import it.owlgram.android.magic.OWLENC;
 import it.owlgram.android.updates.UpdateManager;
 
 public class UpdateAlertDialog extends BottomSheet {
 
-    UpdateManager.UpdateAvailable update;
+    OWLENC.UpdateAvailable update;
     private final LaunchActivity parentActivity;
 
-    public UpdateAlertDialog(LaunchActivity activity, UpdateManager.UpdateAvailable updateAvailable) {
+    public UpdateAlertDialog(LaunchActivity activity, OWLENC.UpdateAvailable updateAvailable) {
         super(activity, false);
         update = updateAvailable;
         parentActivity = activity;
@@ -110,7 +111,7 @@ public class UpdateAlertDialog extends BottomSheet {
         descMessage.setMovementMethod(new AndroidUtilities.LinkMovementMethodMy());
         descMessage.setGravity(Gravity.LEFT | Gravity.TOP);
         descMessage.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
-        setTextEntities(descMessage, updateAvailable.desc);
+        setTextEntities(descMessage, updateAvailable.description);
         linearLayout2.addView(descMessage);
 
         TextView note = new TextView(activity);
@@ -131,7 +132,7 @@ public class UpdateAlertDialog extends BottomSheet {
         BottomSheetCell doneButton = new BottomSheetCell(activity, false);
         doneButton.setText(LocaleController.formatString("AppUpdateDownloadNow", R.string.AppUpdateDownloadNow), false);
         doneButton.background.setOnClickListener(v -> {
-            if (FileDownloader.downloadFile(activity, "appUpdate", UpdateManager.apkFile(), updateAvailable.link_file))
+            if (FileDownloader.downloadFile(activity, "appUpdate", UpdateManager.apkFile(), updateAvailable.fileLink))
                 OwlConfig.saveOldVersion(updateAvailable.version);
             dismiss();
         });

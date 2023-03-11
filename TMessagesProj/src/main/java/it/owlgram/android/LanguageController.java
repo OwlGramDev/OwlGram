@@ -41,19 +41,18 @@ public class LanguageController {
                     }
                     String url = String.format("https://app.owlgram.org/language_version?lang=%s", langCode);
                     JSONObject obj = new JSONObject(new StandardHTTPRequest(url).request());
-                    JSONObject versioning = new JSONObject(OwlConfig.languagePackVersioning);
                     if (!obj.has("error")) {
                         String remoteMD5 = obj.getString("md5");
                         if (getFileFromLang(langCode).exists()) {
-                            if (versioning.has(langCode)) {
-                                if (versioning.getString(langCode).equals(remoteMD5)) {
+                            if (OwlConfig.languagePackVersioning.containsKey(langCode)) {
+                                if (OwlConfig.languagePackVersioning.get(langCode).equals(remoteMD5)) {
                                     return;
                                 }
                             }
                         }
                         loadRemoteLanguage(langCode);
-                        versioning.put(langCode, remoteMD5);
-                        OwlConfig.setLanguagePackVersioning(versioning.toString());
+                        OwlConfig.languagePackVersioning.put(langCode, remoteMD5);
+                        OwlConfig.applyLanguagePackVersioning();
                     }
                 } catch (Exception ignored) {
                 }

@@ -3565,7 +3565,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                             } else if (which == 12) {
                                 SharedConfig.pendingAppUpdate = null;
                                 SharedConfig.saveConfig();
-                                OwlConfig.setUpdateData("");
+                                OwlConfig.updateData.set(null);
+                                OwlConfig.applyUpdateData();
                                 OwlConfig.saveUpdateStatus(0);
                                 OwlConfig.remindUpdate(-1);
                                 OwlConfig.saveLastUpdateCheck(true);

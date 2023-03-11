@@ -94,7 +94,6 @@ import com.google.firebase.appindexing.Action;
 import com.google.firebase.appindexing.FirebaseUserActions;
 import com.google.firebase.appindexing.builders.AssistActionBuilder;
 
-import org.json.JSONObject;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -210,6 +209,7 @@ import java.util.regex.Pattern;
 
 import it.owlgram.android.StoreUtils;
 import it.owlgram.android.OwlConfig;
+import it.owlgram.android.magic.OWLENC;
 import it.owlgram.ui.Components.Dialogs.UpdateAlertDialog;
 import it.owlgram.android.Crashlytics;
 import it.owlgram.android.CustomEmojiController;
@@ -4964,11 +4964,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     UpdateManager.installUpdate(LaunchActivity.this);
                 } else {
                     try {
-                        String data = OwlConfig.updateData;
-                        if(data.length() > 0) {
-                            JSONObject jsonObject = new JSONObject(data);
-                            UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(jsonObject);
-                            if (FileDownloader.downloadFile(LaunchActivity.this, "appUpdate", UpdateManager.apkFile(), update.link_file))
+                        if(OwlConfig.updateData.isPresent()) {
+                            OWLENC.UpdateAvailable update = OwlConfig.updateData.get();
+                            if (FileDownloader.downloadFile(LaunchActivity.this, "appUpdate", UpdateManager.apkFile(), update.fileLink))
                                 OwlConfig.saveOldVersion(update.version);
                         }
                     } catch (Exception ignored){}
@@ -5115,17 +5113,15 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                     updateSizeTextView.animate().alpha(0.0f).scaleX(0.0f).scaleY(0.0f).setDuration(180).start();
                 } else {
                     try {
-                        String data = OwlConfig.updateData;
-                        if(data.length() > 0) {
-                            JSONObject jsonObject = new JSONObject(data);
-                            UpdateManager.UpdateAvailable updateAvailable = UpdateManager.loadUpdate(jsonObject);
+                        if(OwlConfig.updateData.isPresent()) {
+                            OWLENC.UpdateAvailable updateAvailable = OwlConfig.updateData.get();
                             if(updateAvailable.version > BuildVars.BUILD_VERSION) {
                                 createUpdateUI();
                                 updateLayoutIcon.setIcon(MediaActionDrawable.ICON_DOWNLOAD, true, true);
                                 updateTextView.setText(LocaleController.getString("UpdateOwlGram", R.string.UpdateOwlGram));
                                 updateSizeTextView.setTag(null);
                                 updateSizeTextView.animate().alpha(1.0f).scaleX(1.0f).scaleY(1.0f).setDuration(180).start();
-                                updateSizeTextView.setText(AndroidUtilities.formatFileSize(updateAvailable.file_size));
+                                updateSizeTextView.setText(AndroidUtilities.formatFileSize(updateAvailable.fileSize));
                             }
                         }
                     } catch (Exception ignored){}
@@ -5180,11 +5176,13 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 UpdateManager.checkUpdates(new UpdateManager.UpdateCallback() {
                     @Override
                     public void onSuccess(Object updateResult) {
-                        if(updateResult instanceof UpdateManager.UpdateAvailable) {
-                            UpdateManager.UpdateAvailable updateAvailable = (UpdateManager.UpdateAvailable) updateResult;
+                        if(updateResult instanceof OWLENC.UpdateAvailable) {
+                            OWLENC.UpdateAvailable updateAvailable = (OWLENC.UpdateAvailable) updateResult;
                             long passed_time = (new Date().getTime() - OwlConfig.lastUpdateCheck) / 1000;
                             if(passed_time >= 3600 * 2 || OwlConfig.lastUpdateStatus != 1 && !updateAvailable.isReminded() || force) {
-                                OwlConfig.setUpdateData(updateResult.toString());
+                                OwlConfig.updateData.set(updateAvailable);
+                                OwlConfig.applyUpdateData();
+                                OwlConfig.applyUpdateData();
                                 OwlConfig.remindUpdate(-1);
                                 NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
                                 if (StoreUtils.isFromPlayStore()) {
