@@ -12,7 +12,7 @@ public class MagicVector<T> extends MagicBaseObject implements Iterable<T> {
     @SafeVarargs
     public final void readParams(byte[] stream, boolean exception, T... defaultsObject) {
         readParams(stream, exception);
-        if (vector.size() == 0 && defaultsObject != null) {
+        if (stream == null && defaultsObject != null) {
             vector.addAll(Arrays.asList(defaultsObject));
         }
     }
