@@ -153,7 +153,7 @@ public class RawDeepLTranslator {
 
         httpConnection.setRequestMethod("POST");
         httpConnection.setDoOutput(true);
-        httpConnection.getOutputStream().write(body.getBytes(StandardCharsets.UTF_8));
+        httpConnection.getOutputStream().write(body.getBytes(StandardCharsets.UTF_8.name()));
         httpConnection.getOutputStream().flush();
         httpConnection.getOutputStream().close();
 
