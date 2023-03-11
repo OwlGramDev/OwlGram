@@ -9986,7 +9986,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     } else if (position == faqRow) {
                         textCell.setTextAndIcon(LocaleController.getString("TelegramFAQ", R.string.TelegramFAQ), R.drawable.msg2_help, true);
                     } else if (position == policyRow) {
-                        textCell.setTextAndIcon(LocaleController.getString("PrivacyPolicy", R.string.PrivacyPolicy), R.drawable.msg2_policy, false);
+                        textCell.setTextAndIcon(LocaleController.getString("PrivacyPolicy", R.string.PrivacyPolicy), R.drawable.msg2_policy, true);
                     } else if (position == owlgramPolicyRow) {
                         textCell.setTextAndIcon(LocaleController.getString("OwlPrivacyPolicy", R.string.OwlPrivacyPolicy), R.drawable.msg2_policy, false);
                     } else if (position == sendLogsRow) {
