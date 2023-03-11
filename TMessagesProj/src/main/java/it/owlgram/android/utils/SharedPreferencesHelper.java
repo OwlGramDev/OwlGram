@@ -56,7 +56,9 @@ public class SharedPreferencesHelper {
     protected static byte[] getByteArray(String key) {
         String value = preferences.getString(key, null);
         if (value != null) {
-            return Base64.decode(value, Base64.DEFAULT);
+            try {
+                return Base64.decode(value, Base64.DEFAULT);
+            } catch (IllegalArgumentException ignored) {}
         }
         return null;
     }
