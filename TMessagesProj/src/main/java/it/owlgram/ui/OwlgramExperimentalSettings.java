@@ -1,7 +1,13 @@
 package it.owlgram.ui;
 
+import static android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO;
+
 import android.os.Build;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,20 +21,20 @@ import org.telegram.ui.Cells.HeaderCell;
 import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextInfoPrivacyCell;
 import org.telegram.ui.Cells.TextSettingsCell;
+import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.SlideChooseView;
+import org.telegram.ui.Components.StickerImageView;
 
 import java.util.ArrayList;
 
 import it.owlgram.android.AlertController;
 import it.owlgram.android.MonetIconController;
 import it.owlgram.android.OwlConfig;
-import it.owlgram.ui.Cells.LabsHeader;
 
 public class OwlgramExperimentalSettings extends BaseSettingsActivity {
 
     private int checkBoxExperimentalRow;
     private int headerImageRow;
-    private int bottomHeaderRow;
     private int headerExperimental;
     private int betterAudioCallRow;
     private int sendLargePhotosRow;
@@ -40,6 +46,7 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
     private int headerDownloadSpeed;
     private int downloadSpeedBoostRow;
     private int uploadSpeedBoostRow;
+    private int bottomSpaceRow;
 
     @Override
     protected String getActionBarTitle() {
@@ -132,7 +139,6 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
     protected void updateRowsId() {
         super.updateRowsId();
         headerImageRow = -1;
-        bottomHeaderRow = -1;
         headerExperimental = -1;
         betterAudioCallRow = -1;
         sendLargePhotosRow = -1;
@@ -148,7 +154,6 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
         checkBoxExperimentalRow = rowCount++;
         if (OwlConfig.isDevOptEnabled()) {
             headerImageRow = rowCount++;
-            bottomHeaderRow = rowCount++;
             headerExperimental = rowCount++;
             betterAudioCallRow = rowCount++;
             sendLargePhotosRow = rowCount++;
@@ -164,6 +169,7 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
         } else {
             experimentalMessageAlert = rowCount++;
         }
+        bottomSpaceRow = rowCount++;
     }
 
     @Override
@@ -200,9 +206,7 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
                     break;
                 case TEXT_HINT_WITH_PADDING:
                     TextInfoPrivacyCell textInfoPrivacyCell = (TextInfoPrivacyCell) holder.itemView;
-                    if (position == bottomHeaderRow) {
-                        textInfoPrivacyCell.setText(LocaleController.getString("ExperimentalDesc", R.string.ExperimentalDesc));
-                    } else if (position == experimentalMessageAlert) {
+                    if (position == experimentalMessageAlert) {
                         textInfoPrivacyCell.setText(LocaleController.getString("ExperimentalOff", R.string.ExperimentalOff));
                     }
                     break;
@@ -234,7 +238,21 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
             View view = null;
             switch (viewType) {
                 case IMAGE_HEADER:
-                    view = new LabsHeader(context);
+                    LinearLayout stickerHeaderCell = new LinearLayout(context);
+                    stickerHeaderCell.setOrientation(LinearLayout.VERTICAL);
+                    StickerImageView backupImageView = new StickerImageView(context, currentAccount);
+                    backupImageView.setStickerPackName("UtyaDuckFull");
+                    backupImageView.setStickerNum(24);
+                    stickerHeaderCell.addView(backupImageView, LayoutHelper.createLinear(140, 140, Gravity.CENTER, 0, 20, 0, 5));
+                    TextView textView = new TextView(context);
+                    textView.setText(LocaleController.getString("ExperimentalDesc", R.string.ExperimentalDesc));
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
+                    textView.setGravity(Gravity.CENTER);
+                    textView.setPadding(0, AndroidUtilities.dp(10), 0, AndroidUtilities.dp(17));
+                    textView.setTextColor(getThemedColor(Theme.key_windowBackgroundWhiteGrayText4));
+                    textView.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
+                    stickerHeaderCell.addView(textView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER | Gravity.TOP, 25, 0, 25, 0));
+                    view = stickerHeaderCell;
                     break;
                 case SLIDE_CHOOSE:
                     SlideChooseView slideChooseView = new SlideChooseView(context);
@@ -265,7 +283,7 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
                 return ViewType.SWITCH;
             } else if (position == headerImageRow) {
                 return ViewType.IMAGE_HEADER;
-            } else if (position == bottomHeaderRow || position == experimentalMessageAlert) {
+            } else if (position == experimentalMessageAlert) {
                 return ViewType.TEXT_HINT_WITH_PADDING;
             } else if (position == headerExperimental || position == headerDownloadSpeed) {
                 return ViewType.HEADER;
@@ -273,6 +291,8 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
                 return ViewType.SETTINGS;
             } else if (position == downloadSpeedBoostRow) {
                 return ViewType.SLIDE_CHOOSE;
+            } else if (position == bottomSpaceRow) {
+                return ViewType.SHADOW;
             }
             throw new IllegalArgumentException("Invalid position");
         }
