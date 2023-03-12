@@ -251,11 +251,11 @@ public class OwlConfig extends SettingsController {
         if (translationProvider == Translator.PROVIDER_NIU) {
             setTranslationProvider(Translator.PROVIDER_GOOGLE);
         }
-        drawerItems.migrate(getString("drawerItems", null));
+        drawerItems.migrate(getString("drawerItems", ""));
         applyDrawerItems();
-        doNotTranslateLanguages.migrate(getString("doNotTranslateLanguages", null));
+        doNotTranslateLanguages.migrate(getString("doNotTranslateLanguages", ""));
         applyDoNotTranslateLanguages();
-        languagePackVersioning.migrate(getString("languagePackVersioning", null));
+        languagePackVersioning.migrate(getString("languagePackVersioning", ""));
         applyLanguagePackVersioning();
         AutoTranslateConfig.migrate();
     }

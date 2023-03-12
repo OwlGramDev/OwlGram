@@ -1,5 +1,6 @@
 package it.owlgram.android.magic;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.play.core.appupdate.AppUpdateInfo;
@@ -8,8 +9,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.updates.PlayStoreAPI;
@@ -24,6 +25,24 @@ public class OWLENC {
                 }
             } catch (JSONException ignored){}
         }
+
+        @Override
+        public int getConstructor() {
+            return 0x1cb5c421;
+        }
+
+        @Override
+        public boolean equals(@Nullable Object obj) {
+            if (obj instanceof DrawerItems) {
+                DrawerItems other = (DrawerItems) obj;
+                if (size() != other.size()) return false;
+                for (int i = 0; i < size(); i++) {
+                    if (!get(i).equals(other.get(i))) return false;
+                }
+                return true;
+            }
+            return false;
+        }
     }
 
     public static class ExcludedLanguages extends MagicHashVector<String> {
@@ -34,6 +53,11 @@ public class OWLENC {
                     add(languages.getString(i));
                 }
             } catch (JSONException ignored){}
+        }
+
+        @Override
+        public int getConstructor() {
+            return 0x1cb5c422;
         }
     }
 
@@ -91,9 +115,42 @@ public class OWLENC {
                 languages.put(key, get(key));
             }
         }
+
+        @Override
+        public int getConstructor() {
+            return 0x1cb5c423;
+        }
     }
 
-    public static class SettingsExport extends MagicHashMapVector<String, Object> {
+    public static class SettingsBackup extends MagicBaseObject implements Iterable<String> {
+        private final HashMap<String, Object> settings = new HashMap<>();
+        public int VERSION;
 
+        public boolean contains(String key) {
+            return settings.containsKey(key);
+        }
+
+        public Object get(String key) {
+            return settings.get(key);
+        }
+
+        public void put(String key, Object value) {
+            settings.put(key, value);
+        }
+
+        public int size() {
+            return settings.size();
+        }
+
+        @Override
+        public int getConstructor() {
+            return 0x1cb5c420;
+        }
+
+        @NonNull
+        @Override
+        public Iterator<String> iterator() {
+            return settings.keySet().iterator();
+        }
     }
 }

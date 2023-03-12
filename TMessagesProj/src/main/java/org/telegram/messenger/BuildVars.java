@@ -25,6 +25,7 @@ public class BuildVars {
     public static boolean USE_CLOUD_STRINGS = true;
     public static boolean CHECK_UPDATES = false;
     public static boolean IGNORE_VERSION_CHECK = false;
+    public static boolean MAGIC_OWL_EXCEPTIONS = false;
     public static boolean NO_SCOPED_STORAGE = Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q;
     public static int BUILD_VERSION = BuildConfig.BUILD_VERSION;
     public static String BUILD_VERSION_STRING = BuildConfig.BUILD_VERSION_STRING;
