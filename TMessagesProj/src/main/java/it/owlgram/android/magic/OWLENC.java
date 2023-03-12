@@ -9,6 +9,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.PushbackInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -151,6 +154,31 @@ public class OWLENC {
         @Override
         public Iterator<String> iterator() {
             return settings.keySet().iterator();
+        }
+
+        public boolean isNotLegacy(PushbackInputStream stream) throws IOException {
+            byte[] fileBytes = new byte[stream.available()];
+            int len = stream.read(fileBytes);
+            stream.unread(fileBytes, 0, len);
+            try {
+                JSONObject jsonObject = new JSONObject(new String(fileBytes, StandardCharsets.UTF_8));
+                VERSION = jsonObject.getInt("DB_VERSION");
+                Iterator<String> keys = jsonObject.keys();
+                while (keys.hasNext()) {
+                    String key = keys.next();
+                    if (key.equals("DB_VERSION")) continue;
+                    if (key.equals("drawerItems")) {
+                        DrawerItems drawerItems = new DrawerItems();
+                        drawerItems.migrate(jsonObject.getString(key));
+                        settings.put(key, drawerItems);
+                        continue;
+                    }
+                    settings.put(key, jsonObject.get(key));
+                }
+            } catch (Exception e) {
+                return true;
+            }
+            return false;
         }
     }
 }

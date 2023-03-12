@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PushbackInputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -132,12 +133,14 @@ public class SettingsController extends SharedPreferencesHelper {
     public static ArrayList<String> getDifferenceBetweenCurrentConfig(MessageObject selectedObject) {
         ArrayList<String> listDifference = new ArrayList<>();
         File locFile = MessageHelper.getFileFromMessage(selectedObject);
-        FileInputStream stream = null;
+        PushbackInputStream stream = null;
         Map<String, ?> listPreferences = getAll();
         try {
-            stream = new FileInputStream(locFile);
+            stream = new PushbackInputStream(new FileInputStream(locFile), (int) locFile.length());
             OWLENC.SettingsBackup settingsBackup = new OWLENC.SettingsBackup();
-            settingsBackup.readParams(stream, true);
+            if (settingsBackup.isNotLegacy(stream)) {
+                settingsBackup.readParams(stream, true);
+            }
             Field[] fields = getFields();
             for (Field field : fields) {
                 String keyFound = field.getName();
@@ -168,11 +171,13 @@ public class SettingsController extends SharedPreferencesHelper {
     public static int isValidFileSettings(MessageObject selectedObject) {
         File locFile = MessageHelper.getFileFromMessage(selectedObject);
         if (locFile != null && locFile.length() <= 1024 * 25) {
-            FileInputStream stream = null;
+            PushbackInputStream stream = null;
             try {
-                stream = new FileInputStream(locFile);
+                stream = new PushbackInputStream(new FileInputStream(locFile), (int) locFile.length());
                 OWLENC.SettingsBackup settingsBackup = new OWLENC.SettingsBackup();
-                settingsBackup.readParams(stream, true);
+                if (settingsBackup.isNotLegacy(stream)) {
+                    settingsBackup.readParams(stream, true);
+                }
                 int foundValues = 0;
                 int foundValidValues = 0;
                 Field[] fields = getFields();
@@ -278,11 +283,13 @@ public class SettingsController extends SharedPreferencesHelper {
     }
 
     public static void restoreBackup(File inputFile, boolean isRestore) {
-        FileInputStream stream = null;
+        PushbackInputStream stream = null;
         try {
-            stream = new FileInputStream(inputFile);
+            stream = new PushbackInputStream(new FileInputStream(inputFile), (int) inputFile.length());
             OWLENC.SettingsBackup settingsBackup = new OWLENC.SettingsBackup();
-            settingsBackup.readParams(stream, true);
+            if (settingsBackup.isNotLegacy(stream)) {
+                settingsBackup.readParams(stream, true);
+            }
             if (!isRestore) {
                 internalResetSettings();
             }
