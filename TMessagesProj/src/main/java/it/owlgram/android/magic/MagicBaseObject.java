@@ -3,8 +3,8 @@ package it.owlgram.android.magic;
 import org.telegram.tgnet.AbstractSerializedData;
 import org.telegram.tgnet.SerializedData;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,16 +29,9 @@ public abstract class MagicBaseObject {
 
     // READING MAGIC OBJECTS
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public void readParams(FileInputStream ios, boolean exception) throws IOException {
-        byte[] fileBytes;
-        try {
-            fileBytes = new byte[ios.available()];
-            ios.read(fileBytes);
-        } finally {
-            if (ios != null) {
-                ios.close();
-            }
-        }
+    public void readParams(InputStream ios, boolean exception) throws IOException {
+        byte[] fileBytes = new byte[ios.available()];
+        ios.read(fileBytes);
         readParams(fileBytes, exception);
     }
 
