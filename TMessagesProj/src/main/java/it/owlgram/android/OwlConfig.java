@@ -43,7 +43,6 @@ public class OwlConfig extends SettingsController {
     public static boolean gifAsVideo;
     public static boolean showFolderWhenForward;
     public static boolean useRearCamera;
-    public static boolean sendConfirm;
     public static boolean useSystemFont;
     public static boolean useSystemEmoji;
     public static boolean showGreetings;
@@ -78,7 +77,6 @@ public class OwlConfig extends SettingsController {
     public static boolean turnSoundOnVDKey;
     public static boolean openArchiveOnPull;
     public static boolean slidingChatTitle;
-    public static boolean confirmStickersGIFs;
     public static boolean showIDAndDC;
     public static boolean xiaomiBlockedInstaller;
     public static boolean searchIconInActionBar;
@@ -98,12 +96,13 @@ public class OwlConfig extends SettingsController {
     public static boolean translateEntireChat;
     public static String translationTarget = "app";
     public static String translationKeyboardTarget = "app";
-    public static OptionalMagic<OWLENC.UpdateAvailable> updateData;
-    public static OWLENC.DrawerItems drawerItems = new OWLENC.DrawerItems();
     public static String oldBuildVersion = null;
+    public static String emojiPackSelected;
+    public static OWLENC.DrawerItems drawerItems = new OWLENC.DrawerItems();
+    public static OptionalMagic<OWLENC.UpdateAvailable> updateData;
     public static OWLENC.LanguagePacksVersions languagePackVersioning = new OWLENC.LanguagePacksVersions();
     public static OWLENC.ExcludedLanguages doNotTranslateLanguages = new OWLENC.ExcludedLanguages();
-    public static String emojiPackSelected;
+    public static OWLENC.ConfirmSending confirmSending = new OWLENC.ConfirmSending();
     public static int deepLFormality;
     public static int translationProvider;
     public static int lastUpdateStatus = 0;
@@ -158,7 +157,6 @@ public class OwlConfig extends SettingsController {
             gifAsVideo = getBoolean("gifAsVideo", false);
             showFolderWhenForward = getBoolean("showFolderWhenForward", true);
             useRearCamera = getBoolean("useRearCamera", false);
-            sendConfirm = getBoolean("sendConfirm", false);
             useSystemFont = getBoolean("useSystemFont", false);
             useSystemEmoji = getBoolean("useSystemEmoji", false);
             showGreetings = getBoolean("showGreetings", true);
@@ -210,7 +208,6 @@ public class OwlConfig extends SettingsController {
             turnSoundOnVDKey = getBoolean("turnSoundOnVDKey", true);
             openArchiveOnPull = getBoolean("openArchiveOnPull", false);
             slidingChatTitle = getBoolean("slidingChatTitle", false);
-            confirmStickersGIFs = getBoolean("confirmStickersGIFs", false);
             showIDAndDC = getBoolean("showIDAndDC", false);
             doNotTranslateLanguages.readParams(getByteArray("doNotTranslateLanguages"), magicException, "app");
             dcStyleType = getInt("dcStyleType", 0);
@@ -231,6 +228,7 @@ public class OwlConfig extends SettingsController {
             emojiPackSelected = getString("emojiPackSelected", "default");
             lastSelectedCompression = getInt("lastSelectedCompression", 3);
             translateEntireChat = getBoolean("translateEntireChat", false);
+            confirmSending.readParams(getByteArray("confirmSending"), magicException);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -302,10 +300,6 @@ public class OwlConfig extends SettingsController {
 
     public static void toggleUseRearCamera() {
         putValue("useRearCamera", useRearCamera ^= true);
-    }
-
-    public static void toggleSendConfirm() {
-        putValue("sendConfirm", sendConfirm ^= true);
     }
 
     public static void toggleUseSystemFont() {
@@ -431,11 +425,6 @@ public class OwlConfig extends SettingsController {
     public static void toggleSlidingChatTitle() {
         putValue("slidingChatTitle", slidingChatTitle ^= true);
     }
-
-    public static void toggleConfirmStickersGIFs() {
-        putValue("confirmStickersGIFs", confirmStickersGIFs ^= true);
-    }
-
     public static void toggleShowIDAndDC() {
         putValue("showIDAndDC", showIDAndDC ^= true);
     }
@@ -620,6 +609,10 @@ public class OwlConfig extends SettingsController {
 
     public static void applyDoNotTranslateLanguages() {
         putValue("doNotTranslateLanguages", doNotTranslateLanguages.serializeToStream());
+    }
+
+    public static void applyConfirmSending() {
+        putValue("confirmSending", confirmSending.serializeToStream());
     }
 
     public static void setDownloadSpeedBoost(int boost) {

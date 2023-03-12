@@ -2037,9 +2037,9 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                     if (!hasRecordVideo || calledRecordRunnable) {
                         startedDraggingX = -1;
                         if (hasRecordVideo && isInVideoMode()) {
-                            delegate.needStartRecordVideo(OwlConfig.sendConfirm ? 3 : 1, true, 0);
+                            delegate.needStartRecordVideo(OwlConfig.confirmSending.sendVideo ? 3 : 1, true, 0);
                         } else {
-                            if (OwlConfig.sendConfirm) {
+                            if (OwlConfig.confirmSending.sendAudio) {
                                 MediaController.getInstance().stopRecording(2, true, 0);
                             } else {
                                 if (recordingAudioVideo && isInScheduleMode()) {
@@ -2049,7 +2049,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                             }
                             delegate.needStartRecordAudio(0);
                         }
-                        if (!OwlConfig.sendConfirm) {
+                        if (!OwlConfig.confirmSending.sendAudio && !OwlConfig.confirmSending.sendVideo) {
                             recordingAudioVideo = false;
                             messageTransitionIsRunning = false;
                             AndroidUtilities.runOnUIThread(moveToSendStateRunnable = () -> {
@@ -2130,23 +2130,23 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                         startedDraggingX = -1;
                         if (hasRecordVideo && isInVideoMode()) {
                             CameraController.getInstance().cancelOnInitRunnable(onFinishInitCameraRunnable);
-                            delegate.needStartRecordVideo(OwlConfig.sendConfirm ? 3 : 1, true, 0);
+                            delegate.needStartRecordVideo(OwlConfig.confirmSending.sendVideo ? 3 : 1, true, 0);
                         } else if (!sendVoiceEnabled) {
                             delegate.needShowMediaBanHint();
                         } else {
-                            if (!OwlConfig.sendConfirm) {
+                            if (!OwlConfig.confirmSending.sendAudio) {
                                 if (recordingAudioVideo && isInScheduleMode()) {
                                     AlertsCreator.createScheduleDatePickerDialog(parentActivity, parentFragment.getDialogId(), (notify, scheduleDate) -> MediaController.getInstance().stopRecording(1, notify, scheduleDate), () -> MediaController.getInstance().stopRecording(0, false, 0), resourcesProvider);
                                 }
                             }
                             delegate.needStartRecordAudio(0);
-                            if (!OwlConfig.sendConfirm) {
+                            if (!OwlConfig.confirmSending.sendAudio) {
                                 MediaController.getInstance().stopRecording(isInScheduleMode() ? 3 : 1, true, 0);
                             } else {
                                 MediaController.getInstance().stopRecording(2, true, 0);
                             }
                         }
-                        if (!OwlConfig.sendConfirm) {
+                        if (!OwlConfig.confirmSending.sendAudio && !OwlConfig.confirmSending.sendVideo) {
                             recordingAudioVideo = false;
                             messageTransitionIsRunning = false;
                             AndroidUtilities.runOnUIThread(moveToSendStateRunnable = () -> {

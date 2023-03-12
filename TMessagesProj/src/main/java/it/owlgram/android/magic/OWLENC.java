@@ -125,6 +125,51 @@ public class OWLENC {
         }
     }
 
+    public static class ConfirmSending extends MagicBaseObject {
+        public boolean sendGifs;
+        public boolean sendStickers;
+        public boolean sendAudio;
+        public boolean sendVideo;
+
+
+        public void toggleGifs() {
+            sendGifs ^= true;
+        }
+
+        public void toggleStickers() {
+            sendStickers ^= true;
+        }
+
+        public void toggleAudio() {
+            sendAudio ^= true;
+        }
+
+        public void toggleVideo() {
+            sendVideo ^= true;
+        }
+
+        public int count() {
+            int count = 0;
+            if (sendGifs) count++;
+            if (sendStickers) count++;
+            if (sendAudio) count++;
+            if (sendVideo) count++;
+            return count;
+        }
+
+        public void setAll(boolean value) {
+            sendGifs = value;
+            sendStickers = value;
+            sendAudio = value;
+            sendVideo = value;
+        }
+
+        @Override
+        public int getConstructor() {
+            return 0x1cb5c424;
+        }
+    }
+
     public static class SettingsBackup extends MagicBaseObject implements Iterable<String> {
         private final HashMap<String, Object> settings = new HashMap<>();
         public int VERSION;

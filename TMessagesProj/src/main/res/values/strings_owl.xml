@@ -200,8 +200,7 @@
     <string name="RestartAppToApplyChanges">Restart app to apply changes.</string>
     <string name="UseRearRoundVideos">Start with Rear Camera</string>
     <string name="UseRearRoundVideosDesc">Record video messages with the rear camera instead of the front camera</string>
-    <string name="ConfirmAVMessages">Confirm Sending Audio/Video Messages</string>
-    <string name="ConfirmStickersGIFs">Confirm Sending Stickers and GIFs</string>
+    <string name="ConfirmSending">Confirm Sending</string>
     <string name="HideTimeOnSticker">Hide Time on Stickers</string>
     <string name="OnlineStatus">Show Online Status</string>
     <string name="InAppUpdates">In-App Updates</string>

@@ -124,6 +124,8 @@ public class SettingsController extends SharedPreferencesHelper {
             case "emojiPackSelected":
             case "disableAppBarShadow":
             case "stickersSorting":
+            case "confirmStickersGIFs":
+            case "sendConfirm":
                 return false;
             default:
                 return true;
