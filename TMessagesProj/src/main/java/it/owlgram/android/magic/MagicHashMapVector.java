@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class MagicHashMapVector<T, V> extends MagicBaseObject {
+public abstract class MagicHashMapVector<T, V> extends MagicBaseObject {
     HashMap<T, V> vector = new HashMap<>();
 
     public void put(T key, V value) {
@@ -26,15 +26,6 @@ public class MagicHashMapVector<T, V> extends MagicBaseObject {
 
     public boolean containsKey(T key) {
         return vector.containsKey(key);
-    }
-
-    public boolean containsValue(V value) {
-        return vector.containsValue(value);
-    }
-
-    @Override
-    public int getConstructor() {
-        return HASH_MAP_VECTOR_CONSTRUCTOR;
     }
 
     public Set<T> keySet() {

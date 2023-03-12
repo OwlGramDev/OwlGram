@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-public class MagicVector<T> extends MagicBaseObject implements Iterable<T> {
+public abstract class MagicVector<T> extends MagicBaseObject implements Iterable<T> {
     private final ArrayList<T> vector = new ArrayList<>();
 
     @SafeVarargs
@@ -39,10 +39,6 @@ public class MagicVector<T> extends MagicBaseObject implements Iterable<T> {
 
     public void clear() {
         vector.clear();
-    }
-
-    public int getConstructor() {
-        return VECTOR_CONSTRUCTOR;
     }
 
     @NonNull

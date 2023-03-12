@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 
-public class MagicHashVector<T> extends MagicBaseObject implements Iterable<T>{
+public abstract class MagicHashVector<T> extends MagicBaseObject implements Iterable<T> {
     private final HashSet<T> vector = new HashSet<>();
 
     @SafeVarargs
@@ -27,11 +27,6 @@ public class MagicHashVector<T> extends MagicBaseObject implements Iterable<T>{
 
     public int size() {
         return vector.size();
-    }
-
-    @Override
-    public int getConstructor() {
-        return HASH_VECTOR_CONSTRUCTOR;
     }
 
     public void clear() {

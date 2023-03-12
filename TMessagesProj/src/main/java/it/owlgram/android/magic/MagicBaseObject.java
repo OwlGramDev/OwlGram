@@ -3,6 +3,8 @@ package it.owlgram.android.magic;
 import org.telegram.tgnet.AbstractSerializedData;
 import org.telegram.tgnet.SerializedData;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,15 +23,37 @@ public abstract class MagicBaseObject {
     protected final int BOOL_CONSTRUCTOR = 0x997275b6;
     protected final int BYTES_CONSTRUCTOR = 0x1cb5c416;
 
+    private final int MAX_VECTOR_SIZE = 1000;
+
     public abstract int getConstructor();
 
     // READING MAGIC OBJECTS
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public void readParams(FileInputStream ios, boolean exception) throws IOException {
+        byte[] fileBytes;
+        try {
+            fileBytes = new byte[ios.available()];
+            ios.read(fileBytes);
+        } finally {
+            if (ios != null) {
+                ios.close();
+            }
+        }
+        readParams(fileBytes, exception);
+    }
+
     public void readParams(byte[] stream, boolean exception) {
         if (stream == null) {
             return;
         }
-        SerializedData serializedData = new SerializedData(stream);
-        int constructor = serializedData.readInt32(exception);
+        readParams(new SerializedData(stream), exception);
+    }
+
+    public void readParams(AbstractSerializedData stream, boolean exception) {
+        readParams(stream, stream.readInt32(exception), exception);
+    }
+
+    public void readParams(AbstractSerializedData stream, int constructor, boolean exception) {
         int currentConstructor = getConstructor();
         if (constructor != currentConstructor) {
             if (exception) {
@@ -40,8 +64,8 @@ public abstract class MagicBaseObject {
         HashMap<String, Field> fields = getFields(getClass()).stream()
                 .collect(HashMap::new, (m, v) -> m.put(v.getName(), v), HashMap::putAll);
         for (int a = 0; a < fields.size(); a++) {
-            String keyFound = serializedData.readString(exception);
-            int constructorFound = serializedData.readInt32(exception);
+            String keyFound = stream.readString(exception);
+            int constructorFound = stream.readInt32(exception);
             Field field = fields.get(keyFound);
             if (field == null || !fields.containsKey(keyFound)) {
                 if (exception) {
@@ -51,7 +75,7 @@ public abstract class MagicBaseObject {
             }
             try {
                 field.setAccessible(true);
-                Object result = readObject(serializedData, constructorFound, exception);
+                Object result = readObject(stream, constructorFound, exception);
                 if (result == null) {
                     return;
                 }
@@ -67,9 +91,8 @@ public abstract class MagicBaseObject {
     private ArrayList<?> readArrayList(AbstractSerializedData stream, boolean exception) {
         ArrayList<Object> result = new ArrayList<>();
         int count = stream.readInt32(exception);
-        for (int a = 0; a < count; a++) {
-            int constructor = stream.readInt32(exception);
-            result.add(readObject(stream, constructor, exception));
+        for (int a = 0; a < Math.min(count, MAX_VECTOR_SIZE); a++) {
+            result.add(readObject(stream, stream.readInt32(exception), exception));
         }
         return result;
     }
@@ -77,9 +100,8 @@ public abstract class MagicBaseObject {
     private HashSet<?> readHashSet(AbstractSerializedData stream, boolean exception) {
         HashSet<Object> result = new HashSet<>();
         int count = stream.readInt32(exception);
-        for (int a = 0; a < count; a++) {
-            int constructor = stream.readInt32(exception);
-            result.add(readObject(stream, constructor, exception));
+        for (int a = 0; a < Math.min(count, MAX_VECTOR_SIZE); a++) {
+            result.add(readObject(stream, stream.readInt32(exception), exception));
         }
         return result;
     }
@@ -87,11 +109,9 @@ public abstract class MagicBaseObject {
     private HashMap<?, ?> readHashMap(AbstractSerializedData stream, boolean exception) {
         HashMap<Object, Object> result = new HashMap<>();
         int count = stream.readInt32(exception);
-        for (int a = 0; a < count; a++) {
-            int constructor = stream.readInt32(exception);
-            Object key = readObject(stream, constructor, exception);
-            constructor = stream.readInt32(exception);
-            Object value = readObject(stream, constructor, exception);
+        for (int a = 0; a < Math.min(count, MAX_VECTOR_SIZE); a++) {
+            Object key = readObject(stream, stream.readInt32(exception), exception);
+            Object value = readObject(stream, stream.readInt32(exception), exception);
             result.put(key, value);
         }
         return result;
@@ -118,7 +138,7 @@ public abstract class MagicBaseObject {
             case BYTES_CONSTRUCTOR:
                 return stream.readByteArray(exception);
         }
-        return null;
+        return readCustomObject(stream, constructor, exception);
     }
 
     //WRITING MAGIC OBJECTS
@@ -208,8 +228,34 @@ public abstract class MagicBaseObject {
         } else if (object instanceof HashMap) {
             stream.writeInt32(HASH_MAP_VECTOR_CONSTRUCTOR);
             serializeHashMap((HashMap<?, ?>) object, stream);
-        } else if (object instanceof MagicBaseObject) {
+        } else if (object instanceof MagicBaseObject && isCustomObject(object)) {
             ((MagicBaseObject) object).serializeToStream(stream);
+        } else if (object != null) {
+            throw new RuntimeException("can't serialize object " + object);
         }
+    }
+
+    private static boolean isCustomObject(Object obj) {
+        Class<?>[] classes = OWLENC.class.getClasses();
+        for (Class<?> clazz : classes) {
+            if (clazz.isInstance(obj)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static MagicBaseObject readCustomObject(AbstractSerializedData stream, int constructor, boolean exception) {
+        Class<?>[] classes = OWLENC.class.getClasses();
+        for (Class<?> clazz : classes) {
+            try {
+                MagicBaseObject obj = (MagicBaseObject) clazz.newInstance();
+                if (obj.getConstructor() == constructor) {
+                    obj.readParams(stream, constructor, exception);
+                    return obj;
+                }
+            } catch (IllegalAccessException | InstantiationException ignored) {}
+        }
+        return null;
     }
 }
