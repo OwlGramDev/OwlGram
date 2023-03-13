@@ -150,6 +150,7 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
         downloadSpeedBoostRow = -1;
         uploadSpeedBoostRow = -1;
         experimentalMessageAlert = -1;
+        bottomSpaceRow = -1;
 
         checkBoxExperimentalRow = rowCount++;
         if (OwlConfig.isDevOptEnabled()) {
@@ -166,10 +167,10 @@ public class OwlgramExperimentalSettings extends BaseSettingsActivity {
             headerDownloadSpeed = rowCount++;
             downloadSpeedBoostRow = rowCount++;
             uploadSpeedBoostRow = rowCount++;
+            bottomSpaceRow = rowCount++;
         } else {
             experimentalMessageAlert = rowCount++;
         }
-        bottomSpaceRow = rowCount++;
     }
 
     @Override
