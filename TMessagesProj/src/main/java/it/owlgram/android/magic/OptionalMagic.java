@@ -23,15 +23,12 @@ public class OptionalMagic<T> {
     }
 
     public static <T> OptionalMagic<T> readParams(byte[] stream, T object) {
-        try {
-            if (object instanceof MagicBaseObject) {
-                ((MagicBaseObject) object).readParams(stream, true);
-            } else {
-                throw new RuntimeException("Object not MagicBaseObject");
-            }
+        if (object instanceof MagicBaseObject) {
+            ((MagicBaseObject) object).readParams(stream, true);
             return new OptionalMagic<>(object);
-        } catch (RuntimeException ignored) {}
-        return null;
+        } else {
+            return empty();
+        }
     }
 
     public byte[] serializeToStream() {
