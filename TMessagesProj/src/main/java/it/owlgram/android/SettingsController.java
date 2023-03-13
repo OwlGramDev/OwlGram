@@ -148,8 +148,16 @@ public class SettingsController extends SharedPreferencesHelper {
                 String keyFound = field.getName();
                 if (isBackupAvailable(keyFound)) {
                     if (settingsBackup.contains(keyFound)) {
-                        if (!Objects.equals(settingsBackup.get(keyFound), field.get(Object.class))) {
-                            listDifference.add(keyFound);
+                        Object value = settingsBackup.get(keyFound);
+                        Object defaultValue = field.get(Object.class);
+                        if (!Objects.equals(value, defaultValue)) {
+                            int addCount = 1;
+                            if (value instanceof MagicBaseObject) {
+                                addCount = ((MagicBaseObject) value).differenceCount(defaultValue);
+                            }
+                            for (int i = 0; i < addCount; i++) {
+                                listDifference.add(keyFound);
+                            }
                         }
                     } else if (listPreferences.containsKey(keyFound)) {
                         listDifference.add(keyFound);
@@ -275,7 +283,7 @@ public class SettingsController extends SharedPreferencesHelper {
                     return integerValue >= -1 && integerValue <= 4;
             }
         }
-        return value instanceof Boolean;
+        return value instanceof Boolean || value instanceof OWLENC.ConfirmSending;
     }
 
     private static Field[] getFields() {

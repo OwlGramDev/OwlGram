@@ -198,7 +198,7 @@ public class OWLENC {
                 Iterator<String> keys = jsonObject.keys();
                 while (keys.hasNext()) {
                     String key = keys.next();
-                    if (key.equals("DB_VERSION")) continue;
+                    if (key.equals("DB_VERSION") || key.equals("sendConfirm")) continue;
                     if (key.equals("drawerItems")) {
                         DrawerItems drawerItems = new DrawerItems();
                         drawerItems.migrate(jsonObject.getString(key));
@@ -207,6 +207,10 @@ public class OWLENC {
                     }
                     settings.put(key, jsonObject.get(key));
                 }
+                ConfirmSending confirmSending = new ConfirmSending();
+                confirmSending.sendStickers = confirmSending.sendGifs = jsonObject.getBoolean("confirmStickersGIFs");
+                confirmSending.sendAudio = confirmSending.sendVideo = jsonObject.getBoolean("sendConfirm");
+                settings.put("confirmSending", confirmSending);
             } catch (Exception e) {
                 return true;
             }
