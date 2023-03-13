@@ -64,7 +64,7 @@ public class OwlgramSettings extends BaseSettingsActivity {
     protected void onMenuItemClick(int id) {
         super.onMenuItemClick(id);
         if (id == 1) {
-            OwlConfig.shareSettings(getParentActivity());
+            OwlConfig.shareSettings(this);
         } else if (id == 2) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle(LocaleController.getString("ThemeResetToDefaultsTitle", R.string.ThemeResetToDefaultsTitle));

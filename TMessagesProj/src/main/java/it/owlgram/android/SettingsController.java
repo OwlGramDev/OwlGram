@@ -18,7 +18,9 @@ import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
+import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.INavigationLayout;
+import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.LaunchActivity;
 
 import java.io.File;
@@ -287,7 +289,7 @@ public class SettingsController extends SharedPreferencesHelper {
     }
 
     private static Field[] getFields() {
-        return Arrays.stream(OwlConfig.class.getFields())
+        return Arrays.stream(OwlConfig.class.getDeclaredFields())
                 .filter(field -> !field.getName().startsWith("DB_VERSION"))
                 .toArray(Field[]::new);
     }
@@ -462,7 +464,8 @@ public class SettingsController extends SharedPreferencesHelper {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void shareSettings(Activity activity) {
+    public static void shareSettings(BaseFragment fragment) {
+        Activity activity = fragment.getParentActivity();
         new FileSettingsNameDialog(activity, fileName -> {
             try {
                 File cacheFile = new File(FileLoader.getDirectory(FileLoader.MEDIA_DIR_CACHE), fileName + ".owl");
@@ -501,6 +504,8 @@ public class SettingsController extends SharedPreferencesHelper {
                 activity.startActivity(i);
             } catch (IOException e) {
                 FileLog.e(e);
+            } catch (Exception e) {
+                BulletinFactory.of(fragment).createErrorBulletinSubtitle(LocaleController.getString("BrokenMLKit", R.string.BrokenMLKit), LocaleController.getString("BrokenBackupDetail", R.string.BrokenBackupDetail), null).show();
             }
         });
     }

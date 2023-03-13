@@ -330,4 +330,5 @@
     <string name="HRPhotosDesc">Increase the side limit on compressed images from 1280px to 2560px</string>
     <string name="ZeroShutterLag">Zero-Shutter Lag</string>
     <string name="ZeroShutterLagDesc">Minimize latency when taking photos by capturing multiple frames quickly before and after the shutter button is pressed.</string>
+    <string name="BrokenBackupDetail">OwlGram is unable to export your backup. Please report to the developers.</string>
 </resources>
