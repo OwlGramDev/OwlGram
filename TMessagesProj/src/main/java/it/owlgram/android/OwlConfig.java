@@ -246,15 +246,34 @@ public class OwlConfig extends SettingsController {
     }
 
     private static void migrate() {
+        // Migrate translation provider
         if (translationProvider == Translator.PROVIDER_NIU) {
             setTranslationProvider(Translator.PROVIDER_GOOGLE);
         }
+
+        // Migrate drawer items
         drawerItems.migrate(getString("drawerItems", ""));
         applyDrawerItems();
+
+        // Migrate do not translate languages
         doNotTranslateLanguages.migrate(getString("doNotTranslateLanguages", ""));
         applyDoNotTranslateLanguages();
+
+        // Migrate language pack versioning
         languagePackVersioning.migrate(getString("languagePackVersioning", ""));
         applyLanguagePackVersioning();
+
+        // Migrate confirm sending
+        if (getAll().containsKey("confirmStickersGIFs")) {
+            confirmSending.sendStickers = confirmSending.sendGifs = getBoolean("confirmStickersGIFs", false);
+            remove("confirmStickersGIFs");
+        }
+        if (getAll().containsKey("sendConfirm")) {
+            confirmSending.sendAudio = confirmSending.sendVideo = getBoolean("sendConfirm", false);
+            remove("sendConfirm");
+        }
+
+        // Migrate auto translate
         AutoTranslateConfig.migrate();
     }
 
