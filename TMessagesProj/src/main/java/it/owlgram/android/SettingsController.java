@@ -8,6 +8,7 @@ import android.os.Build;
 import androidx.core.content.FileProvider;
 
 import org.telegram.messenger.AccountInstance;
+import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLoader;
@@ -20,6 +21,7 @@ import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.INavigationLayout;
+import org.telegram.ui.Components.Bulletin;
 import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.LaunchActivity;
 
@@ -35,6 +37,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import it.owlgram.android.camera.CameraXUtils;
+import it.owlgram.android.entities.EntitiesHelper;
 import it.owlgram.android.magic.MagicBaseObject;
 import it.owlgram.android.magic.OWLENC;
 import it.owlgram.android.translator.Translator;
@@ -505,7 +508,8 @@ public class SettingsController extends SharedPreferencesHelper {
             } catch (IOException e) {
                 FileLog.e(e);
             } catch (Exception e) {
-                BulletinFactory.of(fragment).createErrorBulletinSubtitle(LocaleController.getString("BrokenMLKit", R.string.BrokenMLKit), LocaleController.getString("BrokenBackupDetail", R.string.BrokenBackupDetail), null).show();
+                String description = LocaleController.formatString("BrokenBackupDetail", R.string.BrokenBackupDetail, LocaleController.getString("GroupUsername", R.string.GroupUsername));
+                BulletinFactory.of(fragment).createErrorBulletinSubtitle(LocaleController.getString("BrokenMLKit", R.string.BrokenMLKit), EntitiesHelper.getUrlNoUnderlineText(AndroidUtilities.fromHtml(description)), null, Bulletin.DURATION_LONG).show();
             }
         });
     }

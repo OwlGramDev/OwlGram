@@ -593,11 +593,15 @@ public final class BulletinFactory {
     }
 
     public Bulletin createErrorBulletinSubtitle(CharSequence errorMessage, CharSequence errorDescription, Theme.ResourcesProvider resourcesProvider) {
+        return createErrorBulletinSubtitle(errorMessage, errorDescription, resourcesProvider, Bulletin.DURATION_SHORT);
+    }
+
+    public Bulletin createErrorBulletinSubtitle(CharSequence errorMessage, CharSequence errorDescription, Theme.ResourcesProvider resourcesProvider, int duration) {
         Bulletin.TwoLineLottieLayout layout = new Bulletin.TwoLineLottieLayout(getContext(), resourcesProvider);
         layout.setAnimation(R.raw.chats_infotip);
         layout.titleTextView.setText(errorMessage);
         layout.subtitleTextView.setText(errorDescription);
-        return create(layout, Bulletin.DURATION_SHORT);
+        return create(layout, duration);
     }
 
     @CheckResult
