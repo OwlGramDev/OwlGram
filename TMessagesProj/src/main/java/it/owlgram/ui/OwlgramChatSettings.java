@@ -139,39 +139,46 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                 ((TextCheckCell) view).setChecked(OwlConfig.useRearCamera);
             }
         } else if (position == showAddToSMRow) {
-            OwlConfig.toggleShowSaveMessage();
+            OwlConfig.contextMenu.toggleSaveMessage();
+            OwlConfig.applyContextMenu();
             if (view instanceof TextCheckbox2Cell) {
-                ((TextCheckbox2Cell) view).setChecked(OwlConfig.showSaveMessage);
+                ((TextCheckbox2Cell) view).setChecked(OwlConfig.contextMenu.saveMessage);
             }
         } else if (position == showRepeatRow) {
-            OwlConfig.toggleShowRepeat();
+            OwlConfig.contextMenu.toggleRepeatMessage();
+            OwlConfig.applyContextMenu();
             if (view instanceof TextCheckbox2Cell) {
-                ((TextCheckbox2Cell) view).setChecked(OwlConfig.showRepeat);
+                ((TextCheckbox2Cell) view).setChecked(OwlConfig.contextMenu.repeatMessage);
             }
         } else if (position == showMessageDetailsRow) {
-            OwlConfig.toggleShowMessageDetails();
+            OwlConfig.contextMenu.toggleMessageDetails();
+            OwlConfig.applyContextMenu();
             if (view instanceof TextCheckbox2Cell) {
-                ((TextCheckbox2Cell) view).setChecked(OwlConfig.showMessageDetails);
+                ((TextCheckbox2Cell) view).setChecked(OwlConfig.contextMenu.messageDetails);
             }
         } else if (position == showNoQuoteForwardRow) {
-            OwlConfig.toggleShowNoQuoteForwardRow();
+            OwlConfig.contextMenu.toggleNoQuoteForward();
+            OwlConfig.applyContextMenu();
             if (view instanceof TextCheckbox2Cell) {
-                ((TextCheckbox2Cell) view).setChecked(OwlConfig.showNoQuoteForward);
+                ((TextCheckbox2Cell) view).setChecked(OwlConfig.contextMenu.noQuoteForward);
             }
         } else if (position == showReportRow) {
-            OwlConfig.toggleShowReportMessage();
+            OwlConfig.contextMenu.toggleReportMessage();
+            OwlConfig.applyContextMenu();
             if (view instanceof TextCheckbox2Cell) {
-                ((TextCheckbox2Cell) view).setChecked(OwlConfig.showReportMessage);
+                ((TextCheckbox2Cell) view).setChecked(OwlConfig.contextMenu.reportMessage);
             }
         } else if (position == showDeleteRow) {
-            OwlConfig.toggleShowDeleteDownloadedFile();
+            OwlConfig.contextMenu.toggleClearFromCache();
+            OwlConfig.applyContextMenu();
             if (view instanceof TextCheckbox2Cell) {
-                ((TextCheckbox2Cell) view).setChecked(OwlConfig.showDeleteDownloadedFile);
+                ((TextCheckbox2Cell) view).setChecked(OwlConfig.contextMenu.clearFromCache);
             }
         } else if (position == showCopyPhotoRow) {
-            OwlConfig.toggleShowCopyPhoto();
+            OwlConfig.contextMenu.toggleCopyPhoto();
+            OwlConfig.applyContextMenu();
             if (view instanceof TextCheckbox2Cell) {
-                ((TextCheckbox2Cell) view).setChecked(OwlConfig.showCopyPhoto);
+                ((TextCheckbox2Cell) view).setChecked(OwlConfig.contextMenu.copyPhoto);
             }
         } else if (position == hideAllTabRow) {
             OwlConfig.toggleHideAllTab();
@@ -180,9 +187,10 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
             }
             reloadDialogs();
         } else if (position == showPatpatRow) {
-            OwlConfig.toggleShowPatpat();
+            OwlConfig.contextMenu.togglePatpat();
+            OwlConfig.applyContextMenu();
             if (view instanceof TextCheckbox2Cell) {
-                ((TextCheckbox2Cell) view).setChecked(OwlConfig.showPatpat);
+                ((TextCheckbox2Cell) view).setChecked(OwlConfig.contextMenu.patpat);
             }
         } else if (position == cameraXOptimizeRow) {
             OwlConfig.toggleCameraXOptimizedMode();
@@ -459,21 +467,21 @@ public class OwlgramChatSettings extends BaseSettingsActivity implements Notific
                 case CHECKBOX:
                     TextCheckbox2Cell textCheckbox2Cell = (TextCheckbox2Cell) holder.itemView;
                     if (position == showDeleteRow) {
-                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("ClearFromCache", R.string.ClearFromCache), OwlConfig.showDeleteDownloadedFile, true);
+                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("ClearFromCache", R.string.ClearFromCache), OwlConfig.contextMenu.clearFromCache, true);
                     } else if (position == showNoQuoteForwardRow) {
-                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("NoQuoteForward", R.string.NoQuoteForward), OwlConfig.showNoQuoteForward, true);
+                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("NoQuoteForward", R.string.NoQuoteForward), OwlConfig.contextMenu.noQuoteForward, true);
                     } else if (position == showAddToSMRow) {
-                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("AddToSavedMessages", R.string.AddToSavedMessages), OwlConfig.showSaveMessage, true);
+                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("AddToSavedMessages", R.string.AddToSavedMessages), OwlConfig.contextMenu.saveMessage, true);
                     } else if (position == showRepeatRow) {
-                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("Repeat", R.string.Repeat), OwlConfig.showRepeat, true);
+                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("Repeat", R.string.Repeat), OwlConfig.contextMenu.repeatMessage, true);
                     } else if (position == showReportRow) {
-                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("ReportChat", R.string.ReportChat), OwlConfig.showReportMessage, true);
+                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("ReportChat", R.string.ReportChat), OwlConfig.contextMenu.reportMessage, true);
                     } else if (position == showMessageDetailsRow) {
-                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("MessageDetails", R.string.MessageDetails), OwlConfig.showMessageDetails, false);
+                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("MessageDetails", R.string.MessageDetails), OwlConfig.contextMenu.messageDetails, false);
                     } else if (position == showCopyPhotoRow) {
-                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("CopyPhoto", R.string.CopyPhoto), OwlConfig.showCopyPhoto, true);
+                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("CopyPhoto", R.string.CopyPhoto), OwlConfig.contextMenu.copyPhoto, true);
                     } else if (position == showPatpatRow) {
-                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("Patpat", R.string.Patpat), OwlConfig.showPatpat, true);
+                        textCheckbox2Cell.setTextAndCheck(LocaleController.getString("Patpat", R.string.Patpat), OwlConfig.contextMenu.patpat, true);
                     }
                     break;
                 case TEXT_CHECK_CELL2:

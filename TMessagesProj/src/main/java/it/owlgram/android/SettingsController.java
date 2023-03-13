@@ -131,6 +131,14 @@ public class SettingsController extends SharedPreferencesHelper {
             case "stickersSorting":
             case "confirmStickersGIFs":
             case "sendConfirm":
+            case "showDeleteDownloadedFile":
+            case "showCopyPhoto":
+            case "showNoQuoteForward":
+            case "showSaveMessage":
+            case "showRepeat":
+            case "showPatpat":
+            case "showReportMessage":
+            case "showMessageDetails":
                 return false;
             default:
                 return true;

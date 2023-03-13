@@ -14488,10 +14488,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     }
                 }
                 if (forwardNoQuoteItem != null) {
-                    if ((((canSaveMusicCount > 0 && canSaveDocumentsCount == 0) || (canSaveMusicCount == 0 && canSaveDocumentsCount > 0)) && cantSaveMessagesCount == 0) && canEditMessagesCount > 0 && canForwardMessagesCount > 0 && OwlConfig.showNoQuoteForward) {
+                    if ((((canSaveMusicCount > 0 && canSaveDocumentsCount == 0) || (canSaveMusicCount == 0 && canSaveDocumentsCount > 0)) && cantSaveMessagesCount == 0) && canEditMessagesCount > 0 && canForwardMessagesCount > 0 && OwlConfig.contextMenu.noQuoteForward) {
                         forwardNoQuoteItem.setVisibility(View.GONE);
                     } else {
-                        forwardNoQuoteItem.setVisibility(OwlConfig.showNoQuoteForward ? View.VISIBLE:View.GONE);
+                        forwardNoQuoteItem.setVisibility(OwlConfig.contextMenu.noQuoteForward ? View.VISIBLE:View.GONE);
                     }
                 }
                 if (saveItem != null) {
@@ -23793,7 +23793,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                         items.add(LocaleController.getString("SaveToGallery", R.string.SaveToGallery));
                                         options.add(OPTION_SAVE_TO_GALLERY);
                                         icons.add(R.drawable.msg_gallery);
-                                        if (OwlConfig.showDeleteDownloadedFile) {
+                                        if (OwlConfig.contextMenu.clearFromCache) {
                                             items.add(LocaleController.getString("ClearFromCache", R.string.ClearFromCache));
                                             options.add(205);
                                             icons.add(R.drawable.msg_clear);
@@ -23806,7 +23806,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                     items.add(LocaleController.getString("SaveToMusic", R.string.SaveToMusic));
                                     options.add(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC);
                                     icons.add(R.drawable.msg_download);
-                                    if (OwlConfig.showDeleteDownloadedFile) {
+                                    if (OwlConfig.contextMenu.clearFromCache) {
                                         items.add(LocaleController.getString("ClearFromCache", R.string.ClearFromCache));
                                         options.add(205);
                                         icons.add(R.drawable.msg_clear);
@@ -23823,7 +23823,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                     items.add(LocaleController.getString("SaveToDownloads", R.string.SaveToDownloads));
                                     options.add(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC);
                                     icons.add(R.drawable.msg_download);
-                                    if (OwlConfig.showDeleteDownloadedFile && !MessageObject.isNewGifDocument(selectedObject.getDocument())) {
+                                    if (OwlConfig.contextMenu.clearFromCache && !MessageObject.isNewGifDocument(selectedObject.getDocument())) {
                                         items.add(LocaleController.getString("ClearFromCache", R.string.ClearFromCache));
                                         options.add(205);
                                         icons.add(R.drawable.msg_clear);
@@ -23836,7 +23836,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                         items.add(LocaleController.getString("SaveToGallery", R.string.SaveToGallery));
                                         options.add(OPTION_SAVE_TO_GALLERY);
                                         icons.add(R.drawable.msg_gallery);
-                                        if (OwlConfig.showCopyPhoto) {
+                                        if (OwlConfig.contextMenu.copyPhoto) {
                                             items.add(LocaleController.getString("CopyPhoto", R.string.CopyPhoto));
                                             options.add(209);
                                             icons.add(R.drawable.msg_copy);
@@ -23852,7 +23852,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 items.add(LocaleController.getString("SaveToDownloads", R.string.SaveToDownloads));
                                 options.add(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC);
                                 icons.add(R.drawable.msg_download);
-                                if (OwlConfig.showDeleteDownloadedFile) {
+                                if (OwlConfig.contextMenu.clearFromCache) {
                                     items.add(LocaleController.getString("ClearFromCache", R.string.ClearFromCache));
                                     options.add(205);
                                     icons.add(R.drawable.msg_clear);
@@ -23898,7 +23898,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             items.add(LocaleController.getString("SaveToDownloads", R.string.SaveToDownloads));
                             options.add(OPTION_SAVE_TO_DOWNLOADS_OR_MUSIC);
                             icons.add(R.drawable.msg_download);
-                            if (OwlConfig.showDeleteDownloadedFile) {
+                            if (OwlConfig.contextMenu.clearFromCache) {
                                 items.add(LocaleController.getString("ClearFromCache", R.string.ClearFromCache));
                                 options.add(205);
                                 icons.add(R.drawable.msg_clear);
@@ -23980,7 +23980,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             options.add(OPTION_FORWARD);
                             icons.add(R.drawable.msg_forward);
                         }
-                        if (OwlConfig.showNoQuoteForward && !selectedObject.isSponsored() && chatMode != MODE_SCHEDULED && !selectedObject.needDrawBluredPreview() && !selectedObject.isLiveLocation() && selectedObject.type != 16 && !noforwards) {
+                        if (OwlConfig.contextMenu.noQuoteForward && !selectedObject.isSponsored() && chatMode != MODE_SCHEDULED && !selectedObject.needDrawBluredPreview() && !selectedObject.isLiveLocation() && selectedObject.type != 16 && !noforwards) {
                             items.add(LocaleController.getString("NoQuoteForward", R.string.NoQuoteForward));
                             options.add(204);
                             icons.add(R.drawable.msg_forward_noquote);
@@ -23989,12 +23989,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             long my_user_id = UserConfig.getInstance(currentAccount).getClientUserId();
                             long user_id = selectedObject.messageOwner.from_id.user_id;
                             long chat_id = selectedObject.getChatId();
-                            if (!(chat_id == 0 && user_id == my_user_id) && OwlConfig.showSaveMessage) {
+                            if (!(chat_id == 0 && user_id == my_user_id) && OwlConfig.contextMenu.saveMessage) {
                                 items.add(LocaleController.getString("AddToSavedMessages", R.string.AddToSavedMessages));
                                 options.add(202);
                                 icons.add(R.drawable.msg_saved);
                             }
-                            if (OwlConfig.showRepeat) {
+                            if (OwlConfig.contextMenu.repeatMessage) {
                                 if (!selectedObject.isSponsored() && !selectedObject.needDrawBluredPreview() && !selectedObject.isLiveLocation() && selectedObject.type != 16) {
                                     boolean allowRepeat = allowChatActions && (!isThreadChat() || getMessageHelper().getMessageForRepeat(selectedObject, selectedObjectGroup) != null);
                                     if (allowRepeat) {
@@ -24006,7 +24006,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             }
                         }
                         if (chatMode != MODE_SCHEDULED) {
-                            if (OwlConfig.showPatpat && allowChatActions && selectedObject.isFromUser()) {
+                            if (OwlConfig.contextMenu.patpat && allowChatActions && selectedObject.isFromUser()) {
                                 items.add(LocaleController.getString("Patpat", R.string.Patpat));
                                 options.add(210);
                                 icons.add(R.drawable.msg_paw);
@@ -24053,7 +24053,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 items.add(LocaleController.getString("BlockContact", R.string.BlockContact));
                                 options.add(OPTION_REPORT_CHAT);
                                 icons.add(R.drawable.msg_block2);
-                            } else if (OwlConfig.showReportMessage){
+                            } else if (OwlConfig.contextMenu.reportMessage){
                                 items.add(LocaleController.getString("ReportChat", R.string.ReportChat));
                                 options.add(OPTION_REPORT_CHAT);
                                 icons.add(R.drawable.msg_report);
@@ -24156,7 +24156,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     }
                 }
 
-                if (OwlConfig.showMessageDetails) {
+                if (OwlConfig.contextMenu.messageDetails) {
                     items.add(LocaleController.getString("MessageDetails", R.string.MessageDetails));
                     options.add(203);
                     icons.add(R.drawable.menu_info_little);

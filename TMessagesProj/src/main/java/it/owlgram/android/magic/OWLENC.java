@@ -173,6 +173,54 @@ public class OWLENC {
         }
     }
 
+    public static class ContextMenu extends MagicBaseObject {
+        public boolean clearFromCache;
+        public boolean copyPhoto;
+        public boolean noQuoteForward;
+        public boolean saveMessage;
+        public boolean repeatMessage;
+        public boolean patpat;
+        public boolean reportMessage = true;
+        public boolean messageDetails;
+
+        public void toggleClearFromCache() {
+            clearFromCache ^= true;
+        }
+
+        public void toggleCopyPhoto() {
+            copyPhoto ^= true;
+        }
+
+        public void toggleNoQuoteForward() {
+            noQuoteForward ^= true;
+        }
+
+        public void toggleSaveMessage() {
+            saveMessage ^= true;
+        }
+
+        public void toggleRepeatMessage() {
+            repeatMessage ^= true;
+        }
+
+        public void togglePatpat() {
+            patpat ^= true;
+        }
+
+        public void toggleReportMessage() {
+            reportMessage ^= true;
+        }
+
+        public void toggleMessageDetails() {
+            messageDetails ^= true;
+        }
+
+        @Override
+        public int getConstructor() {
+            return 0x1cb5c425;
+        }
+    }
+
     public static class SettingsBackup extends MagicBaseObject implements Iterable<String> {
         private final HashMap<String, Object> settings = new HashMap<>();
         public int VERSION;
@@ -254,6 +302,53 @@ public class OWLENC {
             if (settings.containsKey("languagePackVersioning") && settings.get("languagePackVersioning") instanceof String) {
                 LanguagePacksVersions languagePacksVersions = new LanguagePacksVersions();
                 languagePacksVersions.migrate((String) settings.get("languagePackVersioning"));
+            }
+
+            if (settings.containsKey("showDeleteDownloadedFile") || settings.containsKey("showCopyPhoto") || settings.containsKey("showNoQuoteForward") ||
+                    settings.containsKey("showSaveMessage") || settings.containsKey("showRepeat") || settings.containsKey("showPatpat") ||
+                    settings.containsKey("showReportMessage") || settings.containsKey("showMessageDetails")) {
+                ContextMenu contextMenu = new ContextMenu();
+                Object showDeleteDownloadedFile = settings.get("showDeleteDownloadedFile");
+                Object showCopyPhoto = settings.get("showCopyPhoto");
+                Object showNoQuoteForward = settings.get("showNoQuoteForward");
+                Object showSaveMessage = settings.get("showSaveMessage");
+                Object showRepeat = settings.get("showRepeat");
+                Object showPatpat = settings.get("showPatpat");
+                Object showReportMessage = settings.get("showReportMessage");
+                Object showMessageDetails = settings.get("showMessageDetails");
+                if (showDeleteDownloadedFile instanceof Boolean) {
+                    contextMenu.clearFromCache = (Boolean) showDeleteDownloadedFile;
+                    settings.remove("showDeleteDownloadedFile");
+                }
+                if (showCopyPhoto instanceof Boolean) {
+                    contextMenu.copyPhoto = (Boolean) showCopyPhoto;
+                    settings.remove("showCopyPhoto");
+                }
+                if (showNoQuoteForward instanceof Boolean) {
+                    contextMenu.noQuoteForward = (Boolean) showNoQuoteForward;
+                    settings.remove("showNoQuoteForward");
+                }
+                if (showSaveMessage instanceof Boolean) {
+                    contextMenu.saveMessage = (Boolean) showSaveMessage;
+                    settings.remove("showSaveMessage");
+                }
+                if (showRepeat instanceof Boolean) {
+                    contextMenu.repeatMessage = (Boolean) showRepeat;
+                    settings.remove("showRepeat");
+                }
+                if (showPatpat instanceof Boolean) {
+                    contextMenu.patpat = (Boolean) showPatpat;
+                    settings.remove("showPatpat");
+                }
+                if (showReportMessage instanceof Boolean) {
+                    contextMenu.reportMessage = (Boolean) showReportMessage;
+                    settings.remove("showReportMessage");
+                }
+                if (showMessageDetails instanceof Boolean) {
+                    contextMenu.messageDetails = (Boolean) showMessageDetails;
+                    settings.remove("showMessageDetails");
+                }
+                settings.put("contextMenu", contextMenu);
             }
         }
     }

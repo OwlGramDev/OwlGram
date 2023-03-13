@@ -1563,7 +1563,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             actionModeLayout.addView(forwardNoQuoteItem, new LinearLayout.LayoutParams(AndroidUtilities.dp(54), ViewGroup.LayoutParams.MATCH_PARENT));
             actionModeViews.add(forwardNoQuoteItem);
             forwardNoQuoteItem.setOnClickListener(v -> onActionBarItemClick(v, forward_noquote));
-            forwardNoQuoteItem.setVisibility(OwlConfig.showNoQuoteForward ? View.VISIBLE:View.GONE);
+            forwardNoQuoteItem.setVisibility(OwlConfig.contextMenu.noQuoteForward ? View.VISIBLE:View.GONE);
 
             forwardItem = new ActionBarMenuItem(context, null, getThemedColor(Theme.key_actionBarActionModeDefaultSelector), getThemedColor(Theme.key_actionBarActionModeDefaultIcon), false);
             forwardItem.setIcon(R.drawable.msg_forward);

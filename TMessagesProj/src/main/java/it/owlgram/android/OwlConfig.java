@@ -47,25 +47,18 @@ public class OwlConfig extends SettingsController {
     public static boolean useSystemEmoji;
     public static boolean showGreetings;
     public static boolean showTranslate;
-    public static boolean showSaveMessage;
-    public static boolean showRepeat;
-    public static boolean showNoQuoteForward;
-    public static boolean showCopyPhoto;
-    public static boolean showMessageDetails;
     public static boolean betaUpdates;
     public static boolean notifyUpdates;
     public static boolean avatarBackgroundDarken;
     public static boolean avatarBackgroundBlur;
     public static boolean avatarAsDrawerBackground;
     public static boolean betterAudioQuality;
-    public static boolean showReportMessage;
     public static boolean showGradientColor;
     public static boolean showAvatarImage;
     public static boolean pacmanForced;
     public static boolean smartButtons;
     public static boolean showAppBarShadow;
     public static boolean accentAsNotificationColor;
-    public static boolean showDeleteDownloadedFile;
     public static boolean isChineseUser = false;
     public static boolean showSantaHat;
     public static boolean showSnowFalling;
@@ -86,7 +79,6 @@ public class OwlConfig extends SettingsController {
     public static boolean uploadSpeedBoost;
     public static boolean hideTimeOnSticker;
     public static boolean showStatusInChat;
-    public static boolean showPatpat;
     public static boolean unlockedChupa;
     public static boolean hideAllTab;
     public static boolean hideSendAsChannel;
@@ -103,6 +95,7 @@ public class OwlConfig extends SettingsController {
     public static OWLENC.LanguagePacksVersions languagePackVersioning = new OWLENC.LanguagePacksVersions();
     public static OWLENC.ExcludedLanguages doNotTranslateLanguages = new OWLENC.ExcludedLanguages();
     public static OWLENC.ConfirmSending confirmSending = new OWLENC.ConfirmSending();
+    public static OWLENC.ContextMenu contextMenu = new OWLENC.ContextMenu();
     public static int deepLFormality;
     public static int translationProvider;
     public static int lastUpdateStatus = 0;
@@ -161,23 +154,17 @@ public class OwlConfig extends SettingsController {
             useSystemEmoji = getBoolean("useSystemEmoji", false);
             showGreetings = getBoolean("showGreetings", true);
             showTranslate = getBoolean("showTranslate", false);
-            showSaveMessage = getBoolean("showSaveMessage", false);
-            showRepeat = getBoolean("showRepeat", false);
-            showNoQuoteForward = getBoolean("showNoQuoteForward", false);
-            showMessageDetails = getBoolean("showMessageDetails", false);
             betaUpdates = getBoolean("betaUpdates", false);
             notifyUpdates = getBoolean("notifyUpdates", true);
             avatarBackgroundDarken = getBoolean("avatarBackgroundDarken", false);
             avatarBackgroundBlur = getBoolean("avatarBackgroundBlur", false);
             avatarAsDrawerBackground = getBoolean("avatarAsDrawerBackground", false);
-            showReportMessage = getBoolean("showReportMessage", true);
             showGradientColor = getBoolean("showGradientColor", false);
             showAvatarImage = getBoolean("showAvatarImage", true);
             pacmanForced = getBoolean("pacmanForced", false);
             smartButtons = getBoolean("smartButtons", false);
             showAppBarShadow = getBoolean("showAppBarShadow", true);
             accentAsNotificationColor = getBoolean("accentAsNotificationColor", false);
-            showDeleteDownloadedFile = getBoolean("showDeleteDownloadedFile", false);
             lastUpdateCheck = getLong("lastUpdateCheck", 0);
             lastUpdateStatus = getInt("lastUpdateStatus", 0);
             remindedUpdate = getInt("remindedUpdate", 0);
@@ -214,13 +201,11 @@ public class OwlConfig extends SettingsController {
             idType = getInt("idType", 0);
             searchIconInActionBar = getBoolean("searchIconInActionBar", false);
             autoTranslate = getBoolean("autoTranslate", false);
-            showCopyPhoto = getBoolean("showCopyPhoto", false);
             showPencilIcon = getBoolean("showPencilIcon", false);
             keepTranslationMarkdown = getBoolean("keepTranslationMarkdown", true);
             hideTimeOnSticker = getBoolean("hideTimeOnSticker", false);
             showStatusInChat = getBoolean("showStatusInChat", false);
             unlockedSecretIcon = getInt("unlockedSecretIcon", 0);
-            showPatpat = getBoolean("showPatpat", false);
             unlockedChupa = getBoolean("unlockedChupa", false);
             hideAllTab = getBoolean("hideAllTab", false);
             hideSendAsChannel = getBoolean("hideSendAsChannel", false);
@@ -229,6 +214,7 @@ public class OwlConfig extends SettingsController {
             lastSelectedCompression = getInt("lastSelectedCompression", 3);
             translateEntireChat = getBoolean("translateEntireChat", false);
             confirmSending.readParams(getByteArray("confirmSending"), magicException);
+            contextMenu.readParams(getByteArray("contextMenu"), magicException);
 
             //EXPERIMENTAL OPTIONS
             devOptEnabled = getBoolean("devOptEnabled", false);
@@ -315,22 +301,6 @@ public class OwlConfig extends SettingsController {
         putValue("showTranslate", showTranslate ^= true);
     }
 
-    public static void toggleShowSaveMessage() {
-        putValue("showSaveMessage", showSaveMessage ^= true);
-    }
-
-    public static void toggleShowRepeat() {
-        putValue("showRepeat", showRepeat ^= true);
-    }
-
-    public static void toggleShowMessageDetails() {
-        putValue("showMessageDetails", showMessageDetails ^= true);
-    }
-
-    public static void toggleShowNoQuoteForwardRow() {
-        putValue("showNoQuoteForward", showNoQuoteForward ^= true);
-    }
-
     public static void toggleBetaUpdates() {
         putValue("betaUpdates", betaUpdates ^= true);
     }
@@ -349,10 +319,6 @@ public class OwlConfig extends SettingsController {
 
     public static void toggleAvatarBackgroundDarken() {
         putValue("avatarBackgroundDarken", avatarBackgroundDarken ^= true);
-    }
-
-    public static void toggleShowReportMessage() {
-        putValue("showReportMessage", showReportMessage ^= true);
     }
 
     public static void toggleBetterAudioQuality() {
@@ -381,14 +347,6 @@ public class OwlConfig extends SettingsController {
 
     public static void toggleAccentColor() {
         putValue("accentAsNotificationColor", accentAsNotificationColor ^= true);
-    }
-
-    public static void toggleShowDeleteDownloadedFile() {
-        putValue("showDeleteDownloadedFile", showDeleteDownloadedFile ^= true);
-    }
-
-    public static void toggleShowCopyPhoto() {
-        putValue("showCopyPhoto", showCopyPhoto ^= true);
     }
 
     public static void toggleShowSantaHat() {
@@ -452,10 +410,6 @@ public class OwlConfig extends SettingsController {
 
     public static void toggleShowStatusInChat() {
         putValue("showStatusInChat", showStatusInChat ^= true);
-    }
-
-    public static void toggleShowPatpat() {
-        putValue("showPatpat", showPatpat ^= true);
     }
 
     public static void toggleHideAllTab() {
@@ -610,6 +564,10 @@ public class OwlConfig extends SettingsController {
 
     public static void applyConfirmSending() {
         putValue("confirmSending", confirmSending.serializeToStream());
+    }
+
+    public static void applyContextMenu() {
+        putValue("contextMenu", contextMenu.serializeToStream());
     }
 
     public static void setDownloadSpeedBoost(int boost) {
