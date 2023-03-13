@@ -1,5 +1,7 @@
 package it.owlgram.android.magic;
 
+import androidx.annotation.Nullable;
+
 import org.telegram.tgnet.AbstractSerializedData;
 import org.telegram.tgnet.SerializedData;
 
@@ -250,5 +252,74 @@ public abstract class MagicBaseObject {
             } catch (IllegalAccessException | InstantiationException ignored) {}
         }
         return null;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj instanceof MagicBaseObject) {
+            MagicBaseObject other = (MagicBaseObject) obj;
+            for (Field field : getFields(getClass())) {
+                try {
+                    field.setAccessible(true);
+                    Object thisValue = field.get(this);
+                    Object otherValue = field.get(other);
+                    if (thisValue == null && otherValue == null) {
+                        continue;
+                    }
+                    if (thisValue == null || otherValue == null) {
+                        return false;
+                    }
+                    if (thisValue instanceof ArrayList) {
+                        if (!(otherValue instanceof ArrayList)) {
+                            return false;
+                        }
+                        ArrayList<?> thisList = (ArrayList<?>) thisValue;
+                        ArrayList<?> otherList = (ArrayList<?>) otherValue;
+                        if (thisList.size() != otherList.size()) {
+                            return false;
+                        }
+                        for (int a = 0; a < thisList.size(); a++) {
+                            if (!thisList.get(a).equals(otherList.get(a))) {
+                                return false;
+                            }
+                        }
+                    } else if (thisValue instanceof HashSet) {
+                        if (!(otherValue instanceof HashSet)) {
+                            return false;
+                        }
+                        HashSet<?> thisList = (HashSet<?>) thisValue;
+                        HashSet<?> otherList = (HashSet<?>) otherValue;
+                        if (thisList.size() != otherList.size()) {
+                            return false;
+                        }
+                        for (Object item : thisList) {
+                            if (!otherList.contains(item)) {
+                                return false;
+                            }
+                        }
+                    } else if (thisValue instanceof HashMap) {
+                        if (!(otherValue instanceof HashMap)) {
+                            return false;
+                        }
+                        HashMap<?, ?> thisList = (HashMap<?, ?>) thisValue;
+                        HashMap<?, ?> otherList = (HashMap<?, ?>) otherValue;
+                        if (thisList.size() != otherList.size()) {
+                            return false;
+                        }
+                        for (Map.Entry<?, ?> entry : thisList.entrySet()) {
+                            if (!otherList.containsKey(entry.getKey()) || !otherList.get(entry.getKey()).equals(entry.getValue())) {
+                                return false;
+                            }
+                        }
+                    } else if (!thisValue.equals(otherValue)) {
+                        return false;
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            return true;
+        }
+        return false;
     }
 }

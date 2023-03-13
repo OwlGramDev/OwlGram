@@ -33,19 +33,6 @@ public class OWLENC {
         public int getConstructor() {
             return 0x1cb5c421;
         }
-
-        @Override
-        public boolean equals(@Nullable Object obj) {
-            if (obj instanceof DrawerItems) {
-                DrawerItems other = (DrawerItems) obj;
-                if (size() != other.size()) return false;
-                for (int i = 0; i < size(); i++) {
-                    if (!get(i).equals(other.get(i))) return false;
-                }
-                return true;
-            }
-            return false;
-        }
     }
 
     public static class ExcludedLanguages extends MagicHashVector<String> {
