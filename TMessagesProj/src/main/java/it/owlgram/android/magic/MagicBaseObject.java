@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class MagicBaseObject {
     protected final int VECTOR_CONSTRUCTOR = 0x1cb5c415;
@@ -257,69 +258,92 @@ public abstract class MagicBaseObject {
     @Override
     public boolean equals(@Nullable Object obj) {
         if (obj instanceof MagicBaseObject) {
-            MagicBaseObject other = (MagicBaseObject) obj;
+            return differenceCount((MagicBaseObject) obj) == 0;
+        }
+        return false;
+    }
+
+    public int differenceCount(@Nullable Object obj) {
+        if (obj instanceof MagicBaseObject) {
+            return differenceCount((MagicBaseObject) obj);
+        }
+        return 1;
+    }
+
+    public int differenceCount(@Nullable MagicBaseObject obj) {
+        int count = 0;
+        if (obj != null) {
             for (Field field : getFields(getClass())) {
                 try {
                     field.setAccessible(true);
                     Object thisValue = field.get(this);
-                    Object otherValue = field.get(other);
+                    Object otherValue = field.get(obj);
                     if (thisValue == null && otherValue == null) {
                         continue;
                     }
                     if (thisValue == null || otherValue == null) {
-                        return false;
+                        count++;
+                        continue;
                     }
                     if (thisValue instanceof ArrayList) {
                         if (!(otherValue instanceof ArrayList)) {
-                            return false;
+                            count++;
+                            continue;
                         }
                         ArrayList<?> thisList = (ArrayList<?>) thisValue;
                         ArrayList<?> otherList = (ArrayList<?>) otherValue;
                         if (thisList.size() != otherList.size()) {
-                            return false;
+                            count++;
+                            continue;
                         }
                         for (int a = 0; a < thisList.size(); a++) {
                             if (!thisList.get(a).equals(otherList.get(a))) {
-                                return false;
+                                count++;
+                                break;
                             }
                         }
                     } else if (thisValue instanceof HashSet) {
                         if (!(otherValue instanceof HashSet)) {
-                            return false;
+                            count++;
+                            continue;
                         }
                         HashSet<?> thisList = (HashSet<?>) thisValue;
                         HashSet<?> otherList = (HashSet<?>) otherValue;
                         if (thisList.size() != otherList.size()) {
-                            return false;
+                            count++;
+                            continue;
                         }
                         for (Object item : thisList) {
                             if (!otherList.contains(item)) {
-                                return false;
+                                count++;
+                                break;
                             }
                         }
                     } else if (thisValue instanceof HashMap) {
                         if (!(otherValue instanceof HashMap)) {
-                            return false;
+                            count++;
+                            continue;
                         }
                         HashMap<?, ?> thisList = (HashMap<?, ?>) thisValue;
                         HashMap<?, ?> otherList = (HashMap<?, ?>) otherValue;
                         if (thisList.size() != otherList.size()) {
-                            return false;
+                            count++;
+                            continue;
                         }
                         for (Map.Entry<?, ?> entry : thisList.entrySet()) {
-                            if (!otherList.containsKey(entry.getKey()) || !otherList.get(entry.getKey()).equals(entry.getValue())) {
-                                return false;
+                            if (!otherList.containsKey(entry.getKey()) || !Objects.equals(otherList.get(entry.getKey()), entry.getValue())) {
+                                count++;
+                                break;
                             }
                         }
                     } else if (!thisValue.equals(otherValue)) {
-                        return false;
+                        count++;
                     }
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
-            return true;
         }
-        return false;
+        return count;
     }
 }
