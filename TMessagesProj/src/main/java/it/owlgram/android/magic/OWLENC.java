@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import it.owlgram.android.MenuOrderController;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.updates.PlayStoreAPI;
 
@@ -27,6 +28,21 @@ public class OWLENC {
                     add(items.getString(i));
                 }
             } catch (JSONException ignored){}
+        }
+
+        @Override
+        public boolean isValid() {
+            for (String subKey : this) {
+                boolean foundValid = false;
+                for (String item : MenuOrderController.list_items) {
+                    if (item.equals(subKey) || subKey.equals(MenuOrderController.DIVIDER_ITEM)) {
+                        foundValid = true;
+                        break;
+                    }
+                }
+                if (!foundValid) return false;
+            }
+            return true;
         }
 
         @Override
@@ -198,23 +214,47 @@ public class OWLENC {
                 Iterator<String> keys = jsonObject.keys();
                 while (keys.hasNext()) {
                     String key = keys.next();
-                    if (key.equals("DB_VERSION") || key.equals("sendConfirm")) continue;
-                    if (key.equals("drawerItems")) {
-                        DrawerItems drawerItems = new DrawerItems();
-                        drawerItems.migrate(jsonObject.getString(key));
-                        settings.put(key, drawerItems);
-                        continue;
-                    }
+                    if (key.equals("DB_VERSION")) continue;
+                    if (OwlConfig.isNotDeprecatedConfig(key)) continue;
                     settings.put(key, jsonObject.get(key));
                 }
-                ConfirmSending confirmSending = new ConfirmSending();
-                confirmSending.sendStickers = confirmSending.sendGifs = jsonObject.getBoolean("confirmStickersGIFs");
-                confirmSending.sendAudio = confirmSending.sendVideo = jsonObject.getBoolean("sendConfirm");
-                settings.put("confirmSending", confirmSending);
             } catch (Exception e) {
                 return true;
             }
             return false;
+        }
+
+        public void migrate() {
+            if (settings.containsKey("drawerItems") && settings.get("drawerItems") instanceof String) {
+                DrawerItems drawerItems = new DrawerItems();
+                drawerItems.migrate((String) settings.get("drawerItems"));
+                settings.put("drawerItems", drawerItems);
+            }
+
+            if (settings.containsKey("confirmStickersGIFs") || settings.containsKey("sendConfirm")) {
+                ConfirmSending confirmSending = new ConfirmSending();
+                Object confirmStickersGIFs = settings.get("confirmStickersGIFs");
+                Object sendConfirm = settings.get("sendConfirm");
+                if (confirmStickersGIFs instanceof Boolean) {
+                    confirmSending.sendStickers = confirmSending.sendGifs = (Boolean) confirmStickersGIFs;
+                    settings.remove("confirmStickersGIFs");
+                }
+                if (sendConfirm instanceof Boolean) {
+                    confirmSending.sendAudio = confirmSending.sendVideo = (Boolean) sendConfirm;
+                    settings.remove("sendConfirm");
+                }
+                settings.put("confirmSending", confirmSending);
+            }
+
+            if (settings.containsKey("doNotTranslateLanguages") && settings.get("doNotTranslateLanguages") instanceof String) {
+                ExcludedLanguages doNotTranslateSettings = new ExcludedLanguages();
+                doNotTranslateSettings.migrate((String) settings.get("doNotTranslateLanguages"));
+            }
+
+            if (settings.containsKey("languagePackVersioning") && settings.get("languagePackVersioning") instanceof String) {
+                LanguagePacksVersions languagePacksVersions = new LanguagePacksVersions();
+                languagePacksVersions.migrate((String) settings.get("languagePackVersioning"));
+            }
         }
     }
 }

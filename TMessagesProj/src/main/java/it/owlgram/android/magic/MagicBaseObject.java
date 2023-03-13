@@ -263,6 +263,10 @@ public abstract class MagicBaseObject {
         return false;
     }
 
+    public boolean isValid() {
+        return true;
+    }
+
     public int differenceCount(@Nullable Object obj) {
         if (obj instanceof MagicBaseObject) {
             return differenceCount((MagicBaseObject) obj);

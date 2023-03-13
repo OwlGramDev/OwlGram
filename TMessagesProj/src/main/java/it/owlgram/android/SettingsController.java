@@ -106,7 +106,7 @@ public class SettingsController extends SharedPreferencesHelper {
         }
     }
 
-    private static boolean isNotDeprecatedConfig(String key) {
+    public static boolean isNotDeprecatedConfig(String key) {
         switch (key) {
             case "showFireworks":
             case "loopWebMStickers":
@@ -148,6 +148,7 @@ public class SettingsController extends SharedPreferencesHelper {
             if (settingsBackup.isNotLegacy(stream)) {
                 settingsBackup.readParams(stream, true);
             }
+            settingsBackup.migrate();
             Field[] fields = getFields();
             for (Field field : fields) {
                 String keyFound = field.getName();
@@ -193,6 +194,7 @@ public class SettingsController extends SharedPreferencesHelper {
                 if (settingsBackup.isNotLegacy(stream)) {
                     settingsBackup.readParams(stream, true);
                 }
+                settingsBackup.migrate();
                 int foundValues = 0;
                 int foundValidValues = 0;
                 Field[] fields = getFields();
@@ -241,19 +243,8 @@ public class SettingsController extends SharedPreferencesHelper {
     }
 
     private static boolean isValidParameter(String key, Object value) {
-        if (value instanceof OWLENC.DrawerItems) {
-            OWLENC.DrawerItems drawerItems = (OWLENC.DrawerItems) value;
-            for (String subKey : drawerItems) {
-                boolean foundValid = false;
-                for (String item : MenuOrderController.list_items) {
-                    if (item.equals(subKey) || subKey.equals(MenuOrderController.DIVIDER_ITEM)) {
-                        foundValid = true;
-                        break;
-                    }
-                }
-                if (!foundValid) return false;
-            }
-            return true;
+        if (value instanceof MagicBaseObject) {
+            return ((MagicBaseObject) value).isValid();
         } else if (value instanceof Integer) {
             int integerValue = (int) value;
             switch (key) {
@@ -288,7 +279,7 @@ public class SettingsController extends SharedPreferencesHelper {
                     return integerValue >= -1 && integerValue <= 4;
             }
         }
-        return value instanceof Boolean || value instanceof OWLENC.ConfirmSending;
+        return value instanceof Boolean;
     }
 
     private static Field[] getFields() {
@@ -305,6 +296,7 @@ public class SettingsController extends SharedPreferencesHelper {
             if (settingsBackup.isNotLegacy(stream)) {
                 settingsBackup.readParams(stream, true);
             }
+            settingsBackup.migrate();
             if (!isRestore) {
                 internalResetSettings();
             }
