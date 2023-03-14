@@ -145,6 +145,26 @@ public class SettingsController extends SharedPreferencesHelper {
         }
     }
 
+    public static boolean isLegacy(MessageObject selectedObject) {
+        File locFile = MessageHelper.getFileFromMessage(selectedObject);
+        PushbackInputStream stream = null;
+        try {
+            stream = new PushbackInputStream(new FileInputStream(locFile), (int) locFile.length());
+            return !new OWLENC.SettingsBackup().isNotLegacy(stream);
+        } catch (Exception e) {
+            FileLog.e(e);
+        } finally {
+            try {
+                if (stream != null) {
+                    stream.close();
+                }
+            } catch (Exception e) {
+                FileLog.e(e);
+            }
+        }
+        return false;
+    }
+
     public static ArrayList<String> getDifferenceBetweenCurrentConfig(MessageObject selectedObject) {
         ArrayList<String> listDifference = new ArrayList<>();
         File locFile = MessageHelper.getFileFromMessage(selectedObject);
