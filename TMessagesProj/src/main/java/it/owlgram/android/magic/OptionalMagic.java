@@ -1,10 +1,12 @@
 package it.owlgram.android.magic;
 
 
+import org.telegram.tgnet.AbstractSerializedData;
+
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public class OptionalMagic<T> {
+public class OptionalMagic<T> extends MagicBaseObject {
     private static final OptionalMagic<?> EMPTY = new OptionalMagic<>();
     private T value;
 
@@ -32,11 +34,24 @@ public class OptionalMagic<T> {
         return empty();
     }
 
-    public byte[] serializeToStream() {
-        if (isPresent() && value instanceof MagicBaseObject) {
-            return ((MagicBaseObject) value).serializeToStream();
+    @Override
+    public void readParams(AbstractSerializedData stream, int constructor, boolean exception) {
+        if (stream.readBool(exception)) {
+            if (value instanceof MagicBaseObject) {
+                ((MagicBaseObject) value).readParams(stream, exception);
+            }
         }
-        return null;
+    }
+
+    @Override
+    protected void serializeToStream(AbstractSerializedData stream) {
+        stream.writeInt32(getConstructor());
+        stream.writeBool(isPresent());
+        if (isPresent()) {
+            if (value instanceof MagicBaseObject) {
+                ((MagicBaseObject) value).serializeToStream(stream);
+            }
+        }
     }
 
     public T get() {
@@ -72,4 +87,8 @@ public class OptionalMagic<T> {
         return Objects.equals(value, other.value);
     }
 
+    @Override
+    public int getConstructor() {
+        return OPTIONAL_CONSTRUCTOR;
+    }
 }
