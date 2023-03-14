@@ -104,7 +104,7 @@ public class FileSettingsNameDialog {
         editText.requestFocus();
         TextView button = (TextView) alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE);
         if (button != null) {
-            button.setTextColor(Theme.getColor(Theme.key_dialogTextRed2));
+            button.setTextColor(Theme.getColor(Theme.key_dialogTextRed));
         }
     }
 

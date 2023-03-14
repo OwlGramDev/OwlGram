@@ -23,8 +23,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import it.owlgram.android.OwlConfig;
 import it.owlgram.android.MessageHelper;
+import it.owlgram.android.OwlConfig;
 
 
 abstract public class BaseTranslator {

@@ -4,14 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
-import android.text.TextUtils;
 
 import androidx.core.content.FileProvider;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.telegram.messenger.AccountInstance;
+import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.Emoji;
 import org.telegram.messenger.FileLoader;
@@ -22,30 +19,35 @@ import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
+import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.INavigationLayout;
+import org.telegram.ui.Components.Bulletin;
+import org.telegram.ui.Components.BulletinFactory;
 import org.telegram.ui.LaunchActivity;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PushbackInputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Scanner;
 
 import it.owlgram.android.camera.CameraXUtils;
-import it.owlgram.ui.Components.Dialogs.FileSettingsNameDialog;
-import it.owlgram.android.utils.SharedPreferencesHelper;
+import it.owlgram.android.entities.EntitiesHelper;
+import it.owlgram.android.magic.MagicBaseObject;
+import it.owlgram.android.magic.OWLENC;
 import it.owlgram.android.translator.Translator;
+import it.owlgram.android.utils.JavaUtils;
+import it.owlgram.android.utils.SharedPreferencesHelper;
+import it.owlgram.ui.Components.Dialogs.FileSettingsNameDialog;
 
 public class SettingsController extends SharedPreferencesHelper {
     protected static boolean configLoaded;
-
-    public static int DB_VERSION = 0;
+    protected static int DB_VERSION = 0;
     public static final int INVALID_CONFIGURATION = 0;
     public static final int VALID_CONFIGURATION = 1;
     public static final int NEED_UPDATE_CONFIGURATION = 2;
@@ -95,13 +97,16 @@ public class SettingsController extends SharedPreferencesHelper {
             case "NEED_UPDATE_CAMERAX":
             case "NEED_UPDATE_EMOJI":
             case "lastSelectedCompression":
+            case "TELEGRAM_CAMERA":
+            case "CAMERA_X":
+            case "SYSTEM_CAMERA":
                 return false;
             default:
                 return true;
         }
     }
 
-    private static boolean isNotDeprecatedConfig(String key) {
+    public static boolean isNotDeprecatedConfig(String key) {
         switch (key) {
             case "showFireworks":
             case "loopWebMStickers":
@@ -124,30 +129,69 @@ public class SettingsController extends SharedPreferencesHelper {
             case "emojiPackSelected":
             case "disableAppBarShadow":
             case "stickersSorting":
+            case "confirmStickersGIFs":
+            case "sendConfirm":
+            case "showDeleteDownloadedFile":
+            case "showCopyPhoto":
+            case "showNoQuoteForward":
+            case "showSaveMessage":
+            case "showRepeat":
+            case "showPatpat":
+            case "showReportMessage":
+            case "showMessageDetails":
                 return false;
             default:
                 return true;
         }
     }
 
+    public static boolean isLegacy(MessageObject selectedObject) {
+        File locFile = MessageHelper.getFileFromMessage(selectedObject);
+        PushbackInputStream stream = null;
+        try {
+            stream = new PushbackInputStream(new FileInputStream(locFile), (int) locFile.length());
+            return !new OWLENC.SettingsBackup().isNotLegacy(stream);
+        } catch (Exception e) {
+            FileLog.e(e);
+        } finally {
+            try {
+                if (stream != null) {
+                    stream.close();
+                }
+            } catch (Exception e) {
+                FileLog.e(e);
+            }
+        }
+        return false;
+    }
+
     public static ArrayList<String> getDifferenceBetweenCurrentConfig(MessageObject selectedObject) {
         ArrayList<String> listDifference = new ArrayList<>();
-        File locFile = getSettingFileFromMessage(selectedObject);
-        FileInputStream stream = null;
+        File locFile = MessageHelper.getFileFromMessage(selectedObject);
+        PushbackInputStream stream = null;
         Map<String, ?> listPreferences = getAll();
         try {
-            stream = new FileInputStream(locFile);
-            JSONObject jsonObject = new JSONObject(new Scanner(stream, "UTF-8")
-                    .useDelimiter("\\A")
-                    .next());
-            Field[] fields = OwlConfig.class.getFields();
+            stream = new PushbackInputStream(new FileInputStream(locFile), (int) locFile.length());
+            OWLENC.SettingsBackup settingsBackup = new OWLENC.SettingsBackup();
+            if (settingsBackup.isNotLegacy(stream)) {
+                settingsBackup.readParams(stream, true);
+            }
+            settingsBackup.migrate();
+            Field[] fields = getFields();
             for (Field field : fields) {
                 String keyFound = field.getName();
                 if (isBackupAvailable(keyFound)) {
-                    if (jsonObject.has(keyFound)) {
-                        Object result = jsonObject.get(keyFound);
-                        if (!result.toString().equals(Objects.requireNonNull(field.get(Object.class)).toString())) {
-                            listDifference.add(keyFound);
+                    if (settingsBackup.contains(keyFound)) {
+                        Object value = settingsBackup.get(keyFound);
+                        Object defaultValue = field.get(Object.class);
+                        if (!Objects.equals(value, defaultValue)) {
+                            int addCount = 1;
+                            if (value instanceof MagicBaseObject) {
+                                addCount = ((MagicBaseObject) value).differenceCount(defaultValue);
+                            }
+                            for (int i = 0; i < addCount; i++) {
+                                listDifference.add(keyFound);
+                            }
                         }
                     } else if (listPreferences.containsKey(keyFound)) {
                         listDifference.add(keyFound);
@@ -168,50 +212,67 @@ public class SettingsController extends SharedPreferencesHelper {
         return listDifference;
     }
 
-    private static File getSettingFileFromMessage(MessageObject selectedObject) {
-        File locFile = null;
-        if (!TextUtils.isEmpty(selectedObject.messageOwner.attachPath)) {
-            File f = new File(selectedObject.messageOwner.attachPath);
-            if (f.exists()) {
-                locFile = f;
+    public static int isValidFileSettings(MessageObject selectedObject) {
+        File locFile = MessageHelper.getFileFromMessage(selectedObject);
+        if (locFile != null && locFile.length() <= 1024 * 25) {
+            PushbackInputStream stream = null;
+            try {
+                stream = new PushbackInputStream(new FileInputStream(locFile), (int) locFile.length());
+                OWLENC.SettingsBackup settingsBackup = new OWLENC.SettingsBackup();
+                if (settingsBackup.isNotLegacy(stream)) {
+                    settingsBackup.readParams(stream, true);
+                }
+                settingsBackup.migrate();
+                int foundValues = 0;
+                int foundValidValues = 0;
+                Field[] fields = getFields();
+                for (Field field : fields) {
+                    String keyFound = field.getName();
+                    if (settingsBackup.contains(keyFound)) {
+                        Object result = settingsBackup.get(keyFound);
+                        foundValues++;
+                        if (JavaUtils.isInstanceOf(result.getClass(), field.getType())) {
+                            foundValidValues++;
+                        }
+                    }
+                }
+                for (String key : settingsBackup) {
+                    boolean foundValid = false;
+                    for (Field field : fields) {
+                        String keyFound = field.getName();
+                        if ((key.equals(keyFound) && isValidParameter(key, settingsBackup.get(key))) || !isNotDeprecatedConfig(key)) {
+                            foundValid = true;
+                            break;
+                        }
+                    }
+                    if (!foundValid) {
+                        foundValidValues--;
+                        break;
+                    }
+                }
+                if (foundValues == foundValidValues) {
+                    return VALID_CONFIGURATION;
+                } else if (settingsBackup.VERSION > DB_VERSION) {
+                    return NEED_UPDATE_CONFIGURATION;
+                }
+            } catch (Exception e) {
+                FileLog.e(e);
+            } finally {
+                try {
+                    if (stream != null) {
+                        stream.close();
+                    }
+                } catch (Exception e) {
+                    FileLog.e(e);
+                }
             }
         }
-        if (locFile == null) {
-            File f = FileLoader.getInstance(UserConfig.selectedAccount).getPathToMessage(selectedObject.messageOwner);
-            if (f.exists()) {
-                locFile = f;
-            }
-        }
-        return locFile;
+        return INVALID_CONFIGURATION;
     }
 
     private static boolean isValidParameter(String key, Object value) {
-        if (value instanceof String) {
-            String stringValue = (String) value;
-            if ("drawerItems".equals(key)) {
-                try {
-                    JSONArray data = new JSONArray(stringValue);
-                    JSONObject object = new JSONObject();
-                    for (int i = 0; i < data.length(); i++) {
-                        if (data.get(i) instanceof String) {
-                            String subKey = (String) data.get(i);
-                            if (!object.has(subKey)) {
-                                boolean foundValid = false;
-                                for (String item : MenuOrderController.list_items) {
-                                    if (item.equals(subKey) || subKey.equals(MenuOrderController.DIVIDER_ITEM)) {
-                                        object.put(subKey, true);
-                                        foundValid = true;
-                                        break;
-                                    }
-                                }
-                                if (!foundValid) return false;
-                            }
-                        }
-                    }
-                    return true;
-                } catch (Exception ignored) {
-                }
-            }
+        if (value instanceof MagicBaseObject) {
+            return ((MagicBaseObject) value).isValid();
         } else if (value instanceof Integer) {
             int integerValue = (int) value;
             switch (key) {
@@ -249,117 +310,50 @@ public class SettingsController extends SharedPreferencesHelper {
         return value instanceof Boolean;
     }
 
-    public static int isValidFileSettings(MessageObject selectedObject) {
-        File locFile = getSettingFileFromMessage(selectedObject);
-        if (locFile != null && locFile.length() <= 1024 * 25) {
-            FileInputStream stream = null;
+    private static Field[] getFields() {
+        return Arrays.stream(OwlConfig.class.getDeclaredFields())
+                .filter(field -> !field.getName().startsWith("DB_VERSION"))
+                .toArray(Field[]::new);
+    }
+
+    public static void restoreBackup(File inputFile, boolean isRestore) {
+        PushbackInputStream stream = null;
+        try {
+            stream = new PushbackInputStream(new FileInputStream(inputFile), (int) inputFile.length());
+            OWLENC.SettingsBackup settingsBackup = new OWLENC.SettingsBackup();
+            if (settingsBackup.isNotLegacy(stream)) {
+                settingsBackup.readParams(stream, true);
+            }
+            settingsBackup.migrate();
+            if (!isRestore) {
+                internalResetSettings();
+            }
+            for (String key : settingsBackup) {
+                if (isNotDeprecatedConfig(key) && (isRestore || isBackupAvailable(key))) {
+                    Object result = settingsBackup.get(key);
+                    if (result instanceof MagicBaseObject) {
+                        putValue(key, ((MagicBaseObject) result).serializeToStream());
+                    } else {
+                        putValue(key, result);
+                    }
+                }
+            }
+            if (!isRestore) {
+                configLoaded = false;
+                OwlConfig.loadConfig(false);
+                MenuOrderController.reloadConfig();
+            }
+        } catch (Exception e) {
+            FileLog.e(e);
+        } finally {
             try {
-                stream = new FileInputStream(locFile);
-                JSONObject jsonObject = new JSONObject(new Scanner(stream, "UTF-8")
-                        .useDelimiter("\\A")
-                        .next());
-                int foundValues = 0;
-                int foundValidValues = 0;
-                Field[] fields = OwlConfig.class.getFields();
-                for (Field field : fields) {
-                    String keyFound = field.getName();
-                    if (jsonObject.has(keyFound)) {
-                        Object result = jsonObject.get(keyFound);
-                        String typeCheck = field.getType().getSimpleName().toLowerCase().replace("float", "int");
-                        String originalCheck = result.getClass().getSimpleName().toLowerCase().replace("integer", "int");
-                        foundValues++;
-                        if (typeCheck.equals(originalCheck)) {
-                            foundValidValues++;
-                        }
-                    }
-                }
-                for (Iterator<String> data = jsonObject.keys(); data.hasNext(); ) {
-                    String key = data.next();
-                    boolean foundValid = false;
-                    for (Field field : fields) {
-                        String keyFound = field.getName();
-                        if ((key.equals(keyFound) && isValidParameter(key, jsonObject.get(key))) || !isNotDeprecatedConfig(key) || key.equals("DB_VERSION")) {
-                            foundValid = true;
-                            break;
-                        }
-                    }
-                    if (!foundValid) {
-                        foundValidValues--;
-                        break;
-                    }
-                }
-                int DB_VERSION_IMPORT = jsonObject.getInt("DB_VERSION");
-                if (foundValues == foundValidValues) {
-                    return VALID_CONFIGURATION;
-                } else if (DB_VERSION_IMPORT > DB_VERSION) {
-                    return NEED_UPDATE_CONFIGURATION;
-                } else {
-                    return INVALID_CONFIGURATION;
+                if (stream != null) {
+                    stream.close();
                 }
             } catch (Exception e) {
                 FileLog.e(e);
-            } finally {
-                try {
-                    if (stream != null) {
-                        stream.close();
-                    }
-                } catch (Exception e) {
-                    FileLog.e(e);
-                }
             }
-            return INVALID_CONFIGURATION;
         }
-        return INVALID_CONFIGURATION;
-    }
-
-    public static void shareSettings(Activity activity) {
-        new FileSettingsNameDialog(activity, fileName -> {
-            try {
-                File cacheFile = new File(FileLoader.getDirectory(FileLoader.MEDIA_DIR_CACHE), fileName + ".owl");
-                BufferedWriter writer = new BufferedWriter(new FileWriter(cacheFile));
-                JSONObject object = new JSONObject();
-
-                Field[] fields = OwlConfig.class.getFields();
-                for (Field field : fields) {
-                    String key = field.getName();
-                    try {
-                        if ((isBackupAvailable(key) || key.equals("DB_VERSION")) && isNotDeprecatedConfig(key)) {
-                            object.put(key, field.get(Object.class));
-                        }
-                    } catch (Exception e) {
-                        FileLog.e(e);
-                    }
-                }
-                writer.write(object.toString());
-                writer.close();
-
-                Uri uri;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    uri = FileProvider.getUriForFile(activity, ApplicationLoader.getApplicationId() + ".provider", cacheFile);
-                } else {
-                    uri = Uri.fromFile(cacheFile);
-                }
-                Intent i = new Intent(Intent.ACTION_SEND);
-                if (Build.VERSION.SDK_INT >= 24) {
-                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }
-                i.setType("message/rfc822");
-                i.putExtra(Intent.EXTRA_EMAIL, "");
-                i.putExtra(Intent.EXTRA_STREAM, uri);
-                i.setClass(activity, LaunchActivity.class);
-                activity.startActivity(i);
-            } catch (IOException e) {
-                FileLog.e(e);
-            }
-        });
-    }
-
-    static File backupFile() {
-        return new File(ApplicationLoader.getFilesDirFixed(), "owlgram_data.json");
-    }
-
-    public static void restoreBackup(MessageObject messageObject) {
-        restoreBackup(getSettingFileFromMessage(messageObject), false);
     }
 
     public static int getDifferenceUI(MessageObject object) {
@@ -440,77 +434,24 @@ public class SettingsController extends SharedPreferencesHelper {
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
     }
 
-    public static void restoreBackup(File inputFile, boolean isRestore) {
-        FileInputStream stream = null;
-        try {
-            stream = new FileInputStream(inputFile);
-            JSONObject jsonObject = new JSONObject(new Scanner(stream, "UTF-8")
-                    .useDelimiter("\\A")
-                    .next());
-            if (!isRestore) {
-                internalResetSettings();
-            }
-            for (Iterator<String> data = jsonObject.keys(); data.hasNext(); ) {
-                String key = data.next();
-                if (isNotDeprecatedConfig(key) && (isRestore || isBackupAvailable(key))) {
-                    Object result = jsonObject.get(key);
-                    if (result instanceof String) {
-                        putValue(key, result);
-                    } else if (result instanceof Integer) {
-                        putValue(key, result);
-                    } else if (result instanceof Boolean) {
-                        putValue(key, result);
-                    } else if (result instanceof Float) {
-                        putValue(key, result);
-                    } else if (result instanceof Long) {
-                        putValue(key, result);
-                    }
-                }
-            }
-            if (!isRestore) {
-                configLoaded = false;
-                OwlConfig.loadConfig(false);
-                MenuOrderController.reloadConfig();
-            }
-        } catch (Exception e) {
-            FileLog.e(e);
-        } finally {
-            try {
-                if (stream != null) {
-                    stream.close();
-                }
-            } catch (Exception e) {
-                FileLog.e(e);
-            }
-        }
-    }
-
     static void executeBackup() {
         new Thread() {
             @Override
             public void run() {
-                JSONObject object = new JSONObject();
+                OWLENC.SettingsBackup settingsBackup = new OWLENC.SettingsBackup();
                 Map<String, ?> mapBackup = getAll();
                 for (Map.Entry<?, ?> entry : mapBackup.entrySet()) {
                     String key = (String) entry.getKey();
                     if (key == null) {
                         throw new NullPointerException("key == null");
                     }
-                    try {
-                        object.put(key, entry.getValue());
-                    } catch (JSONException e) {
-                        FileLog.e(e);
-                    }
+                    settingsBackup.put(key, entry.getValue());
                 }
+                settingsBackup.VERSION = DB_VERSION;
                 try {
-                    object.put("DB_VERSION", DB_VERSION);
-                } catch (JSONException e) {
-                    FileLog.e(e);
-                }
-                try {
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(backupFile()));
-                    writer.write(object.toString());
-                    writer.close();
+                    FileOutputStream stream = new FileOutputStream(backupFile());
+                    stream.write(settingsBackup.serializeToStream());
+                    stream.close();
                 } catch (IOException e) {
                     FileLog.e(e);
                 }
@@ -527,6 +468,14 @@ public class SettingsController extends SharedPreferencesHelper {
         MenuOrderController.reloadConfig();
     }
 
+    public static void restoreBackup(MessageObject messageObject) {
+        restoreBackup(MessageHelper.getFileFromMessage(messageObject), false);
+    }
+
+    protected static File backupFile() {
+        return new File(ApplicationLoader.getFilesDirFixed(), "owlgram_data.json");
+    }
+
     public static void internalResetSettings() {
         Map<String, ?> mapBackup = getAll();
         for (Map.Entry<?, ?> entry : mapBackup.entrySet()) {
@@ -535,5 +484,53 @@ public class SettingsController extends SharedPreferencesHelper {
                 remove(key);
             }
         }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static void shareSettings(BaseFragment fragment) {
+        Activity activity = fragment.getParentActivity();
+        new FileSettingsNameDialog(activity, fileName -> {
+            try {
+                File cacheFile = new File(FileLoader.getDirectory(FileLoader.MEDIA_DIR_CACHE), fileName + ".owl");
+                if (cacheFile.exists()) {
+                    cacheFile.delete();
+                }
+                OWLENC.SettingsBackup settingsBackup = new OWLENC.SettingsBackup();
+                Field[] fields = getFields();
+                for (Field field : fields) {
+                    String key = field.getName();
+                    try {
+                        if ((isBackupAvailable(key) || key.equals("DB_VERSION")) && isNotDeprecatedConfig(key)) {
+                            settingsBackup.put(key, field.get(Object.class));
+                        }
+                    } catch (Exception e) {
+                        FileLog.e(e);
+                    }
+                }
+                FileOutputStream stream = new FileOutputStream(cacheFile);
+                stream.write(settingsBackup.serializeToStream());
+                stream.close();
+                Uri uri;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    uri = FileProvider.getUriForFile(activity, ApplicationLoader.getApplicationId() + ".provider", cacheFile);
+                } else {
+                    uri = Uri.fromFile(cacheFile);
+                }
+                Intent i = new Intent(Intent.ACTION_SEND);
+                if (Build.VERSION.SDK_INT >= 24) {
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+                i.setType("message/rfc822");
+                i.putExtra(Intent.EXTRA_EMAIL, "");
+                i.putExtra(Intent.EXTRA_STREAM, uri);
+                i.setClass(activity, LaunchActivity.class);
+                activity.startActivity(i);
+            } catch (IOException e) {
+                FileLog.e(e);
+            } catch (Exception e) {
+                String description = LocaleController.formatString("BrokenBackupDetail", R.string.BrokenBackupDetail, LocaleController.getString("GroupUsername", R.string.GroupUsername));
+                BulletinFactory.of(fragment).createErrorBulletinSubtitle(LocaleController.getString("BrokenMLKit", R.string.BrokenMLKit), EntitiesHelper.getUrlNoUnderlineText(AndroidUtilities.fromHtml(description)), null, Bulletin.DURATION_LONG).show();
+            }
+        });
     }
 }

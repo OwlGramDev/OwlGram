@@ -39,8 +39,12 @@ public class ImportSettingsDialog extends BottomSheet {
         frameLayout.addView(linearLayout);
 
         StickerImageView imageView = new StickerImageView(activity, currentAccount);
-        imageView.setStickerPackName("Polar_Owl");
-        imageView.setStickerNum(18);
+        imageView.setStickerPackName("AniDucks");
+        if (OwlConfig.isLegacy(messageObject)) {
+            imageView.setStickerNum(16);
+        } else {
+            imageView.setStickerNum(5);
+        }
         imageView.getImageReceiver().setAutoRepeat(1);
         linearLayout.addView(imageView, LayoutHelper.createLinear(144, 144, Gravity.CENTER_HORIZONTAL, 0, 16, 0, 0));
 

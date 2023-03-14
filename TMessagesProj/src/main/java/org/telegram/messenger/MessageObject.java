@@ -182,6 +182,7 @@ public class MessageObject {
     public String sponsoredChatInviteHash;
     public boolean sponsoredShowPeerPhoto;
     public boolean sponsoredRecommended;
+    public String sponsoredInfo, sponsoredAdditionalInfo;
 
     public TLRPC.TL_forumTopic replyToForumTopic; // used only for reply message in view all messages
 
@@ -233,7 +234,7 @@ public class MessageObject {
     public SendAnimationData sendAnimationData;
 
     private boolean hasUnwrappedEmoji;
-    private int emojiOnlyCount;
+    public int emojiOnlyCount, animatedEmojiCount;
     private int totalAnimatedEmojiCount;
     private boolean layoutCreated;
     private int generatedWithMinSize;
@@ -1330,7 +1331,7 @@ public class MessageObject {
             AnimatedEmojiSpan[] aspans = ((Spannable) messageText).getSpans(0, messageText.length(), AnimatedEmojiSpan.class);
             emojiOnlyCount = Math.max(emojiOnly, (spans == null ? 0 : spans.length) + (aspans == null ? 0 : aspans.length));
             totalAnimatedEmojiCount = aspans == null ? 0 : aspans.length;
-            int animatedEmojiCount = 0;
+            animatedEmojiCount = 0;
             if (aspans != null) {
                 for (int i = 0; i < aspans.length; ++i) {
                     if (!aspans[i].standard) {
@@ -3442,7 +3443,7 @@ public class MessageObject {
                             messageText = LocaleController.formatString("MessageLifetimeRemoved", R.string.MessageLifetimeRemoved, UserObject.getFirstName(fromUser));
                         }
                     }
-                } else if (messageOwner.action instanceof TLRPC.TL_messageActionAttachMenuBotAllowed) {
+                } else if (messageOwner.action instanceof TLRPC.TL_messageActionAttachMenuBotAllowed || messageOwner.action instanceof TLRPC.TL_messageActionBotAllowed && ((TLRPC.TL_messageActionBotAllowed) messageOwner.action).attach_menu) {
                     messageText = LocaleController.getString(R.string.ActionAttachMenuBotAllowed);
                 } else if (messageOwner.action instanceof TLRPC.TL_messageActionRequestedPeer) {
                     TLRPC.Peer peer = ((TLRPC.TL_messageActionRequestedPeer) messageOwner.action).peer;
@@ -6135,7 +6136,7 @@ public class MessageObject {
     }
 
     public static boolean canAutoplayAnimatedSticker(TLRPC.Document document) {
-        return (isAnimatedStickerDocument(document, true) || isVideoStickerDocument(document)) && SharedConfig.getDevicePerformanceClass() != SharedConfig.PERFORMANCE_CLASS_LOW && LiteMode.isEnabled(LiteMode.FLAG_ANIMATED_STICKERS_CHAT);
+        return (isAnimatedStickerDocument(document, true) || isVideoStickerDocument(document)) && LiteMode.isEnabled(LiteMode.FLAG_ANIMATED_STICKERS_KEYBOARD);
     }
 
     public static boolean isMaskDocument(TLRPC.Document document) {
@@ -6702,7 +6703,7 @@ public class MessageObject {
     }
 
     public boolean isMusic() {
-        return isMusicMessage(messageOwner) && !isVideo();
+        return isMusicMessage(messageOwner) && !isVideo() && !isRoundVideo();
     }
 
     public boolean isDocument() {

@@ -10,7 +10,6 @@ import org.telegram.tgnet.TLRPC;
 import java.util.ArrayList;
 
 import it.owlgram.android.OwlConfig;
-import it.owlgram.android.updates.UpdateManager;
 
 public class UpdateSignaling {
     public static void checkWasUpdated() {

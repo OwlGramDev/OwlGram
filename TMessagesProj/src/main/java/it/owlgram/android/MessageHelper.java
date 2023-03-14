@@ -485,4 +485,21 @@ public class MessageHelper extends BaseController {
         }
         return canSendGames && containsGame && !containsSpans;
     }
+
+    public static File getFileFromMessage(MessageObject selectedObject) {
+        File locFile = null;
+        if (!TextUtils.isEmpty(selectedObject.messageOwner.attachPath)) {
+            File f = new File(selectedObject.messageOwner.attachPath);
+            if (f.exists()) {
+                locFile = f;
+            }
+        }
+        if (locFile == null) {
+            File f = FileLoader.getInstance(UserConfig.selectedAccount).getPathToMessage(selectedObject.messageOwner);
+            if (f.exists()) {
+                locFile = f;
+            }
+        }
+        return locFile;
+    }
 }

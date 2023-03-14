@@ -3638,7 +3638,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                         }
                         params.put("ve", ve);
                     }
-                    if (encryptedChat != null && document.dc_id > 0 && !MessageObject.isStickerDocument(document) && !MessageObject.isAnimatedStickerDocument(document, true)) {
+                    if (encryptedChat != null && document.dc_id > 0 && !MessageObject.isStickerDocument(document) && !MessageObject.isAnimatedStickerDocument(document, true) && !MessageObject.isGifDocument(document)) {
                         newMsg.attachPath = FileLoader.getInstance(currentAccount).getPathToAttach(document).toString();
                     } else {
                         newMsg.attachPath = path;
@@ -4858,6 +4858,20 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                     if (message.sendEncryptedRequest != null && document.dc_id != 0) {
                         File file = new File(location);
                         if (!file.exists()) {
+                            file = getFileLoader().getPathToMessage(message.obj.messageOwner);
+                            if (file != null && file.exists()) {
+                                message.obj.messageOwner.attachPath = location = file.getAbsolutePath();
+                                message.obj.attachPathExists = true;
+                            }
+                        }
+                        if (file == null || !file.exists() && message.obj.getDocument() != null) {
+                            file = getFileLoader().getPathToAttach(message.obj.getDocument(), false);
+                            if (file != null && file.exists()) {
+                                message.obj.messageOwner.attachPath = location = file.getAbsolutePath();
+                                message.obj.attachPathExists = true;
+                            }
+                        }
+                        if (file == null || !file.exists()) {
                             putToDelayedMessages(FileLoader.getAttachFileName(document), message);
                             getFileLoader().loadFile(document, message.parentObject, FileLoader.PRIORITY_HIGH, 0);
                             return;
@@ -4898,9 +4912,25 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                 } else {
                     String location = message.obj.messageOwner.attachPath;
                     TLRPC.Document document = message.obj.getDocument();
+
                     if (message.sendEncryptedRequest != null && document.dc_id != 0) {
                         File file = new File(location);
                         if (!file.exists()) {
+                            file = getFileLoader().getPathToMessage(message.obj.messageOwner);
+                            if (file != null && file.exists()) {
+                                message.obj.messageOwner.attachPath = location = file.getAbsolutePath();
+                                message.obj.attachPathExists = true;
+                            }
+                        }
+                        if (file == null || !file.exists() && message.obj.getDocument() != null) {
+                            file = getFileLoader().getPathToAttach(message.obj.getDocument(), false);
+                            if (file != null && file.exists()) {
+                                message.obj.messageOwner.attachPath = location = file.getAbsolutePath();
+                                message.obj.attachPathExists = true;
+                            }
+                        }
+
+                        if (file == null || !file.exists()) {
                             putToDelayedMessages(FileLoader.getAttachFileName(document), message);
                             getFileLoader().loadFile(document, message.parentObject, FileLoader.PRIORITY_HIGH, 0);
                             return;
@@ -6030,7 +6060,7 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
                 }
             }
 
-            if (newMsg.attachPath != null && newMsg.attachPath.startsWith(FileLoader.getDirectory(FileLoader.MEDIA_DIR_CACHE).getAbsolutePath())) {
+            if (newMsg.attachPath != null && newMsg.attachPath.startsWith(FileLoader.getDirectory(FileLoader.MEDIA_DIR_CACHE).getAbsolutePath()) && !MessageObject.isGifDocument(sentMessage.media.document)) {
                 File cacheFile = new File(newMsg.attachPath);
                 File cacheFile2 = FileLoader.getInstance(currentAccount).getPathToAttach(sentMessage.media.document, sentMessage.media.ttl_seconds != 0);
                 if (!cacheFile.renameTo(cacheFile2)) {

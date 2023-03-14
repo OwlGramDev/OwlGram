@@ -64,7 +64,7 @@ public class OwlgramSettings extends BaseSettingsActivity {
     protected void onMenuItemClick(int id) {
         super.onMenuItemClick(id);
         if (id == 1) {
-            OwlConfig.shareSettings(getParentActivity());
+            OwlConfig.shareSettings(this);
         } else if (id == 2) {
             AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle(LocaleController.getString("ThemeResetToDefaultsTitle", R.string.ThemeResetToDefaultsTitle));
@@ -89,7 +89,7 @@ public class OwlgramSettings extends BaseSettingsActivity {
             showDialog(alertDialog);
             TextView button = (TextView) alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
             if (button != null) {
-                button.setTextColor(Theme.getColor(Theme.key_dialogTextRed2));
+                button.setTextColor(Theme.getColor(Theme.key_dialogTextRed));
             }
         }
     }

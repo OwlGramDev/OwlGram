@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
 
+import it.owlgram.android.AlertController;
 import it.owlgram.android.OwlConfig;
 import it.owlgram.android.entities.HTMLKeeper;
-import it.owlgram.android.AlertController;
 
 public class Translator {
 

@@ -16,8 +16,8 @@ import org.telegram.ui.Cells.TextCell;
 import org.telegram.ui.Cells.TextCheckCell;
 import org.telegram.ui.Cells.TextSettingsCell;
 
-import it.owlgram.android.OwlConfig;
 import it.owlgram.android.CustomEmojiController;
+import it.owlgram.android.OwlConfig;
 import it.owlgram.ui.Cells.BlurIntensity;
 import it.owlgram.ui.Cells.DrawerProfilePreview;
 import it.owlgram.ui.Cells.DynamicButtonSelector;

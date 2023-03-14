@@ -200,8 +200,7 @@
     <string name="RestartAppToApplyChanges">Restart app to apply changes.</string>
     <string name="UseRearRoundVideos">Start with Rear Camera</string>
     <string name="UseRearRoundVideosDesc">Record video messages with the rear camera instead of the front camera</string>
-    <string name="ConfirmAVMessages">Confirm Sending Audio/Video Messages</string>
-    <string name="ConfirmStickersGIFs">Confirm Sending Stickers and GIFs</string>
+    <string name="ConfirmSending">Confirm Sending</string>
     <string name="HideTimeOnSticker">Hide Time on Stickers</string>
     <string name="OnlineStatus">Show Online Status</string>
     <string name="InAppUpdates">In-App Updates</string>
@@ -253,8 +252,6 @@
     <string name="FoldersTypeIconsTitles">Icons with Titles</string>
     <string name="ChooseFolderIcon">Choose an Icon</string>
     <string name="OwlGramVersion">OwlGram %1$s\nBased on Telegram %2$s</string>
-    <string name="OwlSoundOn">Enable Owl Sound</string>
-    <string name="OwlSoundOff">Disable Owl Sound</string>
     <string name="MutualContact">Mutual Contact</string>
     <string name="MutualContactDesc">**%s** and you have added each other in the contacts list.</string>
     <string name="JumpToBeginning">Jump to Beginning</string>
@@ -333,4 +330,6 @@
     <string name="HRPhotosDesc">Increase the side limit on compressed images from 1280px to 2560px</string>
     <string name="ZeroShutterLag">Zero-Shutter Lag</string>
     <string name="ZeroShutterLagDesc">Minimize latency when taking photos by capturing multiple frames quickly before and after the shutter button is pressed.</string>
+    <string name="BrokenBackupDetail">Unable to export your backup. Please contact us via our <![CDATA[<a href="https://t.me/%1$s">Support Group</a>]]>.</string>
+    <string name="TranslateInfo">Manage your translation and auto-translation preferences in OwlGram settings.</string>
 </resources>

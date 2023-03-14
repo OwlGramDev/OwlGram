@@ -32,8 +32,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Locale;
 
-import it.owlgram.android.OwlConfig;
 import it.owlgram.android.AlertController;
+import it.owlgram.android.OwlConfig;
 import it.owlgram.android.translator.AutoTranslateConfig;
 import it.owlgram.android.translator.BaseTranslator;
 import it.owlgram.android.translator.DeepLTranslator;

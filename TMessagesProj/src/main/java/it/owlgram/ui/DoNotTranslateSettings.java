@@ -7,10 +7,7 @@ import android.widget.EditText;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LanguageDetector;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
@@ -110,30 +107,24 @@ public class DoNotTranslateSettings extends BaseSettingsActivity {
 
     public static HashSet<String> getRestrictedLanguages(boolean detectMode) {
         if (!LanguageDetector.hasSupport()) return new HashSet<>();
-        try {
-            BaseTranslator translator = Translator.getCurrentTranslator();
-            JSONArray array = new JSONArray(OwlConfig.doNotTranslateLanguages);
-            HashSet<String> result = new HashSet<>();
-            for (int a = 0; a < array.length(); a++) {
-                if (detectMode) {
-                    result.add(translator.getTargetLanguage(array.getString(a)));
-                } else {
-                    result.add(array.getString(a));
-                }
+        BaseTranslator translator = Translator.getCurrentTranslator();
+        HashSet<String> result = new HashSet<>();
+        for (String language : OwlConfig.doNotTranslateLanguages) {
+            if (detectMode) {
+                result.add(translator.getTargetLanguage(language));
+            } else {
+                result.add(language);
             }
-            return result;
-        } catch (JSONException e) {
-            FileLog.e(e);
         }
-        return new HashSet<>();
+        return result;
     }
 
     public static void saveRestrictedLanguages(HashSet<String> languages) {
-        JSONArray jsonArray = new JSONArray();
+        OwlConfig.doNotTranslateLanguages.clear();
         for (String language : languages) {
-            jsonArray.put(language);
+            OwlConfig.doNotTranslateLanguages.add(language);
         }
-        OwlConfig.setDoNotTranslateLanguages(jsonArray.toString());
+        OwlConfig.applyDoNotTranslateLanguages();
     }
 
     private BaseTranslator loadLanguages() {

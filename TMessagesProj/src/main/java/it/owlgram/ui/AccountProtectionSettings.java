@@ -99,7 +99,7 @@ public class AccountProtectionSettings extends BaseSettingsActivity {
                 });
                 AlertDialog alertDialog = builder.create();
                 showDialog(alertDialog);
-                alertDialog.setItemColor(items.size() - 1, Theme.getColor(Theme.key_dialogTextRed2), Theme.getColor(Theme.key_dialogRedIcon));
+                alertDialog.setItemColor(items.size() - 1, Theme.getColor(Theme.key_dialogTextRed), Theme.getColor(Theme.key_dialogRedIcon));
             } else {
                 presentFragment(new PasscodeActivity(PasscodeActivity.TYPE_SETUP_CODE, user.id));
             }

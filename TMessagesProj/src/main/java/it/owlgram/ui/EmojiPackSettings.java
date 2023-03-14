@@ -46,8 +46,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import it.owlgram.android.OwlConfig;
 import it.owlgram.android.CustomEmojiController;
+import it.owlgram.android.OwlConfig;
 import it.owlgram.android.http.FileDownloader;
 import it.owlgram.android.utils.FileUnzip;
 import it.owlgram.ui.Cells.EmojiSet;
@@ -555,7 +555,7 @@ public class EmojiPackSettings extends BaseSettingsActivity implements Notificat
                             showDialog(dialog);
                             TextView button = (TextView) dialog.getButton(DialogInterface.BUTTON_POSITIVE);
                             if (button != null) {
-                                button.setTextColor(Theme.getColor(Theme.key_dialogTextRed2));
+                                button.setTextColor(Theme.getColor(Theme.key_dialogTextRed));
                             }
                         }
                         break;

@@ -68,6 +68,7 @@ import it.owlgram.android.OwlConfig;
 public class ActionBarLayout extends FrameLayout implements INavigationLayout, FloatingDebugProvider {
 
     public boolean highlightActionButtons = false;
+    private boolean attached;
 
     @Override
     public void setHighlightActionButtons(boolean highlightActionButtons) {
@@ -1443,7 +1444,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
                                 }
                             };
                         }
-                        AndroidUtilities.runOnUIThread(waitingForKeyboardCloseRunnable, SharedConfig.smoothKeyboard ? 250 : 200);
+                        AndroidUtilities.runOnUIThread(waitingForKeyboardCloseRunnable, 250);
                     } else if (fragment.needDelayOpenAnimation()) {
                         delayedOpenAnimationRunnable = new Runnable() {
                             @Override
@@ -2391,7 +2392,7 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
     }
 
     @Override
-    public ViewGroup getOverlayContainerView() {
+    public FrameLayout getOverlayContainerView() {
         return this;
     }
 
@@ -2446,14 +2447,13 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
     ArrayList<String> lastActions = new ArrayList<>();
     Runnable debugBlackScreenRunnable = () -> {
-        if (getLastFragment() != null && containerView.getChildCount() == 0) {
+        if (attached && getLastFragment() != null && containerView.getChildCount() == 0) {
             if (BuildVars.DEBUG_VERSION) {
                 FileLog.e(new RuntimeException(TextUtils.join(", ", lastActions)));
             }
             rebuildAllFragmentViews(true, true);
         }
     };
-
 
     public void checkBlackScreen(String action) {
 //        if (!BuildVars.DEBUG_VERSION) {
@@ -2472,5 +2472,15 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         AndroidUtilities.cancelRunOnUIThread(debugBlackScreenRunnable);
         AndroidUtilities.runOnUIThread(debugBlackScreenRunnable, 500);
     }
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        attached = true;
+    }
 
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        attached = false;
+    }
 }

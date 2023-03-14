@@ -3,8 +3,6 @@ package it.owlgram.android.updates;
 import android.app.Activity;
 import android.content.pm.PackageInfo;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
 import com.google.android.play.core.appupdate.AppUpdateInfo;
@@ -29,6 +27,7 @@ import it.owlgram.android.StoreUtils;
 import it.owlgram.android.entities.HTMLKeeper;
 import it.owlgram.android.http.FileDownloader;
 import it.owlgram.android.http.StandardHTTPRequest;
+import it.owlgram.android.magic.OWLENC;
 
 public class UpdateManager {
 
@@ -136,7 +135,7 @@ public class UpdateManager {
                     } else {
                         int remoteVersion = BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE : (psAppUpdateInfo != null ? PlayStoreAPI.getVersionCode(psAppUpdateInfo) : obj.getInt("version"));
                         if (remoteVersion > code) {
-                            UpdateAvailable updateAvailable = loadUpdate(obj);
+                            OWLENC.UpdateAvailable updateAvailable = loadUpdate(obj);
                             OwlConfig.saveUpdateStatus(1);
                             updateAvailable.setPlayStoreMetaData(psAppUpdateInfo);
                             AndroidUtilities.runOnUIThread(() -> updateCallback.onSuccess(updateAvailable));
@@ -154,64 +153,15 @@ public class UpdateManager {
     public static class UpdateNotAvailable {
     }
 
-    public static class UpdateAvailable {
-        public String title;
-        public String desc;
-        public String note;
-        public String banner;
-        public String link_file;
-        public int version;
-        public long file_size;
-
-        UpdateAvailable(String title, String desc, String note, String banner, String link_file, int version, long file_size) {
-            this.title = title;
-            this.desc = desc;
-            this.note = note;
-            this.banner = banner;
-            this.version = BuildVars.IGNORE_VERSION_CHECK ? Integer.MAX_VALUE : version;
-            this.link_file = link_file;
-            this.file_size = file_size;
-        }
-
-        public void setPlayStoreMetaData(@Nullable AppUpdateInfo appUpdateInfo) {
-            if (appUpdateInfo == null) return;
-            this.file_size = appUpdateInfo.totalBytesToDownload();
-            this.version = PlayStoreAPI.getVersionCode(appUpdateInfo);
-        }
-
-        public boolean isReminded() {
-            return OwlConfig.remindedUpdate == version;
-        }
-
-        @NonNull
-        @Override
-        public String toString() {
-            JSONObject obj = new JSONObject();
-            try {
-                obj.put("title", title);
-                obj.put("desc", desc);
-                obj.put("note", note);
-                obj.put("banner", banner);
-                obj.put("version", version);
-                obj.put("link_file", link_file);
-                obj.put("file_size", file_size);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return obj.toString();
-        }
-    }
-
-    public static UpdateAvailable loadUpdate(JSONObject obj) throws JSONException {
-        return new UpdateAvailable(obj.getString("title"), obj.getString("desc"), obj.getString("note"), obj.getString("banner"), obj.getString("link_file"), obj.getInt("version"), obj.getLong("file_size"));
+    public static OWLENC.UpdateAvailable loadUpdate(JSONObject obj) throws JSONException {
+        return new OWLENC.UpdateAvailable(obj);
     }
 
     public static boolean isAvailableUpdate() {
         boolean updateValid = false;
-        String data = OwlConfig.updateData;
         try {
-            if(data.length() > 0) {
-                UpdateAvailable update = loadUpdate(new JSONObject(data));
+            if(OwlConfig.updateData.isPresent()) {
+                OWLENC.UpdateAvailable update = OwlConfig.updateData.get();
                 if (update.version > BuildVars.BUILD_VERSION && !update.isReminded()) {
                     updateValid = true;
                 }
@@ -245,10 +195,8 @@ public class UpdateManager {
     public static boolean updateDownloaded() {
         boolean isCorrupted = true;
         try {
-            String data = OwlConfig.updateData;
-            if (data.length() > 0) {
-                UpdateManager.UpdateAvailable update = UpdateManager.loadUpdate(new JSONObject(data));
-                if (update.file_size == apkFile().length()) {
+            if (OwlConfig.updateData.isPresent()) {
+                if (OwlConfig.updateData.get().fileSize == apkFile().length()) {
                     isCorrupted = false;
                 }
             }
@@ -256,7 +204,8 @@ public class UpdateManager {
         }
         boolean isAvailableFile = apkFile().exists() && !FileDownloader.isRunningDownload("appUpdate") && !isCorrupted;
         if ((BuildVars.BUILD_VERSION >= OwlConfig.oldDownloadedVersion || OwlConfig.oldDownloadedVersion == 0) && isAvailableFile) {
-            OwlConfig.setUpdateData("");
+            OwlConfig.updateData.set(null);
+            OwlConfig.applyUpdateData();
             return false;
         }
         return isAvailableFile;

@@ -433,7 +433,7 @@ public class ContentPreviewViewer {
                     ActionBarMenuSubItem item = ActionBarMenuItem.addItem(i == 0, i == items.size() - 1, previewMenu, icons.get(i), items.get(i), false, resourcesProvider);
                     if (actions.get(i) == 4) {
                         item.setIconColor(getThemedColor(Theme.key_dialogRedIcon));
-                        item.setTextColor(getThemedColor(Theme.key_dialogTextRed2));
+                        item.setTextColor(getThemedColor(Theme.key_dialogTextRed));
                     }
                     item.setTag(i);
                     item.setOnClickListener(onItemClickListener);
@@ -572,7 +572,7 @@ public class ContentPreviewViewer {
                     item.setOnClickListener(onItemClickListener);
 
                     if (canDelete && i == items.size() - 1) {
-                        item.setColors(getThemedColor(Theme.key_dialogTextRed2), getThemedColor(Theme.key_dialogRedIcon));
+                        item.setColors(getThemedColor(Theme.key_dialogTextRed), getThemedColor(Theme.key_dialogRedIcon));
                     }
                 }
                 popupWindow = new ActionBarPopupWindow(previewMenu, LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT) {
@@ -737,6 +737,11 @@ public class ContentPreviewViewer {
         return view instanceof EmojiPacksAlert.EmojiImageView || view instanceof EmojiView.ImageViewEmoji && ((EmojiView.ImageViewEmoji) view).getSpan() != null;
     }
 
+    private boolean canSend(View view) {
+        boolean isGif = view instanceof ContextLinkCell && ((ContextLinkCell) view).isGif();
+        return !OwlConfig.confirmSending.sendGifs && isGif || !OwlConfig.confirmSending.sendStickers && !isGif;
+    }
+
     public boolean onTouch(MotionEvent event, final RecyclerListView listView, final int height, final Object listener, ContentPreviewViewerDelegate contentPreviewViewerDelegate, Theme.ResourcesProvider resourcesProvider) {
         delegate = contentPreviewViewerDelegate;
         this.resourcesProvider = resourcesProvider;
@@ -745,7 +750,7 @@ public class ContentPreviewViewer {
         }
         if (openPreviewRunnable != null || isVisible()) {
             if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_POINTER_UP) {
-                if (!OwlConfig.confirmStickersGIFs || isCustomEmoji(currentPreviewCell) || delegate == null || !delegate.needSend(currentContentType)) {
+                if (canSend(currentPreviewCell) || isCustomEmoji(currentPreviewCell) || delegate == null || !delegate.needSend(currentContentType)) {
                     AndroidUtilities.runOnUIThread(() -> {
                         if (listView != null) {
                             listView.setOnItemClickListener((RecyclerListView.OnItemClickListener) listener);
@@ -754,7 +759,7 @@ public class ContentPreviewViewer {
                 } else {
                     confirmSending();
                 }
-                if (openPreviewRunnable != null && (!OwlConfig.confirmStickersGIFs || isCustomEmoji(currentPreviewCell) || delegate == null || !delegate.needSend(currentContentType))) {
+                if (openPreviewRunnable != null && (canSend(currentPreviewCell) || isCustomEmoji(currentPreviewCell) || delegate == null || !delegate.needSend(currentContentType))) {
                     AndroidUtilities.cancelRunOnUIThread(openPreviewRunnable);
                     openPreviewRunnable = null;
                 } else if (openPreviewRunnable != null) {

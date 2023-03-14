@@ -83,7 +83,7 @@ public class AutoTranslationException extends BaseSettingsActivity {
             showDialog(alertDialog);
             TextView button = (TextView) alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
             if (button != null) {
-                button.setTextColor(Theme.getColor(Theme.key_dialogTextRed2));
+                button.setTextColor(Theme.getColor(Theme.key_dialogTextRed));
             }
         }
     }
@@ -150,7 +150,7 @@ public class AutoTranslationException extends BaseSettingsActivity {
                             });
                             AlertDialog alertDialog = builder.create();
                             showDialog(alertDialog);
-                            alertDialog.setItemColor(items.size() - 1, Theme.getColor(Theme.key_dialogTextRed2), Theme.getColor(Theme.key_dialogRedIcon));
+                            alertDialog.setItemColor(items.size() - 1, Theme.getColor(Theme.key_dialogTextRed), Theme.getColor(Theme.key_dialogRedIcon));
                         }
                         return true;
                     });
@@ -194,7 +194,7 @@ public class AutoTranslationException extends BaseSettingsActivity {
             showDialog(alertDialog);
             TextView button = (TextView) alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
             if (button != null) {
-                button.setTextColor(Theme.getColor(Theme.key_dialogTextRed2));
+                button.setTextColor(Theme.getColor(Theme.key_dialogTextRed));
             }
         }
 
