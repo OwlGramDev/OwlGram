@@ -57,6 +57,7 @@ public abstract class MagicBaseObject {
             }
             return;
         }
+        stream.readInt32(exception);
         HashMap<String, Field> fields = getFields(getClass()).stream()
                 .collect(HashMap::new, (m, v) -> m.put(v.getName(), v), HashMap::putAll);
         for (int a = 0; a < fields.size(); a++) {
@@ -71,11 +72,13 @@ public abstract class MagicBaseObject {
             }
             try {
                 field.setAccessible(true);
-                Object result = readObject(stream, constructorFound, exception);
-                if (result == null) {
-                    return;
-                }
-                field.set(this, result);
+                try {
+                    Object result = readObject(stream, constructorFound, exception);
+                    if (result == null) {
+                        return;
+                    }
+                    field.set(this, result);
+                } catch (SkipException ignored) {}
             } catch (IllegalAccessException | SecurityException e) {
                 if (exception) {
                     throw new RuntimeException(String.format("can't set value %s for key %s in %s", field.getName(), keyFound, getClass().getSimpleName()));
@@ -88,7 +91,9 @@ public abstract class MagicBaseObject {
         ArrayList<Object> result = new ArrayList<>();
         int count = stream.readInt32(exception);
         for (int a = 0; a < Math.min(count, MAX_VECTOR_SIZE); a++) {
-            result.add(readObject(stream, stream.readInt32(exception), exception));
+            try {
+                result.add(readObject(stream, stream.readInt32(exception), exception));
+            } catch (SkipException ignored) {}
         }
         return result;
     }
@@ -97,7 +102,9 @@ public abstract class MagicBaseObject {
         HashSet<Object> result = new HashSet<>();
         int count = stream.readInt32(exception);
         for (int a = 0; a < Math.min(count, MAX_VECTOR_SIZE); a++) {
-            result.add(readObject(stream, stream.readInt32(exception), exception));
+            try {
+                result.add(readObject(stream, stream.readInt32(exception), exception));
+            } catch (SkipException ignored) {}
         }
         return result;
     }
@@ -106,14 +113,16 @@ public abstract class MagicBaseObject {
         HashMap<Object, Object> result = new HashMap<>();
         int count = stream.readInt32(exception);
         for (int a = 0; a < Math.min(count, MAX_VECTOR_SIZE); a++) {
-            Object key = readObject(stream, stream.readInt32(exception), exception);
-            Object value = readObject(stream, stream.readInt32(exception), exception);
-            result.put(key, value);
+            try {
+                Object key = readObject(stream, stream.readInt32(exception), exception);
+                Object value = readObject(stream, stream.readInt32(exception), exception);
+                result.put(key, value);
+            } catch (SkipException ignored) {}
         }
         return result;
     }
 
-    private Object readObject(AbstractSerializedData stream, int constructor, boolean exception) {
+    private Object readObject(AbstractSerializedData stream, int constructor, boolean exception) throws SkipException {
         switch (constructor) {
             case VECTOR_CONSTRUCTOR:
                 return readArrayList(stream, exception);
@@ -137,6 +146,29 @@ public abstract class MagicBaseObject {
         return readCustomObject(stream, constructor, exception);
     }
 
+    private Object readCustomObject(AbstractSerializedData stream, int constructor, boolean exception) throws SkipException {
+        Class<?>[] classes = OWLENC.class.getClasses();
+        for (Class<?> clazz : classes) {
+            try {
+                MagicBaseObject obj = (MagicBaseObject) clazz.newInstance();
+                if (obj.getConstructor() == constructor) {
+                    obj.readParams(stream, constructor, exception);
+                    return obj;
+                }
+            } catch (IllegalAccessException | InstantiationException ignored) {}
+        }
+
+        // Skip unknown object
+        int count = stream.readInt32(exception);
+        for (int a = 0; a < Math.min(count, MAX_VECTOR_SIZE); a++) {
+            stream.readString(exception);
+            try {
+                readObject(stream, stream.readInt32(exception), exception);
+            } catch (SkipException ignored) {}
+        }
+        throw new SkipException();
+    }
+
     //WRITING MAGIC OBJECTS
     public byte[] serializeToStream() {
         SerializedData stream = new SerializedData();
@@ -155,7 +187,9 @@ public abstract class MagicBaseObject {
 
     private void serializeToStream(AbstractSerializedData stream) {
         stream.writeInt32(getConstructor());
-        for (Field field : getFields(getClass())) {
+        ArrayList<Field> fields = getFields(getClass());
+        stream.writeInt32(fields.size());
+        for (Field field : fields) {
             String keyFound = field.getName();
             stream.writeString(keyFound);
             serializeObject(field, stream);
@@ -224,8 +258,9 @@ public abstract class MagicBaseObject {
         } else if (object instanceof HashMap) {
             stream.writeInt32(HASH_MAP_VECTOR_CONSTRUCTOR);
             serializeHashMap((HashMap<?, ?>) object, stream);
-        } else if (object instanceof MagicBaseObject && isCustomObject(object)) {
-            ((MagicBaseObject) object).serializeToStream(stream);
+        } else if (object instanceof MagicBaseObject /*&& isCustomObject(object)*/) {
+            MagicBaseObject magicObject = (MagicBaseObject) object;
+            magicObject.serializeToStream(stream);
         } else if (object != null) {
             throw new RuntimeException("can't serialize object " + object);
         }
@@ -239,20 +274,6 @@ public abstract class MagicBaseObject {
             }
         }
         return false;
-    }
-
-    private static MagicBaseObject readCustomObject(AbstractSerializedData stream, int constructor, boolean exception) {
-        Class<?>[] classes = OWLENC.class.getClasses();
-        for (Class<?> clazz : classes) {
-            try {
-                MagicBaseObject obj = (MagicBaseObject) clazz.newInstance();
-                if (obj.getConstructor() == constructor) {
-                    obj.readParams(stream, constructor, exception);
-                    return obj;
-                }
-            } catch (IllegalAccessException | InstantiationException ignored) {}
-        }
-        return null;
     }
 
     @Override
@@ -343,11 +364,11 @@ public abstract class MagicBaseObject {
                     } else if (!thisValue.equals(otherValue)) {
                         count++;
                     }
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+                } catch (IllegalAccessException ignored) {}
             }
         }
         return count;
     }
+
+    public static class SkipException extends Exception {}
 }
