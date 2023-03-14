@@ -434,20 +434,28 @@ public class SettingsController extends SharedPreferencesHelper {
         NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.reloadInterface);
     }
 
+    private static OWLENC.SettingsBackup getBackup(boolean isInternal) {
+        OWLENC.SettingsBackup settingsBackup = new OWLENC.SettingsBackup();
+        Field[] fields = getFields();
+        for (Field field : fields) {
+            String key = field.getName();
+            try {
+                if ((isBackupAvailable(key) || isInternal) && isNotDeprecatedConfig(key)) {
+                    settingsBackup.put(key, field.get(Object.class));
+                }
+            } catch (Exception e) {
+                FileLog.e(e);
+            }
+        }
+        settingsBackup.VERSION = DB_VERSION;
+        return settingsBackup;
+    }
+
     static void executeBackup() {
         new Thread() {
             @Override
             public void run() {
-                OWLENC.SettingsBackup settingsBackup = new OWLENC.SettingsBackup();
-                Map<String, ?> mapBackup = getAll();
-                for (Map.Entry<?, ?> entry : mapBackup.entrySet()) {
-                    String key = (String) entry.getKey();
-                    if (key == null) {
-                        throw new NullPointerException("key == null");
-                    }
-                    settingsBackup.put(key, entry.getValue());
-                }
-                settingsBackup.VERSION = DB_VERSION;
+                OWLENC.SettingsBackup settingsBackup = getBackup(true);
                 try {
                     FileOutputStream stream = new FileOutputStream(backupFile());
                     stream.write(settingsBackup.serializeToStream());
@@ -495,20 +503,8 @@ public class SettingsController extends SharedPreferencesHelper {
                 if (cacheFile.exists()) {
                     cacheFile.delete();
                 }
-                OWLENC.SettingsBackup settingsBackup = new OWLENC.SettingsBackup();
-                Field[] fields = getFields();
-                for (Field field : fields) {
-                    String key = field.getName();
-                    try {
-                        if ((isBackupAvailable(key) || key.equals("DB_VERSION")) && isNotDeprecatedConfig(key)) {
-                            settingsBackup.put(key, field.get(Object.class));
-                        }
-                    } catch (Exception e) {
-                        FileLog.e(e);
-                    }
-                }
                 FileOutputStream stream = new FileOutputStream(cacheFile);
-                stream.write(settingsBackup.serializeToStream());
+                stream.write(getBackup(false).serializeToStream());
                 stream.close();
                 Uri uri;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
