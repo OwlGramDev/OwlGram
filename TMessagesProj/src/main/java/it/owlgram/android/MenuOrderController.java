@@ -121,10 +121,7 @@ public class MenuOrderController {
     }
 
     public static void changePosition(int oldPosition, int newPosition) {
-        String data1 = OwlConfig.drawerItems.get(newPosition);
-        String data2 = OwlConfig.drawerItems.get(oldPosition);
-        OwlConfig.drawerItems.add(oldPosition, data1);
-        OwlConfig.drawerItems.add(newPosition, data2);
+        OwlConfig.drawerItems.move(oldPosition, newPosition);
         OwlConfig.applyDrawerItems();
     }
 

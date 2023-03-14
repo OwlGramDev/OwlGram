@@ -29,6 +29,11 @@ public abstract class MagicVector<T> extends MagicBaseObject implements Iterable
         return vector.get(index);
     }
 
+    public void move(int fromIndex, int toIndex) {
+        T object = vector.remove(fromIndex);
+        vector.add(toIndex, object);
+    }
+
     public T remove(int index) {
         return vector.remove(index);
     }
