@@ -1557,7 +1557,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             gotoItem.setOnClickListener(v -> onActionBarItemClick(v, gotochat));
 
             forwardNoQuoteItem = new ActionBarMenuItem(context, null, getThemedColor(Theme.key_actionBarActionModeDefaultSelector), getThemedColor(Theme.key_actionBarActionModeDefaultIcon), false);
-            forwardNoQuoteItem.setIcon(R.drawable.msg_forward_noquote);
+            forwardNoQuoteItem.setIcon(R.drawable.msg_forward);
             forwardNoQuoteItem.setContentDescription(LocaleController.getString("NoQuoteForward", R.string.NoQuoteForward));
             forwardNoQuoteItem.setDuplicateParentStateEnabled(false);
             actionModeLayout.addView(forwardNoQuoteItem, new LinearLayout.LayoutParams(AndroidUtilities.dp(54), ViewGroup.LayoutParams.MATCH_PARENT));
@@ -1566,7 +1566,7 @@ public class SharedMediaLayout extends FrameLayout implements NotificationCenter
             forwardNoQuoteItem.setVisibility(OwlConfig.contextMenu.noQuoteForward ? View.VISIBLE:View.GONE);
 
             forwardItem = new ActionBarMenuItem(context, null, getThemedColor(Theme.key_actionBarActionModeDefaultSelector), getThemedColor(Theme.key_actionBarActionModeDefaultIcon), false);
-            forwardItem.setIcon(R.drawable.msg_forward);
+            forwardItem.setIcon(OwlConfig.contextMenu.noQuoteForward ? R.drawable.msg_forward_quote:R.drawable.msg_forward);
             forwardItem.setContentDescription(LocaleController.getString("Forward", R.string.Forward));
             forwardItem.setDuplicateParentStateEnabled(false);
             actionModeLayout.addView(forwardItem, new LinearLayout.LayoutParams(AndroidUtilities.dp(54), ViewGroup.LayoutParams.MATCH_PARENT));
