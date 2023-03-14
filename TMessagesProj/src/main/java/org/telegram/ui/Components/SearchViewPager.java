@@ -62,6 +62,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
+import it.owlgram.android.OwlConfig;
+import it.owlgram.android.utils.ForwardContext;
+
 public class SearchViewPager extends ViewPagerFixed implements FilteredSearchView.UiCallback {
 
     protected final ViewPagerAdapter viewPagerAdapter;
@@ -84,12 +87,14 @@ public class SearchViewPager extends ViewPagerFixed implements FilteredSearchVie
 
     public final static int gotoItemId = 200;
     public final static int forwardItemId = 201;
+    public final static int forwardNoQuoteItemId = 204;
     public final static int deleteItemId = 202;
     public final static int speedItemId = 203;
 
     private ActionBarMenuItem speedItem;
     private ActionBarMenuItem gotoItem;
     private ActionBarMenuItem forwardItem;
+    private ActionBarMenuItem forwardNoQuoteItem;
     private ActionBarMenuItem deleteItem;
 
     private ActionBarMenu actionMode;
@@ -417,7 +422,8 @@ public class SearchViewPager extends ViewPagerFixed implements FilteredSearchVie
             speedItem = actionMode.addItemWithWidth(speedItemId, R.drawable.avd_speed, AndroidUtilities.dp(54), LocaleController.getString("AccDescrPremiumSpeed", R.string.AccDescrPremiumSpeed));
             speedItem.getIconView().setColorFilter(new PorterDuffColorFilter(Theme.getColor(Theme.key_actionBarActionModeDefaultIcon), PorterDuff.Mode.SRC_IN));
             gotoItem = actionMode.addItemWithWidth(gotoItemId, R.drawable.msg_message, AndroidUtilities.dp(54), LocaleController.getString("AccDescrGoToMessage", R.string.AccDescrGoToMessage));
-            forwardItem = actionMode.addItemWithWidth(forwardItemId, R.drawable.msg_forward, AndroidUtilities.dp(54), LocaleController.getString("Forward", R.string.Forward));
+            forwardNoQuoteItem = actionMode.addItemWithWidth(forwardNoQuoteItemId, R.drawable.msg_forward, AndroidUtilities.dp(54), LocaleController.getString("NoQuoteForward", R.string.NoQuoteForward));
+            forwardItem = actionMode.addItemWithWidth(forwardItemId, OwlConfig.contextMenu.noQuoteForward ? R.drawable.msg_forward_quote:R.drawable.msg_forward, AndroidUtilities.dp(54), LocaleController.getString("Forward", R.string.Forward));
             deleteItem = actionMode.addItemWithWidth(deleteItemId, R.drawable.msg_delete, AndroidUtilities.dp(54), LocaleController.getString("Delete", R.string.Delete));
         }
         if (selectedMessagesCountTextView != null) {
@@ -438,6 +444,7 @@ public class SearchViewPager extends ViewPagerFixed implements FilteredSearchVie
             speedItem.setVisibility(isSpeedItemVisible() ? View.VISIBLE : View.GONE);
             gotoItem.setVisibility(View.VISIBLE);
             forwardItem.setVisibility(View.VISIBLE);
+            forwardNoQuoteItem.setVisibility(OwlConfig.contextMenu.noQuoteForward ? View.VISIBLE : View.GONE);
             deleteItem.setVisibility(View.VISIBLE);
         } else {
             parent.getActionBar().hideActionMode();
@@ -515,18 +522,16 @@ public class SearchViewPager extends ViewPagerFixed implements FilteredSearchVie
             }
             MessageObject messageObject = selectedFiles.values().iterator().next();
             goToMessage(messageObject);
-        } else if (id == forwardItemId) {
+        } else if (id == forwardItemId || id == forwardNoQuoteItemId) {
             Bundle args = new Bundle();
             args.putBoolean("onlySelect", true);
             args.putInt("dialogsType", DialogsActivity.DIALOGS_TYPE_FORWARD);
             DialogsActivity fragment = new DialogsActivity(args);
+            ArrayList<MessageObject> fmessages = new ArrayList<>(selectedFiles.values());
+            fragment.forwardContext = () -> fmessages;
+            ForwardContext.ForwardParams forwardParams = fragment.forwardContext.getForwardParams();
+            forwardParams.noQuote = id == forwardNoQuoteItemId;
             fragment.setDelegate((fragment1, dids, message, param, topicsFragment) -> {
-                ArrayList<MessageObject> fmessages = new ArrayList<>();
-                Iterator<FilteredSearchView.MessageHashId> idIterator = selectedFiles.keySet().iterator();
-                while (idIterator.hasNext()) {
-                    FilteredSearchView.MessageHashId hashId = idIterator.next();
-                    fmessages.add(selectedFiles.get(hashId));
-                }
                 selectedFiles.clear();
 
                 showActionMode(false);
@@ -535,14 +540,16 @@ public class SearchViewPager extends ViewPagerFixed implements FilteredSearchVie
                     for (int a = 0; a < dids.size(); a++) {
                         long did = dids.get(a).dialogId;
                         if (message != null) {
-                            AccountInstance.getInstance(currentAccount).getSendMessagesHelper().sendMessage(message.toString(), did, null, null, null, true, null, null, null, true, 0, null, false);
+                            AccountInstance.getInstance(currentAccount).getSendMessagesHelper().sendMessage(message.toString(), did, null, null, null, true, null, null, null, forwardParams.notify, forwardParams.scheduleDate, null, false);
                         }
-                        AccountInstance.getInstance(currentAccount).getSendMessagesHelper().sendMessage(fmessages, did, false,false, true, 0);
+                        AccountInstance.getInstance(currentAccount).getSendMessagesHelper().sendMessage(fmessages, did, forwardParams.noQuote, forwardParams.noCaption, forwardParams.notify, forwardParams.scheduleDate);
                     }
                     fragment1.finishFragment();
                 } else {
                     long did = dids.get(0).dialogId;
                     Bundle args1 = new Bundle();
+                    args1.putBoolean("forward_noQuote", forwardParams.noQuote);
+                    args1.putBoolean("forward_noCaption", forwardParams.noCaption);
                     args1.putBoolean("scrollToTopOnResume", true);
                     if (DialogObject.isEncryptedDialog(did)) {
                         args1.putInt("enc_id", DialogObject.getEncryptedChatId(did));
