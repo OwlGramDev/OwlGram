@@ -85,12 +85,10 @@ public class FileUnzip {
                         ZipInputStream zipIn = new ZipInputStream(new FileInputStream(inputFile));
                         ZipEntry entry = zipIn.getNextEntry();
                         while (entry != null) {
-                            String filePath = mOutput.getCanonicalPath() + File.separator + entry.getName();
-                            if (!filePath.startsWith(mOutput.getCanonicalPath())) {
-                                zipIn.closeEntry();
-                                zipIn.close();
-                                AndroidUtilities.runOnUIThread(() -> onPostExecute(true));
-                                return;
+                            File target = new File(mOutput, entry.getName());
+                            String canonicalPath = target.getCanonicalPath();
+                            if (!canonicalPath.startsWith(mOutput.getAbsolutePath())) {
+                                throw new SecurityException();
                             }
                             if (isUnzipCanceled) {
                                 zipIn.closeEntry();
@@ -99,7 +97,7 @@ public class FileUnzip {
                                 return;
                             }
                             if (!entry.isDirectory()) {
-                                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath));
+                                BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(target));
                                 byte[] bytesIn = new byte[4096];
                                 int read;
                                 while ((read = zipIn.read(bytesIn)) != -1) {
@@ -113,15 +111,14 @@ public class FileUnzip {
                                 }
                                 bos.close();
                             } else {
-                                File dir = new File(filePath);
-                                dir.mkdir();
+                                target.mkdir();
                             }
                             zipIn.closeEntry();
                             entry = zipIn.getNextEntry();
                         }
                         zipIn.close();
                         AndroidUtilities.runOnUIThread(() -> onPostExecute(false));
-                    } catch (IOException e) {
+                    } catch (IOException | SecurityException e) {
                         AndroidUtilities.runOnUIThread(() -> onPostExecute(true));
                     }
                 }
