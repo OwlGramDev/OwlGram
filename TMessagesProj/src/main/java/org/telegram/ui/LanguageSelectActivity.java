@@ -283,9 +283,9 @@ public class LanguageSelectActivity extends BaseFragment implements Notification
 
                     if (selectedLanguages.contains(prevLangCode) && !selectedLanguages.contains(langCode)) {
                         newSelectedLanguages.removeIf(s -> s != null && s.equals(prevLangCode));
-                        if (langCode != null && !"null".equals(langCode)) {
-                            newSelectedLanguages.add(langCode);
-                        }
+                    }
+                    if (langCode != null && !"null".equals(langCode)) {
+                        newSelectedLanguages.add(langCode);
                     }
                     preferences.edit().putStringSet("translate_button_restricted_languages", newSelectedLanguages).apply();
                     MessagesController.getInstance(currentAccount).getTranslateController().checkRestrictedLanguagesUpdate();
