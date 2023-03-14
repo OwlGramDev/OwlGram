@@ -263,7 +263,6 @@ public class OWLENC {
                 while (keys.hasNext()) {
                     String key = keys.next();
                     if (key.equals("DB_VERSION")) continue;
-                    if (OwlConfig.isNotDeprecatedConfig(key)) continue;
                     settings.put(key, jsonObject.get(key));
                 }
             } catch (Exception e) {
