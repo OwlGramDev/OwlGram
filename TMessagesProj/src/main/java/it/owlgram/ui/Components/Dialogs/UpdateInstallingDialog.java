@@ -160,8 +160,8 @@ public class UpdateInstallingDialog extends BottomSheet {
         mainLayout.addView(textView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT, Gravity.TOP | Gravity.LEFT, 17, 20, 17, 0));
 
         imageView = new StickerImageView(context, currentAccount);
-        imageView.setStickerPackName("Polar_Owl");
-        imageView.setStickerNum(12);
+        imageView.setStickerPackName("UtyaDuck");
+        imageView.setStickerNum(31);
         imageView.getImageReceiver().setAutoRepeat(1);
         mainLayout.addView(imageView, LayoutHelper.createFrame(160, 160, Gravity.CENTER_HORIZONTAL | Gravity.TOP, 17, 79, 17, 0));
 
