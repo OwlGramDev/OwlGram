@@ -3,13 +3,17 @@ package it.owlgram.ui;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.util.SparseIntArray;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.ActionBarMenu;
@@ -17,6 +21,7 @@ import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.HeaderCell;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import it.owlgram.android.MenuOrderController;
@@ -43,9 +48,7 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
     protected void onMenuItemClick(int id) {
         super.onMenuItemClick(id);
         if (id == 1) {
-            MenuOrderController.addItem(MenuOrderController.DIVIDER_ITEM);
-            updateRowsId();
-            listAdapter.notifyItemInserted(menuItemsStartRow);
+            updateListAnimated(() -> MenuOrderController.addItem(MenuOrderController.DIVIDER_ITEM));
             if (MenuOrderController.IsDefaultPosition()) {
                 menuItem.hideSubItem(2);
             } else {
@@ -53,9 +56,7 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
             }
             reloadMainInfo();
         } else if (id == 2) {
-            MenuOrderController.resetToDefaultPosition();
-            updateRowsId();
-            listAdapter.notifyDataSetChanged();
+            updateListAnimated(MenuOrderController::resetToDefaultPosition);
             menuItem.hideSubItem(2);
             reloadMainInfo();
         }
@@ -177,25 +178,7 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
                         int index = listView.getChildViewHolder(swapOrderCell).getAdapterPosition();
                         int position = index - menuItemsStartRow;
                         if (MenuOrderController.isAvailable(swapOrderCell.menuId, position)) {
-                            int prevRecommendedHeaderRow = 0, index2 = 0;
-                            MenuOrderController.removeItem(position);
-                            if (!Objects.equals(swapOrderCell.menuId, MenuOrderController.DIVIDER_ITEM)) {
-                                index2 = MenuOrderController.getPositionOf(swapOrderCell.menuId);
-                                index2 += menuHintsStartRow;
-                                prevRecommendedHeaderRow = headerSuggestedOptionsRow;
-                            }
-                            updateRowsId();
-                            if (!Objects.equals(swapOrderCell.menuId, MenuOrderController.DIVIDER_ITEM)) {
-                                if (prevRecommendedHeaderRow == -1 && headerSuggestedOptionsRow != -1) {
-                                    int itemsCount = hintsDividerRow - headerSuggestedOptionsRow + 1;
-                                    index += itemsCount;
-                                    listAdapter.notifyItemRangeInserted(headerSuggestedOptionsRow, itemsCount);
-                                } else {
-                                    index += 1;
-                                    listAdapter.notifyItemInserted(index2);
-                                }
-                            }
-                            listAdapter.notifyItemRemoved(index);
+                            updateListAnimated(() -> MenuOrderController.removeItem(position));
                             if (MenuOrderController.IsDefaultPosition()) {
                                 menuItem.hideSubItem(2);
                             } else {
@@ -212,22 +195,11 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
                     addItemCell.setAddOnClickListener(v -> {
                         if (!MenuOrderController.isAvailable(addItemCell.menuId)) {
                             int index = MenuOrderController.getPositionOf(addItemCell.menuId);
-                            if (index != -1) {
-                                MenuOrderController.addItem(addItemCell.menuId);
-                                int prevRecommendedHintHeaderRow = headerSuggestedOptionsRow;
-                                int prevRecommendedHintSectionRow = hintsDividerRow;
-                                index += menuHintsStartRow;
-                                updateRowsId();
-                                if (prevRecommendedHintHeaderRow != -1 && headerSuggestedOptionsRow == -1) {
-                                    listAdapter.notifyItemRangeRemoved(prevRecommendedHintHeaderRow, prevRecommendedHintSectionRow - prevRecommendedHintHeaderRow + 1);
-                                } else {
-                                    listAdapter.notifyItemRemoved(index);
+                            updateListAnimated(() -> {
+                                if (index != -1) {
+                                    MenuOrderController.addItem(addItemCell.menuId);
                                 }
-                                listAdapter.notifyItemInserted(menuItemsStartRow);
-                            } else {
-                                updateRowsId();
-                                listAdapter.notifyDataSetChanged();
-                            }
+                            });
                             if (MenuOrderController.IsDefaultPosition()) {
                                 menuItem.hideSubItem(2);
                             } else {
@@ -322,6 +294,114 @@ public class DrawerOrderSettings extends BaseSettingsActivity {
         public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
             super.clearView(recyclerView, viewHolder);
             viewHolder.itemView.setPressed(false);
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateListAnimated(Runnable callback) {
+        if (listAdapter == null) {
+            updateRowsId();
+            return;
+        }
+        DiffCallback diffCallback = new DiffCallback();
+        diffCallback.oldRowCount = rowCount;
+        diffCallback.fillPositions(diffCallback.oldPositionToItem);
+        diffCallback.oldMenuHints.clear();
+        diffCallback.oldMenuItems.clear();
+        diffCallback.oldMenuHints.add(null); // header
+        for (int i = 0; i < MenuOrderController.sizeHints(); i++) {
+            diffCallback.oldMenuHints.add(MenuOrderController.getSingleNotAvailableMenuItem(i));
+        }
+        diffCallback.oldMenuHints.add(null); // divider
+        for (int i = 0; i < MenuOrderController.sizeAvailable(); i++) {
+            diffCallback.oldMenuItems.add(MenuOrderController.getSingleAvailableMenuItem(i));
+        }
+        diffCallback.oldMenuHintsStartRow = headerSuggestedOptionsRow;
+        diffCallback.oldMenuHintsEndRow = hintsDividerRow;
+        diffCallback.oldMenuItemsStartRow = menuItemsStartRow;
+        diffCallback.oldMenuItemsEndRow = menuItemsEndRow;
+        callback.run();
+        updateRowsId();
+        diffCallback.fillPositions(diffCallback.newPositionToItem);
+        try {
+            DiffUtil.calculateDiff(diffCallback).dispatchUpdatesTo(listAdapter);
+        } catch (Exception e) {
+            FileLog.e(e);
+            listAdapter.notifyDataSetChanged();
+        }
+        AndroidUtilities.updateVisibleRows(listView);
+    }
+
+    private class DiffCallback extends DiffUtil.Callback {
+        int oldRowCount;
+        SparseIntArray oldPositionToItem = new SparseIntArray();
+        SparseIntArray newPositionToItem = new SparseIntArray();
+        ArrayList<MenuOrderController.EditableMenuItem> oldMenuHints = new ArrayList<>();
+        ArrayList<MenuOrderController.EditableMenuItem> oldMenuItems = new ArrayList<>();
+        int oldMenuHintsStartRow;
+        int oldMenuHintsEndRow;
+        int oldMenuItemsStartRow;
+        int oldMenuItemsEndRow;
+
+        @Override
+        public int getOldListSize() {
+            return oldRowCount;
+        }
+
+        @Override
+        public int getNewListSize() {
+            return rowCount;
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            if (newItemPosition >= menuHintsStartRow && newItemPosition < menuHintsEndRow) {
+                if (oldItemPosition >= oldMenuHintsStartRow && oldItemPosition < oldMenuHintsEndRow) {
+                    MenuOrderController.EditableMenuItem oldItem = oldMenuHints.get(oldItemPosition - oldMenuHintsStartRow);
+                    MenuOrderController.EditableMenuItem newItem = MenuOrderController.getSingleNotAvailableMenuItem(newItemPosition - menuHintsStartRow);
+                    if (oldItem == null || newItem == null) {
+                        return false;
+                    }
+                    return Objects.equals(oldItem.id, newItem.id);
+                }
+            }
+            if (newItemPosition >= menuItemsStartRow && newItemPosition < menuItemsEndRow) {
+                if (oldItemPosition >= oldMenuItemsStartRow && oldItemPosition < oldMenuItemsEndRow) {
+                    MenuOrderController.EditableMenuItem oldItem = oldMenuItems.get(oldItemPosition - oldMenuItemsStartRow);
+                    MenuOrderController.EditableMenuItem newItem = MenuOrderController.getSingleAvailableMenuItem(newItemPosition - menuItemsStartRow);
+                    if (oldItem == null || newItem == null) {
+                        return false;
+                    }
+                    return Objects.equals(oldItem.id, newItem.id);
+                }
+            }
+            int oldIndex = oldPositionToItem.get(oldItemPosition, -1);
+            int newIndex = newPositionToItem.get(newItemPosition, -1);
+            return oldIndex == newIndex && oldIndex >= 0;
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return areItemsTheSame(oldItemPosition, newItemPosition);
+        }
+
+        public void fillPositions(SparseIntArray sparseIntArray) {
+            sparseIntArray.clear();
+            int pointer = 0;
+
+            put(++pointer, headerHintRow, sparseIntArray);
+            if (MenuOrderController.sizeHints() > 0) {
+                put(++pointer, headerSuggestedOptionsRow, sparseIntArray);
+                put(++pointer, hintsDividerRow, sparseIntArray);
+            }
+            put(++pointer, headerMenuRow, sparseIntArray);
+            put(++pointer, menuItemsDividerRow, sparseIntArray);
+        }
+
+        private void put(int id, int position, SparseIntArray sparseIntArray) {
+            if (position >= 0) {
+                sparseIntArray.put(position, id);
+            }
         }
     }
 }

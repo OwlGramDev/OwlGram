@@ -101,7 +101,7 @@ public class MenuOrderController {
     }
 
     private static int getArrayPosition(String id, int startFrom) {
-        for (int i = startFrom; i < OwlConfig.drawerItems.size(); i++) {
+        for (int i = startFrom; i < OwlConfig.drawerItems.size() && startFrom >= 0; i++) {
             if (OwlConfig.drawerItems.get(i).equals(id)) {
                 return i;
             }
