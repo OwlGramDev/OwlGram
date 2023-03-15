@@ -374,7 +374,7 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
                         items.add(new Item(203, data.text, R.drawable.datacenter_status));
                         break;
                     case "qr_login":
-                        items.add(new Item(204, LocaleController.getString("AuthAnotherClient", R.string.AuthAnotherClient), R.drawable.msg_qrcode));
+                        items.add(new Item(204, data.text, R.drawable.msg_qrcode));
                         break;
                     case "set_status":
                         if (me != null && me.isPremium()) {
@@ -384,6 +384,15 @@ public class DrawerLayoutAdapter extends RecyclerListView.SelectionAdapter {
                                 items.add(new Item(15, LocaleController.getString("SetEmojiStatus", R.string.SetEmojiStatus), 0, R.raw.emoji_status_set_to_change));
                             }
                         }
+                        break;
+                    case "connected_devices":
+                        items.add(new Item(205, data.text, R.drawable.msg2_devices));
+                        break;
+                    case "power_usage":
+                        items.add(new Item(206, data.text, R.drawable.msg2_battery));
+                        break;
+                    case "proxy_settings":
+                        items.add(new Item(207, data.text, R.drawable.msg2_proxy));
                         break;
                     case "divider":
                         boolean foundPreviousDivider = false;

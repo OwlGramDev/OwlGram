@@ -666,6 +666,15 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                         drawerLayoutContainer.setAllowOpenDrawer(true, false);
                     }
                     drawerLayoutContainer.closeDrawer(false);
+                } else if (id == 205) {
+                    presentFragment(new SessionsActivity(0));
+                    drawerLayoutContainer.closeDrawer(false);
+                } else if (id == 206) {
+                    presentFragment(new LiteModeSettingsActivity());
+                    drawerLayoutContainer.closeDrawer(false);
+                } else if (id == 207) {
+                    presentFragment(new ProxyListActivity());
+                    drawerLayoutContainer.closeDrawer(false);
                 }
             }
         });

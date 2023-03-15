@@ -26,6 +26,9 @@ public class MenuOrderController {
             "datacenter_status",
             "qr_login",
             "set_status",
+            "connected_devices",
+            "power_usage",
+            "proxy_settings",
     };
 
     static {
@@ -208,121 +211,66 @@ public class MenuOrderController {
         return -1;
     }
 
+    private static String getText(String id) {
+        switch (id) {
+            case "new_group":
+                return LocaleController.getString("NewGroup", R.string.NewGroup);
+            case "contacts":
+                return LocaleController.getString("Contacts", R.string.Contacts);
+            case "calls":
+                return LocaleController.getString("Calls", R.string.Calls);
+            case "nearby_people":
+                return LocaleController.getString("PeopleNearby", R.string.PeopleNearby);
+            case "saved_message":
+                return LocaleController.getString("SavedMessages", R.string.SavedMessages);
+            case "settings":
+                return LocaleController.getString("Settings", R.string.Settings);
+            case "owlgram_settings":
+                return LocaleController.getString("OwlSetting", R.string.OwlSetting);
+            case "new_channel":
+                return LocaleController.getString("NewChannel", R.string.NewChannel);
+            case "new_secret_chat":
+                return LocaleController.getString("NewSecretChat", R.string.NewSecretChat);
+            case "invite_friends":
+                return LocaleController.getString("InviteFriends", R.string.InviteFriends);
+            case "telegram_features":
+                return LocaleController.getString("TelegramFeatures", R.string.TelegramFeatures);
+            case "archived_messages":
+                return LocaleController.getString("ArchivedChats", R.string.ArchivedChats);
+            case "datacenter_status":
+                return LocaleController.getString("DatacenterStatus", R.string.DatacenterStatus);
+            case "qr_login":
+                return LocaleController.getString("AuthAnotherClient", R.string.AuthAnotherClient);
+            case "set_status":
+                return LocaleController.getString("SetEmojiStatus", R.string.SetEmojiStatus);
+            case "connected_devices":
+                return LocaleController.getString("Devices", R.string.Devices);
+            case "power_usage":
+                return LocaleController.getString("PowerUsage", R.string.PowerUsage);
+            case "proxy_settings":
+                return LocaleController.getString("ProxySettings", R.string.ProxySettings);
+        }
+        throw new RuntimeException("Unknown id: " + id);
+    }
+
     public static ArrayList<EditableMenuItem> getMenuItemsEditable() {
         ArrayList<EditableMenuItem> list = new ArrayList<>();
-        list.add(
-                new EditableMenuItem(
-                        list_items[14],
-                        LocaleController.getString("SetEmojiStatus", R.string.SetEmojiStatus),
-                        false,
-                        true
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[0],
-                        LocaleController.getString("NewGroup", R.string.NewGroup),
-                        false
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[1],
-                        LocaleController.getString("Contacts", R.string.Contacts),
-                        true
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[2],
-                        LocaleController.getString("Calls", R.string.Calls),
-                        true
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[3],
-                        LocaleController.getString("PeopleNearby", R.string.PeopleNearby),
-                        false
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[4],
-                        LocaleController.getString("SavedMessages", R.string.SavedMessages),
-                        false
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[5],
-                        LocaleController.getString("Settings", R.string.Settings),
-                        true
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[6],
-                        LocaleController.getString("OwlSetting", R.string.OwlSetting),
-                        false
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[7],
-                        LocaleController.getString("NewChannel", R.string.NewChannel),
-                        false
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[8],
-                        LocaleController.getString("NewSecretChat", R.string.NewSecretChat),
-                        false
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[9],
-                        LocaleController.getString("InviteFriends", R.string.InviteFriends),
-                        false
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[10],
-                        LocaleController.getString("TelegramFeatures", R.string.TelegramFeatures),
-                        false
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[11],
-                        LocaleController.getString("ArchivedChats", R.string.ArchivedChats),
-                        false
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[12],
-                        LocaleController.getString("DatacenterStatus", R.string.DatacenterStatus),
-                        false
-                )
-        );
-        list.add(
-                new EditableMenuItem(
-                        list_items[13],
-                        LocaleController.getString("AuthAnotherClient", R.string.AuthAnotherClient),
-                        false
-                )
-        );
+        for (String id : list_items) {
+            list.add(
+                    new EditableMenuItem(
+                            id,
+                            getText(id),
+                            "settings".equals(id),
+                            "set_status".equals(id)
+                    )
+            );
+        }
         for (String id : OwlConfig.drawerItems) {
             if (id.equals(DIVIDER_ITEM)) {
                 list.add(
                         new EditableMenuItem(
                                 DIVIDER_ITEM,
-                                LocaleController.getString("Divider", R.string.Divider),
-                                false
+                                LocaleController.getString("Divider", R.string.Divider)
                         )
                 );
             }
@@ -352,8 +300,8 @@ public class MenuOrderController {
         public final boolean isDefault;
         public final boolean isPremium;
 
-        public EditableMenuItem(String menu_id, String menu_text, boolean menu_default) {
-            this(menu_id, menu_text, menu_default, false);
+        public EditableMenuItem(String menu_id, String menu_text) {
+            this(menu_id, menu_text, false, false);
         }
 
         public EditableMenuItem(String menu_id, String menu_text, boolean menu_default, boolean is_premium) {
