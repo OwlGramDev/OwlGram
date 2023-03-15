@@ -440,7 +440,7 @@ public class SettingsController extends SharedPreferencesHelper {
         for (Field field : fields) {
             String key = field.getName();
             try {
-                if ((isBackupAvailable(key) || isInternal) && isNotDeprecatedConfig(key)) {
+                if (((isBackupAvailable(key) || isInternal) && isNotDeprecatedConfig(key) && field.isAccessible())) {
                     settingsBackup.put(key, field.get(Object.class));
                 }
             } catch (Exception e) {
