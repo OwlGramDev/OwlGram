@@ -170,7 +170,7 @@ public class OwlConfig extends SettingsController {
             remindedUpdate = getInt("remindedUpdate", 0);
             translationTarget = getString("translationTarget", "app");
             translationKeyboardTarget = getString("translationKeyboardTarget", "app");
-            updateData = OptionalMagic.readParams(getByteArray("updateData"), new OWLENC.UpdateAvailable());
+            updateData = OptionalMagic.of(getByteArray("updateData"), magicException);
             drawerItems.readParams(getByteArray("drawerItems"), magicException);
             oldDownloadedVersion = getInt("oldDownloadedVersion", 0);
             eventType = getInt("eventType", 0);

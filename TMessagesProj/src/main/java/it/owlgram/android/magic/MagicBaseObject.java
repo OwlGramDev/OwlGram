@@ -123,6 +123,10 @@ public abstract class MagicBaseObject {
         return result;
     }
 
+    protected Object readObject(AbstractSerializedData stream, boolean exception) throws SkipException {
+        return readObject(stream, stream.readInt32(exception), exception);
+    }
+
     private Object readObject(AbstractSerializedData stream, int constructor, boolean exception) throws SkipException {
         switch (constructor) {
             case VECTOR_CONSTRUCTOR:
@@ -226,7 +230,7 @@ public abstract class MagicBaseObject {
         }
     }
 
-    private void serializeObject(Object object, AbstractSerializedData stream) {
+    protected void serializeObject(Object object, AbstractSerializedData stream) {
         if (object instanceof Field) {
             try {
                 Field field = (Field) object;

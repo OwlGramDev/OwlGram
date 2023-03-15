@@ -10,36 +10,27 @@ public class OptionalMagic<T> extends MagicBaseObject {
     private static final OptionalMagic<?> EMPTY = new OptionalMagic<>();
     private T value;
 
-    private OptionalMagic() {
-        this.value = null;
-    }
-
     public static<T> OptionalMagic<T> empty() {
         @SuppressWarnings("unchecked")
         OptionalMagic<T> t = (OptionalMagic<T>) EMPTY;
         return t;
     }
 
-    private OptionalMagic(T value) {
-        this.value = Objects.requireNonNull(value);
-    }
-
-    public static <T> OptionalMagic<T> readParams(byte[] stream, T object) {
-        if (object instanceof MagicBaseObject) {
-            try {
-                ((MagicBaseObject) object).readParams(stream, true);
-                return new OptionalMagic<>(object);
-            } catch (RuntimeException ignored) {}
-        }
-        return empty();
+    public static <T> OptionalMagic<T> of(byte[] stream, boolean exception) {
+        OptionalMagic<T> optional = empty();
+        optional.readParams(stream, exception);
+        return optional;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void readParams(AbstractSerializedData stream, int constructor, boolean exception) {
         if (stream.readBool(exception)) {
-            if (value instanceof MagicBaseObject) {
-                ((MagicBaseObject) value).readParams(stream, exception);
-            }
+            try {
+                value = (T) readObject(stream, exception);
+            } catch (SkipException ignored) {}
+        } else {
+            value = null;
         }
     }
 
@@ -48,9 +39,7 @@ public class OptionalMagic<T> extends MagicBaseObject {
         stream.writeInt32(getConstructor());
         stream.writeBool(isPresent());
         if (isPresent()) {
-            if (value instanceof MagicBaseObject) {
-                ((MagicBaseObject) value).serializeToStream(stream);
-            }
+            serializeObject(value, stream);
         }
     }
 
