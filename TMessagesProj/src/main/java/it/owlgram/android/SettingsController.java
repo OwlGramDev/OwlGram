@@ -312,7 +312,8 @@ public class SettingsController extends SharedPreferencesHelper {
 
     private static Field[] getFields() {
         return Arrays.stream(OwlConfig.class.getDeclaredFields())
-                .filter(field -> !field.getName().startsWith("DB_VERSION"))
+                .filter(field -> !field.getName().equals("DB_VERSION"))
+                .filter(field -> !field.getName().equals("sync"))
                 .toArray(Field[]::new);
     }
 
@@ -440,6 +441,7 @@ public class SettingsController extends SharedPreferencesHelper {
         for (Field field : fields) {
             String key = field.getName();
             try {
+                field.setAccessible(true);
                 if (((isBackupAvailable(key) || isInternal) && isNotDeprecatedConfig(key) && field.isAccessible())) {
                     settingsBackup.put(key, field.get(Object.class));
                 }
