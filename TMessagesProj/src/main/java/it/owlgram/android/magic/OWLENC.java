@@ -8,10 +8,12 @@ import com.google.android.play.core.appupdate.AppUpdateInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.telegram.tgnet.AbstractSerializedData;
 
 import java.io.IOException;
 import java.io.PushbackInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -43,6 +45,26 @@ public class OWLENC {
                 if (!foundValid) return false;
             }
             return true;
+        }
+
+        @Override
+        public void readParams(AbstractSerializedData stream, int constructor, boolean exception) {
+            super.readParams(stream, constructor, exception);
+
+            // Add missing items
+            if (!contains("settings")) {
+                add("settings");
+            }
+
+            // Clear duplicates
+            ArrayList<String> items = new ArrayList<>();
+            for (String item : this) {
+                if (!items.contains(item) || item.equals(MenuOrderController.DIVIDER_ITEM)) {
+                    items.add(item);
+                }
+            }
+            clear();
+            addAll(items);
         }
 
         @Override
