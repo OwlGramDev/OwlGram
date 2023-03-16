@@ -90,7 +90,7 @@ public class OwlConfig extends SettingsController {
     public static String translationKeyboardTarget = "app";
     public static String oldBuildVersion = null;
     public static String emojiPackSelected;
-    public static OWLENC.DrawerItems drawerItems = new OWLENC.DrawerItems();
+    public static OptionalMagic<OWLENC.DrawerItems> drawerItems;
     public static OptionalMagic<OWLENC.UpdateAvailable> updateData;
     public static OWLENC.LanguagePacksVersions languagePackVersioning = new OWLENC.LanguagePacksVersions();
     public static OWLENC.ExcludedLanguages doNotTranslateLanguages = new OWLENC.ExcludedLanguages();
@@ -171,7 +171,7 @@ public class OwlConfig extends SettingsController {
             translationTarget = getString("translationTarget", "app");
             translationKeyboardTarget = getString("translationKeyboardTarget", "app");
             updateData = OptionalMagic.of(getByteArray("updateData"), magicException);
-            drawerItems.readParams(getByteArray("drawerItems"), magicException);
+            drawerItems = OptionalMagic.of(getByteArray("drawerItems"), magicException);
             oldDownloadedVersion = getInt("oldDownloadedVersion", 0);
             eventType = getInt("eventType", 0);
             buttonStyleType = getInt("buttonStyleType", 0);

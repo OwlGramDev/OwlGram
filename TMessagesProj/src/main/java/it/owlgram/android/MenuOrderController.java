@@ -5,6 +5,8 @@ import org.telegram.messenger.R;
 
 import java.util.ArrayList;
 
+import it.owlgram.android.magic.OWLENC;
+
 public class MenuOrderController {
     private static final Object sync = new Object();
 
@@ -45,7 +47,7 @@ public class MenuOrderController {
             if (configLoaded) {
                 return;
             }
-            if (OwlConfig.drawerItems.size() == 0) {
+            if (OwlConfig.drawerItems.isEmpty()) {
                 loadDefaultItems();
             }
             configLoaded = true;
@@ -69,8 +71,10 @@ public class MenuOrderController {
     }
 
     public static void resetToDefaultPosition() {
-        OwlConfig.drawerItems.clear();
-        loadDefaultItems();
+        if (OwlConfig.drawerItems.isPresent()) {
+            OwlConfig.drawerItems.get().clear();
+            loadDefaultItems();
+        }
     }
 
     public static boolean IsDefaultPosition() {
@@ -89,9 +93,10 @@ public class MenuOrderController {
     }
 
     private static void loadDefaultItems() {
+        OwlConfig.drawerItems.set(new OWLENC.DrawerItems());
         String[] defaultItems = getDefaultItems();
         for (String defaultItem : defaultItems) {
-            OwlConfig.drawerItems.add(defaultItem);
+            OwlConfig.drawerItems.get().add(defaultItem);
         }
         OwlConfig.applyDrawerItems();
     }
@@ -101,9 +106,11 @@ public class MenuOrderController {
     }
 
     private static int getArrayPosition(String id, int startFrom) {
-        for (int i = startFrom; i < OwlConfig.drawerItems.size() && startFrom >= 0; i++) {
-            if (OwlConfig.drawerItems.get(i).equals(id)) {
-                return i;
+        if (OwlConfig.drawerItems.isPresent()) {
+            for (int i = startFrom; i < OwlConfig.drawerItems.get().size() && startFrom >= 0; i++) {
+                if (OwlConfig.drawerItems.get().get(i).equals(id)) {
+                    return i;
+                }
             }
         }
         return -1;
@@ -114,18 +121,23 @@ public class MenuOrderController {
     }
 
     public static int getPositionItem(String id, boolean isDefault, int startFrom) {
-        int position = getArrayPosition(id, startFrom);
-        if (position == -1 && isDefault) {
-            position = 0;
-            OwlConfig.drawerItems.add(id);
-            OwlConfig.applyDrawerItems();
+        if (OwlConfig.drawerItems.isPresent()) {
+            int position = getArrayPosition(id, startFrom);
+            if (position == -1 && isDefault) {
+                position = 0;
+                OwlConfig.drawerItems.get().add(id);
+                OwlConfig.applyDrawerItems();
+            }
+            return position;
         }
-        return position;
+        return -1;
     }
 
     public static void changePosition(int oldPosition, int newPosition) {
-        OwlConfig.drawerItems.move(oldPosition, newPosition);
-        OwlConfig.applyDrawerItems();
+        if (OwlConfig.drawerItems.isPresent()) {
+            OwlConfig.drawerItems.get().move(oldPosition, newPosition);
+            OwlConfig.applyDrawerItems();
+        }
     }
 
     public static EditableMenuItem getSingleAvailableMenuItem(int position) {
@@ -265,14 +277,16 @@ public class MenuOrderController {
                     )
             );
         }
-        for (String id : OwlConfig.drawerItems) {
-            if (id.equals(DIVIDER_ITEM)) {
-                list.add(
-                        new EditableMenuItem(
-                                DIVIDER_ITEM,
-                                LocaleController.getString("Divider", R.string.Divider)
-                        )
-                );
+        if (OwlConfig.drawerItems.isPresent()) {
+            for (String id : OwlConfig.drawerItems.get()) {
+                if (id.equals(DIVIDER_ITEM)) {
+                    list.add(
+                            new EditableMenuItem(
+                                    DIVIDER_ITEM,
+                                    LocaleController.getString("Divider", R.string.Divider)
+                            )
+                    );
+                }
             }
         }
         return list;
@@ -285,13 +299,17 @@ public class MenuOrderController {
     }
 
     private static void addAsFirst(String id) {
-        OwlConfig.drawerItems.add(0, id);
-        OwlConfig.applyDrawerItems();
+        if (OwlConfig.drawerItems.isPresent()) {
+            OwlConfig.drawerItems.get().add(0, id);
+            OwlConfig.applyDrawerItems();
+        }
     }
 
     public static void removeItem(int position) {
-        OwlConfig.drawerItems.remove(position);
-        OwlConfig.applyDrawerItems();
+        if (OwlConfig.drawerItems.isPresent()) {
+            OwlConfig.drawerItems.get().remove(position);
+            OwlConfig.applyDrawerItems();
+        }
     }
 
     public static class EditableMenuItem {
