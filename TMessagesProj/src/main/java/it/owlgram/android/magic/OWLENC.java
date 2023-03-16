@@ -30,6 +30,7 @@ public class OWLENC {
                     add(items.getString(i));
                 }
             } catch (JSONException ignored){}
+            fixItems();
         }
 
         @Override
@@ -50,7 +51,10 @@ public class OWLENC {
         @Override
         public void readParams(AbstractSerializedData stream, int constructor, boolean exception) {
             super.readParams(stream, constructor, exception);
+            fixItems();
+        }
 
+        private void fixItems() {
             // Add missing items
             if (!contains("settings")) {
                 add("settings");
@@ -65,6 +69,12 @@ public class OWLENC {
             }
             clear();
             addAll(items);
+        }
+
+        @Override
+        protected void serializeToStream(AbstractSerializedData stream) {
+            fixItems();
+            super.serializeToStream(stream);
         }
 
         @Override
