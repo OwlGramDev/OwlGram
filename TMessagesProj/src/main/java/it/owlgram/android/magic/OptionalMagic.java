@@ -7,17 +7,16 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class OptionalMagic<T> extends MagicBaseObject {
-    private static final OptionalMagic<?> EMPTY = new OptionalMagic<>();
     private T value;
 
-    public static<T> OptionalMagic<T> empty() {
-        @SuppressWarnings("unchecked")
-        OptionalMagic<T> t = (OptionalMagic<T>) EMPTY;
-        return t;
+    public static <T> OptionalMagic<T> of(T value) {
+        OptionalMagic<T> optional = new OptionalMagic<>();
+        optional.value = value;
+        return optional;
     }
 
     public static <T> OptionalMagic<T> of(byte[] stream, boolean exception) {
-        OptionalMagic<T> optional = empty();
+        OptionalMagic<T> optional = new OptionalMagic<>();
         optional.readParams(stream, exception);
         return optional;
     }

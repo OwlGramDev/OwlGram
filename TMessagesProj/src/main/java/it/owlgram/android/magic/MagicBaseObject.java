@@ -148,7 +148,7 @@ public abstract class MagicBaseObject {
             case BYTES_CONSTRUCTOR:
                 return stream.readByteArray(exception);
             case OPTIONAL_CONSTRUCTOR:
-                OptionalMagic<?> obj = OptionalMagic.empty();
+                OptionalMagic<?> obj = new OptionalMagic<>();
                 obj.readParams(stream, constructor, exception);
                 return obj;
         }
