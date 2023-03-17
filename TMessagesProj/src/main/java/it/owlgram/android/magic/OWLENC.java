@@ -305,13 +305,18 @@ public class OWLENC {
 
         public void migrate() {
             if (settings.containsKey("drawerItems")) {
+                OptionalMagic<DrawerItems> optionalMagic = new OptionalMagic<>();
                 if (settings.get("drawerItems") instanceof String) {
                     DrawerItems drawerItems = new DrawerItems();
                     drawerItems.migrate((String) settings.get("drawerItems"));
-                    settings.put("drawerItems", OptionalMagic.of(drawerItems));
+                    optionalMagic.set(drawerItems);
                 } else if (settings.get("drawerItems") instanceof DrawerItems) {
-                    settings.put("drawerItems", OptionalMagic.of((DrawerItems) settings.get("drawerItems")));
+                    optionalMagic.set((DrawerItems) settings.get("drawerItems"));
                 }
+                if (optionalMagic.isPresent() && optionalMagic.get().size() == 0) {
+                    optionalMagic.set(null);
+                }
+                settings.put("drawerItems", optionalMagic);
             }
 
             if (settings.containsKey("confirmStickersGIFs") || settings.containsKey("sendConfirm")) {
