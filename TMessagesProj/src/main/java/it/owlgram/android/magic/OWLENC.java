@@ -304,10 +304,14 @@ public class OWLENC {
         }
 
         public void migrate() {
-            if (settings.containsKey("drawerItems") && settings.get("drawerItems") instanceof String) {
-                DrawerItems drawerItems = new DrawerItems();
-                drawerItems.migrate((String) settings.get("drawerItems"));
-                settings.put("drawerItems", drawerItems);
+            if (settings.containsKey("drawerItems")) {
+                if (settings.get("drawerItems") instanceof String) {
+                    DrawerItems drawerItems = new DrawerItems();
+                    drawerItems.migrate((String) settings.get("drawerItems"));
+                    settings.put("drawerItems", OptionalMagic.of(drawerItems));
+                } else if (settings.get("drawerItems") instanceof DrawerItems) {
+                    settings.put("drawerItems", OptionalMagic.of((DrawerItems) settings.get("drawerItems")));
+                }
             }
 
             if (settings.containsKey("confirmStickersGIFs") || settings.containsKey("sendConfirm")) {
