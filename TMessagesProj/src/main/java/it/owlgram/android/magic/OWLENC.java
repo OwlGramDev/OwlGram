@@ -30,7 +30,6 @@ public class OWLENC {
                     add(items.getString(i));
                 }
             } catch (JSONException ignored){}
-            fixItems();
         }
 
         @Override
@@ -51,10 +50,9 @@ public class OWLENC {
         @Override
         public void readParams(AbstractSerializedData stream, int constructor, boolean exception) {
             super.readParams(stream, constructor, exception);
-            fixItems();
         }
 
-        private void fixItems() {
+        public void fixItems() {
             // Add missing items
             if (!contains("settings")) {
                 add("settings");
@@ -73,7 +71,6 @@ public class OWLENC {
 
         @Override
         protected void serializeToStream(AbstractSerializedData stream) {
-            fixItems();
             super.serializeToStream(stream);
         }
 
@@ -315,6 +312,9 @@ public class OWLENC {
                 }
                 if (optionalMagic.isPresent() && optionalMagic.get().size() == 0) {
                     optionalMagic.set(null);
+                }
+                if (optionalMagic.isPresent()) {
+                    optionalMagic.get().fixItems();
                 }
                 settings.put("drawerItems", optionalMagic);
             }
