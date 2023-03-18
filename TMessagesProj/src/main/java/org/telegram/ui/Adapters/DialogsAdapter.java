@@ -1233,7 +1233,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             itemInternals.add(new ItemInternal(VIEW_TYPE_SHADOW));
             itemInternals.add(new ItemInternal(VIEW_TYPE_HEADER));
             itemInternals.add(new ItemInternal(VIEW_TYPE_CONTACTS_FLICKER));
-        } else if (onlineContacts != null) {
+        } else if (onlineContacts != null && !onlineContacts.isEmpty()) {
             if (dialogsCount == 0) {
                 isEmpty = true;
                 itemInternals.add(new ItemInternal(requestPeerType == null ? VIEW_TYPE_EMPTY : VIEW_TYPE_REQUIRED_EMPTY));
@@ -1245,11 +1245,11 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
                 }
                 itemInternals.add(new ItemInternal(VIEW_TYPE_SHADOW));
                 itemInternals.add(new ItemInternal(VIEW_TYPE_HEADER));
-                for (int k = 0; k < onlineContacts.size(); k++) {
-                    itemInternals.add(new ItemInternal(VIEW_TYPE_USER, onlineContacts.get(k)));
-                }
-                itemInternals.add(new ItemInternal(VIEW_TYPE_LAST_EMPTY));
             }
+            for (int k = 0; k < onlineContacts.size(); k++) {
+                itemInternals.add(new ItemInternal(VIEW_TYPE_USER, onlineContacts.get(k)));
+            }
+            itemInternals.add(new ItemInternal(VIEW_TYPE_LAST_EMPTY));
             stopUpdate = true;
         } else if (hasHints) {
             int count = MessagesController.getInstance(currentAccount).hintDialogs.size();
@@ -1280,20 +1280,22 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
                     itemInternals.add(new ItemInternal(VIEW_TYPE_DIALOG, array.get(k)));
                 }
             }
-        }
 
-        if (!forceShowEmptyCell && dialogsType != 7 && dialogsType != 8 && !MessagesController.getInstance(currentAccount).isDialogsEndReached(folderId)) {
-            itemInternals.add(new ItemInternal(VIEW_TYPE_FLICKER));
-        } else if (dialogsCount == 0) {
-            isEmpty = true;
-            itemInternals.add(new ItemInternal(requestPeerType == null ? VIEW_TYPE_EMPTY : VIEW_TYPE_REQUIRED_EMPTY));
-        } else {
-            if (folderId == 0 && dialogsCount > MIN_SHOW_COUNTER) {
-                itemInternals.add(new ItemInternal(VIEW_TYPE_NEW_CHAT_HINT));
-            } else if (folderId == 1 && dialogsCount > MIN_SHOW_COUNTER) {
-                itemInternals.add(new ItemInternal(VIEW_TYPE_SHADOW));
+            if (!forceShowEmptyCell && dialogsType != 7 && dialogsType != 8 && !MessagesController.getInstance(currentAccount).isDialogsEndReached(folderId)) {
+                if (dialogsCount != 0) {
+                    itemInternals.add(new ItemInternal(VIEW_TYPE_FLICKER));
+                }
+            } else if (dialogsCount == 0) {
+                isEmpty = true;
+                itemInternals.add(new ItemInternal(requestPeerType == null ? VIEW_TYPE_EMPTY : VIEW_TYPE_REQUIRED_EMPTY));
+            } else {
+                if (folderId == 0 && dialogsCount > MIN_SHOW_COUNTER) {
+                    itemInternals.add(new ItemInternal(VIEW_TYPE_NEW_CHAT_HINT));
+                } else if (folderId == 1 && dialogsCount > MIN_SHOW_COUNTER) {
+                    itemInternals.add(new ItemInternal(VIEW_TYPE_SHADOW));
+                }
+                itemInternals.add(new ItemInternal(VIEW_TYPE_LAST_EMPTY));
             }
-            itemInternals.add(new ItemInternal(VIEW_TYPE_LAST_EMPTY));
         }
     }
 }
