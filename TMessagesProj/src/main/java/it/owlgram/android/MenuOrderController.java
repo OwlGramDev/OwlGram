@@ -1,12 +1,9 @@
 package it.owlgram.android;
 
-import com.google.android.exoplayer2.util.Log;
-
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import it.owlgram.android.magic.OWLENC;
 
