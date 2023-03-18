@@ -8,7 +8,6 @@ import com.google.android.play.core.appupdate.AppUpdateInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.telegram.tgnet.AbstractSerializedData;
 
 import java.io.IOException;
 import java.io.PushbackInputStream;
@@ -47,11 +46,6 @@ public class OWLENC {
             return true;
         }
 
-        @Override
-        public void readParams(AbstractSerializedData stream, int constructor, boolean exception) {
-            super.readParams(stream, constructor, exception);
-        }
-
         public void fixItems() {
             // Add missing items
             if (!contains("settings")) {
@@ -67,11 +61,6 @@ public class OWLENC {
             }
             clear();
             addAll(items);
-        }
-
-        @Override
-        protected void serializeToStream(AbstractSerializedData stream) {
-            super.serializeToStream(stream);
         }
 
         @Override
@@ -309,6 +298,11 @@ public class OWLENC {
                     optionalMagic.set(drawerItems);
                 } else if (settings.get("drawerItems") instanceof DrawerItems) {
                     optionalMagic.set((DrawerItems) settings.get("drawerItems"));
+                } else if (settings.get("drawerItems") instanceof OptionalMagic) {
+                    OptionalMagic<?> optionalMagic1 = (OptionalMagic<?>) settings.get("drawerItems");
+                    if (optionalMagic1 != null && optionalMagic1.isPresent()) {
+                        optionalMagic.set((DrawerItems) optionalMagic1.get());
+                    }
                 }
                 if (optionalMagic.isPresent() && optionalMagic.get().size() == 0) {
                     optionalMagic.set(null);

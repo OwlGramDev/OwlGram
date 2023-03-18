@@ -1,9 +1,12 @@
 package it.owlgram.android;
 
+import com.google.android.exoplayer2.util.Log;
+
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import it.owlgram.android.magic.OWLENC;
 
@@ -56,17 +59,17 @@ public class MenuOrderController {
 
     private static String[] getDefaultItems() {
         return new String[]{
-                list_items[14],
+                "set_status",
                 DIVIDER_ITEM,
-                list_items[0],
-                list_items[1],
-                list_items[2],
-                list_items[3],
-                list_items[4],
-                list_items[5],
+                "new_group",
+                "contacts",
+                "calls",
+                "nearby_people",
+                "saved_message",
+                "settings",
                 DIVIDER_ITEM,
-                list_items[9],
-                list_items[10],
+                "invite_friends",
+                "telegram_features",
         };
     }
 
@@ -116,19 +119,9 @@ public class MenuOrderController {
         return -1;
     }
 
-    public static int getPositionItem(String id, boolean isDefault) {
-        return getPositionItem(id, isDefault, 0);
-    }
-
-    public static int getPositionItem(String id, boolean isDefault, int startFrom) {
+    public static int getPositionItem(String id, int startFrom) {
         if (OwlConfig.drawerItems.isPresent()) {
-            int position = getArrayPosition(id, startFrom);
-            if (position == -1 && isDefault) {
-                position = 0;
-                OwlConfig.drawerItems.get().add(id);
-                OwlConfig.applyDrawerItems();
-            }
-            return position;
+            return getArrayPosition(id, startFrom);
         }
         return -1;
     }
@@ -143,7 +136,7 @@ public class MenuOrderController {
     public static EditableMenuItem getSingleAvailableMenuItem(int position) {
         ArrayList<EditableMenuItem> list = getMenuItemsEditable();
         for (int i = 0; i < list.size(); i++) {
-            if (getPositionItem(list.get(i).id, list.get(i).isDefault, position) == position) {
+            if (getPositionItem(list.get(i).id, position) == position) {
                 return list.get(i);
             }
         }
@@ -157,7 +150,7 @@ public class MenuOrderController {
     public static Boolean isAvailable(String id, int startFrom) {
         ArrayList<EditableMenuItem> list = getMenuItemsEditable();
         for (int i = 0; i < list.size(); i++) {
-            if (getPositionItem(list.get(i).id, list.get(i).isDefault, startFrom) != -1) {
+            if (getPositionItem(list.get(i).id, startFrom) != -1) {
                 if (list.get(i).id.equals(id)) {
                     return true;
                 }
@@ -170,7 +163,7 @@ public class MenuOrderController {
         ArrayList<EditableMenuItem> list = getMenuItemsEditable();
         int curr_pos = -1;
         for (int i = 0; i < list.size(); i++) {
-            if (getPositionItem(list.get(i).id, list.get(i).isDefault) == -1) {
+            if (getPositionItem(list.get(i).id, 0) == -1) {
                 curr_pos++;
             }
             if (curr_pos == position) {
@@ -184,7 +177,7 @@ public class MenuOrderController {
         ArrayList<EditableMenuItem> list = getMenuItemsEditable();
         int size = 0;
         for (int i = 0; i < list.size(); i++) {
-            if (getPositionItem(list.get(i).id, list.get(i).isDefault) == -1) {
+            if (getPositionItem(list.get(i).id, 0) == -1) {
                 size++;
             }
         }
@@ -195,7 +188,7 @@ public class MenuOrderController {
         ArrayList<EditableMenuItem> list = getMenuItemsEditable();
         int size = 0;
         for (int i = 0; i < list.size(); i++) {
-            if (getPositionItem(list.get(i).id, list.get(i).isDefault) != -1) {
+            if (getPositionItem(list.get(i).id, 0) != -1) {
                 size++;
             }
         }
@@ -206,7 +199,7 @@ public class MenuOrderController {
         ArrayList<EditableMenuItem> list = getMenuItemsEditable();
         int sizeNAv = 0;
         for (int i = 0; i < list.size(); i++) {
-            boolean isAv = getPositionItem(list.get(i).id, list.get(i).isDefault) != -1;
+            boolean isAv = getPositionItem(list.get(i).id, 0) != -1;
             if (list.get(i).id.equals(id) && !isAv) {
                 return sizeNAv;
             }
